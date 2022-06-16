@@ -25,6 +25,7 @@ docs/Computed.md
 docs/ContextualTupleKeys.md
 docs/CreateStoreRequest.md
 docs/CreateStoreResponse.md
+docs/Difference.md
 docs/ErrorCode.md
 docs/ExpandRequest.md
 docs/ExpandResponse.md
@@ -52,6 +53,7 @@ docs/TupleChange.md
 docs/TupleKey.md
 docs/TupleKeys.md
 docs/TupleOperation.md
+docs/TupleToUserset.md
 docs/TypeDefinition.md
 docs/TypeDefinitions.md
 docs/Users.md
@@ -60,8 +62,6 @@ docs/UsersetTree.md
 docs/UsersetTreeDifference.md
 docs/UsersetTreeTupleToUserset.md
 docs/Usersets.md
-docs/V1Difference.md
-docs/V1TupleToUserset.md
 docs/ValidationErrorMessageResponse.md
 docs/WriteAssertionsRequest.md
 docs/WriteAuthorizationModelResponse.md
@@ -97,6 +97,7 @@ src/OpenFga.Sdk/Model/Computed.cs
 src/OpenFga.Sdk/Model/ContextualTupleKeys.cs
 src/OpenFga.Sdk/Model/CreateStoreRequest.cs
 src/OpenFga.Sdk/Model/CreateStoreResponse.cs
+src/OpenFga.Sdk/Model/Difference.cs
 src/OpenFga.Sdk/Model/ErrorCode.cs
 src/OpenFga.Sdk/Model/ExpandRequest.cs
 src/OpenFga.Sdk/Model/ExpandResponse.cs
@@ -123,6 +124,7 @@ src/OpenFga.Sdk/Model/TupleChange.cs
 src/OpenFga.Sdk/Model/TupleKey.cs
 src/OpenFga.Sdk/Model/TupleKeys.cs
 src/OpenFga.Sdk/Model/TupleOperation.cs
+src/OpenFga.Sdk/Model/TupleToUserset.cs
 src/OpenFga.Sdk/Model/TypeDefinition.cs
 src/OpenFga.Sdk/Model/TypeDefinitions.cs
 src/OpenFga.Sdk/Model/Users.cs
@@ -131,8 +133,6 @@ src/OpenFga.Sdk/Model/UsersetTree.cs
 src/OpenFga.Sdk/Model/UsersetTreeDifference.cs
 src/OpenFga.Sdk/Model/UsersetTreeTupleToUserset.cs
 src/OpenFga.Sdk/Model/Usersets.cs
-src/OpenFga.Sdk/Model/V1Difference.cs
-src/OpenFga.Sdk/Model/V1TupleToUserset.cs
 src/OpenFga.Sdk/Model/ValidationErrorMessageResponse.cs
 src/OpenFga.Sdk/Model/WriteAssertionsRequest.cs
 src/OpenFga.Sdk/Model/WriteAuthorizationModelResponse.cs

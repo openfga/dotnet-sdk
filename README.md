@@ -267,7 +267,7 @@ var response = await openFgaApi.ReadChanges(type, pageSize, continuationToken);
 | [**Read**](docs/OpenFgaApi.md#read) | **POST** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules |
 | [**ReadAssertions**](docs/OpenFgaApi.md#readassertions) | **GET** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID |
 | [**ReadAuthorizationModel**](docs/OpenFgaApi.md#readauthorizationmodel) | **GET** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model |
-| [**ReadAuthorizationModels**](docs/OpenFgaApi.md#readauthorizationmodels) | **GET** /stores/{store_id}/authorization-models | Return all the authorization model IDs for a particular store |
+| [**ReadAuthorizationModels**](docs/OpenFgaApi.md#readauthorizationmodels) | **GET** /stores/{store_id}/authorization-models | Return all the authorization models for a particular store |
 | [**ReadChanges**](docs/OpenFgaApi.md#readchanges) | **GET** /stores/{store_id}/changes | Return a list of all the tuple changes |
 | [**Write**](docs/OpenFgaApi.md#write) | **POST** /stores/{store_id}/write | Add or delete tuples from the store |
 | [**WriteAssertions**](docs/OpenFgaApi.md#writeassertions) | **PUT** /stores/{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID |
@@ -286,6 +286,7 @@ var response = await openFgaApi.ReadChanges(type, pageSize, continuationToken);
  - [Model.ContextualTupleKeys](docs/ContextualTupleKeys.md)
  - [Model.CreateStoreRequest](docs/CreateStoreRequest.md)
  - [Model.CreateStoreResponse](docs/CreateStoreResponse.md)
+ - [Model.Difference](docs/Difference.md)
  - [Model.ErrorCode](docs/ErrorCode.md)
  - [Model.ExpandRequest](docs/ExpandRequest.md)
  - [Model.ExpandResponse](docs/ExpandResponse.md)
@@ -312,6 +313,7 @@ var response = await openFgaApi.ReadChanges(type, pageSize, continuationToken);
  - [Model.TupleKey](docs/TupleKey.md)
  - [Model.TupleKeys](docs/TupleKeys.md)
  - [Model.TupleOperation](docs/TupleOperation.md)
+ - [Model.TupleToUserset](docs/TupleToUserset.md)
  - [Model.TypeDefinition](docs/TypeDefinition.md)
  - [Model.TypeDefinitions](docs/TypeDefinitions.md)
  - [Model.Users](docs/Users.md)
@@ -320,8 +322,6 @@ var response = await openFgaApi.ReadChanges(type, pageSize, continuationToken);
  - [Model.UsersetTreeDifference](docs/UsersetTreeDifference.md)
  - [Model.UsersetTreeTupleToUserset](docs/UsersetTreeTupleToUserset.md)
  - [Model.Usersets](docs/Usersets.md)
- - [Model.V1Difference](docs/V1Difference.md)
- - [Model.V1TupleToUserset](docs/V1TupleToUserset.md)
  - [Model.ValidationErrorMessageResponse](docs/ValidationErrorMessageResponse.md)
  - [Model.WriteAssertionsRequest](docs/WriteAssertionsRequest.md)
  - [Model.WriteAuthorizationModelResponse](docs/WriteAuthorizationModelResponse.md)

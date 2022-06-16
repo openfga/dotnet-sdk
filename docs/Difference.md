@@ -1,11 +1,11 @@
-# OpenFga.Sdk.Model.V1TupleToUserset
+# OpenFga.Sdk.Model.Difference
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Tupleset** | [**ObjectRelation**](ObjectRelation.md) |  | [optional] 
-**ComputedUserset** | [**ObjectRelation**](ObjectRelation.md) |  | [optional] 
+**Base** | [**Userset**](Userset.md) |  | [optional] 
+**Subtract** | [**Userset**](Userset.md) |  | [optional] 
 
 [[Back to Model list]](../README.md#models) [[Back to API list]](../README.md#api-endpoints) [[Back to README]](../README.md)
 

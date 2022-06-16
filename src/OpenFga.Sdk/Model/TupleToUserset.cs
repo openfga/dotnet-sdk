@@ -18,16 +18,16 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// V1TupleToUserset
+    /// TupleToUserset
     /// </summary>
-    [DataContract(Name = "v1.TupleToUserset")]
-    public partial class V1TupleToUserset : IEquatable<V1TupleToUserset>, IValidatableObject {
+    [DataContract(Name = "TupleToUserset")]
+    public partial class TupleToUserset : IEquatable<TupleToUserset>, IValidatableObject {
         /// <summary>
-        /// Initializes a new instance of the <see cref="V1TupleToUserset" /> class.
+        /// Initializes a new instance of the <see cref="TupleToUserset" /> class.
         /// </summary>
         /// <param name="tupleset">tupleset.</param>
         /// <param name="computedUserset">computedUserset.</param>
-        public V1TupleToUserset(ObjectRelation? tupleset = default(ObjectRelation), ObjectRelation? computedUserset = default(ObjectRelation)) {
+        public TupleToUserset(ObjectRelation? tupleset = default(ObjectRelation), ObjectRelation? computedUserset = default(ObjectRelation)) {
             this.Tupleset = tupleset;
             this.ComputedUserset = computedUserset;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -63,11 +63,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a V1TupleToUserset from the JSON string presentation of the object
+        /// Builds a TupleToUserset from the JSON string presentation of the object
         /// </summary>
-        /// <returns>V1TupleToUserset</returns>
-        public static V1TupleToUserset FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<V1TupleToUserset>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>TupleToUserset</returns>
+        public static TupleToUserset FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<TupleToUserset>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -76,15 +76,15 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as V1TupleToUserset);
+            return this.Equals(input as TupleToUserset);
         }
 
         /// <summary>
-        /// Returns true if V1TupleToUserset instances are equal
+        /// Returns true if TupleToUserset instances are equal
         /// </summary>
-        /// <param name="input">Instance of V1TupleToUserset to be compared</param>
+        /// <param name="input">Instance of TupleToUserset to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(V1TupleToUserset input) {
+        public bool Equals(TupleToUserset input) {
             if (input == null) {
                 return false;
             }

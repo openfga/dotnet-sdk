@@ -31,7 +31,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="union">union.</param>
         /// <param name="intersection">intersection.</param>
         /// <param name="difference">difference.</param>
-        public Userset(Object? _this = default(Object), ObjectRelation? computedUserset = default(ObjectRelation), V1TupleToUserset? tupleToUserset = default(V1TupleToUserset), Usersets? union = default(Usersets), Usersets? intersection = default(Usersets), V1Difference? difference = default(V1Difference)) {
+        public Userset(Object? _this = default(Object), ObjectRelation? computedUserset = default(ObjectRelation), TupleToUserset? tupleToUserset = default(TupleToUserset), Usersets? union = default(Usersets), Usersets? intersection = default(Usersets), Difference? difference = default(Difference)) {
             this.This = _this;
             this.ComputedUserset = computedUserset;
             this.TupleToUserset = tupleToUserset;
@@ -61,7 +61,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tupleToUserset", EmitDefaultValue = false)]
         [JsonPropertyName("tupleToUserset")]
-        public V1TupleToUserset TupleToUserset { get; set; }
+        public TupleToUserset TupleToUserset { get; set; }
 
         /// <summary>
         /// Gets or Sets Union
@@ -82,7 +82,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "difference", EmitDefaultValue = false)]
         [JsonPropertyName("difference")]
-        public V1Difference Difference { get; set; }
+        public Difference Difference { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

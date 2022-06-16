@@ -18,16 +18,16 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// V1Difference
+    /// Difference
     /// </summary>
-    [DataContract(Name = "v1.Difference")]
-    public partial class V1Difference : IEquatable<V1Difference>, IValidatableObject {
+    [DataContract(Name = "Difference")]
+    public partial class Difference : IEquatable<Difference>, IValidatableObject {
         /// <summary>
-        /// Initializes a new instance of the <see cref="V1Difference" /> class.
+        /// Initializes a new instance of the <see cref="Difference" /> class.
         /// </summary>
         /// <param name="_base">_base.</param>
         /// <param name="subtract">subtract.</param>
-        public V1Difference(Userset? _base = default(Userset), Userset? subtract = default(Userset)) {
+        public Difference(Userset? _base = default(Userset), Userset? subtract = default(Userset)) {
             this.Base = _base;
             this.Subtract = subtract;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -63,11 +63,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a V1Difference from the JSON string presentation of the object
+        /// Builds a Difference from the JSON string presentation of the object
         /// </summary>
-        /// <returns>V1Difference</returns>
-        public static V1Difference FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<V1Difference>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>Difference</returns>
+        public static Difference FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<Difference>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -76,15 +76,15 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as V1Difference);
+            return this.Equals(input as Difference);
         }
 
         /// <summary>
-        /// Returns true if V1Difference instances are equal
+        /// Returns true if Difference instances are equal
         /// </summary>
-        /// <param name="input">Instance of V1Difference to be compared</param>
+        /// <param name="input">Instance of Difference to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(V1Difference input) {
+        public bool Equals(Difference input) {
             if (input == null) {
                 return false;
             }
