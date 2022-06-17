@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpandResponse" /> class.
         /// </summary>
+        [JsonConstructor]
+        public ExpandResponse() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpandResponse" /> class.
+        /// </summary>
         /// <param name="tree">tree.</param>
         public ExpandResponse(UsersetTree? tree = default(UsersetTree)) {
             this.Tree = tree;
@@ -114,6 +122,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

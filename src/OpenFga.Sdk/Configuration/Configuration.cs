@@ -32,10 +32,6 @@ public class Configuration {
     /// </summary>
     /// <exception cref="FgaRequiredParamError"></exception>
     public void IsValid() {
-        if (string.IsNullOrWhiteSpace(StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(StoreId));
-        }
-
         if (string.IsNullOrWhiteSpace(ApiScheme)) {
             throw new FgaRequiredParamError("Configuration", nameof(ApiScheme));
         }
@@ -49,32 +45,11 @@ public class Configuration {
                 $"Configuration.ApiScheme ({ApiScheme}) and Configuration.ApiHost ({ApiHost}) do not form a valid URI ({BasePath})");
         }
 
-        if (!string.IsNullOrWhiteSpace(ClientId) || !string.IsNullOrWhiteSpace(ClientSecret)) {
-            if (string.IsNullOrWhiteSpace(ClientId)) {
-                throw new FgaRequiredParamError("Configuration", nameof(ClientId));
-            }
-
-            if (string.IsNullOrWhiteSpace(ClientSecret)) {
-                throw new FgaRequiredParamError("Configuration", nameof(ClientSecret));
-            }
-
-            if (string.IsNullOrWhiteSpace(ApiTokenIssuer)) {
-                throw new FgaRequiredParamError("Configuration", nameof(ApiTokenIssuer));
-            }
-
-            if (string.IsNullOrWhiteSpace(ApiAudience)) {
-                throw new FgaRequiredParamError("Configuration", nameof(ApiAudience));
-            }
-        }
-
-        if (!string.IsNullOrWhiteSpace(ApiTokenIssuer) && !IsWellFormedUriString($"https://{ApiTokenIssuer}")) {
-            throw new FgaValidationError(
-                $"Configuration.ApiTokenIssuer does not form a valid URI (https://{ApiTokenIssuer})");
-        }
-
         if (MaxRetry > 5) {
             throw new FgaValidationError("Configuration.MaxRetry exceeds maximum allowed limit of 5");
         }
+
+        Credentials?.IsValid();
     }
 
     #endregion
@@ -104,7 +79,7 @@ public class Configuration {
     /// </summary>
     /// <exception cref="FgaRequiredParamError"></exception>
     public Configuration() {
-        UserAgent = "openfga-sdk {sdkId}/{packageVersion}".Replace("{sdkId}", "dotnet").Replace("{packageVersion}", "0.0.1");
+        UserAgent = "openfga-sdk {sdkId}/{packageVersion}".Replace("{sdkId}", "dotnet").Replace("{packageVersion}", Version);
         DefaultHeaders ??= new Dictionary<string, string>();
 
         if (!DefaultHeaders.ContainsKey("User-Agent")) {
@@ -150,31 +125,13 @@ public class Configuration {
     ///     Gets or sets the Store ID.
     /// </summary>
     /// <value>Store ID.</value>
-    public string StoreId { get; set; }
+    public string? StoreId { get; set; }
 
     /// <summary>
-    ///     Gets or sets the Client ID.
+    ///     Gets or sets the Credentials
     /// </summary>
-    /// <value>Client ID.</value>
-    public string? ClientId { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the Client Secret.
-    /// </summary>
-    /// <value>Client Secret.</value>
-    public string? ClientSecret { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the API Token Issuer.
-    /// </summary>
-    /// <value>API Token Issuer.</value>
-    public string ApiTokenIssuer { get; set; } = null!;
-
-    /// <summary>
-    ///     Gets or sets the API Audience.
-    /// </summary>
-    /// <value>API Audience.</value>
-    public string ApiAudience { get; set; } = null!;
+    /// <value>Credentials.</value>
+    public Credentials? Credentials { get; set; }
 
     /// <summary>
     ///     Max number of times to retry after a request is rate limited

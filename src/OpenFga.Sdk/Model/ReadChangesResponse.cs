@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadChangesResponse" /> class.
         /// </summary>
+        [JsonConstructor]
+        public ReadChangesResponse() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadChangesResponse" /> class.
+        /// </summary>
         /// <param name="changes">changes.</param>
         /// <param name="continuationToken">continuationToken.</param>
         public ReadChangesResponse(List<TupleChange>? changes = default(List<TupleChange>), string? continuationToken = default(string)) {
@@ -132,6 +140,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

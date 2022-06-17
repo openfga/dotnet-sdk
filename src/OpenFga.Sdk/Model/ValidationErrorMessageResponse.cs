@@ -32,6 +32,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidationErrorMessageResponse" /> class.
         /// </summary>
+        [JsonConstructor]
+        public ValidationErrorMessageResponse() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValidationErrorMessageResponse" /> class.
+        /// </summary>
         /// <param name="code">code.</param>
         /// <param name="message">message.</param>
         public ValidationErrorMessageResponse(ErrorCode? code = default(ErrorCode?), string? message = default(string)) {
@@ -128,6 +136,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

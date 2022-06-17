@@ -26,9 +26,10 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="Assertion" /> class.
         /// </summary>
         [JsonConstructor]
-        protected Assertion() {
+        public Assertion() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Assertion" /> class.
         /// </summary>
@@ -135,6 +136,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="WriteRequest" /> class.
         /// </summary>
+        [JsonConstructor]
+        public WriteRequest() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WriteRequest" /> class.
+        /// </summary>
         /// <param name="writes">writes.</param>
         /// <param name="deletes">deletes.</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
@@ -148,6 +156,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

@@ -44,13 +44,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -124,13 +121,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -202,13 +196,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -279,13 +270,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -359,13 +347,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -437,13 +422,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -517,13 +499,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -597,13 +576,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -677,13 +653,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -757,13 +730,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -839,13 +809,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -923,13 +890,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -1003,13 +967,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
@@ -1084,13 +1045,10 @@ namespace Example
     {
         public static void Main()
         {
-            var configuration = new Configuration(storeId, environment) {
-                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"),
-                Host = Environment.GetEnvironmentVariable("OPENFGA_HOST"),
-                ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"), // optional, required if client id is passed
-                ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"), // optional, required if client id is passed
-                ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"), // optional
-                ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"), // optional, required if client id is passed
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);

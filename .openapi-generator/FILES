@@ -67,6 +67,7 @@ docs/WriteAssertionsRequest.md
 docs/WriteAuthorizationModelResponse.md
 docs/WriteRequest.md
 src/OpenFga.Sdk.Test/Api/OpenFgaApiTests.cs
+src/OpenFga.Sdk.Test/Models/ModelTests.cs
 src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj
 src/OpenFga.Sdk/Api/OpenFgaApi.cs
 src/OpenFga.Sdk/Client/ApiClient.cs
@@ -76,6 +77,7 @@ src/OpenFga.Sdk/Client/OAuth2Client.cs
 src/OpenFga.Sdk/Client/RequestBuilder.cs
 src/OpenFga.Sdk/Client/Utils.cs
 src/OpenFga.Sdk/Configuration/Configuration.cs
+src/OpenFga.Sdk/Configuration/Credentials.cs
 src/OpenFga.Sdk/Exceptions/ApiAuthenticationError.cs
 src/OpenFga.Sdk/Exceptions/ApiError.cs
 src/OpenFga.Sdk/Exceptions/ApiException.cs

@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckRequest" /> class.
         /// </summary>
+        [JsonConstructor]
+        public CheckRequest() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CheckRequest" /> class.
+        /// </summary>
         /// <param name="tupleKey">tupleKey.</param>
         /// <param name="contextualTuples">contextualTuples.</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
@@ -168,6 +176,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

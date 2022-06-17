@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Computed" /> class.
         /// </summary>
+        [JsonConstructor]
+        public Computed() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Computed" /> class.
+        /// </summary>
         /// <param name="userset">userset.</param>
         public Computed(string? userset = default(string)) {
             this.Userset = userset;
@@ -114,6 +122,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

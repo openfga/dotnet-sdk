@@ -25,17 +25,17 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Users" /> class.
         /// </summary>
-        /// <param name="users">users.</param>
-        public Users(List<string>? users = default(List<string>)) {
-            this._Users = users;
+        [JsonConstructor]
+        public Users() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Users" /> class.
         /// </summary>
-        [JsonConstructor]
-        public Users() {
+        /// <param name="users">users.</param>
+        public Users(List<string>? users = default(List<string>)) {
+            this._Users = users;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -123,6 +123,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

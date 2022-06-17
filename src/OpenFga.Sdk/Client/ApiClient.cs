@@ -11,6 +11,7 @@
 //
 
 
+using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 
 namespace OpenFga.Sdk.Client;
@@ -33,8 +34,20 @@ public class ApiClient : IDisposable {
         _configuration = configuration;
         _baseClient = new BaseClient(configuration, userHttpClient);
 
-        if (!string.IsNullOrEmpty(_configuration.ClientId)) {
-            _oauth2Client = new OAuth2Client(configuration, _baseClient);
+        if (configuration.Credentials == null) {
+            return;
+        }
+
+        switch (configuration.Credentials.Method) {
+            case CredentialsMethod.ApiToken:
+                configuration.DefaultHeaders.Add("Authorization", $"Bearer {configuration.Credentials.Config!.ApiToken}");
+                break;
+            case CredentialsMethod.ClientCredentials:
+                _oauth2Client = new OAuth2Client(configuration.Credentials, _baseClient);
+                break;
+            case CredentialsMethod.None:
+            default:
+                break;
         }
     }
 

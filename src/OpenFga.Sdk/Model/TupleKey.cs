@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="TupleKey" /> class.
         /// </summary>
+        [JsonConstructor]
+        public TupleKey() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TupleKey" /> class.
+        /// </summary>
         /// <param name="_object">_object.</param>
         /// <param name="relation">relation.</param>
         /// <param name="user">user.</param>
@@ -32,14 +40,6 @@ namespace OpenFga.Sdk.Model {
             this.Object = _object;
             this.Relation = relation;
             this.User = user;
-            this.AdditionalProperties = new Dictionary<string, object>();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TupleKey" /> class.
-        /// </summary>
-        [JsonConstructor]
-        public TupleKey() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -171,6 +171,7 @@ namespace OpenFga.Sdk.Model {
 
             yield break;
         }
+
     }
 
 }

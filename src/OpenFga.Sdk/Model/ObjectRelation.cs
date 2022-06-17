@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectRelation" /> class.
         /// </summary>
+        [JsonConstructor]
+        public ObjectRelation() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ObjectRelation" /> class.
+        /// </summary>
         /// <param name="_object">_object.</param>
         /// <param name="relation">relation.</param>
         public ObjectRelation(string? _object = default(string), string? relation = default(string)) {
@@ -131,6 +139,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

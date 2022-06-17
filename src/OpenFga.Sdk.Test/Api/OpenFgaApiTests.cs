@@ -14,6 +14,7 @@ using Moq;
 using Moq.Protected;
 using OpenFga.Sdk.Api;
 using OpenFga.Sdk.Client;
+using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Exceptions.Parsers;
 using OpenFga.Sdk.Model;
@@ -62,13 +63,24 @@ namespace OpenFga.Sdk.Test.Api {
         }
 
         /// <summary>
-        /// Test that a storeId is required in the configuration
+        /// Test that a storeId is not required in the configuration
         /// </summary>
         [Fact]
-        public void StoreIdRequired() {
+        public void StoreIdNotRequired() {
             var storeIdRequiredConfig = new Configuration.Configuration() { ApiHost = _host };
-            void ActionMissingStoreId() => storeIdRequiredConfig.IsValid();
-            var exception = Assert.Throws<FgaRequiredParamError>(ActionMissingStoreId);
+            storeIdRequiredConfig.IsValid();
+        }
+
+        /// <summary>
+        /// Test that a storeId is required when calling methods that need it
+        /// </summary>
+        [Fact]
+        public async void StoreIdRequiredWhenNeeded() {
+            var config = new Configuration.Configuration() { ApiHost = _host };
+            var openFgaApi = new OpenFgaApi(config);
+
+            async Task<ReadAuthorizationModelsResponse> ActionMissingStoreId() => await openFgaApi.ReadAuthorizationModels(null, null);
+            var exception = await Assert.ThrowsAsync<FgaRequiredParamError>(ActionMissingStoreId);
             Assert.Equal("Required parameter StoreId was not defined when calling Configuration.", exception.Message);
         }
 
@@ -94,12 +106,44 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.Equal("Configuration.ApiScheme (https) and Configuration.ApiHost (https://api.fga.example) do not form a valid URI (https://https://api.fga.example)", exception.Message);
         }
 
+        /// <summary>
+        /// Test that providing no api token when it is required should error
+        /// </summary>
+        [Fact]
+        public void ApiTokenRequired() {
+            var missingApiTokenConfig = new Configuration.Configuration() {
+                StoreId = _storeId,
+                ApiHost = _host,
+                Credentials = new Credentials() {
+                    Method = CredentialsMethod.ApiToken,
+                }
+            };
+            void ActionMissingApiToken() =>
+                missingApiTokenConfig.IsValid();
+            var exceptionMissingApiToken =
+                Assert.Throws<FgaRequiredParamError>(ActionMissingApiToken);
+            Assert.Equal("Required parameter ApiToken was not defined when calling Configuration.",
+                exceptionMissingApiToken.Message);
+        }
+
         // /// <summary>
         // /// Test that the provided api token issuer is well-formed
         // /// </summary>
         [Fact]
         public void ValidApiTokenIssuerWellFormed() {
-            var config = new Configuration.Configuration() { StoreId = _storeId, ApiHost = "api.fga.example", ApiTokenIssuer = "https://tokenissuer.fga.example" };
+            var config = new Configuration.Configuration() {
+                StoreId = _storeId,
+                ApiHost = _host,
+                Credentials = new Credentials() {
+                    Method = CredentialsMethod.ClientCredentials,
+                    Config = new CredentialsConfig() {
+                        ClientId = "some-id",
+                        ClientSecret = "some-secret",
+                        ApiTokenIssuer = "https://tokenissuer.fga.example",
+                        ApiAudience = "some-audience",
+                    }
+                }
+            };
             void ActionMalformedApiTokenIssuer() => config.IsValid();
             var exception = Assert.Throws<FgaValidationError>(ActionMalformedApiTokenIssuer);
             Assert.Equal("Configuration.ApiTokenIssuer does not form a valid URI (https://https://tokenissuer.fga.example)", exception.Message);
@@ -113,9 +157,14 @@ namespace OpenFga.Sdk.Test.Api {
             var missingClientIdConfig = new Configuration.Configuration() {
                 StoreId = _storeId,
                 ApiHost = _host,
-                ClientSecret = "some-secret",
-                ApiTokenIssuer = "tokenisssuer.fga.example",
-                ApiAudience = _host,
+                Credentials = new Credentials() {
+                    Method = CredentialsMethod.ClientCredentials,
+                    Config = new CredentialsConfig() {
+                        ClientSecret = "some-secret",
+                        ApiTokenIssuer = "tokenissuer.fga.example",
+                        ApiAudience = "some-audience",
+                    }
+                }
             };
             void ActionMissingClientId() =>
                 missingClientIdConfig.IsValid();
@@ -127,9 +176,14 @@ namespace OpenFga.Sdk.Test.Api {
             var missingClientSecretConfig = new Configuration.Configuration() {
                 StoreId = _storeId,
                 ApiHost = _host,
-                ApiTokenIssuer = "tokenisssuer.fga.example",
-                ApiAudience = _host,
-                ClientId = "some-id"
+                Credentials = new Credentials() {
+                    Method = CredentialsMethod.ClientCredentials,
+                    Config = new CredentialsConfig() {
+                        ClientId = "some-id",
+                        ApiTokenIssuer = "tokenissuer.fga.example",
+                        ApiAudience = "some-audience",
+                    }
+                }
             };
             void ActionMissingClientSecret() =>
                 missingClientSecretConfig.IsValid();
@@ -141,9 +195,14 @@ namespace OpenFga.Sdk.Test.Api {
             var missingApiTokenIssuerConfig = new Configuration.Configuration() {
                 StoreId = _storeId,
                 ApiHost = _host,
-                ApiAudience = _host,
-                ClientId = "some-id",
-                ClientSecret = "some-secret"
+                Credentials = new Credentials() {
+                    Method = CredentialsMethod.ClientCredentials,
+                    Config = new CredentialsConfig() {
+                        ClientId = "some-id",
+                        ClientSecret = "some-secret",
+                        ApiAudience = "some-audience",
+                    }
+                }
             };
             void ActionMissingApiTokenIssuer() =>
                 missingApiTokenIssuerConfig.IsValid();
@@ -155,10 +214,16 @@ namespace OpenFga.Sdk.Test.Api {
             var missingApiAudienceConfig = new Configuration.Configuration() {
                 StoreId = _storeId,
                 ApiHost = _host,
-                ApiTokenIssuer = "tokenisssuer.fga.example",
-                ClientId = "some-id",
-                ClientSecret = "some-secret"
+                Credentials = new Credentials() {
+                    Method = CredentialsMethod.ClientCredentials,
+                    Config = new CredentialsConfig() {
+                        ClientId = "some-id",
+                        ClientSecret = "some-secret",
+                        ApiTokenIssuer = "tokenissuer.fga.example",
+                    }
+                }
             };
+
             void ActionMissingApiAudience() =>
                 missingApiAudienceConfig.IsValid();
             var exceptionMissingApiAudience =
@@ -175,10 +240,15 @@ namespace OpenFga.Sdk.Test.Api {
             var config = new Configuration.Configuration() {
                 StoreId = _storeId,
                 ApiHost = _host,
-                ApiTokenIssuer = "tokenisssuer.fga.example",
-                ApiAudience = _host,
-                ClientId = "some-id",
-                ClientSecret = "some-secret"
+                Credentials = new Credentials() {
+                    Method = CredentialsMethod.ClientCredentials,
+                    Config = new CredentialsConfig() {
+                        ClientId = "some-id",
+                        ClientSecret = "some-secret",
+                        ApiTokenIssuer = "tokenissuer.fga.example",
+                        ApiAudience = "some-audience",
+                    }
+                }
             };
 
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
@@ -186,7 +256,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"https://{config.ApiTokenIssuer}/oauth/token") &&
+                        req.RequestUri == new Uri($"https://{config.Credentials.Config.ApiTokenIssuer}/oauth/token") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -223,7 +293,7 @@ namespace OpenFga.Sdk.Test.Api {
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"https://{config.ApiTokenIssuer}/oauth/token") &&
+                    req.RequestUri == new Uri($"https://{config.Credentials.Config.ApiTokenIssuer}/oauth/token") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -243,6 +313,19 @@ namespace OpenFga.Sdk.Test.Api {
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
+        }
+
+        /// <summary>
+        /// Test that updating StoreId after initialization works
+        /// </summary>
+        [Fact]
+        public void UpdateStoreIdTest() {
+            var config = new Configuration.Configuration() { ApiHost = _host };
+            var openFgaApi = new OpenFgaApi(config);
+            Assert.Equal(null, openFgaApi.StoreId);
+            var storeId = "some-id";
+            openFgaApi.StoreId = storeId;
+            Assert.Equal(storeId, openFgaApi.StoreId);
         }
 
         /**
@@ -810,8 +893,6 @@ namespace OpenFga.Sdk.Test.Api {
                     }))),
                 }))
             ));
-            var jsonResponse = JsonSerializer.Serialize(mockResponse);
-            //Console.Write(jsonResponse);
 
             mockHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
@@ -823,7 +904,7 @@ namespace OpenFga.Sdk.Test.Api {
                 )
                 .ReturnsAsync(new HttpResponseMessage() {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(jsonResponse, Encoding.UTF8, "application/json"),
+                    Content = Utils.CreateJsonStringContent(mockResponse),
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);

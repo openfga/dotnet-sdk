@@ -32,6 +32,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="TupleChange" /> class.
         /// </summary>
+        [JsonConstructor]
+        public TupleChange() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TupleChange" /> class.
+        /// </summary>
         /// <param name="tupleKey">tupleKey.</param>
         /// <param name="operation">operation.</param>
         /// <param name="timestamp">timestamp.</param>
@@ -145,6 +153,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

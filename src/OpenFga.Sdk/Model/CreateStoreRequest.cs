@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateStoreRequest" /> class.
         /// </summary>
+        [JsonConstructor]
+        public CreateStoreRequest() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateStoreRequest" /> class.
+        /// </summary>
         /// <param name="name">name.</param>
         public CreateStoreRequest(string? name = default(string)) {
             this.Name = name;
@@ -114,6 +122,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

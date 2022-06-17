@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadAuthorizationModelsResponse" /> class.
         /// </summary>
+        [JsonConstructor]
+        public ReadAuthorizationModelsResponse() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReadAuthorizationModelsResponse" /> class.
+        /// </summary>
         /// <param name="authorizationModels">authorizationModels.</param>
         /// <param name="continuationToken">continuationToken.</param>
         public ReadAuthorizationModelsResponse(List<AuthorizationModel>? authorizationModels = default(List<AuthorizationModel>), string? continuationToken = default(string)) {
@@ -132,6 +140,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

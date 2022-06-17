@@ -32,6 +32,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="InternalErrorMessageResponse" /> class.
         /// </summary>
+        [JsonConstructor]
+        public InternalErrorMessageResponse() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InternalErrorMessageResponse" /> class.
+        /// </summary>
         /// <param name="code">code.</param>
         /// <param name="message">message.</param>
         public InternalErrorMessageResponse(InternalErrorCode? code = default(InternalErrorCode?), string? message = default(string)) {
@@ -128,6 +136,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

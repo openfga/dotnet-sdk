@@ -25,19 +25,19 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersetTreeDifference" /> class.
         /// </summary>
-        /// <param name="_base">_base.</param>
-        /// <param name="subtract">subtract.</param>
-        public UsersetTreeDifference(Node? _base = default(Node), Node? subtract = default(Node)) {
-            this.Base = _base;
-            this.Subtract = subtract;
+        [JsonConstructor]
+        public UsersetTreeDifference() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersetTreeDifference" /> class.
         /// </summary>
-        [JsonConstructor]
-        public UsersetTreeDifference() {
+        /// <param name="_base">_base.</param>
+        /// <param name="subtract">subtract.</param>
+        public UsersetTreeDifference(Node? _base = default(Node), Node? subtract = default(Node)) {
+            this.Base = _base;
+            this.Subtract = subtract;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -139,6 +139,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

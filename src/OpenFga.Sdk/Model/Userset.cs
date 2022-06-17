@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Userset" /> class.
         /// </summary>
+        [JsonConstructor]
+        public Userset() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Userset" /> class.
+        /// </summary>
         /// <param name="_this">A DirectUserset is a sentinel message for referencing the direct members specified by an object/relation mapping..</param>
         /// <param name="computedUserset">computedUserset.</param>
         /// <param name="tupleToUserset">tupleToUserset.</param>
@@ -200,6 +208,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

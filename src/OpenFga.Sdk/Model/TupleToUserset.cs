@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="TupleToUserset" /> class.
         /// </summary>
+        [JsonConstructor]
+        public TupleToUserset() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TupleToUserset" /> class.
+        /// </summary>
         /// <param name="tupleset">tupleset.</param>
         /// <param name="computedUserset">computedUserset.</param>
         public TupleToUserset(ObjectRelation? tupleset = default(ObjectRelation), ObjectRelation? computedUserset = default(ObjectRelation)) {
@@ -131,6 +139,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

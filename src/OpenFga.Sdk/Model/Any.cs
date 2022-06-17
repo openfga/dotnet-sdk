@@ -25,6 +25,12 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Any" /> class.
         /// </summary>
+        [JsonConstructor]
+        public Any() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Any" /> class.
+        /// </summary>
         /// <param name="type">type.</param>
         public Any(string? type = default(string)) : base() {
             this.Type = type;
@@ -103,6 +109,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

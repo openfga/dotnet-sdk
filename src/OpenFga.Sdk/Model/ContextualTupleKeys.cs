@@ -26,9 +26,10 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ContextualTupleKeys" /> class.
         /// </summary>
         [JsonConstructor]
-        protected ContextualTupleKeys() {
+        public ContextualTupleKeys() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ContextualTupleKeys" /> class.
         /// </summary>
@@ -126,6 +127,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

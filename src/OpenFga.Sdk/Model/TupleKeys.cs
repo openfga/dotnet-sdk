@@ -26,9 +26,10 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="TupleKeys" /> class.
         /// </summary>
         [JsonConstructor]
-        protected TupleKeys() {
+        public TupleKeys() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TupleKeys" /> class.
         /// </summary>
@@ -126,6 +127,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

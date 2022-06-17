@@ -26,9 +26,10 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="TypeDefinition" /> class.
         /// </summary>
         [JsonConstructor]
-        protected TypeDefinition() {
+        public TypeDefinition() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeDefinition" /> class.
         /// </summary>
@@ -147,6 +148,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

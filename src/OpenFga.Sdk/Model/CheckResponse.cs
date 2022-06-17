@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckResponse" /> class.
         /// </summary>
+        [JsonConstructor]
+        public CheckResponse() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CheckResponse" /> class.
+        /// </summary>
         /// <param name="allowed">allowed.</param>
         /// <param name="resolution">For internal use only..</param>
         public CheckResponse(bool allowed = default(bool), string? resolution = default(string)) {
@@ -129,6 +137,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }

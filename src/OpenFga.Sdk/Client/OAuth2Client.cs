@@ -11,6 +11,7 @@
 //
 
 
+using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 using System.Text.Json.Serialization;
 
@@ -87,24 +88,24 @@ public class OAuth2Client {
     /// <summary>
     /// Initializes a new instance of the <see cref="OAuth2Client" /> class
     /// </summary>
-    /// <param name="config"></param>
+    /// <param name="credentialsConfig"></param>
     /// <param name="httpClient"></param>
     /// <exception cref="NullReferenceException"></exception>
-    public OAuth2Client(Configuration.Configuration config, BaseClient httpClient) {
-        if (string.IsNullOrWhiteSpace(config.ClientId)) {
+    public OAuth2Client(Credentials credentialsConfig, BaseClient httpClient) {
+        if (string.IsNullOrWhiteSpace(credentialsConfig.Config!.ClientId)) {
             throw new FgaRequiredParamError("OAuth2Client", "config.ClientId");
         }
 
-        if (string.IsNullOrWhiteSpace(config.ClientSecret)) {
+        if (string.IsNullOrWhiteSpace(credentialsConfig.Config.ClientSecret)) {
             throw new FgaRequiredParamError("OAuth2Client", "config.ClientSecret");
         }
 
         this._httpClient = httpClient;
-        this._apiTokenIssuer = config.ApiTokenIssuer;
+        this._apiTokenIssuer = credentialsConfig.Config.ApiTokenIssuer;
         this._authRequest = new AuthRequestBody() {
-            ClientId = config.ClientId,
-            ClientSecret = config.ClientSecret,
-            Audience = config.ApiAudience,
+            ClientId = credentialsConfig.Config.ClientId,
+            ClientSecret = credentialsConfig.Config.ClientSecret,
+            Audience = credentialsConfig.Config.ApiAudience,
             GrantType = "client_credentials"
         };
     }

@@ -25,6 +25,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersetTree" /> class.
         /// </summary>
+        [JsonConstructor]
+        public UsersetTree() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UsersetTree" /> class.
+        /// </summary>
         /// <param name="root">root.</param>
         public UsersetTree(Node? root = default(Node)) {
             this.Root = root;
@@ -114,6 +122,7 @@ namespace OpenFga.Sdk.Model {
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
+
     }
 
 }
