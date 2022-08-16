@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="authorizationModelId">authorizationModelId.</param>
         /// <param name="assertions">assertions.</param>
-        public ReadAssertionsResponse(string? authorizationModelId = default(string), List<Assertion>? assertions = default(List<Assertion>)) {
+        public ReadAssertionsResponse(string authorizationModelId = default(string), List<Assertion> assertions = default(List<Assertion>)) {
             this.AuthorizationModelId = authorizationModelId;
             this.Assertions = assertions;
             this.AdditionalProperties = new Dictionary<string, object>();

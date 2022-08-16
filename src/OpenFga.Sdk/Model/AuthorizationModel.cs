@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="id">id.</param>
         /// <param name="typeDefinitions">typeDefinitions.</param>
-        public AuthorizationModel(string? id = default(string), List<TypeDefinition>? typeDefinitions = default(List<TypeDefinition>)) {
+        public AuthorizationModel(string id = default(string), List<TypeDefinition> typeDefinitions = default(List<TypeDefinition>)) {
             this.Id = id;
             this.TypeDefinitions = typeDefinitions;
             this.AdditionalProperties = new Dictionary<string, object>();

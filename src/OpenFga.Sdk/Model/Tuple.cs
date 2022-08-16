@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="key">key.</param>
         /// <param name="timestamp">timestamp.</param>
-        public Tuple(TupleKey? key = default(TupleKey), DateTime timestamp = default(DateTime)) {
+        public Tuple(TupleKey key = default(TupleKey), DateTime timestamp = default(DateTime)) {
             this.Key = key;
             this.Timestamp = timestamp;
             this.AdditionalProperties = new Dictionary<string, object>();

@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="CreateStoreRequest" /> class.
         /// </summary>
         /// <param name="name">name.</param>
-        public CreateStoreRequest(string? name = default(string)) {
+        public CreateStoreRequest(string name = default(string)) {
             this.Name = name;
             this.AdditionalProperties = new Dictionary<string, object>();
         }

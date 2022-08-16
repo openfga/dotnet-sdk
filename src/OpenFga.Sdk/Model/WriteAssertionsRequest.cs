@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="WriteAssertionsRequest" /> class.
         /// </summary>
         /// <param name="assertions">assertions (required).</param>
-        public WriteAssertionsRequest(List<Assertion>? assertions = default(List<Assertion>)) {
+        public WriteAssertionsRequest(List<Assertion> assertions = default(List<Assertion>)) {
             // to ensure "assertions" is required (not null)
             if (assertions == null) {
                 throw new ArgumentNullException("assertions is a required property for WriteAssertionsRequest and cannot be null");

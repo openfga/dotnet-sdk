@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tupleset">tupleset.</param>
         /// <param name="computed">computed.</param>
-        public UsersetTreeTupleToUserset(string? tupleset = default(string), List<Computed>? computed = default(List<Computed>)) {
+        public UsersetTreeTupleToUserset(string tupleset = default(string), List<Computed> computed = default(List<Computed>)) {
             this.Tupleset = tupleset;
             this.Computed = computed;
             this.AdditionalProperties = new Dictionary<string, object>();

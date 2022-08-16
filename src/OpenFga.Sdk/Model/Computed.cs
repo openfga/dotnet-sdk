@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="Computed" /> class.
         /// </summary>
         /// <param name="userset">userset.</param>
-        public Computed(string? userset = default(string)) {
+        public Computed(string userset = default(string)) {
             this.Userset = userset;
             this.AdditionalProperties = new Dictionary<string, object>();
         }

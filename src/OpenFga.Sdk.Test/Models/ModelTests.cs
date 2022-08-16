@@ -109,5 +109,16 @@ namespace OpenFga.Sdk.Test.Models {
 
             JsonSerializer.Deserialize<ExpandResponse>(jsonResponse);
         }
+
+        /// <summary>
+        /// Deserialize ListObjectsResponse
+        /// </summary>
+        [Fact]
+        public void DeserializeListObjectsResponse() {
+            var jsonResponse =
+                "{\"object_ids\":[\"roadmap\"]}";
+
+            JsonSerializer.Deserialize<ListObjectsResponse>(jsonResponse);
+        }
     }
 }

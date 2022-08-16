@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="_base">_base.</param>
         /// <param name="subtract">subtract.</param>
-        public Difference(Userset? _base = default(Userset), Userset? subtract = default(Userset)) {
+        public Difference(Userset _base = default(Userset), Userset subtract = default(Userset)) {
             this.Base = _base;
             this.Subtract = subtract;
             this.AdditionalProperties = new Dictionary<string, object>();

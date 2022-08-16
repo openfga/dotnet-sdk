@@ -18,37 +18,48 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// TupleKey
+    /// ListObjectsRequest
     /// </summary>
-    [DataContract(Name = "TupleKey")]
-    public partial class TupleKey : IEquatable<TupleKey>, IValidatableObject {
+    [DataContract(Name = "ListObjects_request")]
+    public partial class ListObjectsRequest : IEquatable<ListObjectsRequest>, IValidatableObject {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TupleKey" /> class.
+        /// Initializes a new instance of the <see cref="ListObjectsRequest" /> class.
         /// </summary>
         [JsonConstructor]
-        public TupleKey() {
+        public ListObjectsRequest() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TupleKey" /> class.
+        /// Initializes a new instance of the <see cref="ListObjectsRequest" /> class.
         /// </summary>
-        /// <param name="_object">_object.</param>
+        /// <param name="authorizationModelId">authorizationModelId.</param>
+        /// <param name="type">type.</param>
         /// <param name="relation">relation.</param>
         /// <param name="user">user.</param>
-        public TupleKey(string _object = default(string), string relation = default(string), string user = default(string)) {
-            this.Object = _object;
+        /// <param name="contextualTuples">contextualTuples.</param>
+        public ListObjectsRequest(string authorizationModelId = default(string), string type = default(string), string relation = default(string), string user = default(string), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys)) {
+            this.AuthorizationModelId = authorizationModelId;
+            this.Type = type;
             this.Relation = relation;
             this.User = user;
+            this.ContextualTuples = contextualTuples;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Gets or Sets Object
+        /// Gets or Sets AuthorizationModelId
         /// </summary>
-        [DataMember(Name = "object", EmitDefaultValue = false)]
-        [JsonPropertyName("object")]
-        public string Object { get; set; }
+        [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
+        [JsonPropertyName("authorization_model_id")]
+        public string AuthorizationModelId { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Type
+        /// </summary>
+        [DataMember(Name = "type", EmitDefaultValue = false)]
+        [JsonPropertyName("type")]
+        public string Type { get; set; }
 
         /// <summary>
         /// Gets or Sets Relation
@@ -63,6 +74,13 @@ namespace OpenFga.Sdk.Model {
         [DataMember(Name = "user", EmitDefaultValue = false)]
         [JsonPropertyName("user")]
         public string User { get; set; }
+
+        /// <summary>
+        /// Gets or Sets ContextualTuples
+        /// </summary>
+        [DataMember(Name = "contextual_tuples", EmitDefaultValue = false)]
+        [JsonPropertyName("contextual_tuples")]
+        public ContextualTupleKeys ContextualTuples { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -80,11 +98,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a TupleKey from the JSON string presentation of the object
+        /// Builds a ListObjectsRequest from the JSON string presentation of the object
         /// </summary>
-        /// <returns>TupleKey</returns>
-        public static TupleKey FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<TupleKey>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>ListObjectsRequest</returns>
+        public static ListObjectsRequest FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<ListObjectsRequest>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -93,23 +111,28 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as TupleKey);
+            return this.Equals(input as ListObjectsRequest);
         }
 
         /// <summary>
-        /// Returns true if TupleKey instances are equal
+        /// Returns true if ListObjectsRequest instances are equal
         /// </summary>
-        /// <param name="input">Instance of TupleKey to be compared</param>
+        /// <param name="input">Instance of ListObjectsRequest to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(TupleKey input) {
+        public bool Equals(ListObjectsRequest input) {
             if (input == null) {
                 return false;
             }
             return
                 (
-                    this.Object == input.Object ||
-                    (this.Object != null &&
-                    this.Object.Equals(input.Object))
+                    this.AuthorizationModelId == input.AuthorizationModelId ||
+                    (this.AuthorizationModelId != null &&
+                    this.AuthorizationModelId.Equals(input.AuthorizationModelId))
+                ) &&
+                (
+                    this.Type == input.Type ||
+                    (this.Type != null &&
+                    this.Type.Equals(input.Type))
                 ) &&
                 (
                     this.Relation == input.Relation ||
@@ -120,6 +143,11 @@ namespace OpenFga.Sdk.Model {
                     this.User == input.User ||
                     (this.User != null &&
                     this.User.Equals(input.User))
+                ) &&
+                (
+                    this.ContextualTuples == input.ContextualTuples ||
+                    (this.ContextualTuples != null &&
+                    this.ContextualTuples.Equals(input.ContextualTuples))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -132,14 +160,20 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 9661;
-                if (this.Object != null) {
-                    hashCode = (hashCode * 9923) + this.Object.GetHashCode();
+                if (this.AuthorizationModelId != null) {
+                    hashCode = (hashCode * 9923) + this.AuthorizationModelId.GetHashCode();
+                }
+                if (this.Type != null) {
+                    hashCode = (hashCode * 9923) + this.Type.GetHashCode();
                 }
                 if (this.Relation != null) {
                     hashCode = (hashCode * 9923) + this.Relation.GetHashCode();
                 }
                 if (this.User != null) {
                     hashCode = (hashCode * 9923) + this.User.GetHashCode();
+                }
+                if (this.ContextualTuples != null) {
+                    hashCode = (hashCode * 9923) + this.ContextualTuples.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
@@ -154,21 +188,6 @@ namespace OpenFga.Sdk.Model {
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
-            // Object (string) maxLength
-            if (this.Object != null && this.Object.Length > 256) {
-                yield return new ValidationResult("Invalid value for Object, length must be less than 256.", new[] { "Object" });
-            }
-
-            // Relation (string) maxLength
-            if (this.Relation != null && this.Relation.Length > 50) {
-                yield return new ValidationResult("Invalid value for Relation, length must be less than 50.", new[] { "Relation" });
-            }
-
-            // User (string) maxLength
-            if (this.User != null && this.User.Length > 512) {
-                yield return new ValidationResult("Invalid value for User, length must be less than 512.", new[] { "User" });
-            }
-
             yield break;
         }
 

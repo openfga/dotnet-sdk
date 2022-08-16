@@ -38,7 +38,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="createdAt">createdAt.</param>
         /// <param name="updatedAt">updatedAt.</param>
         /// <param name="deletedAt">deletedAt.</param>
-        public Store(string? id = default(string), string? name = default(string), DateTime createdAt = default(DateTime), DateTime updatedAt = default(DateTime), DateTime deletedAt = default(DateTime)) {
+        public Store(string id = default(string), string name = default(string), DateTime createdAt = default(DateTime), DateTime updatedAt = default(DateTime), DateTime deletedAt = default(DateTime)) {
             this.Id = id;
             this.Name = name;
             this.CreatedAt = createdAt;

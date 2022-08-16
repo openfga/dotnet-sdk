@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tupleset">tupleset.</param>
         /// <param name="computedUserset">computedUserset.</param>
-        public TupleToUserset(ObjectRelation? tupleset = default(ObjectRelation), ObjectRelation? computedUserset = default(ObjectRelation)) {
+        public TupleToUserset(ObjectRelation tupleset = default(ObjectRelation), ObjectRelation computedUserset = default(ObjectRelation)) {
             this.Tupleset = tupleset;
             this.ComputedUserset = computedUserset;
             this.AdditionalProperties = new Dictionary<string, object>();

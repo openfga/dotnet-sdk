@@ -18,33 +18,33 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// Nodes
+    /// ListObjectsResponse
     /// </summary>
-    [DataContract(Name = "Nodes")]
-    public partial class Nodes : IEquatable<Nodes>, IValidatableObject {
+    [DataContract(Name = "ListObjectsResponse")]
+    public partial class ListObjectsResponse : IEquatable<ListObjectsResponse>, IValidatableObject {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Nodes" /> class.
+        /// Initializes a new instance of the <see cref="ListObjectsResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public Nodes() {
+        public ListObjectsResponse() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Nodes" /> class.
+        /// Initializes a new instance of the <see cref="ListObjectsResponse" /> class.
         /// </summary>
-        /// <param name="nodes">nodes.</param>
-        public Nodes(List<Node> nodes = default(List<Node>)) {
-            this._Nodes = nodes;
+        /// <param name="objectIds">objectIds.</param>
+        public ListObjectsResponse(List<string> objectIds = default(List<string>)) {
+            this.ObjectIds = objectIds;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Gets or Sets _Nodes
+        /// Gets or Sets ObjectIds
         /// </summary>
-        [DataMember(Name = "nodes", EmitDefaultValue = false)]
-        [JsonPropertyName("nodes")]
-        public List<Node> _Nodes { get; set; }
+        [DataMember(Name = "object_ids", EmitDefaultValue = false)]
+        [JsonPropertyName("object_ids")]
+        public List<string> ObjectIds { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -62,11 +62,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a Nodes from the JSON string presentation of the object
+        /// Builds a ListObjectsResponse from the JSON string presentation of the object
         /// </summary>
-        /// <returns>Nodes</returns>
-        public static Nodes FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<Nodes>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>ListObjectsResponse</returns>
+        public static ListObjectsResponse FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<ListObjectsResponse>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -75,24 +75,24 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as Nodes);
+            return this.Equals(input as ListObjectsResponse);
         }
 
         /// <summary>
-        /// Returns true if Nodes instances are equal
+        /// Returns true if ListObjectsResponse instances are equal
         /// </summary>
-        /// <param name="input">Instance of Nodes to be compared</param>
+        /// <param name="input">Instance of ListObjectsResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Nodes input) {
+        public bool Equals(ListObjectsResponse input) {
             if (input == null) {
                 return false;
             }
             return
                 (
-                    this._Nodes == input._Nodes ||
-                    this._Nodes != null &&
-                    input._Nodes != null &&
-                    this._Nodes.SequenceEqual(input._Nodes)
+                    this.ObjectIds == input.ObjectIds ||
+                    this.ObjectIds != null &&
+                    input.ObjectIds != null &&
+                    this.ObjectIds.SequenceEqual(input.ObjectIds)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -105,8 +105,8 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 9661;
-                if (this._Nodes != null) {
-                    hashCode = (hashCode * 9923) + this._Nodes.GetHashCode();
+                if (this.ObjectIds != null) {
+                    hashCode = (hashCode * 9923) + this.ObjectIds.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

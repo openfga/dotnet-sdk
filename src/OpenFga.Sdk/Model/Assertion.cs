@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tupleKey">tupleKey.</param>
         /// <param name="expectation">expectation (required).</param>
-        public Assertion(TupleKey? tupleKey = default(TupleKey), bool expectation = default(bool)) {
+        public Assertion(TupleKey tupleKey = default(TupleKey), bool expectation = default(bool)) {
             this.Expectation = expectation;
             this.TupleKey = tupleKey;
             this.AdditionalProperties = new Dictionary<string, object>();

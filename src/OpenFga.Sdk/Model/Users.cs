@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="Users" /> class.
         /// </summary>
         /// <param name="users">users.</param>
-        public Users(List<string>? users = default(List<string>)) {
+        public Users(List<string> users = default(List<string>)) {
             this._Users = users;
             this.AdditionalProperties = new Dictionary<string, object>();
         }

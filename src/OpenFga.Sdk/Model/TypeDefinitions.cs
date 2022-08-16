@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="TypeDefinitions" /> class.
         /// </summary>
         /// <param name="typeDefinitions">typeDefinitions.</param>
-        public TypeDefinitions(List<TypeDefinition>? typeDefinitions = default(List<TypeDefinition>)) {
+        public TypeDefinitions(List<TypeDefinition> typeDefinitions = default(List<TypeDefinition>)) {
             this._TypeDefinitions = typeDefinitions;
             this.AdditionalProperties = new Dictionary<string, object>();
         }

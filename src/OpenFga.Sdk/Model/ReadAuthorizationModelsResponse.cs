@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="authorizationModels">authorizationModels.</param>
         /// <param name="continuationToken">continuationToken.</param>
-        public ReadAuthorizationModelsResponse(List<AuthorizationModel>? authorizationModels = default(List<AuthorizationModel>), string? continuationToken = default(string)) {
+        public ReadAuthorizationModelsResponse(List<AuthorizationModel> authorizationModels = default(List<AuthorizationModel>), string continuationToken = default(string)) {
             this.AuthorizationModels = authorizationModels;
             this.ContinuationToken = continuationToken;
             this.AdditionalProperties = new Dictionary<string, object>();

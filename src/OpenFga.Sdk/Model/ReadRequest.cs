@@ -37,7 +37,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="authorizationModelId">authorizationModelId.</param>
         /// <param name="pageSize">pageSize.</param>
         /// <param name="continuationToken">continuationToken.</param>
-        public ReadRequest(TupleKey? tupleKey = default(TupleKey), string? authorizationModelId = default(string), int pageSize = default(int), string? continuationToken = default(string)) {
+        public ReadRequest(TupleKey tupleKey = default(TupleKey), string authorizationModelId = default(string), int pageSize = default(int), string continuationToken = default(string)) {
             this.TupleKey = tupleKey;
             this.AuthorizationModelId = authorizationModelId;
             this.PageSize = pageSize;

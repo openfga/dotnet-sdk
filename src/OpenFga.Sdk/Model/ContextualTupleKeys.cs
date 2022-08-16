@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ContextualTupleKeys" /> class.
         /// </summary>
         /// <param name="tupleKeys">tupleKeys (required).</param>
-        public ContextualTupleKeys(List<TupleKey>? tupleKeys = default(List<TupleKey>)) {
+        public ContextualTupleKeys(List<TupleKey> tupleKeys = default(List<TupleKey>)) {
             // to ensure "tupleKeys" is required (not null)
             if (tupleKeys == null) {
                 throw new ArgumentNullException("tupleKeys is a required property for ContextualTupleKeys and cannot be null");

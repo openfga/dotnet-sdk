@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="UsersetTree" /> class.
         /// </summary>
         /// <param name="root">root.</param>
-        public UsersetTree(Node? root = default(Node)) {
+        public UsersetTree(Node root = default(Node)) {
             this.Root = root;
             this.AdditionalProperties = new Dictionary<string, object>();
         }

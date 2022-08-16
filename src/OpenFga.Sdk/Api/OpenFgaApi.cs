@@ -184,6 +184,36 @@ public class OpenFgaApi : IDisposable {
     }
 
     /// <summary>
+    /// ListObjects lists all of the object ids for objects of the provided type that the given user has a specific relation with. 
+    /// </summary>
+    /// <exception cref="ApiException">Thrown when fails to make API call</exception>
+    /// <param name="body"></param>
+    /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+    /// <returns>Task of ListObjectsResponse</returns>
+    public async Task<ListObjectsResponse> ListObjects(ListObjectsRequest body, CancellationToken cancellationToken = default) {
+        var pathParams = new Dictionary<string, string> { };
+        if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
+            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+        }
+        pathParams.Add("store_id", _configuration.StoreId);
+
+
+        var queryParams = new Dictionary<string, string>();
+
+        var requestBuilder = new RequestBuilder {
+            Method = new HttpMethod("POST"),
+            BasePath = _configuration.BasePath,
+            PathTemplate = "/stores/{store_id}/list-objects",
+            PathParameters = pathParams,
+            Body = Utils.CreateJsonStringContent(body),
+            QueryParameters = queryParams
+        };
+
+        return await this._apiClient.SendRequestAsync<ListObjectsResponse>(requestBuilder,
+            "ListObjects", cancellationToken);
+    }
+
+    /// <summary>
     /// Get all stores Returns a paginated list of OpenFGA stores.
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
@@ -309,7 +339,7 @@ public class OpenFgaApi : IDisposable {
     }
 
     /// <summary>
-    /// Return all the authorization models for a particular store The GET authorization-models API will return all the authorization models for a certain store. Path parameter &#x60;store_id&#x60; is required. OpenFGA&#39;s response will contain an array of all authorization models, sorted in descending order of creation.  ## Example Assume that a store&#39;s authorization model has been configured twice. To get all the authorization models that have been created in this store, call GET authorization-models. The API will return a response that looks like: &#x60;&#x60;&#x60;json {   \&quot;authorization_models\&quot;: [     {       \&quot;id\&quot;: \&quot;01G50QVV17PECNVAHX1GG4Y5NC\&quot;,       \&quot;type_definitions\&quot;: [...]     },     {       \&quot;id\&quot;: \&quot;01G4ZW8F4A07AKQ8RHSVG9RW04\&quot;,       \&quot;type_definitions\&quot;: [...]     },   ] } &#x60;&#x60;&#x60; If there are more authorization models available, the response will contain an extra field &#x60;continuation_token&#x60;: &#x60;&#x60;&#x60;json {   \&quot;authorization_models\&quot;: [     {       \&quot;id\&quot;: \&quot;01G50QVV17PECNVAHX1GG4Y5NC\&quot;,       \&quot;type_definitions\&quot;: [...]     },     {       \&quot;id\&quot;: \&quot;01G4ZW8F4A07AKQ8RHSVG9RW04\&quot;,       \&quot;type_definitions\&quot;: [...]     },   ]   \&quot;continuation_token\&quot;: \&quot;eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ&#x3D;&#x3D;\&quot; } &#x60;&#x60;&#x60; 
+    /// Return all the authorization models for a particular store The GET authorization-models API will return all the authorization models for a certain store. Path parameter &#x60;store_id&#x60; is required. OpenFGA&#39;s response will contain an array of all authorization models, sorted in descending order of creation.  ## Example Assume that a store&#39;s authorization model has been configured twice. To get all the authorization models that have been created in this store, call GET authorization-models. The API will return a response that looks like: &#x60;&#x60;&#x60;json {   \&quot;authorization_models\&quot;: [     {       \&quot;id\&quot;: \&quot;01G50QVV17PECNVAHX1GG4Y5NC\&quot;,       \&quot;type_definitions\&quot;: [...]     },     {       \&quot;id\&quot;: \&quot;01G4ZW8F4A07AKQ8RHSVG9RW04\&quot;,       \&quot;type_definitions\&quot;: [...]     },   ] } &#x60;&#x60;&#x60; If there are more authorization models available, the response will contain an extra field &#x60;continuation_token&#x60;: &#x60;&#x60;&#x60;json {   \&quot;authorization_models\&quot;: [     {       \&quot;id\&quot;: \&quot;01G50QVV17PECNVAHX1GG4Y5NC\&quot;,       \&quot;type_definitions\&quot;: [...]     },     {       \&quot;id\&quot;: \&quot;01G4ZW8F4A07AKQ8RHSVG9RW04\&quot;,       \&quot;type_definitions\&quot;: [...]     },   ],   \&quot;continuation_token\&quot;: \&quot;eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ&#x3D;&#x3D;\&quot; } &#x60;&#x60;&#x60; 
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="pageSize"> (optional)</param>

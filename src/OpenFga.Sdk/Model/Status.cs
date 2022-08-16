@@ -36,7 +36,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="code">code.</param>
         /// <param name="message">message.</param>
         /// <param name="details">details.</param>
-        public Status(int code = default(int), string? message = default(string), List<Any>? details = default(List<Any>)) {
+        public Status(int code = default(int), string message = default(string), List<Any> details = default(List<Any>)) {
             this.Code = code;
             this.Message = message;
             this.Details = details;

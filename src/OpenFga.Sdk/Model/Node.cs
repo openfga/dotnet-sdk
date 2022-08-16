@@ -38,7 +38,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="difference">difference.</param>
         /// <param name="union">union.</param>
         /// <param name="intersection">intersection.</param>
-        public Node(string? name = default(string), Leaf? leaf = default(Leaf), UsersetTreeDifference? difference = default(UsersetTreeDifference), Nodes? union = default(Nodes), Nodes? intersection = default(Nodes)) {
+        public Node(string name = default(string), Leaf leaf = default(Leaf), UsersetTreeDifference difference = default(UsersetTreeDifference), Nodes union = default(Nodes), Nodes intersection = default(Nodes)) {
             this.Name = name;
             this.Leaf = leaf;
             this.Difference = difference;

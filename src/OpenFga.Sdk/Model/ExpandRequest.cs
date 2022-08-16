@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tupleKey">tupleKey.</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
-        public ExpandRequest(TupleKey? tupleKey = default(TupleKey), string? authorizationModelId = default(string)) {
+        public ExpandRequest(TupleKey tupleKey = default(TupleKey), string authorizationModelId = default(string)) {
             this.TupleKey = tupleKey;
             this.AuthorizationModelId = authorizationModelId;
             this.AdditionalProperties = new Dictionary<string, object>();

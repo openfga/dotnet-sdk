@@ -9,6 +9,7 @@ Method | HTTP request | Description
 [**DeleteStore**](OpenFgaApi.md#deletestore) | **DELETE** /stores/{store_id} | Delete a store
 [**Expand**](OpenFgaApi.md#expand) | **POST** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
 [**GetStore**](OpenFgaApi.md#getstore) | **GET** /stores/{store_id} | Get a store
+[**ListObjects**](OpenFgaApi.md#listobjects) | **POST** /stores/{store_id}/list-objects | ListObjects lists all of the object ids for objects of the provided type that the given user has a specific relation with.
 [**ListStores**](OpenFgaApi.md#liststores) | **GET** /stores | Get all stores
 [**Read**](OpenFgaApi.md#read) | **POST** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
 [**ReadAssertions**](OpenFgaApi.md#readassertions) | **GET** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
@@ -165,7 +166,7 @@ Name | Type | Description  | Notes
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-| **200** | A successful response. |  -  |
+| **201** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **500** | Request failed due to internal server error. |  -  |
@@ -385,6 +386,81 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | A successful response. |  -  |
+| **400** | Request failed due to invalid input. |  -  |
+| **404** | Request failed due to incorrect path. |  -  |
+| **500** | Request failed due to internal server error. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+<a name="listobjects"></a>
+# **ListObjects**
+> ListObjectsResponse ListObjects (ListObjectsRequest body)
+
+ListObjects lists all of the object ids for objects of the provided type that the given user has a specific relation with.
+
+### Example
+```csharp
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net.Http;
+using OpenFga.Sdk.Api;
+using OpenFga.Sdk.Client;
+using OpenFga.Sdk.Configuration;
+using OpenFga.Sdk.Model;
+
+namespace Example
+{
+    public class ListObjectsExample
+    {
+        public static void Main()
+        {
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
+            };
+            HttpClient httpClient = new HttpClient();
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+            var body = new ListObjectsRequest(); // ListObjectsRequest | 
+
+            try
+            {
+                // ListObjects lists all of the object ids for objects of the provided type that the given user has a specific relation with.
+                ListObjectsResponse response = await openFgaApi.ListObjects(body);
+                Debug.WriteLine(response);
+            }
+            catch (ApiException  e)
+            {
+                Debug.Print("Exception when calling OpenFgaApi.ListObjects: " + e.Message );
+                Debug.Print("Status Code: "+ e.ErrorCode);
+                Debug.Print(e.StackTrace);
+            }
+        }
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **body** | [**ListObjectsRequest**](ListObjectsRequest.md)|  | 
+
+### Return type
+
+[**ListObjectsResponse**](ListObjectsResponse.md)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 
@@ -712,7 +788,7 @@ Name | Type | Description  | Notes
 
 Return all the authorization models for a particular store
 
-The GET authorization-models API will return all the authorization models for a certain store. Path parameter `store_id` is required. OpenFGA's response will contain an array of all authorization models, sorted in descending order of creation.  ## Example Assume that a store's authorization model has been configured twice. To get all the authorization models that have been created in this store, call GET authorization-models. The API will return a response that looks like: ```json {   \"authorization_models\": [     {       \"id\": \"01G50QVV17PECNVAHX1GG4Y5NC\",       \"type_definitions\": [...]     },     {       \"id\": \"01G4ZW8F4A07AKQ8RHSVG9RW04\",       \"type_definitions\": [...]     },   ] } ``` If there are more authorization models available, the response will contain an extra field `continuation_token`: ```json {   \"authorization_models\": [     {       \"id\": \"01G50QVV17PECNVAHX1GG4Y5NC\",       \"type_definitions\": [...]     },     {       \"id\": \"01G4ZW8F4A07AKQ8RHSVG9RW04\",       \"type_definitions\": [...]     },   ]   \"continuation_token\": \"eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==\" } ``` 
+The GET authorization-models API will return all the authorization models for a certain store. Path parameter `store_id` is required. OpenFGA's response will contain an array of all authorization models, sorted in descending order of creation.  ## Example Assume that a store's authorization model has been configured twice. To get all the authorization models that have been created in this store, call GET authorization-models. The API will return a response that looks like: ```json {   \"authorization_models\": [     {       \"id\": \"01G50QVV17PECNVAHX1GG4Y5NC\",       \"type_definitions\": [...]     },     {       \"id\": \"01G4ZW8F4A07AKQ8RHSVG9RW04\",       \"type_definitions\": [...]     },   ] } ``` If there are more authorization models available, the response will contain an extra field `continuation_token`: ```json {   \"authorization_models\": [     {       \"id\": \"01G50QVV17PECNVAHX1GG4Y5NC\",       \"type_definitions\": [...]     },     {       \"id\": \"01G4ZW8F4A07AKQ8RHSVG9RW04\",       \"type_definitions\": [...]     },   ],   \"continuation_token\": \"eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==\" } ``` 
 
 ### Example
 ```csharp

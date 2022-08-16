@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="type">type (required).</param>
         /// <param name="relations">relations (required).</param>
-        public TypeDefinition(string? type = default(string), Dictionary<string, Userset>? relations = default(Dictionary<string, Userset>)) {
+        public TypeDefinition(string type = default(string), Dictionary<string, Userset> relations = default(Dictionary<string, Userset>)) {
             // to ensure "type" is required (not null)
             if (type == null) {
                 throw new ArgumentNullException("type is a required property for TypeDefinition and cannot be null");

@@ -36,7 +36,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="users">users.</param>
         /// <param name="computed">computed.</param>
         /// <param name="tupleToUserset">tupleToUserset.</param>
-        public Leaf(Users? users = default(Users), Computed? computed = default(Computed), UsersetTreeTupleToUserset? tupleToUserset = default(UsersetTreeTupleToUserset)) {
+        public Leaf(Users users = default(Users), Computed computed = default(Computed), UsersetTreeTupleToUserset tupleToUserset = default(UsersetTreeTupleToUserset)) {
             this.Users = users;
             this.Computed = computed;
             this.TupleToUserset = tupleToUserset;

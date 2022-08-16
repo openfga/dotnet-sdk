@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="Usersets" /> class.
         /// </summary>
         /// <param name="child">child.</param>
-        public Usersets(List<Userset>? child = default(List<Userset>)) {
+        public Usersets(List<Userset> child = default(List<Userset>)) {
             this.Child = child;
             this.AdditionalProperties = new Dictionary<string, object>();
         }

@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tuples">tuples.</param>
         /// <param name="continuationToken">continuationToken.</param>
-        public ReadResponse(List<Tuple>? tuples = default(List<Tuple>), string? continuationToken = default(string)) {
+        public ReadResponse(List<Tuple> tuples = default(List<Tuple>), string continuationToken = default(string)) {
             this.Tuples = tuples;
             this.ContinuationToken = continuationToken;
             this.AdditionalProperties = new Dictionary<string, object>();

@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ExpandResponse" /> class.
         /// </summary>
         /// <param name="tree">tree.</param>
-        public ExpandResponse(UsersetTree? tree = default(UsersetTree)) {
+        public ExpandResponse(UsersetTree tree = default(UsersetTree)) {
             this.Tree = tree;
             this.AdditionalProperties = new Dictionary<string, object>();
         }

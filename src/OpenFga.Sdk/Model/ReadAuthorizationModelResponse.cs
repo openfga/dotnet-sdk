@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ReadAuthorizationModelResponse" /> class.
         /// </summary>
         /// <param name="authorizationModel">authorizationModel.</param>
-        public ReadAuthorizationModelResponse(AuthorizationModel? authorizationModel = default(AuthorizationModel)) {
+        public ReadAuthorizationModelResponse(AuthorizationModel authorizationModel = default(AuthorizationModel)) {
             this.AuthorizationModel = authorizationModel;
             this.AdditionalProperties = new Dictionary<string, object>();
         }

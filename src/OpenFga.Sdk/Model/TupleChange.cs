@@ -43,7 +43,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="tupleKey">tupleKey.</param>
         /// <param name="operation">operation.</param>
         /// <param name="timestamp">timestamp.</param>
-        public TupleChange(TupleKey? tupleKey = default(TupleKey), TupleOperation? operation = default(TupleOperation?), DateTime timestamp = default(DateTime)) {
+        public TupleChange(TupleKey tupleKey = default(TupleKey), TupleOperation? operation = default(TupleOperation?), DateTime timestamp = default(DateTime)) {
             this.TupleKey = tupleKey;
             this.Operation = operation;
             this.Timestamp = timestamp;

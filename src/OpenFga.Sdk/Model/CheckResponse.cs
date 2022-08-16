@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="allowed">allowed.</param>
         /// <param name="resolution">For internal use only..</param>
-        public CheckResponse(bool allowed = default(bool), string? resolution = default(string)) {
+        public CheckResponse(bool allowed = default(bool), string resolution = default(string)) {
             this.Allowed = allowed;
             this.Resolution = resolution;
             this.AdditionalProperties = new Dictionary<string, object>();

@@ -36,7 +36,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="writes">writes.</param>
         /// <param name="deletes">deletes.</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
-        public WriteRequest(TupleKeys? writes = default(TupleKeys), TupleKeys? deletes = default(TupleKeys), string? authorizationModelId = default(string)) {
+        public WriteRequest(TupleKeys writes = default(TupleKeys), TupleKeys deletes = default(TupleKeys), string authorizationModelId = default(string)) {
             this.Writes = writes;
             this.Deletes = deletes;
             this.AuthorizationModelId = authorizationModelId;

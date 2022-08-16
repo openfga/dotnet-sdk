@@ -36,7 +36,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="tupleKey">tupleKey.</param>
         /// <param name="contextualTuples">contextualTuples.</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
-        public CheckRequest(TupleKey? tupleKey = default(TupleKey), ContextualTupleKeys? contextualTuples = default(ContextualTupleKeys), string? authorizationModelId = default(string)) {
+        public CheckRequest(TupleKey tupleKey = default(TupleKey), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys), string authorizationModelId = default(string)) {
             this.TupleKey = tupleKey;
             this.ContextualTuples = contextualTuples;
             this.AuthorizationModelId = authorizationModelId;

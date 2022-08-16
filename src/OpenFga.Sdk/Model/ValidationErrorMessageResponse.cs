@@ -42,7 +42,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="code">code.</param>
         /// <param name="message">message.</param>
-        public ValidationErrorMessageResponse(ErrorCode? code = default(ErrorCode?), string? message = default(string)) {
+        public ValidationErrorMessageResponse(ErrorCode? code = default(ErrorCode?), string message = default(string)) {
             this.Code = code;
             this.Message = message;
             this.AdditionalProperties = new Dictionary<string, object>();

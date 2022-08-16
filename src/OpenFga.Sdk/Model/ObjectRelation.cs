@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="_object">_object.</param>
         /// <param name="relation">relation.</param>
-        public ObjectRelation(string? _object = default(string), string? relation = default(string)) {
+        public ObjectRelation(string _object = default(string), string relation = default(string)) {
             this.Object = _object;
             this.Relation = relation;
             this.AdditionalProperties = new Dictionary<string, object>();

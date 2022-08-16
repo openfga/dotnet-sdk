@@ -32,7 +32,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="Any" /> class.
         /// </summary>
         /// <param name="type">type.</param>
-        public Any(string? type = default(string)) : base() {
+        public Any(string type = default(string)) : base() {
             this.Type = type;
         }
 

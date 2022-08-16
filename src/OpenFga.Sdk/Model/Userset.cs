@@ -39,7 +39,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="union">union.</param>
         /// <param name="intersection">intersection.</param>
         /// <param name="difference">difference.</param>
-        public Userset(Object? _this = default(Object), ObjectRelation? computedUserset = default(ObjectRelation), TupleToUserset? tupleToUserset = default(TupleToUserset), Usersets? union = default(Usersets), Usersets? intersection = default(Usersets), Difference? difference = default(Difference)) {
+        public Userset(Object _this = default(Object), ObjectRelation computedUserset = default(ObjectRelation), TupleToUserset tupleToUserset = default(TupleToUserset), Usersets union = default(Usersets), Usersets intersection = default(Usersets), Difference difference = default(Difference)) {
             this.This = _this;
             this.ComputedUserset = computedUserset;
             this.TupleToUserset = tupleToUserset;

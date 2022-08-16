@@ -322,7 +322,7 @@ namespace OpenFga.Sdk.Test.Api {
         public void UpdateStoreIdTest() {
             var config = new Configuration.Configuration() { ApiHost = _host };
             var openFgaApi = new OpenFgaApi(config);
-            Assert.Equal(null, openFgaApi.StoreId);
+            Assert.Null(openFgaApi.StoreId);
             var storeId = "some-id";
             openFgaApi.StoreId = storeId;
             Assert.Equal(storeId, openFgaApi.StoreId);
@@ -924,6 +924,57 @@ namespace OpenFga.Sdk.Test.Api {
 
             Assert.IsType<ExpandResponse>(response);
             Assert.Equal(response, mockResponse);
+        }
+
+        /// <summary>
+        /// Test ListObjects
+        /// </summary>
+        [Fact]
+        public async Task ListObjectsTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var expectedResponse = new ListObjectsResponse { ObjectIds = new List<string> { "roadmap" } };
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/list-objects") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(expectedResponse),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new ListObjectsRequest {
+                AuthorizationModelId = "01GAHCE4YVKPQEKZQHT2R89MQV",
+                User = "anne",
+                Relation = "can_read",
+                Type = "document",
+                ContextualTuples = new ContextualTupleKeys() {
+                    TupleKeys = new List<TupleKey> {
+                        new("folder:product", "editor", "anne"),
+                        new("document:roadmap", "parent", "folder:product")
+                    }
+                }
+            };
+            var response = await openFgaApi.ListObjects(body);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/list-objects") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+
+            Assert.IsType<ListObjectsResponse>(response);
+            Assert.Single(response.ObjectIds);
+            Assert.Equal(response, expectedResponse);
         }
 
         /// <summary>
