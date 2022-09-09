@@ -18,7 +18,7 @@ namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Defines InternalErrorCode
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumMemberConverter<InternalErrorCode>))]
     public enum InternalErrorCode {
         /// <summary>
         /// Enum NoInternalError for value: no_internal_error

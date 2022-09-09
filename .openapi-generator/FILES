@@ -108,6 +108,7 @@ src/OpenFga.Sdk/Model/ExpandResponse.cs
 src/OpenFga.Sdk/Model/GetStoreResponse.cs
 src/OpenFga.Sdk/Model/InternalErrorCode.cs
 src/OpenFga.Sdk/Model/InternalErrorMessageResponse.cs
+src/OpenFga.Sdk/Model/JsonStringEnumMemberConverter.cs
 src/OpenFga.Sdk/Model/Leaf.cs
 src/OpenFga.Sdk/Model/ListObjectsRequest.cs
 src/OpenFga.Sdk/Model/ListObjectsResponse.cs

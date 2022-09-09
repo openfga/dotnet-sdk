@@ -53,6 +53,7 @@ public class ApiClient : IDisposable {
 
     /// <summary>
     /// Handles getting the access token, calling the API and potentially retrying
+    /// Based on: https://github.com/auth0/auth0.net/blob/595ae80ccad8aa7764b80d26d2ef12f8b35bbeff/src/Auth0.ManagementApi/HttpClientManagementConnection.cs#L67
     /// </summary>
     /// <param name="requestBuilder"></param>
     /// <param name="apiName"></param>

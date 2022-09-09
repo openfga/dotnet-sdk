@@ -18,7 +18,7 @@ namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Defines NotFoundErrorCode
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumMemberConverter<NotFoundErrorCode>))]
     public enum NotFoundErrorCode {
         /// <summary>
         /// Enum NoNotFoundError for value: no_not_found_error

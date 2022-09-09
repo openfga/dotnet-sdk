@@ -18,7 +18,7 @@ namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Defines ErrorCode
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumMemberConverter<ErrorCode>))]
     public enum ErrorCode {
         /// <summary>
         /// Enum NoError for value: no_error

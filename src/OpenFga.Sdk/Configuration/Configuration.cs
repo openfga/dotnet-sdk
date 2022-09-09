@@ -60,7 +60,7 @@ public class Configuration {
     ///     Version of the package.
     /// </summary>
     /// <value>Version of the package.</value>
-    public const string Version = "0.0.2";
+    public const string Version = "0.0.3";
 
     #endregion Constants
 

@@ -18,7 +18,7 @@ namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Defines TupleOperation
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumMemberConverter<TupleOperation>))]
     public enum TupleOperation {
         /// <summary>
         /// Enum WRITE for value: TUPLE_OPERATION_WRITE
