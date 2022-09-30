@@ -482,10 +482,10 @@ public class OpenFgaApi : IDisposable {
     /// Create a new authorization model The POST authorization-model API will update the authorization model for a certain store. Path parameter &#x60;store_id&#x60; and &#x60;type_definitions&#x60; array in the body are required.  Each item in the &#x60;type_definitions&#x60; array is a type definition as specified in the field &#x60;type_definition&#x60;. The response will return the authorization model&#39;s ID in the &#x60;id&#x60; field.  ## Example To update the authorization model with a single &#x60;document&#x60; authorization model, call POST authorization-models API with the body:  &#x60;&#x60;&#x60;json {   \&quot;type_definitions\&quot;:[     {       \&quot;type\&quot;:\&quot;document\&quot;,       \&quot;relations\&quot;:{         \&quot;reader\&quot;:{           \&quot;union\&quot;:{             \&quot;child\&quot;:[               {                 \&quot;this\&quot;:{}               },               {                 \&quot;computedUserset\&quot;:{                   \&quot;object\&quot;:\&quot;\&quot;,                   \&quot;relation\&quot;:\&quot;writer\&quot;                 }               }             ]           }         },         \&quot;writer\&quot;:{           \&quot;this\&quot;:{}         }       }     }   ] } &#x60;&#x60;&#x60; OpenFGA&#39;s response will include the version id for this authorization model, which will look like  &#x60;&#x60;&#x60; {\&quot;authorization_model_id\&quot;: \&quot;01G50QVV17PECNVAHX1GG4Y5NC\&quot;} &#x60;&#x60;&#x60; 
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
-    /// <param name="typeDefinitions"></param>
+    /// <param name="body"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of WriteAuthorizationModelResponse</returns>
-    public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(TypeDefinitions typeDefinitions, CancellationToken cancellationToken = default) {
+    public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(WriteAuthorizationModelRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
             throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
@@ -500,7 +500,7 @@ public class OpenFgaApi : IDisposable {
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/authorization-models",
             PathParameters = pathParams,
-            Body = Utils.CreateJsonStringContent(typeDefinitions),
+            Body = Utils.CreateJsonStringContent(body),
             QueryParameters = queryParams
         };
 

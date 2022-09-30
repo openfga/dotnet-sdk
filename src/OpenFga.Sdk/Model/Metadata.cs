@@ -18,33 +18,33 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// TypeDefinitions
+    /// Metadata
     /// </summary>
-    [DataContract(Name = "TypeDefinitions")]
-    public partial class TypeDefinitions : IEquatable<TypeDefinitions>, IValidatableObject {
+    [DataContract(Name = "Metadata")]
+    public partial class Metadata : IEquatable<Metadata>, IValidatableObject {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TypeDefinitions" /> class.
+        /// Initializes a new instance of the <see cref="Metadata" /> class.
         /// </summary>
         [JsonConstructor]
-        public TypeDefinitions() {
+        public Metadata() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TypeDefinitions" /> class.
+        /// Initializes a new instance of the <see cref="Metadata" /> class.
         /// </summary>
-        /// <param name="typeDefinitions">typeDefinitions.</param>
-        public TypeDefinitions(List<TypeDefinition> typeDefinitions = default(List<TypeDefinition>)) {
-            this._TypeDefinitions = typeDefinitions;
+        /// <param name="relations">relations.</param>
+        public Metadata(Dictionary<string, RelationMetadata> relations = default(Dictionary<string, RelationMetadata>)) {
+            this.Relations = relations;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Gets or Sets _TypeDefinitions
+        /// Gets or Sets Relations
         /// </summary>
-        [DataMember(Name = "type_definitions", EmitDefaultValue = false)]
-        [JsonPropertyName("type_definitions")]
-        public List<TypeDefinition> _TypeDefinitions { get; set; }
+        [DataMember(Name = "relations", EmitDefaultValue = false)]
+        [JsonPropertyName("relations")]
+        public Dictionary<string, RelationMetadata> Relations { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -62,11 +62,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a TypeDefinitions from the JSON string presentation of the object
+        /// Builds a Metadata from the JSON string presentation of the object
         /// </summary>
-        /// <returns>TypeDefinitions</returns>
-        public static TypeDefinitions FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<TypeDefinitions>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>Metadata</returns>
+        public static Metadata FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<Metadata>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -75,24 +75,24 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as TypeDefinitions);
+            return this.Equals(input as Metadata);
         }
 
         /// <summary>
-        /// Returns true if TypeDefinitions instances are equal
+        /// Returns true if Metadata instances are equal
         /// </summary>
-        /// <param name="input">Instance of TypeDefinitions to be compared</param>
+        /// <param name="input">Instance of Metadata to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(TypeDefinitions input) {
+        public bool Equals(Metadata input) {
             if (input == null) {
                 return false;
             }
             return
                 (
-                    this._TypeDefinitions == input._TypeDefinitions ||
-                    this._TypeDefinitions != null &&
-                    input._TypeDefinitions != null &&
-                    this._TypeDefinitions.SequenceEqual(input._TypeDefinitions)
+                    this.Relations == input.Relations ||
+                    this.Relations != null &&
+                    input.Relations != null &&
+                    this.Relations.SequenceEqual(input.Relations)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -105,8 +105,8 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 9661;
-                if (this._TypeDefinitions != null) {
-                    hashCode = (hashCode * 9923) + this._TypeDefinitions.GetHashCode();
+                if (this.Relations != null) {
+                    hashCode = (hashCode * 9923) + this.Relations.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

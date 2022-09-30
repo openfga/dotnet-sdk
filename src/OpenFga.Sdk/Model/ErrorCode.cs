@@ -294,7 +294,19 @@ namespace OpenFga.Sdk.Model {
         /// Enum DuplicateContextualTuple for value: duplicate_contextual_tuple
         /// </summary>
         [EnumMember(Value = "duplicate_contextual_tuple")]
-        DuplicateContextualTuple = 46
+        DuplicateContextualTuple = 46,
+
+        /// <summary>
+        /// Enum InvalidAuthorizationModel for value: invalid_authorization_model
+        /// </summary>
+        [EnumMember(Value = "invalid_authorization_model")]
+        InvalidAuthorizationModel = 47,
+
+        /// <summary>
+        /// Enum UnsupportedSchemaVersion for value: unsupported_schema_version
+        /// </summary>
+        [EnumMember(Value = "unsupported_schema_version")]
+        UnsupportedSchemaVersion = 48
 
     }
 

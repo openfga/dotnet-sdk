@@ -36,6 +36,7 @@ docs/Leaf.md
 docs/ListObjectsRequest.md
 docs/ListObjectsResponse.md
 docs/ListStoresResponse.md
+docs/Metadata.md
 docs/Node.md
 docs/Nodes.md
 docs/NotFoundErrorCode.md
@@ -48,6 +49,8 @@ docs/ReadAuthorizationModelsResponse.md
 docs/ReadChangesResponse.md
 docs/ReadRequest.md
 docs/ReadResponse.md
+docs/RelationMetadata.md
+docs/RelationReference.md
 docs/Status.md
 docs/Store.md
 docs/Tuple.md
@@ -57,7 +60,6 @@ docs/TupleKeys.md
 docs/TupleOperation.md
 docs/TupleToUserset.md
 docs/TypeDefinition.md
-docs/TypeDefinitions.md
 docs/Users.md
 docs/Userset.md
 docs/UsersetTree.md
@@ -66,6 +68,7 @@ docs/UsersetTreeTupleToUserset.md
 docs/Usersets.md
 docs/ValidationErrorMessageResponse.md
 docs/WriteAssertionsRequest.md
+docs/WriteAuthorizationModelRequest.md
 docs/WriteAuthorizationModelResponse.md
 docs/WriteRequest.md
 src/OpenFga.Sdk.Test/Api/OpenFgaApiTests.cs
@@ -113,6 +116,7 @@ src/OpenFga.Sdk/Model/Leaf.cs
 src/OpenFga.Sdk/Model/ListObjectsRequest.cs
 src/OpenFga.Sdk/Model/ListObjectsResponse.cs
 src/OpenFga.Sdk/Model/ListStoresResponse.cs
+src/OpenFga.Sdk/Model/Metadata.cs
 src/OpenFga.Sdk/Model/Node.cs
 src/OpenFga.Sdk/Model/Nodes.cs
 src/OpenFga.Sdk/Model/NotFoundErrorCode.cs
@@ -124,6 +128,8 @@ src/OpenFga.Sdk/Model/ReadAuthorizationModelsResponse.cs
 src/OpenFga.Sdk/Model/ReadChangesResponse.cs
 src/OpenFga.Sdk/Model/ReadRequest.cs
 src/OpenFga.Sdk/Model/ReadResponse.cs
+src/OpenFga.Sdk/Model/RelationMetadata.cs
+src/OpenFga.Sdk/Model/RelationReference.cs
 src/OpenFga.Sdk/Model/Status.cs
 src/OpenFga.Sdk/Model/Store.cs
 src/OpenFga.Sdk/Model/Tuple.cs
@@ -133,7 +139,6 @@ src/OpenFga.Sdk/Model/TupleKeys.cs
 src/OpenFga.Sdk/Model/TupleOperation.cs
 src/OpenFga.Sdk/Model/TupleToUserset.cs
 src/OpenFga.Sdk/Model/TypeDefinition.cs
-src/OpenFga.Sdk/Model/TypeDefinitions.cs
 src/OpenFga.Sdk/Model/Users.cs
 src/OpenFga.Sdk/Model/Userset.cs
 src/OpenFga.Sdk/Model/UsersetTree.cs
@@ -142,6 +147,7 @@ src/OpenFga.Sdk/Model/UsersetTreeTupleToUserset.cs
 src/OpenFga.Sdk/Model/Usersets.cs
 src/OpenFga.Sdk/Model/ValidationErrorMessageResponse.cs
 src/OpenFga.Sdk/Model/WriteAssertionsRequest.cs
+src/OpenFga.Sdk/Model/WriteAuthorizationModelRequest.cs
 src/OpenFga.Sdk/Model/WriteAuthorizationModelResponse.cs
 src/OpenFga.Sdk/Model/WriteRequest.cs
 src/OpenFga.Sdk/OpenFga.Sdk.csproj

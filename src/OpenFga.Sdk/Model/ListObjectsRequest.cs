@@ -188,6 +188,11 @@ namespace OpenFga.Sdk.Model {
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+            // User (string) maxLength
+            if (this.User != null && this.User.Length > 512) {
+                yield return new ValidationResult("Invalid value for User, length must be less than 512.", new[] { "User" });
+            }
+
             yield break;
         }
 

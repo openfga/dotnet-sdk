@@ -235,7 +235,7 @@ var relations = new Dictionary<string, Userset>()
             {new(new object(), new ObjectRelation("", "writer"))}))
     }
 };
-var body = new TypeDefinitions(new List<TypeDefinition>() {new("repo", relations)});
+var body = new WriteAuthorizationModelRequest(new List<TypeDefinition>() {new("repo", relations)});
 var response = await openFgaApi.WriteAuthorizationModel(body);
 
 // response.AuthorizationModelId = 1uHxCSuTP0VKPYSnkq1pbb1jeZw
@@ -269,7 +269,7 @@ var response = await openFgaApi.ReadAuthorizationModels();
 
 ```csharp
 var body =
-    new CheckRequest(tupleKey: new TupleKey("document:project-roadmap", "editor", "anne"));
+    new CheckRequest(tupleKey: new TupleKey("document:project-roadmap", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
 var response = await openFgaApi.Check(body);
 // response.Allowed = true
 ```
@@ -280,7 +280,7 @@ var response = await openFgaApi.Check(body);
 
 ```csharp
 var body = new WriteRequest(new TupleKeys(new List<TupleKey>
-    {new("document:project-roadmap", "editor", "anne")}));
+    {new("document:project-roadmap", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")}));
 var response = await openFgaApi.Write(body);
 ```
 
@@ -290,7 +290,7 @@ var response = await openFgaApi.Write(body);
 
 ```csharp
 var body = new WriteRequest(new TupleKeys(new List<TupleKey> { }),
-    new TupleKeys(new List<TupleKey> {new("document:project-roadmap", "editor", "anne")}));
+    new TupleKeys(new List<TupleKey> {new("document:project-roadmap", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")}));
 var response = await openFgaApi.Write(body);
 ```
 
@@ -302,7 +302,7 @@ var response = await openFgaApi.Write(body);
 var body = new ExpandRequest(new TupleKey("document:project-roadmap", "editor"));
 var response = await openFgaApi.Expand(body);
 
-// response.Tree.Root = {"name":"workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6#admin","leaf":{"users":{"users":["anne","beth"]}}}
+// response.Tree.Root = {"name":"workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6#admin","leaf":{"users":{"users":["user:81684243-9356-4421-8fbf-a4f8d36aa31b","user:f52a4f7a-054d-47ff-bb6e-3ac81269988f"]}}}
 ```
 
 #### Read Changes
@@ -314,24 +314,24 @@ var response = await openFgaApi.Expand(body);
 var body = new ReadRequest(new TupleKey(
     _object: "workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6",
     relation: "admin",
-    user: "81684243-9356-4421-8fbf-a4f8d36aa31b"));
+    user: "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
 
 // Find all relationship tuples where a certain user has a relationship as any relation to a certain workspace
 var body = new ReadRequest(new TupleKey(
     _object: "workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6",
-    user: "81684243-9356-4421-8fbf-a4f8d36aa31b"));
+    user: "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
 
 // Find all relationship tuples where a certain user is an admin on any workspace
 var body = new ReadRequest(new TupleKey(
     _object: "workspace:",
     relation: "admin",
-    user: "81684243-9356-4421-8fbf-a4f8d36aa31b"));
+    user: "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
 
 // Find all relationship tuples where any user has a relationship as any relation with a particular workspace
 var body = new ReadRequest(new TupleKey(
     _object: "workspace:675bcac4-ad38-4fb1-a19a-94a5648c91d6"));
 
-var body = new ReadRequest(new TupleKey("document:project-roadmap", "editor", "anne"));
+var body = new ReadRequest(new TupleKey("document:project-roadmap", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
 var response = await openFgaApi.Read(body);
 
 // In all the above situations, the response will be of the form:
@@ -368,7 +368,7 @@ var body = new ListObjectsRequest{
     Type = "document",
     ContextualTuples = new ContextualTupleKeys() {
         TupleKeys = new List<TupleKey> {
-            new("folder:product", "editor", "anne"),
+            new("folder:product", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
             new("document:roadmap", "parent", "folder:product")
         }
     }
@@ -423,6 +423,7 @@ var response = await openFgaApi.ListObjects(body);
  - [Model.ListObjectsRequest](docs/ListObjectsRequest.md)
  - [Model.ListObjectsResponse](docs/ListObjectsResponse.md)
  - [Model.ListStoresResponse](docs/ListStoresResponse.md)
+ - [Model.Metadata](docs/Metadata.md)
  - [Model.Node](docs/Node.md)
  - [Model.Nodes](docs/Nodes.md)
  - [Model.NotFoundErrorCode](docs/NotFoundErrorCode.md)
@@ -434,6 +435,8 @@ var response = await openFgaApi.ListObjects(body);
  - [Model.ReadChangesResponse](docs/ReadChangesResponse.md)
  - [Model.ReadRequest](docs/ReadRequest.md)
  - [Model.ReadResponse](docs/ReadResponse.md)
+ - [Model.RelationMetadata](docs/RelationMetadata.md)
+ - [Model.RelationReference](docs/RelationReference.md)
  - [Model.Status](docs/Status.md)
  - [Model.Store](docs/Store.md)
  - [Model.Tuple](docs/Tuple.md)
@@ -443,7 +446,6 @@ var response = await openFgaApi.ListObjects(body);
  - [Model.TupleOperation](docs/TupleOperation.md)
  - [Model.TupleToUserset](docs/TupleToUserset.md)
  - [Model.TypeDefinition](docs/TypeDefinition.md)
- - [Model.TypeDefinitions](docs/TypeDefinitions.md)
  - [Model.Users](docs/Users.md)
  - [Model.Userset](docs/Userset.md)
  - [Model.UsersetTree](docs/UsersetTree.md)
@@ -452,6 +454,7 @@ var response = await openFgaApi.ListObjects(body);
  - [Model.Usersets](docs/Usersets.md)
  - [Model.ValidationErrorMessageResponse](docs/ValidationErrorMessageResponse.md)
  - [Model.WriteAssertionsRequest](docs/WriteAssertionsRequest.md)
+ - [Model.WriteAuthorizationModelRequest](docs/WriteAuthorizationModelRequest.md)
  - [Model.WriteAuthorizationModelResponse](docs/WriteAuthorizationModelResponse.md)
  - [Model.WriteRequest](docs/WriteRequest.md)
 

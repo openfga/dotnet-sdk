@@ -18,32 +18,30 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// TypeDefinition
+    /// RelationReference represents a relation of a particular object type (e.g. &#39;document#viewer&#39;).
     /// </summary>
-    [DataContract(Name = "TypeDefinition")]
-    public partial class TypeDefinition : IEquatable<TypeDefinition>, IValidatableObject {
+    [DataContract(Name = "RelationReference")]
+    public partial class RelationReference : IEquatable<RelationReference>, IValidatableObject {
         /// <summary>
-        /// Initializes a new instance of the <see cref="TypeDefinition" /> class.
+        /// Initializes a new instance of the <see cref="RelationReference" /> class.
         /// </summary>
         [JsonConstructor]
-        public TypeDefinition() {
+        public RelationReference() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TypeDefinition" /> class.
+        /// Initializes a new instance of the <see cref="RelationReference" /> class.
         /// </summary>
         /// <param name="type">type (required).</param>
-        /// <param name="relations">relations.</param>
-        /// <param name="metadata">metadata.</param>
-        public TypeDefinition(string type = default(string), Dictionary<string, Userset> relations = default(Dictionary<string, Userset>), Metadata metadata = default(Metadata)) {
+        /// <param name="relation">relation.</param>
+        public RelationReference(string type = default(string), string relation = default(string)) {
             // to ensure "type" is required (not null)
             if (type == null) {
-                throw new ArgumentNullException("type is a required property for TypeDefinition and cannot be null");
+                throw new ArgumentNullException("type is a required property for RelationReference and cannot be null");
             }
             this.Type = type;
-            this.Relations = relations;
-            this.Metadata = metadata;
+            this.Relation = relation;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -55,18 +53,11 @@ namespace OpenFga.Sdk.Model {
         public string Type { get; set; }
 
         /// <summary>
-        /// Gets or Sets Relations
+        /// Gets or Sets Relation
         /// </summary>
-        [DataMember(Name = "relations", EmitDefaultValue = false)]
-        [JsonPropertyName("relations")]
-        public Dictionary<string, Userset> Relations { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Metadata
-        /// </summary>
-        [DataMember(Name = "metadata", EmitDefaultValue = false)]
-        [JsonPropertyName("metadata")]
-        public Metadata Metadata { get; set; }
+        [DataMember(Name = "relation", EmitDefaultValue = false)]
+        [JsonPropertyName("relation")]
+        public string Relation { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -84,11 +75,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a TypeDefinition from the JSON string presentation of the object
+        /// Builds a RelationReference from the JSON string presentation of the object
         /// </summary>
-        /// <returns>TypeDefinition</returns>
-        public static TypeDefinition FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<TypeDefinition>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>RelationReference</returns>
+        public static RelationReference FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<RelationReference>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -97,15 +88,15 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as TypeDefinition);
+            return this.Equals(input as RelationReference);
         }
 
         /// <summary>
-        /// Returns true if TypeDefinition instances are equal
+        /// Returns true if RelationReference instances are equal
         /// </summary>
-        /// <param name="input">Instance of TypeDefinition to be compared</param>
+        /// <param name="input">Instance of RelationReference to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(TypeDefinition input) {
+        public bool Equals(RelationReference input) {
             if (input == null) {
                 return false;
             }
@@ -116,15 +107,9 @@ namespace OpenFga.Sdk.Model {
                     this.Type.Equals(input.Type))
                 ) &&
                 (
-                    this.Relations == input.Relations ||
-                    this.Relations != null &&
-                    input.Relations != null &&
-                    this.Relations.SequenceEqual(input.Relations)
-                ) &&
-                (
-                    this.Metadata == input.Metadata ||
-                    (this.Metadata != null &&
-                    this.Metadata.Equals(input.Metadata))
+                    this.Relation == input.Relation ||
+                    (this.Relation != null &&
+                    this.Relation.Equals(input.Relation))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -140,11 +125,8 @@ namespace OpenFga.Sdk.Model {
                 if (this.Type != null) {
                     hashCode = (hashCode * 9923) + this.Type.GetHashCode();
                 }
-                if (this.Relations != null) {
-                    hashCode = (hashCode * 9923) + this.Relations.GetHashCode();
-                }
-                if (this.Metadata != null) {
-                    hashCode = (hashCode * 9923) + this.Metadata.GetHashCode();
+                if (this.Relation != null) {
+                    hashCode = (hashCode * 9923) + this.Relation.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

@@ -1099,7 +1099,7 @@ void (empty response body)
 
 <a name="writeauthorizationmodel"></a>
 # **WriteAuthorizationModel**
-> WriteAuthorizationModelResponse WriteAuthorizationModel (TypeDefinitions typeDefinitions)
+> WriteAuthorizationModelResponse WriteAuthorizationModel (WriteAuthorizationModelRequest body)
 
 Create a new authorization model
 
@@ -1128,12 +1128,12 @@ namespace Example
             };
             HttpClient httpClient = new HttpClient();
             var openFgaApi = new OpenFgaApi(config, httpClient);
-            var typeDefinitions = new TypeDefinitions(); // TypeDefinitions | 
+            var body = new WriteAuthorizationModelRequest(); // WriteAuthorizationModelRequest | 
 
             try
             {
                 // Create a new authorization model
-                WriteAuthorizationModelResponse response = await openFgaApi.WriteAuthorizationModel(typeDefinitions);
+                WriteAuthorizationModelResponse response = await openFgaApi.WriteAuthorizationModel(body);
                 Debug.WriteLine(response);
             }
             catch (ApiException  e)
@@ -1152,7 +1152,7 @@ namespace Example
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **typeDefinitions** | [**TypeDefinitions**](TypeDefinitions.md)|  | 
+ **body** | [**WriteAuthorizationModelRequest**](WriteAuthorizationModelRequest.md)|  | 
 
 ### Return type
 
