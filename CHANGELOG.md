@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.1.1
+
+### [0.1.1](https://github.com/openfga/dotnet-sdk/compare/v0.1.0...v0.1.1) (2022-10-07)
+
+- Fix for issue in deserializing nullable DateTime (https://github.com/openfga/dotnet-sdk/issues/5)
+
 ## v0.1.0
 
 ### [0.1.0](https://github.com/openfga/dotnet-sdk/compare/v0.0.3...v0.1.0) (2022-09-29)

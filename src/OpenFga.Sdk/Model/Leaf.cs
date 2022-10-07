@@ -48,21 +48,21 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "users", EmitDefaultValue = false)]
         [JsonPropertyName("users")]
-        public Users Users { get; set; }
+        public Users? Users { get; set; }
 
         /// <summary>
         /// Gets or Sets Computed
         /// </summary>
         [DataMember(Name = "computed", EmitDefaultValue = false)]
         [JsonPropertyName("computed")]
-        public Computed Computed { get; set; }
+        public Computed? Computed { get; set; }
 
         /// <summary>
         /// Gets or Sets TupleToUserset
         /// </summary>
         [DataMember(Name = "tupleToUserset", EmitDefaultValue = false)]
         [JsonPropertyName("tupleToUserset")]
-        public UsersetTreeTupleToUserset TupleToUserset { get; set; }
+        public UsersetTreeTupleToUserset? TupleToUserset { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

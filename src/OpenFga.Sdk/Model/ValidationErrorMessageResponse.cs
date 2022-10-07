@@ -53,7 +53,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "message", EmitDefaultValue = false)]
         [JsonPropertyName("message")]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

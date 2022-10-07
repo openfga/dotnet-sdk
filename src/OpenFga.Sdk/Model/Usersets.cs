@@ -44,7 +44,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "child", EmitDefaultValue = false)]
         [JsonPropertyName("child")]
-        public List<Userset> Child { get; set; }
+        public List<Userset>? Child { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

@@ -46,14 +46,14 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tupleset", EmitDefaultValue = false)]
         [JsonPropertyName("tupleset")]
-        public ObjectRelation Tupleset { get; set; }
+        public ObjectRelation? Tupleset { get; set; }
 
         /// <summary>
         /// Gets or Sets ComputedUserset
         /// </summary>
         [DataMember(Name = "computedUserset", EmitDefaultValue = false)]
         [JsonPropertyName("computedUserset")]
-        public ObjectRelation ComputedUserset { get; set; }
+        public ObjectRelation? ComputedUserset { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

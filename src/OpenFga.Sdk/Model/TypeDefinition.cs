@@ -59,14 +59,14 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "relations", EmitDefaultValue = false)]
         [JsonPropertyName("relations")]
-        public Dictionary<string, Userset> Relations { get; set; }
+        public Dictionary<string, Userset>? Relations { get; set; }
 
         /// <summary>
         /// Gets or Sets Metadata
         /// </summary>
         [DataMember(Name = "metadata", EmitDefaultValue = false)]
         [JsonPropertyName("metadata")]
-        public Metadata Metadata { get; set; }
+        public Metadata? Metadata { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

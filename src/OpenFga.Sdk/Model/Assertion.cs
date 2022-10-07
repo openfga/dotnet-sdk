@@ -46,7 +46,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tuple_key", EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
-        public TupleKey TupleKey { get; set; }
+        public TupleKey? TupleKey { get; set; }
 
         /// <summary>
         /// Gets or Sets Expectation

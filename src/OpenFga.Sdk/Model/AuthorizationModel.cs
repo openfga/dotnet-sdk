@@ -48,21 +48,21 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "id", EmitDefaultValue = false)]
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         /// <summary>
         /// Gets or Sets SchemaVersion
         /// </summary>
         [DataMember(Name = "schema_version", EmitDefaultValue = false)]
         [JsonPropertyName("schema_version")]
-        public string SchemaVersion { get; set; }
+        public string? SchemaVersion { get; set; }
 
         /// <summary>
         /// Gets or Sets TypeDefinitions
         /// </summary>
         [DataMember(Name = "type_definitions", EmitDefaultValue = false)]
         [JsonPropertyName("type_definitions")]
-        public List<TypeDefinition> TypeDefinitions { get; set; }
+        public List<TypeDefinition>? TypeDefinitions { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

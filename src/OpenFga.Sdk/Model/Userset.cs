@@ -55,42 +55,42 @@ namespace OpenFga.Sdk.Model {
         /// <value>A DirectUserset is a sentinel message for referencing the direct members specified by an object/relation mapping.</value>
         [DataMember(Name = "this", EmitDefaultValue = false)]
         [JsonPropertyName("this")]
-        public Object This { get; set; }
+        public Object? This { get; set; }
 
         /// <summary>
         /// Gets or Sets ComputedUserset
         /// </summary>
         [DataMember(Name = "computedUserset", EmitDefaultValue = false)]
         [JsonPropertyName("computedUserset")]
-        public ObjectRelation ComputedUserset { get; set; }
+        public ObjectRelation? ComputedUserset { get; set; }
 
         /// <summary>
         /// Gets or Sets TupleToUserset
         /// </summary>
         [DataMember(Name = "tupleToUserset", EmitDefaultValue = false)]
         [JsonPropertyName("tupleToUserset")]
-        public TupleToUserset TupleToUserset { get; set; }
+        public TupleToUserset? TupleToUserset { get; set; }
 
         /// <summary>
         /// Gets or Sets Union
         /// </summary>
         [DataMember(Name = "union", EmitDefaultValue = false)]
         [JsonPropertyName("union")]
-        public Usersets Union { get; set; }
+        public Usersets? Union { get; set; }
 
         /// <summary>
         /// Gets or Sets Intersection
         /// </summary>
         [DataMember(Name = "intersection", EmitDefaultValue = false)]
         [JsonPropertyName("intersection")]
-        public Usersets Intersection { get; set; }
+        public Usersets? Intersection { get; set; }
 
         /// <summary>
         /// Gets or Sets Difference
         /// </summary>
         [DataMember(Name = "difference", EmitDefaultValue = false)]
         [JsonPropertyName("difference")]
-        public Difference Difference { get; set; }
+        public Difference? Difference { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

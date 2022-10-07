@@ -46,14 +46,14 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
         [JsonPropertyName("authorization_model_id")]
-        public string AuthorizationModelId { get; set; }
+        public string? AuthorizationModelId { get; set; }
 
         /// <summary>
         /// Gets or Sets Assertions
         /// </summary>
         [DataMember(Name = "assertions", EmitDefaultValue = false)]
         [JsonPropertyName("assertions")]
-        public List<Assertion> Assertions { get; set; }
+        public List<Assertion>? Assertions { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

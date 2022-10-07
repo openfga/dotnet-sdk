@@ -48,21 +48,21 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tuple_key", EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
-        public TupleKey TupleKey { get; set; }
+        public TupleKey? TupleKey { get; set; }
 
         /// <summary>
         /// Gets or Sets ContextualTuples
         /// </summary>
         [DataMember(Name = "contextual_tuples", EmitDefaultValue = false)]
         [JsonPropertyName("contextual_tuples")]
-        public ContextualTupleKeys ContextualTuples { get; set; }
+        public ContextualTupleKeys? ContextualTuples { get; set; }
 
         /// <summary>
         /// Gets or Sets AuthorizationModelId
         /// </summary>
         [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
         [JsonPropertyName("authorization_model_id")]
-        public string AuthorizationModelId { get; set; }
+        public string? AuthorizationModelId { get; set; }
 
         /// <summary>
         /// Defaults to false. Making it true has performance implications.
@@ -70,7 +70,7 @@ namespace OpenFga.Sdk.Model {
         /// <value>Defaults to false. Making it true has performance implications.</value>
         [DataMember(Name = "trace", EmitDefaultValue = true)]
         [JsonPropertyName("trace")]
-        public bool Trace { get; private set; }
+        public bool? Trace { get; private set; }
 
         /// <summary>
         /// Returns false as Trace should not be serialized given that it's read-only.

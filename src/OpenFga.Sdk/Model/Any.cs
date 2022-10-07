@@ -41,7 +41,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "@type", EmitDefaultValue = false)]
         [JsonPropertyName("@type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
 
         /// <summary>

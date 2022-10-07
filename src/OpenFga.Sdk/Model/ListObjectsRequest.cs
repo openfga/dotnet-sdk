@@ -52,35 +52,35 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
         [JsonPropertyName("authorization_model_id")]
-        public string AuthorizationModelId { get; set; }
+        public string? AuthorizationModelId { get; set; }
 
         /// <summary>
         /// Gets or Sets Type
         /// </summary>
         [DataMember(Name = "type", EmitDefaultValue = false)]
         [JsonPropertyName("type")]
-        public string Type { get; set; }
+        public string? Type { get; set; }
 
         /// <summary>
         /// Gets or Sets Relation
         /// </summary>
         [DataMember(Name = "relation", EmitDefaultValue = false)]
         [JsonPropertyName("relation")]
-        public string Relation { get; set; }
+        public string? Relation { get; set; }
 
         /// <summary>
         /// Gets or Sets User
         /// </summary>
         [DataMember(Name = "user", EmitDefaultValue = false)]
         [JsonPropertyName("user")]
-        public string User { get; set; }
+        public string? User { get; set; }
 
         /// <summary>
         /// Gets or Sets ContextualTuples
         /// </summary>
         [DataMember(Name = "contextual_tuples", EmitDefaultValue = false)]
         [JsonPropertyName("contextual_tuples")]
-        public ContextualTupleKeys ContextualTuples { get; set; }
+        public ContextualTupleKeys? ContextualTuples { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

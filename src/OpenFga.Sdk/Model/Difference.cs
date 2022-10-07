@@ -46,14 +46,14 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "base", EmitDefaultValue = false)]
         [JsonPropertyName("base")]
-        public Userset Base { get; set; }
+        public Userset? Base { get; set; }
 
         /// <summary>
         /// Gets or Sets Subtract
         /// </summary>
         [DataMember(Name = "subtract", EmitDefaultValue = false)]
         [JsonPropertyName("subtract")]
-        public Userset Subtract { get; set; }
+        public Userset? Subtract { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

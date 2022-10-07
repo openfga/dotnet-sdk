@@ -46,14 +46,14 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "stores", EmitDefaultValue = false)]
         [JsonPropertyName("stores")]
-        public List<Store> Stores { get; set; }
+        public List<Store>? Stores { get; set; }
 
         /// <summary>
         /// Gets or Sets ContinuationToken
         /// </summary>
         [DataMember(Name = "continuation_token", EmitDefaultValue = false)]
         [JsonPropertyName("continuation_token")]
-        public string ContinuationToken { get; set; }
+        public string? ContinuationToken { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

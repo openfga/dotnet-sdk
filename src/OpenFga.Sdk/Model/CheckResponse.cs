@@ -46,7 +46,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "allowed", EmitDefaultValue = true)]
         [JsonPropertyName("allowed")]
-        public bool Allowed { get; set; }
+        public bool? Allowed { get; set; }
 
         /// <summary>
         /// For internal use only.
@@ -54,7 +54,7 @@ namespace OpenFga.Sdk.Model {
         /// <value>For internal use only.</value>
         [DataMember(Name = "resolution", EmitDefaultValue = false)]
         [JsonPropertyName("resolution")]
-        public string Resolution { get; set; }
+        public string? Resolution { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

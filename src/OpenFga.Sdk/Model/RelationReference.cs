@@ -57,7 +57,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "relation", EmitDefaultValue = false)]
         [JsonPropertyName("relation")]
-        public string Relation { get; set; }
+        public string? Relation { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

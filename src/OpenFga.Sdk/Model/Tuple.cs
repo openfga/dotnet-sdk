@@ -46,14 +46,14 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "key", EmitDefaultValue = false)]
         [JsonPropertyName("key")]
-        public TupleKey Key { get; set; }
+        public TupleKey? Key { get; set; }
 
         /// <summary>
         /// Gets or Sets Timestamp
         /// </summary>
         [DataMember(Name = "timestamp", EmitDefaultValue = false)]
         [JsonPropertyName("timestamp")]
-        public DateTime Timestamp { get; set; }
+        public DateTime? Timestamp { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

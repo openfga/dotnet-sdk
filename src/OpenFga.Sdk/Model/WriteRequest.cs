@@ -48,21 +48,21 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "writes", EmitDefaultValue = false)]
         [JsonPropertyName("writes")]
-        public TupleKeys Writes { get; set; }
+        public TupleKeys? Writes { get; set; }
 
         /// <summary>
         /// Gets or Sets Deletes
         /// </summary>
         [DataMember(Name = "deletes", EmitDefaultValue = false)]
         [JsonPropertyName("deletes")]
-        public TupleKeys Deletes { get; set; }
+        public TupleKeys? Deletes { get; set; }
 
         /// <summary>
         /// Gets or Sets AuthorizationModelId
         /// </summary>
         [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
         [JsonPropertyName("authorization_model_id")]
-        public string AuthorizationModelId { get; set; }
+        public string? AuthorizationModelId { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

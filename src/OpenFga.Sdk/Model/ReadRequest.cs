@@ -50,28 +50,28 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tuple_key", EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
-        public TupleKey TupleKey { get; set; }
+        public TupleKey? TupleKey { get; set; }
 
         /// <summary>
         /// Gets or Sets AuthorizationModelId
         /// </summary>
         [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
         [JsonPropertyName("authorization_model_id")]
-        public string AuthorizationModelId { get; set; }
+        public string? AuthorizationModelId { get; set; }
 
         /// <summary>
         /// Gets or Sets PageSize
         /// </summary>
         [DataMember(Name = "page_size", EmitDefaultValue = false)]
         [JsonPropertyName("page_size")]
-        public int PageSize { get; set; }
+        public int? PageSize { get; set; }
 
         /// <summary>
         /// Gets or Sets ContinuationToken
         /// </summary>
         [DataMember(Name = "continuation_token", EmitDefaultValue = false)]
         [JsonPropertyName("continuation_token")]
-        public string ContinuationToken { get; set; }
+        public string? ContinuationToken { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

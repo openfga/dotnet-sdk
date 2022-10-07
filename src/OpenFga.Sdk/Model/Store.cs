@@ -52,35 +52,35 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "id", EmitDefaultValue = false)]
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         /// <summary>
         /// Gets or Sets Name
         /// </summary>
         [DataMember(Name = "name", EmitDefaultValue = false)]
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or Sets CreatedAt
         /// </summary>
         [DataMember(Name = "created_at", EmitDefaultValue = false)]
         [JsonPropertyName("created_at")]
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         /// <summary>
         /// Gets or Sets UpdatedAt
         /// </summary>
         [DataMember(Name = "updated_at", EmitDefaultValue = false)]
         [JsonPropertyName("updated_at")]
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
         /// Gets or Sets DeletedAt
         /// </summary>
         [DataMember(Name = "deleted_at", EmitDefaultValue = false)]
         [JsonPropertyName("deleted_at")]
-        public DateTime DeletedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

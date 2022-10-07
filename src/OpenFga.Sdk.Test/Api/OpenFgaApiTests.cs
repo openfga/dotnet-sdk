@@ -1151,5 +1151,129 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.Equal(authorizationModelId, response.AuthorizationModelId);
             Assert.Empty(response.Assertions);
         }
+
+        /// <summary>
+        /// Test ListStores
+        /// </summary>
+        [Fact]
+        public async Task ListStoresTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var expectedResponse = new ListStoresResponse() {
+                Stores = new List<Store>() {
+                            new() { Id = "45678", Name = "TestStore", CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now}
+                        }
+            };
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri ==
+                        new Uri($"{_config.BasePath}/stores") &&
+                        req.Method == HttpMethod.Get),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(expectedResponse),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var response = await openFgaApi.ListStores();
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores") &&
+                    req.Method == HttpMethod.Get),
+                ItExpr.IsAny<CancellationToken>()
+            );
+            Assert.IsType<ListStoresResponse>(response);
+            Assert.Single(response.Stores);
+            Assert.Equal(response, expectedResponse);
+        }
+
+
+        /// <summary>
+        /// Test ListStores with Null DateTime
+        /// </summary>
+        [Fact]
+        public async Task ListStoresTestNullDeletedAt() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var content = "{ \"stores\": [{\"id\": \"xyz123\", \"name\": \"abcdefg\", \"created_at\": \"2022-10-07T14:00:40.205Z\", \"updated_at\": \"2022-10-07T14:00:40.205Z\", \"deleted_at\": null}], \"continuation_token\": \"eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==\"}";
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri ==
+                        new Uri($"{_config.BasePath}/stores") &&
+                        req.Method == HttpMethod.Get),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(content, Encoding.UTF8, "application/json")
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var response = await openFgaApi.ListStores();
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores") &&
+                    req.Method == HttpMethod.Get),
+                ItExpr.IsAny<CancellationToken>()
+            );
+            Assert.IsType<ListStoresResponse>(response);
+            Assert.Single(response.Stores);
+            Assert.Equal("xyz123", response.Stores[0].Id);
+            Assert.Equal("abcdefg", response.Stores[0].Name);
+            Assert.Null(response.Stores[0].DeletedAt);
+        }
+
+        /// <summary>
+        /// Test ListStores for empty array
+        /// </summary>
+        [Fact]
+        public async Task ListStoresEmptyTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var expectedResponse = new ListStoresResponse() {
+                Stores = new List<Store>() {
+                }
+            };
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri ==
+                        new Uri($"{_config.BasePath}/stores") &&
+                        req.Method == HttpMethod.Get),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(expectedResponse),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var response = await openFgaApi.ListStores();
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores") &&
+                    req.Method == HttpMethod.Get),
+                ItExpr.IsAny<CancellationToken>()
+            );
+            Assert.IsType<ListStoresResponse>(response);
+            Assert.Empty(response.Stores);
+            Assert.Equal(response, expectedResponse);
+        }
     }
 }
