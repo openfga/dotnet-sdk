@@ -361,6 +361,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+*.rej
+.local_feed
+
 
 # IDEs
 .idea
@@ -368,13 +371,17 @@ FodyWeavers.xsd
 .sublime-workspace
 .sublime-project
 .idea/
+.vscode/
 
 # Possible credential files
 .env
 credentials.json
 
-*.rej
+# git conflict leftover files
 *.orig
+
+# Mac
 .DS_Store
-.local_feed
+
 VERSION.txt
+git_push.sh
