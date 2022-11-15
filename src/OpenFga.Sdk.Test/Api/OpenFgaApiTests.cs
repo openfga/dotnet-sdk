@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -150,6 +151,55 @@ namespace OpenFga.Sdk.Test.Api {
         }
 
         /// <summary>
+        /// Test that the authorization header is being sent
+        /// </summary>
+        [Fact]
+        public async Task ApiTokenSentInHeader() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var config = new Configuration.Configuration() {
+                StoreId = _storeId,
+                ApiHost = _host,
+                Credentials = new Credentials() {
+                    Method = CredentialsMethod.ApiToken,
+                    Config = new CredentialsConfig() {
+                        ApiToken = "some-token"
+                    }
+                }
+            };
+
+            var readAuthorizationModelsMockExpression = ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri.ToString()
+                    .StartsWith($"{config.BasePath}/stores/{config.StoreId}/authorization-models") &&
+                req.Method == HttpMethod.Get &&
+                req.Headers.Contains("Authorization") &&
+                req.Headers.Authorization.Equals(new AuthenticationHeaderValue("Bearer", "some-token")));
+
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    readAuthorizationModelsMockExpression,
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(
+                            new ReadAuthorizationModelsResponse() { AuthorizationModels = { } }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFga = new OpenFgaApi(config, httpClient);
+
+            var response = await openFga.ReadAuthorizationModels(null, null);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                readAuthorizationModelsMockExpression,
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
         /// Test that providing no client id, secret, api token issuer or api audience when they are required should error
         /// </summary>
         [Fact]
@@ -269,13 +319,16 @@ namespace OpenFga.Sdk.Test.Api {
                     }),
                 });
 
+            var readAuthorizationModelsMockExpression = ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri.ToString()
+                    .StartsWith($"{config.BasePath}/stores/{config.StoreId}/authorization-models") &&
+                req.Method == HttpMethod.Get &&
+                req.Headers.Contains("Authorization") &&
+                req.Headers.Authorization.Equals(new AuthenticationHeaderValue("Bearer", "some-token")));
             mockHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
-                    ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri.ToString()
-                            .StartsWith($"{config.BasePath}/stores/{config.StoreId}/authorization-models") &&
-                        req.Method == HttpMethod.Get),
+                    readAuthorizationModelsMockExpression,
                     ItExpr.IsAny<CancellationToken>()
                 )
                 .ReturnsAsync(new HttpResponseMessage() {
@@ -300,9 +353,7 @@ namespace OpenFga.Sdk.Test.Api {
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
-                ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri.ToString().StartsWith($"{config.BasePath}/stores/{config.StoreId}/authorization-models") &&
-                    req.Method == HttpMethod.Get),
+                readAuthorizationModelsMockExpression,
                 ItExpr.IsAny<CancellationToken>()
             );
             mockHandler.Protected().Verify(

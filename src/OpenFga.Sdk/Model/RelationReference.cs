@@ -35,13 +35,15 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="type">type (required).</param>
         /// <param name="relation">relation.</param>
-        public RelationReference(string type = default(string), string relation = default(string)) {
+        /// <param name="wildcard">wildcard.</param>
+        public RelationReference(string type = default(string), string relation = default(string), Object wildcard = default(Object)) {
             // to ensure "type" is required (not null)
             if (type == null) {
                 throw new ArgumentNullException("type is a required property for RelationReference and cannot be null");
             }
             this.Type = type;
             this.Relation = relation;
+            this.Wildcard = wildcard;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -58,6 +60,13 @@ namespace OpenFga.Sdk.Model {
         [DataMember(Name = "relation", EmitDefaultValue = false)]
         [JsonPropertyName("relation")]
         public string? Relation { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Wildcard
+        /// </summary>
+        [DataMember(Name = "wildcard", EmitDefaultValue = false)]
+        [JsonPropertyName("wildcard")]
+        public Object? Wildcard { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -110,6 +119,11 @@ namespace OpenFga.Sdk.Model {
                     this.Relation == input.Relation ||
                     (this.Relation != null &&
                     this.Relation.Equals(input.Relation))
+                ) &&
+                (
+                    this.Wildcard == input.Wildcard ||
+                    (this.Wildcard != null &&
+                    this.Wildcard.Equals(input.Wildcard))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -127,6 +141,9 @@ namespace OpenFga.Sdk.Model {
                 }
                 if (this.Relation != null) {
                     hashCode = (hashCode * 9923) + this.Relation.GetHashCode();
+                }
+                if (this.Wildcard != null) {
+                    hashCode = (hashCode * 9923) + this.Wildcard.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

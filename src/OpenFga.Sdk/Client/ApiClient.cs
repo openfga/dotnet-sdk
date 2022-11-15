@@ -34,16 +34,17 @@ public class ApiClient : IDisposable {
         _configuration = configuration;
         _baseClient = new BaseClient(configuration, userHttpClient);
 
-        if (configuration.Credentials == null) {
+        if (_configuration.Credentials == null) {
             return;
         }
 
-        switch (configuration.Credentials.Method) {
+        switch (_configuration.Credentials.Method) {
             case CredentialsMethod.ApiToken:
-                configuration.DefaultHeaders.Add("Authorization", $"Bearer {configuration.Credentials.Config!.ApiToken}");
+                _configuration.DefaultHeaders.Add("Authorization", $"Bearer {_configuration.Credentials.Config!.ApiToken}");
+                _baseClient = new BaseClient(_configuration, userHttpClient);
                 break;
             case CredentialsMethod.ClientCredentials:
-                _oauth2Client = new OAuth2Client(configuration.Credentials, _baseClient);
+                _oauth2Client = new OAuth2Client(_configuration.Credentials, _baseClient);
                 break;
             case CredentialsMethod.None:
             default:

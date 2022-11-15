@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.1.2
+
+### [0.1.2](https://github.com/openfga/dotnet-sdk/compare/v0.1.1...v0.1.2) (2022-11-15)
+
+- feat: regenerate from latest API Document, changes include:
+    - documentation fixes
+    - types that represent enabling wildcards in authorization models
+- fix: send authorization header to server when ApiToken used (https://github.com/openfga/sdk-generator/issues/58)
+- chore: update test dependencies
+
 ## v0.1.1
 
 ### [0.1.1](https://github.com/openfga/dotnet-sdk/compare/v0.1.0...v0.1.1) (2022-10-07)
