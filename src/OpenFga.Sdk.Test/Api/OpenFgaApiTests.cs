@@ -405,7 +405,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new CheckRequest(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
+            var body = new CheckRequest { TupleKey = new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw" };
 
             Task<CheckResponse> BadRequestError() => openFgaApi.Check(body);
             var error = await Assert.ThrowsAsync<FgaApiValidationError>(BadRequestError);
@@ -748,7 +748,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new CheckRequest(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
+            var body = new CheckRequest { TupleKey = new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw" };
             var response = await openFgaApi.Check(body);
 
             mockHandler.Protected().Verify(
@@ -786,8 +786,10 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new WriteRequest(
-                new TupleKeys(new List<TupleKey> { new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }));
+            var body = new WriteRequest {
+                Writes = new TupleKeys(new List<TupleKey> { new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }),
+                AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
+            };
             var response = await openFgaApi.Write(body);
 
             mockHandler.Protected().Verify(
@@ -822,8 +824,10 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new WriteRequest(new TupleKeys(new List<TupleKey> { }),
-                new TupleKeys(new List<TupleKey> { new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }));
+            var body = new WriteRequest {
+                Deletes = new TupleKeys(new List<TupleKey> { new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }),
+                AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
+            };
             var response = await openFgaApi.Write(body);
 
             mockHandler.Protected().Verify(
@@ -899,7 +903,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new ExpandRequest(new TupleKey(_object: "document:roadmap", relation: "viewer"));
+            var body = new ExpandRequest { TupleKey = new TupleKey(_object: "document:roadmap", relation: "viewer"), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw" };
             var response = await openFgaApi.Expand(body);
 
             mockHandler.Protected().Verify(
@@ -983,7 +987,7 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public async Task ListObjectsTest() {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-            var expectedResponse = new ListObjectsResponse { ObjectIds = new List<string> { "roadmap" } };
+            var expectedResponse = new ListObjectsResponse { Objects = new List<string> { "document:roadmap" } };
             mockHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
@@ -1024,7 +1028,7 @@ namespace OpenFga.Sdk.Test.Api {
             );
 
             Assert.IsType<ListObjectsResponse>(response);
-            Assert.Single(response.ObjectIds);
+            Assert.Single(response.Objects);
             Assert.Equal(response, expectedResponse);
         }
 
@@ -1055,7 +1059,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new ReadRequest(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
+            var body = new ReadRequest { TupleKey = new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") };
             var response = await openFgaApi.Read(body);
 
             mockHandler.Protected().Verify(

@@ -33,10 +33,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckRequest" /> class.
         /// </summary>
-        /// <param name="tupleKey">tupleKey.</param>
+        /// <param name="tupleKey">tupleKey (required).</param>
         /// <param name="contextualTuples">contextualTuples.</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
         public CheckRequest(TupleKey tupleKey = default(TupleKey), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys), string authorizationModelId = default(string)) {
+            // to ensure "tupleKey" is required (not null)
+            if (tupleKey == null) {
+                throw new ArgumentNullException("tupleKey is a required property for CheckRequest and cannot be null");
+            }
             this.TupleKey = tupleKey;
             this.ContextualTuples = contextualTuples;
             this.AuthorizationModelId = authorizationModelId;
@@ -46,9 +50,9 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets TupleKey
         /// </summary>
-        [DataMember(Name = "tuple_key", EmitDefaultValue = false)]
+        [DataMember(Name = "tuple_key", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
-        public TupleKey? TupleKey { get; set; }
+        public TupleKey TupleKey { get; set; }
 
         /// <summary>
         /// Gets or Sets ContextualTuples

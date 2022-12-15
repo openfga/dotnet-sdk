@@ -5,7 +5,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **TupleKey** | [**TupleKey**](TupleKey.md) |  | [optional] 
-**AuthorizationModelId** | **string** |  | [optional] 
 **PageSize** | **int** |  | [optional] 
 **ContinuationToken** | **string** |  | [optional] 
 

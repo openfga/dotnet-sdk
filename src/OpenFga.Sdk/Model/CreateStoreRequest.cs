@@ -33,8 +33,12 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateStoreRequest" /> class.
         /// </summary>
-        /// <param name="name">name.</param>
+        /// <param name="name">name (required).</param>
         public CreateStoreRequest(string name = default(string)) {
+            // to ensure "name" is required (not null)
+            if (name == null) {
+                throw new ArgumentNullException("name is a required property for CreateStoreRequest and cannot be null");
+            }
             this.Name = name;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -42,9 +46,9 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Name
         /// </summary>
-        [DataMember(Name = "name", EmitDefaultValue = false)]
+        [DataMember(Name = "name", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("name")]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

@@ -34,15 +34,27 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ListObjectsRequest" /> class.
         /// </summary>
         /// <param name="authorizationModelId">authorizationModelId.</param>
-        /// <param name="type">type.</param>
-        /// <param name="relation">relation.</param>
-        /// <param name="user">user.</param>
+        /// <param name="type">type (required).</param>
+        /// <param name="relation">relation (required).</param>
+        /// <param name="user">user (required).</param>
         /// <param name="contextualTuples">contextualTuples.</param>
         public ListObjectsRequest(string authorizationModelId = default(string), string type = default(string), string relation = default(string), string user = default(string), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys)) {
-            this.AuthorizationModelId = authorizationModelId;
+            // to ensure "type" is required (not null)
+            if (type == null) {
+                throw new ArgumentNullException("type is a required property for ListObjectsRequest and cannot be null");
+            }
             this.Type = type;
+            // to ensure "relation" is required (not null)
+            if (relation == null) {
+                throw new ArgumentNullException("relation is a required property for ListObjectsRequest and cannot be null");
+            }
             this.Relation = relation;
+            // to ensure "user" is required (not null)
+            if (user == null) {
+                throw new ArgumentNullException("user is a required property for ListObjectsRequest and cannot be null");
+            }
             this.User = user;
+            this.AuthorizationModelId = authorizationModelId;
             this.ContextualTuples = contextualTuples;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -57,23 +69,23 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Type
         /// </summary>
-        [DataMember(Name = "type", EmitDefaultValue = false)]
+        [DataMember(Name = "type", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("type")]
-        public string? Type { get; set; }
+        public string Type { get; set; }
 
         /// <summary>
         /// Gets or Sets Relation
         /// </summary>
-        [DataMember(Name = "relation", EmitDefaultValue = false)]
+        [DataMember(Name = "relation", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("relation")]
-        public string? Relation { get; set; }
+        public string Relation { get; set; }
 
         /// <summary>
         /// Gets or Sets User
         /// </summary>
-        [DataMember(Name = "user", EmitDefaultValue = false)]
+        [DataMember(Name = "user", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("user")]
-        public string? User { get; set; }
+        public string User { get; set; }
 
         /// <summary>
         /// Gets or Sets ContextualTuples
@@ -191,6 +203,11 @@ namespace OpenFga.Sdk.Model {
             // User (string) maxLength
             if (this.User != null && this.User.Length > 512) {
                 yield return new ValidationResult("Invalid value for User, length must be less than 512.", new[] { "User" });
+            }
+
+            // User (string) minLength
+            if (this.User != null && this.User.Length < 1) {
+                yield return new ValidationResult("Invalid value for User, length must be greater than 1.", new[] { "User" });
             }
 
             yield break;

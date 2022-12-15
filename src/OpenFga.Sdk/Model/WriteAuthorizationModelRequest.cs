@@ -33,9 +33,13 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="WriteAuthorizationModelRequest" /> class.
         /// </summary>
-        /// <param name="typeDefinitions">typeDefinitions.</param>
+        /// <param name="typeDefinitions">typeDefinitions (required).</param>
         /// <param name="schemaVersion">schemaVersion.</param>
         public WriteAuthorizationModelRequest(List<TypeDefinition> typeDefinitions = default(List<TypeDefinition>), string schemaVersion = default(string)) {
+            // to ensure "typeDefinitions" is required (not null)
+            if (typeDefinitions == null) {
+                throw new ArgumentNullException("typeDefinitions is a required property for WriteAuthorizationModelRequest and cannot be null");
+            }
             this.TypeDefinitions = typeDefinitions;
             this.SchemaVersion = schemaVersion;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -44,9 +48,9 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets TypeDefinitions
         /// </summary>
-        [DataMember(Name = "type_definitions", EmitDefaultValue = false)]
+        [DataMember(Name = "type_definitions", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("type_definitions")]
-        public List<TypeDefinition>? TypeDefinitions { get; set; }
+        public List<TypeDefinition> TypeDefinitions { get; set; }
 
         /// <summary>
         /// Gets or Sets SchemaVersion

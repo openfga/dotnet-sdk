@@ -33,18 +33,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ListObjectsResponse" /> class.
         /// </summary>
-        /// <param name="objectIds">objectIds.</param>
-        public ListObjectsResponse(List<string> objectIds = default(List<string>)) {
-            this.ObjectIds = objectIds;
+        /// <param name="objects">objects.</param>
+        public ListObjectsResponse(List<string> objects = default(List<string>)) {
+            this.Objects = objects;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Gets or Sets ObjectIds
+        /// Gets or Sets Objects
         /// </summary>
-        [DataMember(Name = "object_ids", EmitDefaultValue = false)]
-        [JsonPropertyName("object_ids")]
-        public List<string>? ObjectIds { get; set; }
+        [DataMember(Name = "objects", EmitDefaultValue = false)]
+        [JsonPropertyName("objects")]
+        public List<string>? Objects { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -89,10 +89,10 @@ namespace OpenFga.Sdk.Model {
             }
             return
                 (
-                    this.ObjectIds == input.ObjectIds ||
-                    this.ObjectIds != null &&
-                    input.ObjectIds != null &&
-                    this.ObjectIds.SequenceEqual(input.ObjectIds)
+                    this.Objects == input.Objects ||
+                    this.Objects != null &&
+                    input.Objects != null &&
+                    this.Objects.SequenceEqual(input.Objects)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -105,8 +105,8 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 9661;
-                if (this.ObjectIds != null) {
-                    hashCode = (hashCode * 9923) + this.ObjectIds.GetHashCode();
+                if (this.Objects != null) {
+                    hashCode = (hashCode * 9923) + this.Objects.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

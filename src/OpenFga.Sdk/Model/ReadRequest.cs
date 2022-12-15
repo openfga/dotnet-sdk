@@ -34,12 +34,10 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ReadRequest" /> class.
         /// </summary>
         /// <param name="tupleKey">tupleKey.</param>
-        /// <param name="authorizationModelId">authorizationModelId.</param>
         /// <param name="pageSize">pageSize.</param>
         /// <param name="continuationToken">continuationToken.</param>
-        public ReadRequest(TupleKey tupleKey = default(TupleKey), string authorizationModelId = default(string), int pageSize = default(int), string continuationToken = default(string)) {
+        public ReadRequest(TupleKey tupleKey = default(TupleKey), int pageSize = default(int), string continuationToken = default(string)) {
             this.TupleKey = tupleKey;
-            this.AuthorizationModelId = authorizationModelId;
             this.PageSize = pageSize;
             this.ContinuationToken = continuationToken;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -51,13 +49,6 @@ namespace OpenFga.Sdk.Model {
         [DataMember(Name = "tuple_key", EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
         public TupleKey? TupleKey { get; set; }
-
-        /// <summary>
-        /// Gets or Sets AuthorizationModelId
-        /// </summary>
-        [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
-        [JsonPropertyName("authorization_model_id")]
-        public string? AuthorizationModelId { get; set; }
 
         /// <summary>
         /// Gets or Sets PageSize
@@ -121,11 +112,6 @@ namespace OpenFga.Sdk.Model {
                     this.TupleKey.Equals(input.TupleKey))
                 ) &&
                 (
-                    this.AuthorizationModelId == input.AuthorizationModelId ||
-                    (this.AuthorizationModelId != null &&
-                    this.AuthorizationModelId.Equals(input.AuthorizationModelId))
-                ) &&
-                (
                     this.PageSize == input.PageSize ||
                     this.PageSize.Equals(input.PageSize)
                 ) &&
@@ -147,9 +133,6 @@ namespace OpenFga.Sdk.Model {
                 int hashCode = 9661;
                 if (this.TupleKey != null) {
                     hashCode = (hashCode * 9923) + this.TupleKey.GetHashCode();
-                }
-                if (this.AuthorizationModelId != null) {
-                    hashCode = (hashCode * 9923) + this.AuthorizationModelId.GetHashCode();
                 }
                 hashCode = (hashCode * 9923) + this.PageSize.GetHashCode();
                 if (this.ContinuationToken != null) {

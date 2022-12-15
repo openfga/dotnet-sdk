@@ -33,9 +33,13 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpandRequest" /> class.
         /// </summary>
-        /// <param name="tupleKey">tupleKey.</param>
+        /// <param name="tupleKey">tupleKey (required).</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
         public ExpandRequest(TupleKey tupleKey = default(TupleKey), string authorizationModelId = default(string)) {
+            // to ensure "tupleKey" is required (not null)
+            if (tupleKey == null) {
+                throw new ArgumentNullException("tupleKey is a required property for ExpandRequest and cannot be null");
+            }
             this.TupleKey = tupleKey;
             this.AuthorizationModelId = authorizationModelId;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -44,9 +48,9 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets TupleKey
         /// </summary>
-        [DataMember(Name = "tuple_key", EmitDefaultValue = false)]
+        [DataMember(Name = "tuple_key", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
-        public TupleKey? TupleKey { get; set; }
+        public TupleKey TupleKey { get; set; }
 
         /// <summary>
         /// Gets or Sets AuthorizationModelId

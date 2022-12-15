@@ -33,10 +33,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Difference" /> class.
         /// </summary>
-        /// <param name="_base">_base.</param>
-        /// <param name="subtract">subtract.</param>
+        /// <param name="_base">_base (required).</param>
+        /// <param name="subtract">subtract (required).</param>
         public Difference(Userset _base = default(Userset), Userset subtract = default(Userset)) {
+            // to ensure "_base" is required (not null)
+            if (_base == null) {
+                throw new ArgumentNullException("_base is a required property for Difference and cannot be null");
+            }
             this.Base = _base;
+            // to ensure "subtract" is required (not null)
+            if (subtract == null) {
+                throw new ArgumentNullException("subtract is a required property for Difference and cannot be null");
+            }
             this.Subtract = subtract;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -44,16 +52,16 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Base
         /// </summary>
-        [DataMember(Name = "base", EmitDefaultValue = false)]
+        [DataMember(Name = "base", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("base")]
-        public Userset? Base { get; set; }
+        public Userset Base { get; set; }
 
         /// <summary>
         /// Gets or Sets Subtract
         /// </summary>
-        [DataMember(Name = "subtract", EmitDefaultValue = false)]
+        [DataMember(Name = "subtract", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("subtract")]
-        public Userset? Subtract { get; set; }
+        public Userset Subtract { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
