@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.1
+
+### [0.2.1](https://github.com/openfga/dotnet-sdk/compare/v0.2.0...v0.2.1) (2023-01-17)
+
+- chore(deps): upgrade `Microsoft.NET.Test.Sdk` and `Moq` dev dependencies
+
 ## v0.2.0
 
 ### [0.2.0](https://github.com/openfga/dotnet-sdk/compare/v0.1.2...v0.2.0) (2022-12-14)

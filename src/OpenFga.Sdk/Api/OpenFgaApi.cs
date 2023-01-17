@@ -184,7 +184,7 @@ public class OpenFgaApi : IDisposable {
     }
 
     /// <summary>
-    /// [EXPERIMENTAL] Get all object ids of the given type that the user has a relation with The ListObjects API returns a list of all the objects of the given type that the user has a relation with. To achieve this, both the store tuples and the authorization model are used. An &#x60;authorization_model_id&#x60; may be specified in the body. If it is, it will be used to decide the underlying implementation used. If it is not specified, the latest authorization model ID will be used. You may also specify &#x60;contextual_tuples&#x60; that will be treated as regular tuples. 
+    /// [EXPERIMENTAL] Get all objects of the given type that the user has a relation with The ListObjects API returns a list of all the objects of the given type that the user has a relation with. To achieve this, both the store tuples and the authorization model are used. An &#x60;authorization_model_id&#x60; may be specified in the body. If it is, it will be used to decide the underlying implementation used. If it is not specified, the latest authorization model ID will be used. You may also specify &#x60;contextual_tuples&#x60; that will be treated as regular tuples. The response will contain the related objects in an array in the \&quot;objects\&quot; field of the response and they will be strings in the object format &#x60;&lt;type&gt;:&lt;id&gt;&#x60; (e.g. \&quot;document:roadmap\&quot;)  
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="body"></param>

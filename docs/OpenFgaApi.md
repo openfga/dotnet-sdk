@@ -9,7 +9,7 @@ Method | HTTP request | Description
 [**DeleteStore**](OpenFgaApi.md#deletestore) | **DELETE** /stores/{store_id} | Delete a store
 [**Expand**](OpenFgaApi.md#expand) | **POST** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship
 [**GetStore**](OpenFgaApi.md#getstore) | **GET** /stores/{store_id} | Get a store
-[**ListObjects**](OpenFgaApi.md#listobjects) | **POST** /stores/{store_id}/list-objects | [EXPERIMENTAL] Get all object ids of the given type that the user has a relation with
+[**ListObjects**](OpenFgaApi.md#listobjects) | **POST** /stores/{store_id}/list-objects | [EXPERIMENTAL] Get all objects of the given type that the user has a relation with
 [**ListStores**](OpenFgaApi.md#liststores) | **GET** /stores | List all stores
 [**Read**](OpenFgaApi.md#read) | **POST** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
 [**ReadAssertions**](OpenFgaApi.md#readassertions) | **GET** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
@@ -403,9 +403,9 @@ Name | Type | Description  | Notes
 # **ListObjects**
 > ListObjectsResponse ListObjects (ListObjectsRequest body)
 
-[EXPERIMENTAL] Get all object ids of the given type that the user has a relation with
+[EXPERIMENTAL] Get all objects of the given type that the user has a relation with
 
-The ListObjects API returns a list of all the objects of the given type that the user has a relation with. To achieve this, both the store tuples and the authorization model are used. An `authorization_model_id` may be specified in the body. If it is, it will be used to decide the underlying implementation used. If it is not specified, the latest authorization model ID will be used. You may also specify `contextual_tuples` that will be treated as regular tuples. 
+The ListObjects API returns a list of all the objects of the given type that the user has a relation with. To achieve this, both the store tuples and the authorization model are used. An `authorization_model_id` may be specified in the body. If it is, it will be used to decide the underlying implementation used. If it is not specified, the latest authorization model ID will be used. You may also specify `contextual_tuples` that will be treated as regular tuples. The response will contain the related objects in an array in the \"objects\" field of the response and they will be strings in the object format `<type>:<id>` (e.g. \"document:roadmap\")  
 
 ### Example
 ```csharp
@@ -434,7 +434,7 @@ namespace Example
 
             try
             {
-                // [EXPERIMENTAL] Get all object ids of the given type that the user has a relation with
+                // [EXPERIMENTAL] Get all objects of the given type that the user has a relation with
                 ListObjectsResponse response = await openFgaApi.ListObjects(body);
                 Debug.WriteLine(response);
             }
