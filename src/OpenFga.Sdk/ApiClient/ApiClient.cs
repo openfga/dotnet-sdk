@@ -14,7 +14,7 @@
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 
-namespace OpenFga.Sdk.Client;
+namespace OpenFga.Sdk.ApiClient;
 
 /// <summary>
 /// API Client - used by all the API related methods to call the API. Handles token exchange and retries.

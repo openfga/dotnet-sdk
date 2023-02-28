@@ -11,7 +11,7 @@
 //
 
 
-using OpenFga.Sdk.Client;
+using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
 
@@ -19,7 +19,7 @@ namespace OpenFga.Sdk.Api;
 
 public class OpenFgaApi : IDisposable {
     private Configuration.Configuration _configuration;
-    private ApiClient _apiClient;
+    private ApiClient.ApiClient _apiClient;
 
     /// <summary>
     /// Store ID
@@ -39,7 +39,7 @@ public class OpenFgaApi : IDisposable {
         HttpClient? httpClient = null
     ) {
         this._configuration = configuration;
-        this._apiClient = new ApiClient(_configuration, httpClient);
+        this._apiClient = new ApiClient.ApiClient(_configuration, httpClient);
     }
 
     /// <summary>

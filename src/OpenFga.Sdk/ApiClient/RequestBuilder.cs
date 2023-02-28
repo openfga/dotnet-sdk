@@ -14,7 +14,7 @@
 using OpenFga.Sdk.Exceptions;
 using System.Web;
 
-namespace OpenFga.Sdk.Client;
+namespace OpenFga.Sdk.ApiClient;
 
 public class RequestBuilder {
     public HttpMethod Method { get; set; }

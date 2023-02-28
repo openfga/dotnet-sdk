@@ -15,7 +15,7 @@ using OpenFga.Sdk.Exceptions;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
-namespace OpenFga.Sdk.Client;
+namespace OpenFga.Sdk.ApiClient;
 
 /// <summary>
 /// Base Client, used by the API and OAuth Clients
