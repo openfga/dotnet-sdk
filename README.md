@@ -3,7 +3,7 @@
 [![Nuget](https://img.shields.io/nuget/v/OpenFga.Sdk?label=OpenFga.Sdk&style=flat-square)](https://www.nuget.org/packages/OpenFga.Sdk)
 [![Release](https://img.shields.io/github/v/release/openfga/dotnet-sdk?sort=semver&color=green)](https://github.com/openfga/dotnet-sdk/releases)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
-[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B4989%2Fgithub.com%2Fopenfga%2Fdotnet-sdk.svg?type=shield)](https://app.fossa.com/reports/4b3a7481-7918-4779-b4ff-b42e5c273517)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenfga%2Fdotnet-sdk.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenfga%2Fdotnet-sdk?ref=badge_shield)
 [![Discord Server](https://img.shields.io/discord/759188666072825867?color=7289da&logo=discord "Discord Server")](https://discord.com/channels/759188666072825867/930524706854031421)
 [![Twitter](https://img.shields.io/twitter/follow/openfga?color=%23179CF0&logo=twitter&style=flat-square "@openfga on Twitter")](https://twitter.com/openfga)
 
