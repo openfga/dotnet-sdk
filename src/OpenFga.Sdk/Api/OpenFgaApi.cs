@@ -65,7 +65,7 @@ public class OpenFgaApi : IDisposable {
             PathTemplate = "/stores/{store_id}/check",
             PathParameters = pathParams,
             Body = Utils.CreateJsonStringContent(body),
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<CheckResponse>(requestBuilder,

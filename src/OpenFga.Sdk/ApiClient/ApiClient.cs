@@ -127,6 +127,14 @@ public class ApiClient : IDisposable {
 
                 await Task.Delay(waitInMs);
             }
+            catch (FgaApiError err) {
+                if (!err.ShouldRetry || numRetries > _configuration.MaxRetry) {
+                    throw;
+                }
+                var waitInMs = (int)(_configuration.MinWaitInMs);
+    
+                await Task.Delay(waitInMs);
+            }
         }
     }
 
@@ -148,6 +156,14 @@ public class ApiClient : IDisposable {
                     ? _configuration.MinWaitInMs
                     : err.ResetInMs);
 
+                await Task.Delay(waitInMs);
+            }
+            catch (FgaApiError err) {
+                if (!err.ShouldRetry || numRetries > _configuration.MaxRetry) {
+                    throw;
+                }
+                var waitInMs = (int)(_configuration.MinWaitInMs);
+    
                 await Task.Delay(waitInMs);
             }
         }

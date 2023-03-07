@@ -20,6 +20,11 @@ namespace OpenFga.Sdk.Exceptions;
 
 public class FgaApiError : ApiException {
     /// <summary>
+    /// Whether this Error should be retried
+    /// </summary>
+    public readonly bool ShouldRetry = true;
+    
+    /// <summary>
     /// The name of the API endpoint.
     /// </summary>
     [JsonPropertyName("api_name")]
@@ -111,7 +116,8 @@ public class FgaApiError : ApiException {
     /// <param name="message">The error message that explains the reason for the exception.</param>
     /// <param name="innerException">The exception that is the cause of the current exception, or a null
     /// reference if no inner exception is specified.</param>
-    public FgaApiError(HttpStatusCode statusCode, string message, Exception innerException)
+    /// <param name="shouldRetry"></param>
+    public FgaApiError(HttpStatusCode statusCode, string message, Exception innerException, bool shouldRetry = true)
         : base(message, innerException) {
         StatusCode = statusCode;
     }
@@ -134,7 +140,8 @@ public class FgaApiError : ApiException {
     /// <param name="request"></param>
     /// <param name="apiName"></param>
     /// <param name="apiError">Optional <see cref="ApiErrorParser"/> of the failing API call.</param>
-    public FgaApiError(HttpResponseMessage response, HttpRequestMessage request, string? apiName, ApiErrorParser? apiError = null)
+    /// <param name="shouldRetry"></param>
+    public FgaApiError(HttpResponseMessage response, HttpRequestMessage request, string? apiName, ApiErrorParser? apiError = null, bool shouldRetry = true)
         : this(apiError == null ? response.StatusCode.ToString() : apiError.Message) {
         StatusCode = response.StatusCode;
         ApiError = apiError ?? new ApiErrorParser();
@@ -146,6 +153,7 @@ public class FgaApiError : ApiException {
         RequestHeaders = request.Headers;
         ResponseData = response.Content;
         ResponseHeaders = response.Headers;
+        ShouldRetry = shouldRetry;
     }
 
     internal static async Task<FgaApiError> CreateAsync(HttpResponseMessage response, HttpRequestMessage request, string? apiName) {

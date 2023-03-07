@@ -66,6 +66,8 @@ public class ApiException : Exception {
             case 429:
                 return await FgaApiRateLimitExceededError.CreateAsync(response, request, apiName).ConfigureAwait(false);
             case 500:
+            case 502:
+            case 503:
                 return await FgaApiInternalError.CreateAsync(response, request, apiName).ConfigureAwait(false);
             default:
                 return await FgaApiError.CreateAsync(response, request, apiName).ConfigureAwait(false);

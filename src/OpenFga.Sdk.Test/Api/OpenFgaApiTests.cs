@@ -13,6 +13,7 @@
 using Moq;
 using Moq.Protected;
 using OpenFga.Sdk.Api;
+using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;

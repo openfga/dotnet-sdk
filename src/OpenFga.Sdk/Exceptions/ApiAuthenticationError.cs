@@ -29,13 +29,13 @@ public class FgaApiAuthenticationError : FgaApiError {
     /// <param name="innerException">The exception that is the cause of the current exception, or a null
     /// reference if no inner exception is specified.</param>
     public FgaApiAuthenticationError(string message, string apiName, Exception innerException)
-        : base(HttpStatusCode.Unauthorized, message, innerException) {
+        : base(HttpStatusCode.Unauthorized, message, innerException, false) {
         ApiName = apiName;
         Method = HttpMethod.Post;
     }
 
     public FgaApiAuthenticationError(HttpResponseMessage response, HttpRequestMessage request, string? apiName,
-        ApiErrorParser? apiError = null) : base(response, request, apiName, apiError) {
+        ApiErrorParser? apiError = null) : base(response, request, apiName, apiError, false) {
     }
 
     internal new static async Task<FgaApiAuthenticationError> CreateAsync(HttpResponseMessage response, HttpRequestMessage request, string? apiName) {

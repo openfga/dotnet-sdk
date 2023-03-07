@@ -21,7 +21,7 @@ namespace OpenFga.Sdk.Exceptions;
 public class FgaApiValidationError : FgaApiError {
     /// <inheritdoc />
     public FgaApiValidationError(HttpResponseMessage response, HttpRequestMessage request, string? apiName,
-        ApiErrorParser? apiError = null) : base(response, request, apiName, apiError) {
+        ApiErrorParser? apiError = null) : base(response, request, apiName, apiError, false) {
     }
 
     internal new static async Task<FgaApiValidationError> CreateAsync(HttpResponseMessage response, HttpRequestMessage request, string? apiName) {
