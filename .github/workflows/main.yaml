@@ -6,44 +6,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  fossa:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
-      - name: Restore dependencies
-        run: dotnet restore
-      - name: Run FOSSA scan and upload build data
-        uses: fossas/fossa-action@main
-        with:
-          api-key: ${{ secrets.FOSSA_API_KEY }}
-          branch: ${{ github.ref_name }}
-      - name: Run FOSSA tests
-        uses: fossas/fossa-action@main
-        with:
-          api-key: ${{ secrets.FOSSA_API_KEY }}
-          run-tests: true
-
-  snyk:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: 6.0.x
-      - name: Restore dependencies
-        run: dotnet restore
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/dotnet@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: src/OpenFga.Sdk/
-
   test:
     runs-on: ubuntu-latest
 
@@ -72,7 +34,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [test, fossa, snyk]
+    needs: [test]
 
     steps:
       - uses: actions/checkout@v3
