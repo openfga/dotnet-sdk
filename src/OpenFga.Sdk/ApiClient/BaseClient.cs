@@ -106,7 +106,7 @@ public class BaseClient : IDisposable {
 
         var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         {
-            if (!response.IsSuccessStatusCode) {
+            if (response == null || (response.StatusCode != null && !response.IsSuccessStatusCode)) {
                 throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
             }
 

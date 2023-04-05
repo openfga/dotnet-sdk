@@ -22,7 +22,7 @@ public class FgaApiError : ApiException {
     /// <summary>
     /// Whether this Error should be retried
     /// </summary>
-    public readonly bool ShouldRetry = true;
+    public readonly bool ShouldRetry;
     
     /// <summary>
     /// The name of the API endpoint.
@@ -58,7 +58,7 @@ public class FgaApiError : ApiException {
     /// The response data received from the API
     /// </summary>
     [JsonPropertyName("response_data")]
-    public HttpContent ResponseData { get; internal set; }
+    public HttpContent? ResponseData { get; internal set; }
 
     /// <summary>
     /// The request headers sent to the API
@@ -70,7 +70,7 @@ public class FgaApiError : ApiException {
     /// The response headers received from the API
     /// </summary>
     [JsonPropertyName("response_headers")]
-    public HttpResponseHeaders ResponseHeaders { get; internal set; }
+    public HttpResponseHeaders? ResponseHeaders { get; internal set; }
 
     /// <summary>
     /// Optional <see cref="ApiError"/> from the failing API call.
@@ -117,7 +117,7 @@ public class FgaApiError : ApiException {
     /// <param name="innerException">The exception that is the cause of the current exception, or a null
     /// reference if no inner exception is specified.</param>
     /// <param name="shouldRetry"></param>
-    public FgaApiError(HttpStatusCode statusCode, string message, Exception innerException, bool shouldRetry = true)
+    public FgaApiError(HttpStatusCode statusCode, string message, Exception innerException, bool shouldRetry = false)
         : base(message, innerException) {
         StatusCode = statusCode;
     }
@@ -128,7 +128,7 @@ public class FgaApiError : ApiException {
     /// <param name="statusCode"><see cref="HttpStatusCode"/>code of the failing API call.</param>
     /// <param name="apiError">Optional <see cref="ApiErrorParser"/> of the failing API call.</param>
     public FgaApiError(HttpStatusCode statusCode, ApiErrorParser? apiError = null)
-        : this(apiError == null ? statusCode.ToString() : apiError.Message) {
+        : this((apiError == null ? statusCode.ToString() : apiError.Message) ?? string.Empty) {
         StatusCode = statusCode;
         ApiError = apiError ?? new ApiErrorParser();
     }
@@ -141,9 +141,9 @@ public class FgaApiError : ApiException {
     /// <param name="apiName"></param>
     /// <param name="apiError">Optional <see cref="ApiErrorParser"/> of the failing API call.</param>
     /// <param name="shouldRetry"></param>
-    public FgaApiError(HttpResponseMessage response, HttpRequestMessage request, string? apiName, ApiErrorParser? apiError = null, bool shouldRetry = true)
-        : this(apiError == null ? response.StatusCode.ToString() : apiError.Message) {
-        StatusCode = response.StatusCode;
+    public FgaApiError(HttpResponseMessage? response, HttpRequestMessage request, string? apiName, ApiErrorParser? apiError = null, bool shouldRetry = false)
+        : this((apiError == null ? (response?.StatusCode.ToString()) : apiError.Message) ?? string.Empty) {
+        StatusCode = response?.StatusCode ?? HttpStatusCode.InternalServerError;
         ApiError = apiError ?? new ApiErrorParser();
         StoreId = request.RequestUri?.LocalPath.Split("/")[2];
         ApiName = apiName;
@@ -151,8 +151,8 @@ public class FgaApiError : ApiException {
         RequestUrl = request.RequestUri?.ToString();
         RequestData = request.Content;
         RequestHeaders = request.Headers;
-        ResponseData = response.Content;
-        ResponseHeaders = response.Headers;
+        ResponseData = response?.Content;
+        ResponseHeaders = response?.Headers;
         ShouldRetry = shouldRetry;
     }
 

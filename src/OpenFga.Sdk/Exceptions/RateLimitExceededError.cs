@@ -57,7 +57,7 @@ public class FgaApiRateLimitExceededError : FgaApiError {
     /// <param name="apiName"></param>
     /// <param name="apiError"></param>
     public FgaApiRateLimitExceededError(HttpResponseMessage response, HttpRequestMessage request, string? apiName,
-        ApiErrorParser? apiError = null) : base(response, request, apiName, apiError) {
+        ApiErrorParser? apiError = null) : base(response, request, apiName, apiError, true) {
         var rateLimit = RateLimitParser.Parse(response.Headers,
             request.Method, apiName);
         Limit = rateLimit.Limit;

@@ -848,7 +848,7 @@ public class OpenFgaClientTests {
 
         mockHandler.Protected().Verify(
             "SendAsync",
-            Times.Exactly(5),
+            Times.Exactly(4),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
                 req.Method == HttpMethod.Post),
@@ -1083,7 +1083,7 @@ public class OpenFgaClientTests {
 
         mockHandler.Protected().Verify(
             "SendAsync",
-            Times.Exactly(5),
+            Times.Exactly(4),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
                 req.Method == HttpMethod.Post),

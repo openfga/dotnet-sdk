@@ -11,6 +11,7 @@
 //
 
 
+using System.Net;
 using System.Runtime.Serialization;
 
 namespace OpenFga.Sdk.Exceptions;
@@ -54,22 +55,24 @@ public class ApiException : Exception {
     /// <param name="request"><see cref="HttpRequestMessage"/></param>
     /// <param name="apiName"></param>
     /// <returns>An instance of a <see cref="ApiException"/> subclass containing the appropriate exception for this response.</returns>
-    public static async Task<ApiException> CreateSpecificExceptionAsync(HttpResponseMessage response, HttpRequestMessage request,
+    public static async Task<ApiException> CreateSpecificExceptionAsync(HttpResponseMessage? response, HttpRequestMessage request,
         string? apiName = null) {
-        switch ((int)response.StatusCode) {
-            case 401:
-            case 403:
+        var statusCode = response?.StatusCode;
+        switch (statusCode) {
+            case HttpStatusCode.Unauthorized:
+            case HttpStatusCode.Forbidden:
                 return await FgaApiAuthenticationError.CreateAsync(response, request, apiName).ConfigureAwait(false);
-            case 400:
-            case 442:
+            case HttpStatusCode.BadRequest:
+            case HttpStatusCode.UnprocessableEntity:
                 return await FgaApiValidationError.CreateAsync(response, request, apiName).ConfigureAwait(false);
-            case 429:
+            case HttpStatusCode.NotFound:
+                return await FgaApiNotFoundError.CreateAsync(response, request, apiName).ConfigureAwait(false);
+            case HttpStatusCode.TooManyRequests:
                 return await FgaApiRateLimitExceededError.CreateAsync(response, request, apiName).ConfigureAwait(false);
-            case 500:
-            case 502:
-            case 503:
-                return await FgaApiInternalError.CreateAsync(response, request, apiName).ConfigureAwait(false);
             default:
+                if (statusCode >= HttpStatusCode.InternalServerError && statusCode != HttpStatusCode.NotImplemented) {
+                    return await FgaApiInternalError.CreateAsync(response, request, apiName).ConfigureAwait(false);
+                }
                 return await FgaApiError.CreateAsync(response, request, apiName).ConfigureAwait(false);
         }
     }
