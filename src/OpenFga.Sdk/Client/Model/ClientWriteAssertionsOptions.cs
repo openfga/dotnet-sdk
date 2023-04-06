@@ -21,11 +21,6 @@ public interface IClientWriteAssertionsOptions : ClientRequestOptions, Authoriza
 
 /// <inheritdoc />
 public class ClientWriteAssertionsOptions : IClientWriteAssertionsOptions {
-    /// <inheritdoc />
-    public RetryParams? RetryParams { get; set; }
-
-    /// <inheritdoc />
-    public Dictionary<string, string>? Headers { get; set; }
 
     /// <inheritdoc />
     public string? AuthorizationModelId { get; set; }

@@ -21,11 +21,6 @@ public interface IClientReadAuthorizationModelsOptions : ClientRequestOptions, C
 
 /// <inheritdoc />
 public class ClientReadAuthorizationModelsOptions : IClientReadAuthorizationModelsOptions {
-    /// <inheritdoc />
-    public RetryParams? RetryParams { get; set; }
-
-    /// <inheritdoc />
-    public Dictionary<string, string>? Headers { get; set; }
 
     /// <inheritdoc />
     public int? PageSize { get; set; }

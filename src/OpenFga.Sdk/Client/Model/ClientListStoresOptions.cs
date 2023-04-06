@@ -21,11 +21,6 @@ public interface IClientListStoresOptions : ClientRequestOptions, AuthorizationM
 
 /// <inheritdoc />
 public class ClientListStoresOptions : IClientListStoresOptions {
-    /// <inheritdoc />
-    public RetryParams? RetryParams { get; set; }
-
-    /// <inheritdoc />
-    public Dictionary<string, string>? Headers { get; set; }
 
     /// <inheritdoc />
     public string? AuthorizationModelId { get; set; }

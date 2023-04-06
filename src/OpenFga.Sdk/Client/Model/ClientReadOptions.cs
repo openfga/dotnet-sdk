@@ -21,11 +21,6 @@ public interface IClientReadOptions : ClientRequestOptions, ClientPaginationOpti
 
 /// <inheritdoc />
 public class ClientReadOptions : IClientReadOptions {
-    /// <inheritdoc />
-    public RetryParams? RetryParams { get; set; }
-
-    /// <inheritdoc />
-    public Dictionary<string, string>? Headers { get; set; }
 
     /// <inheritdoc />
     public int? PageSize { get; set; }

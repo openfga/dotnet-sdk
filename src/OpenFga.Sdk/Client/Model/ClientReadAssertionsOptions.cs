@@ -21,11 +21,6 @@ public interface IClientReadAssertionsOptions : ClientRequestOptions, Authorizat
 
 /// <inheritdoc />
 public class ClientReadAssertionsOptions : IClientReadAssertionsOptions {
-    /// <inheritdoc />
-    public RetryParams? RetryParams { get; set; }
-
-    /// <inheritdoc />
-    public Dictionary<string, string>? Headers { get; set; }
 
     /// <inheritdoc />
     public string? AuthorizationModelId { get; set; }
