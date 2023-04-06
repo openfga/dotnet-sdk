@@ -13,8 +13,20 @@
 
 namespace OpenFga.Sdk.Client.Model;
 
-public class ClientBatchCheckOptions : IClientRequestOptionsWithAuthZModelId {
+public interface IClientBatchCheckOptions : IClientRequestOptionsWithAuthZModelId {
+    /// <summary>
+    ///     Max Requests to issue in parallel
+    /// </summary>
+    public int? MaxParallelRequests { get; set; }
+}
+
+public class ClientBatchCheckOptions : IClientBatchCheckOptions {
 
     /// <inheritdoc />
     public string? AuthorizationModelId { get; set; }
+
+    /// <summary>
+    ///     Max Requests to issue in parallel
+    /// </summary>
+    public int? MaxParallelRequests { get; set; }
 }

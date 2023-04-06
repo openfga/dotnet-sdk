@@ -859,7 +859,7 @@ public class OpenFgaClientTests {
                 Object = "document:roadmap",
             }
         };
-        var options = new ClientCheckOptions { };
+        var options = new ClientBatchCheckOptions { };
         var response = await fgaClient.BatchCheck(body, options);
 
         mockHandler.Protected().Verify(

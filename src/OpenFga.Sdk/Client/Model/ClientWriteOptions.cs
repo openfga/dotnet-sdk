@@ -28,9 +28,9 @@ public interface TransactionOpts {
     int? MaxPerChunk { get; set; }
 
     /// <summary>
-    ///     Time to wait between writing chunks
+    ///     Max Requests to issue in parallel
     /// </summary>
-    int? WaitTimeBetweenChunksInMs { get; set; }
+    int? MaxParallelRequests { get; set; }
 }
 
 public interface IClientWriteOptions : IClientRequestOptionsWithAuthZModelId {
@@ -38,11 +38,6 @@ public interface IClientWriteOptions : IClientRequestOptionsWithAuthZModelId {
 }
 
 public class ClientWriteOptions : IClientWriteOptions {
-    /// <inheritdoc />
-    public RetryParams? RetryParams { get; set; }
-
-    public Dictionary<string, string>? Headers { get; set; }
-
     /// <summary>
     ///     Override the Authorization Model ID for this request
     /// </summary>

@@ -165,8 +165,8 @@ public class OpenFgaClient : IDisposable {
         var maxPerChunk =
             options.Transaction?.MaxPerChunk ??
             1; // 1 has to be the default otherwise the chunks will be sent in transactions
-        var waitTimeBetweenChunksInMs =
-            options.Transaction?.WaitTimeBetweenChunksInMs ?? DEFAULT_WAIT_TIME_BETWEEN_CHUNKS_IN_MS;
+        var maxParallelReqs =
+            options.Transaction?.MaxParallelRequests ?? DEFAULT_MAX_METHOD_PARALLEL_REQS;
         var authorizationModelId = GetAuthorizationModelId(options);
 
         if (options.Transaction?.Disable != true) {
@@ -188,56 +188,60 @@ public class OpenFgaClient : IDisposable {
             };
         }
 
-        var responses = new ClientWriteResponse {
-            Writes = new List<ClientWriteSingleResponse>(),
-            Deletes = new List<ClientWriteSingleResponse>()
-        };
-
         var writeChunks = body.Writes?.Chunk(maxPerChunk).ToList() ?? new List<TupleKey[]>();
-        for (var index = 0; index < writeChunks.Count(); index++) {
-            var request = writeChunks[index].ToList();
-            try {
-                var response = await api.Write(
-                    new WriteRequest { Writes = new TupleKeys(request), AuthorizationModelId = authorizationModelId },
-                    cancellationToken);
-
-                responses.Writes.AddRange(request.ConvertAll(req => new ClientWriteSingleResponse {
-                    TupleKey = req,
-                    Status = ClientWriteStatus.SUCCESS
-                }));
-            }
-            catch (Exception e) {
-                responses.Writes.AddRange(request.ConvertAll(req => new ClientWriteSingleResponse {
-                    TupleKey = req,
-                    Status = ClientWriteStatus.FAILURE,
-                    Error = e
-                }));
-            }
-        }
-
         var deleteChunks = body.Deletes?.Chunk(maxPerChunk).ToList() ?? new List<TupleKey[]>();
-        for (var index = 0; index < deleteChunks.Count(); index++) {
-            var request = deleteChunks[index].ToList();
-            try {
-                var response = await api.Write(
-                    new WriteRequest { Deletes = new TupleKeys(request), AuthorizationModelId = authorizationModelId },
-                    cancellationToken);
 
-                responses.Deletes.AddRange(request.ConvertAll(req => new ClientWriteSingleResponse {
-                    TupleKey = req,
-                    Status = ClientWriteStatus.SUCCESS
-                }));
-            }
-            catch (Exception e) {
-                responses.Deletes.AddRange(request.ConvertAll(req => new ClientWriteSingleResponse {
-                    TupleKey = req,
-                    Status = ClientWriteStatus.FAILURE,
-                    Error = e
-                }));
-            }
-        }
+        var writeResponses = new ConcurrentBag<ClientWriteSingleResponse>();
+        var deleteResponses = new ConcurrentBag<ClientWriteSingleResponse>();
+        await Parallel.ForEachAsync(writeChunks,
+            new ParallelOptions { MaxDegreeOfParallelism = maxParallelReqs }, async (request, token) => {
+                var writes = request.ToList();
+                try {
+                    await this.api.Write(new WriteRequest { Writes = new TupleKeys(writes), AuthorizationModelId = authorizationModelId }, cancellationToken);
 
-        return responses;
+                    foreach (var tupleKey in writes) {
+                        writeResponses.Add(new ClientWriteSingleResponse {
+                            TupleKey = tupleKey,
+                            Status = ClientWriteStatus.SUCCESS,
+                        });
+                    }
+                }
+                catch (Exception e) {
+                    foreach (var tupleKey in writes) {
+                        writeResponses.Add(new ClientWriteSingleResponse {
+                            TupleKey = tupleKey,
+                            Status = ClientWriteStatus.FAILURE,
+                            Error = e,
+                        });
+                    }
+                }
+            });
+
+        await Parallel.ForEachAsync(deleteChunks,
+            new ParallelOptions { MaxDegreeOfParallelism = maxParallelReqs }, async (request, token) => {
+                var deletes = request.ToList();
+                try {
+                    await this.api.Write(new WriteRequest { Deletes = new TupleKeys(deletes), AuthorizationModelId = authorizationModelId }, cancellationToken);
+
+                    foreach (var tupleKey in deletes) {
+                        deleteResponses.Add(new ClientWriteSingleResponse {
+                            TupleKey = tupleKey,
+                            Status = ClientWriteStatus.SUCCESS,
+                        });
+                    }
+                }
+                catch (Exception e) {
+                    foreach (var tupleKey in deletes) {
+                        deleteResponses.Add(new ClientWriteSingleResponse {
+                            TupleKey = tupleKey,
+                            Status = ClientWriteStatus.FAILURE,
+                            Error = e,
+                        });
+                    }
+                }
+            });
+
+        return new ClientWriteResponse { Writes = writeResponses.ToList(), Deletes = deleteResponses.ToList() };
     }
 
     /**
@@ -279,11 +283,11 @@ public class OpenFgaClient : IDisposable {
    * BatchCheck - Run a set of checks (evaluates)
    */
     public async Task<BatchCheckResponse> BatchCheck(List<ClientCheckRequest> body,
-        IClientRequestOptionsWithAuthZModelId? options = default,
+        IClientBatchCheckOptions? options = default,
         CancellationToken cancellationToken = default) {
         var responses = new ConcurrentBag<BatchCheckSingleResponse>();
         await Parallel.ForEachAsync(body,
-            new ParallelOptions { MaxDegreeOfParallelism = DEFAULT_MAX_METHOD_PARALLEL_REQS }, async (request, token) => {
+            new ParallelOptions { MaxDegreeOfParallelism = options?.MaxParallelRequests ?? DEFAULT_MAX_METHOD_PARALLEL_REQS }, async (request, token) => {
                 try {
                     var response = await Check(request, options, cancellationToken);
 
@@ -331,7 +335,7 @@ public class OpenFgaClient : IDisposable {
      * ListRelations - List all the relations a user has with an object (evaluates)
      */
     public async Task<ListRelationsResponse> ListRelations(ListRelationsRequest body,
-        IClientRequestOptionsWithAuthZModelId? options = default,
+        IClientBatchCheckOptions? options = default,
         CancellationToken cancellationToken = default) {
         var responses = new ListRelationsResponse();
         var batchCheckRequests = new List<ClientCheckRequest>();
