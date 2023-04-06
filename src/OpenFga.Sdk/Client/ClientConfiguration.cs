@@ -1,3 +1,16 @@
+//
+// OpenFGA/.NET SDK for OpenFGA
+//
+// API version: 0.1
+// Website: https://openfga.dev
+// Documentation: https://openfga.dev/docs
+// Support: https://discord.gg/8naAwJfWN6
+// License: [Apache-2.0](https://github.com/openfga/dotnet-sdk/blob/main/LICENSE)
+//
+// NOTE: This file was auto generated. DO NOT EDIT.
+//
+
+
 using OpenFga.Sdk.Client.Model;
 
 namespace OpenFga.Sdk.Client;
@@ -10,7 +23,7 @@ public class ClientConfiguration : Configuration.Configuration {
         Credentials = config.Credentials;
         DefaultHeaders = config.DefaultHeaders;
         StoreId = config.StoreId;
-        RetryParams = new RetryParams {MaxRetry = config.MaxRetry, MinWaitInMs = config.MinWaitInMs};
+        RetryParams = new RetryParams { MaxRetry = config.MaxRetry, MinWaitInMs = config.MinWaitInMs };
     }
 
     public ClientConfiguration() { }

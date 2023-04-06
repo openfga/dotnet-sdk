@@ -34,11 +34,15 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="AuthorizationModel" /> class.
         /// </summary>
         /// <param name="id">id.</param>
-        /// <param name="schemaVersion">schemaVersion.</param>
+        /// <param name="schemaVersion">schemaVersion (required).</param>
         /// <param name="typeDefinitions">typeDefinitions.</param>
         public AuthorizationModel(string id = default(string), string schemaVersion = default(string), List<TypeDefinition> typeDefinitions = default(List<TypeDefinition>)) {
-            this.Id = id;
+            // to ensure "schemaVersion" is required (not null)
+            if (schemaVersion == null) {
+                throw new ArgumentNullException("schemaVersion is a required property for AuthorizationModel and cannot be null");
+            }
             this.SchemaVersion = schemaVersion;
+            this.Id = id;
             this.TypeDefinitions = typeDefinitions;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -53,9 +57,9 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets SchemaVersion
         /// </summary>
-        [DataMember(Name = "schema_version", EmitDefaultValue = false)]
+        [DataMember(Name = "schema_version", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("schema_version")]
-        public string? SchemaVersion { get; set; }
+        public string SchemaVersion { get; set; }
 
         /// <summary>
         /// Gets or Sets TypeDefinitions

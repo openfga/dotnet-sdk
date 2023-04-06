@@ -91,9 +91,9 @@ Search for and install `OpenFga.Sdk` in each of their respective package manager
 
 [Learn how to initialize your SDK](https://openfga.dev/docs/getting-started/setup-sdk-client)
 
-The documentation below refers to the `OpenFgaClient`, to read the documentation for `OpenFgaApi`, check out the [`v0.2.1` documentation](https://github.com/openfga/dotnet-sdk/tree/v0.2.1#readme).
+The documentation below refers to the `OpenFga.SdkClient`, to read the documentation for `OpenFga.SdkApi`, check out the [`v0.2.1` documentation](https://github.com/openfga/dotnet-sdk/tree/v0.2.1#readme).
 
-> The OpenFgaClient will by default retry API requests up to 15 times on 429 and 5xx errors.
+> The OpenFga.SdkClient will by default retry API requests up to 15 times on 429 and 5xx errors.
 
 #### No Credentials
 
@@ -204,6 +204,8 @@ If your server is configured with [authentication enabled](https://openfga.dev/d
 
 ##### List Stores
 
+Get a paginated list of stores.
+
 [API Documentation](https://openfga.dev/api/service/docs/api#/Stores/ListStores)
 
 ```csharp
@@ -217,6 +219,8 @@ var response = await fgaClient.ListStores(options);
 ```
 
 ##### Create Store
+
+Initialize a store.
 
 [API Documentation](https://openfga.dev/api/service/docs/api#/Stores/CreateStore)
 
@@ -235,6 +239,8 @@ fgaClient.StoreId = storeId;
 
 ##### Get Store
 
+Get information about the current store.
+
 [API Documentation](https://openfga.dev/api/service/docs/api#/Stores/GetStore)
 
 > Requires a client initialized with a storeId
@@ -247,6 +253,8 @@ var store = await fgaClient.GetStore();
 
 ##### Delete Store
 
+Delete a store.
+
 [API Documentation](https://openfga.dev/api/service/docs/api#/Stores/DeleteStore)
 
 > Requires a client initialized with a storeId
@@ -258,6 +266,8 @@ var store = await fgaClient.DeleteStore();
 #### Authorization Models
 
 ##### Read Authorization Models
+
+Read all versions of the authorization model.
 
 [API Documentation](https://openfga.dev/api/service#/Authorization%20Models/ReadAuthorizationModels)
 
@@ -274,6 +284,8 @@ var response = await fgaClient.ReadAuthorizationModels(options);
 ```
 
 ##### Write Authorization Model
+
+Create a new version of the authorization model.
 
 [API Documentation](https://openfga.dev/api/service#/Authorization%20Models/WriteAuthorizationModel)
 
@@ -305,6 +317,8 @@ var response = await fgaClient.WriteAuthorizationModel(body);
 
 #### Read a Single Authorization Model
 
+Read a particular version of the Authorization Model.
+
 [API Documentation](https://openfga.dev/api/service#/Authorization%20Models/ReadAuthorizationModel)
 
 ```csharp
@@ -321,7 +335,7 @@ var response = await fgaClient.ReadAuthorizationModel(options);
 
 ##### Read the Latest Authorization Model
 
-Reads the latest authorization model (note: this ignores the model id in configuration).
+Reads the latest authorization model versions (note: this ignores the model id in configuration).
 
 [API Documentation](https://openfga.dev/api/service#/Authorization%20Models/ReadAuthorizationModel)
 
@@ -335,6 +349,8 @@ var response = await fgaClient.ReadLatestAuthorizationModel();
 #### Relationship Tuples
 
 ##### Read Relationship Tuple Changes (Watch)
+
+Reads the list of historical relationship tuple writes and deletes.
 
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Tuples/ReadChanges)
 
@@ -355,6 +371,8 @@ var response = await fgaClient.ReadChanges(body, options);
 ```
 
 ##### Read Relationship Tuples
+
+Reads the relationship tuple stored in the database (does not evaluate according to the model).
 
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Tuples/Read)
 
@@ -404,6 +422,8 @@ var response = await fgaClient.Read(body, options);
 
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Tuples/Write)
 
+Create and/or delete relationship tuples to update the system state.
+
 ```csharp
 var body = new ClientWriteRequest() {
     Writes = new List<ClientTupleKey> {
@@ -433,14 +453,21 @@ var body = new WriteRequest{Deletes = new TupleKeys(new List<TupleKey>
     {new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")}), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"};
 var response = await fgaClient.Write(body);
 ```
-
+TODO
 ###### Transaction mode (default)
 
+By default, write runs in a transaction mode where any invalid operation (deleting a non-exiting tuple, creating an existing tuple, one of the tuples was invalid) or a server error will fail the entire operation.
+
+
 ###### Non-transaction mode
+
+The SDK will split the writes into separate requests and send them sequentially to avoid violating rate limits.
 
 #### Relationship Queries
 
 ##### Check
+
+Check if a user has a particular relation with an object.
 
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Queries/Check)
 
@@ -458,7 +485,7 @@ var response = await fgaClient.Check(body, options);
 ##### Batch Check
 
 Run a set of [checks](#check). Batch Check will return `allowed: false` if it encounters an error, and will return the error in the body.
-If 429s or 5xxs are encountered, the underlying check will retry up to 5 times before giving up.
+If 429s or 5xxs are encountered, the underlying check will retry up to 15 times before giving up.
 
 ```csharp
 var options = new ClientCheckOptions {
@@ -550,6 +577,8 @@ response.Responses = [{
 
 ##### Expand
 
+Expands the relationships in userset tree format.
+
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Queries/Expand)
 
 ```csharp
@@ -567,6 +596,8 @@ var response = await fgaClient.Expand(body, options);
 ```
 
 #### List Objects
+
+List the objects of a particular type a user has access to.
 
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Queries/ListObjects)
 
@@ -587,6 +618,29 @@ var response = await fgaClient.ListObjects(body);
 // response.Objects = ["document:roadmap"]
 ```
 
+#### List Relations
+
+List the relations a user has on an object.
+
+```csharp
+ListRelationsRequest body =
+    new ListRelationsRequest() {
+        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+        Object = "document:roadmap",
+        Relations = new List<string> {"can_view", "can_edit", "can_delete", "can_rename"},
+        ContextualTuples = new List<ClientTupleKey>() {
+            new ClientTupleKey {
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                Relation = "editor",
+                Object = "document:roadmap",
+            }
+        }
+    };
+var response = await fgaClient.ListRelations(body);
+
+// response.Relations = ["can_view", "can_edit"]
+```
+
 
 ### API Endpoints
 
@@ -597,7 +651,7 @@ var response = await fgaClient.ListObjects(body);
 | [**DeleteStore**](docs/OpenFgaApi.md#deletestore) | **DELETE** /stores/{store_id} | Delete a store |
 | [**Expand**](docs/OpenFgaApi.md#expand) | **POST** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship |
 | [**GetStore**](docs/OpenFgaApi.md#getstore) | **GET** /stores/{store_id} | Get a store |
-| [**ListObjects**](docs/OpenFgaApi.md#listobjects) | **POST** /stores/{store_id}/list-objects | [EXPERIMENTAL] Get all objects of the given type that the user has a relation with |
+| [**ListObjects**](docs/OpenFgaApi.md#listobjects) | **POST** /stores/{store_id}/list-objects | Get all objects of the given type that the user has a relation with |
 | [**ListStores**](docs/OpenFgaApi.md#liststores) | **GET** /stores | List all stores |
 | [**Read**](docs/OpenFgaApi.md#read) | **POST** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules |
 | [**ReadAssertions**](docs/OpenFgaApi.md#readassertions) | **GET** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID |

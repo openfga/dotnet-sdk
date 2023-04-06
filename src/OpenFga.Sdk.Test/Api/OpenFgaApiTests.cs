@@ -14,7 +14,6 @@ using Moq;
 using Moq.Protected;
 using OpenFga.Sdk.Api;
 using OpenFga.Sdk.ApiClient;
-using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Exceptions.Parsers;
@@ -448,7 +447,9 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
 
             var config = new Configuration.Configuration() {
-                StoreId = _storeId, ApiHost = _host, MaxRetry = 1,
+                StoreId = _storeId,
+                ApiHost = _host,
+                MaxRetry = 1,
             };
             var openFgaApi = new OpenFgaApi(config, httpClient);
 
@@ -470,7 +471,8 @@ namespace OpenFga.Sdk.Test.Api {
                 ItExpr.IsAny<CancellationToken>()
             );
         }
-        
+
+
         /// <summary>
         /// Test 500s return FgaApiInternalError
         /// </summary>
@@ -509,13 +511,13 @@ namespace OpenFga.Sdk.Test.Api {
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
-            
+
             Assert.IsType<CheckResponse>(response);
             Assert.True(response.Allowed);
         }
 
         /// <summary>
-        /// Test 404s return FgaApiError
+        /// Test 404s return FgaApiNotFoundError
         /// </summary>
         [Fact]
         public async Task FgaNotFoundErrorTest() {
@@ -618,8 +620,12 @@ namespace OpenFga.Sdk.Test.Api {
                 .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, true));
 
             var httpClient = new HttpClient(mockHandler.Object);
-
-            var openFgaApi = new OpenFgaApi(_config, httpClient);
+            var config = new Configuration.Configuration() {
+                StoreId = _storeId,
+                ApiHost = _host,
+                MaxRetry = 5,
+            };
+            var openFgaApi = new OpenFgaApi(config, httpClient);
 
             var body = new CheckRequest(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
 
@@ -675,7 +681,7 @@ namespace OpenFga.Sdk.Test.Api {
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
-            
+
             Assert.IsType<CheckResponse>(response);
             Assert.True(response.Allowed);
         }
@@ -781,7 +787,10 @@ namespace OpenFga.Sdk.Test.Api {
                     }))
                 }
             };
-            var body = new WriteAuthorizationModelRequest(new List<TypeDefinition>() { new("repo", relations) });
+            var body = new WriteAuthorizationModelRequest {
+                SchemaVersion = "1.1",
+                TypeDefinitions = new List<TypeDefinition>() { new("repo", relations) }
+            };
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
             mockHandler.Protected()
@@ -836,7 +845,7 @@ namespace OpenFga.Sdk.Test.Api {
                     StatusCode = HttpStatusCode.OK,
                     Content = Utils.CreateJsonStringContent(new ReadAuthorizationModelResponse() {
                         AuthorizationModel = new AuthorizationModel(id: authorizationModelId,
-                                typeDefinitions: new List<TypeDefinition>())
+                                typeDefinitions: new List<TypeDefinition>(), schemaVersion: "1.1")
                     }),
                 });
 

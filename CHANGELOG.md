@@ -2,7 +2,7 @@
 
 ## v0.2.2
 
-### [0.2.2](https://github.com/openfga/js-sdk/compare/v0.2.1...v0.2.2) (2023-04-07)
+### [0.2.2](https://github.com/openfga/dotnet-sdk/compare/v0.2.1...v0.2.2) (2023-04-07)
 
 - feat(client): add OpenFgaClient wrapper see [docs](https://github.com/openfga/dotnet-sdk/tree/main#readme), see the `v0.2.1` docs for [the OpenFgaApi docs](https://github.com/openfga/dotnet-sdk/tree/v0.2.1#readme)
 - feat(client): implement `BatchCheck` to check multiple tuples in parallel

@@ -23,7 +23,7 @@ public class FgaApiError : ApiException {
     /// Whether this Error should be retried
     /// </summary>
     public readonly bool ShouldRetry;
-    
+
     /// <summary>
     /// The name of the API endpoint.
     /// </summary>

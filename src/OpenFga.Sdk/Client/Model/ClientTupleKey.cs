@@ -1,3 +1,16 @@
+//
+// OpenFGA/.NET SDK for OpenFGA
+//
+// API version: 0.1
+// Website: https://openfga.dev
+// Documentation: https://openfga.dev/docs
+// Support: https://discord.gg/8naAwJfWN6
+// License: [Apache-2.0](https://github.com/openfga/dotnet-sdk/blob/main/LICENSE)
+//
+// NOTE: This file was auto generated. DO NOT EDIT.
+//
+
+
 using OpenFga.Sdk.Model;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
@@ -37,7 +50,7 @@ public class ClientTupleKey : TupleKey {
     [JsonPropertyName("user")]
     public new string User { get; set; }
 
-    public virtual TupleKey ToTupleKey() => new TupleKey {User = User, Relation = Relation, Object = Object};
+    public virtual TupleKey ToTupleKey() => new TupleKey { User = User, Relation = Relation, Object = Object };
 
     public virtual string ToJson() => JsonSerializer.Serialize(this);
 

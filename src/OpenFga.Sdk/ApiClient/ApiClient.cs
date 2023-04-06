@@ -131,8 +131,8 @@ public class ApiClient : IDisposable {
                 if (!err.ShouldRetry || numRetries > _configuration.MaxRetry) {
                     throw;
                 }
-                var waitInMs = (int)(_configuration.MinWaitInMs);
-    
+                var waitInMs = _configuration.MinWaitInMs;
+
                 await Task.Delay(waitInMs);
             }
         }
@@ -162,8 +162,8 @@ public class ApiClient : IDisposable {
                 if (!err.ShouldRetry || numRetries > _configuration.MaxRetry) {
                     throw;
                 }
-                var waitInMs = (int)(_configuration.MinWaitInMs);
-    
+                var waitInMs = _configuration.MinWaitInMs;
+
                 await Task.Delay(waitInMs);
             }
         }

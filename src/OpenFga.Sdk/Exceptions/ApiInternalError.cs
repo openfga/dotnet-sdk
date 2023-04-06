@@ -12,7 +12,6 @@
 
 
 using OpenFga.Sdk.Exceptions.Parsers;
-
 namespace OpenFga.Sdk.Exceptions;
 
 public class FgaApiInternalError : FgaApiError {
