@@ -779,17 +779,33 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public async Task WriteAuthorizationModelTest() {
             const string authorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw";
-            var relations = new Dictionary<string, Userset>() {
-                {"writer", new Userset(_this: new object())}, {
-                    "viewer",
-                    new Userset(union: new Usersets(new List<Userset>() {
-                        new(new object(), new ObjectRelation("", "writer"))
-                    }))
-                }
-            };
             var body = new WriteAuthorizationModelRequest {
                 SchemaVersion = "1.1",
-                TypeDefinitions = new List<TypeDefinition>() { new("repo", relations) }
+                TypeDefinitions = new List<TypeDefinition>() {
+                    new() {
+                        Type = "user",
+                        Relations = new Dictionary<string, Userset>() {}
+                    },
+                    new() {
+                        Type = "document",
+                        Relations = new Dictionary<string, Userset>()
+                            {
+                                {"writer", new Userset(_this: new object())},
+                                {
+                                    "viewer",
+                                    new Userset(union: new Usersets(new List<Userset>()
+                                        {new(new object(), new ObjectRelation("", "writer"))}))
+                                }
+                            },
+                        Metadata = new Metadata() {
+                            Relations = new Dictionary<string, RelationMetadata>() { {
+                                "viewer", new RelationMetadata() { DirectlyRelatedUserTypes = new List<RelationReference> {
+                                    new () { Type = "user"}
+                                } }
+                            } }
+                        },
+                    }
+                }
             };
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
