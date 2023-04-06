@@ -393,7 +393,7 @@ public class OpenFgaClient : IDisposable {
 
         for (var index = 0; index < body.Count; index++) {
             var assertion = body[index];
-            assertions.Append(new Assertion {
+            assertions.Add(new Assertion {
                 TupleKey = new TupleKey {
                     User = assertion.User,
                     Relation = assertion.Relation,
