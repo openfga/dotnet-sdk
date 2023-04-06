@@ -279,8 +279,8 @@ var options = new ClientReadAuthorizationModelsOptions {
 var response = await fgaClient.ReadAuthorizationModels(options);
 
 // response.AuthorizationModels = [
-// { id: "1uHxCSuTP0VKPYSnkq1pbb1jeZw", type_definitions: [...] },
-// { id: "GtQpMohWezFmIbyXxVEocOCxxgq", type_definitions: [...] }];
+// { id: "1uHxCSuTP0VKPYSnkq1pbb1jeZw", schema_version: "1.1", type_definitions: [...] },
+// { id: "GtQpMohWezFmIbyXxVEocOCxxgq", schema_version: "1.1", type_definitions: [...] }];
 ```
 
 ##### Write Authorization Model
@@ -296,20 +296,22 @@ Create a new version of the authorization model.
 > You can use the [OpenFGA Syntax Transformer](https://github.com/openfga/syntax-transformer) to convert between the friendly DSL and the JSON authorization model.
 
 ```csharp
-var documentRelations = new Dictionary<string, Userset>()
-{
-    {"writer", new Userset(_this: new object())},
-    {
-        "viewer",
-        new Userset(union: new Usersets(new List<Userset>()
-            {new(new object(), new ObjectRelation("", "writer"))}))
+var body = new WriteAuthorizationModelRequest {
+    SchemaVersion = "1.1",
+    TypeDefinitions = new List<TypeDefinition>() {
+        new("user", new Dictionary<string, Userset>() {}),
+        new("document", new Dictionary<string, Userset>()
+            {
+                {"writer", new Userset(_this: new object())},
+                {
+                    "viewer",
+                    new Userset(union: new Usersets(new List<Userset>()
+                        {new(new object(), new ObjectRelation("", "writer"))}))
+                }
+            };
+        )
     }
 };
-var userRelations = new Dictionary<string, Userset>()
-{
-};
-
-var body = new WriteAuthorizationModelRequest(new List<TypeDefinition>() {new("document", documentRelations), new("user", userRelations)});
 var response = await fgaClient.WriteAuthorizationModel(body);
 
 // response.AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
@@ -330,6 +332,7 @@ var options = new ClientReadAuthorizationModelOptions {
 var response = await fgaClient.ReadAuthorizationModel(options);
 
 // response.AuthorizationModel.Id = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
+// response.SchemaVersion = "1.1"
 // response.AuthorizationModel.TypeDefinitions = [{ "type": "document", "relations": { ... } }, { "type": "user", "relations": { ... }}]
 ```
 
@@ -343,6 +346,7 @@ Reads the latest authorization model versions (note: this ignores the model id i
 var response = await fgaClient.ReadLatestAuthorizationModel();
 
 // response.AuthorizationModel.Id = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
+// response.SchemaVersion = "1.1"
 // response.AuthorizationModel.TypeDefinitions = [{ "type": "document", "relations": { ... } }, { "type": "user", "relations": { ... }}]
 ```
 
