@@ -20,15 +20,6 @@ using System.Text.Json.Serialization;
 namespace OpenFga.Sdk.Client.Model;
 
 public class ClientTupleKey : TupleKey {
-    public ClientTupleKey(string user, string relation, string _object) {
-        Object = _object;
-        Relation = relation;
-        User = user;
-    }
-
-    public ClientTupleKey() {
-    }
-
     /// <summary>
     ///     Gets or Sets Object
     /// </summary>

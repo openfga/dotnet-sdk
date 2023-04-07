@@ -163,19 +163,24 @@ public class OpenFgaClient : IDisposable {
     public async Task<ClientWriteResponse> Write(ClientWriteRequest body, ClientWriteOptions? options = default,
         CancellationToken cancellationToken = default) {
         var maxPerChunk =
-            options.Transaction?.MaxPerChunk ??
+            options?.Transaction?.MaxPerChunk ??
             1; // 1 has to be the default otherwise the chunks will be sent in transactions
         var maxParallelReqs =
-            options.Transaction?.MaxParallelRequests ?? DEFAULT_MAX_METHOD_PARALLEL_REQS;
+            options?.Transaction?.MaxParallelRequests ?? DEFAULT_MAX_METHOD_PARALLEL_REQS;
         var authorizationModelId = GetAuthorizationModelId(options);
 
-        if (options.Transaction?.Disable != true) {
-            await api.Write(
-                new WriteRequest {
-                    Writes = new TupleKeys(body.Writes ?? new List<TupleKey>()),
-                    Deletes = new TupleKeys(body.Deletes ?? new List<TupleKey>()),
-                    AuthorizationModelId = authorizationModelId
-                }, cancellationToken);
+        if (options?.Transaction?.Disable != true) {
+            var requestBody = new WriteRequest() {
+                AuthorizationModelId = authorizationModelId
+            };
+            if (body.Writes?.Count > 0) {
+                requestBody.Writes = new TupleKeys(body.Writes.ConvertAll(key => key.ToTupleKey()));
+            }
+            if (body.Deletes?.Count > 0) {
+                requestBody.Deletes = new TupleKeys(body.Deletes.ConvertAll(key => key.ToTupleKey()));
+            }
+
+            await api.Write(requestBody, cancellationToken);
             return new ClientWriteResponse {
                 Writes =
                     body.Writes?.ConvertAll(tupleKey =>
@@ -188,8 +193,8 @@ public class OpenFgaClient : IDisposable {
             };
         }
 
-        var writeChunks = body.Writes?.Chunk(maxPerChunk).ToList() ?? new List<TupleKey[]>();
-        var deleteChunks = body.Deletes?.Chunk(maxPerChunk).ToList() ?? new List<TupleKey[]>();
+        var writeChunks = body.Writes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKey[]>();
+        var deleteChunks = body.Deletes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKey[]>();
 
         var writeResponses = new ConcurrentBag<ClientWriteSingleResponse>();
         var deleteResponses = new ConcurrentBag<ClientWriteSingleResponse>();
@@ -197,7 +202,7 @@ public class OpenFgaClient : IDisposable {
             new ParallelOptions { MaxDegreeOfParallelism = maxParallelReqs }, async (request, token) => {
                 var writes = request.ToList();
                 try {
-                    await this.api.Write(new WriteRequest { Writes = new TupleKeys(writes), AuthorizationModelId = authorizationModelId }, cancellationToken);
+                    await this.Write(new ClientWriteRequest() { Writes = writes }, new ClientWriteOptions() { AuthorizationModelId = authorizationModelId }, cancellationToken);
 
                     foreach (var tupleKey in writes) {
                         writeResponses.Add(new ClientWriteSingleResponse {
@@ -221,7 +226,7 @@ public class OpenFgaClient : IDisposable {
             new ParallelOptions { MaxDegreeOfParallelism = maxParallelReqs }, async (request, token) => {
                 var deletes = request.ToList();
                 try {
-                    await this.api.Write(new WriteRequest { Deletes = new TupleKeys(deletes), AuthorizationModelId = authorizationModelId }, cancellationToken);
+                    await this.Write(new ClientWriteRequest() { Deletes = deletes }, new ClientWriteOptions() { AuthorizationModelId = authorizationModelId }, cancellationToken);
 
                     foreach (var tupleKey in deletes) {
                         deleteResponses.Add(new ClientWriteSingleResponse {
@@ -247,14 +252,14 @@ public class OpenFgaClient : IDisposable {
     /**
      * WriteTuples - Utility method to write tuples, wraps Write
      */
-    public async Task<ClientWriteResponse> WriteTuples(List<TupleKey> body, ClientWriteOptions? options = default,
+    public async Task<ClientWriteResponse> WriteTuples(List<ClientTupleKey> body, ClientWriteOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await Write(new ClientWriteRequest { Writes = body }, options, cancellationToken);
 
     /**
      * DeleteTuples - Utility method to delete tuples, wraps Write
      */
-    public async Task<ClientWriteResponse> DeleteTuples(List<TupleKey> body, ClientWriteOptions? options = default,
+    public async Task<ClientWriteResponse> DeleteTuples(List<ClientTupleKey> body, ClientWriteOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await Write(new ClientWriteRequest { Deletes = body }, options, cancellationToken);
 

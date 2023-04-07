@@ -52,7 +52,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<CheckResponse> Check(CheckRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("Check", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -106,7 +106,7 @@ public class OpenFgaApi : IDisposable {
     public async Task DeleteStore(CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("DeleteStore", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -135,7 +135,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ExpandResponse> Expand(ExpandRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("Expand", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -164,7 +164,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<GetStoreResponse> GetStore(CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("GetStore", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -193,7 +193,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ListObjectsResponse> ListObjects(ListObjectsRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("ListObjects", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -254,7 +254,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ReadResponse> Read(ReadRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("Read", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -284,7 +284,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ReadAssertionsResponse> ReadAssertions(string authorizationModelId, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("ReadAssertions", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -316,7 +316,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ReadAuthorizationModelResponse> ReadAuthorizationModel(string id, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("ReadAuthorizationModel", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -349,7 +349,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ReadAuthorizationModelsResponse> ReadAuthorizationModels(int? pageSize = default(int?), string? continuationToken = default(string?), CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("ReadAuthorizationModels", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -386,7 +386,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ReadChangesResponse> ReadChanges(string? type = default(string?), int? pageSize = default(int?), string? continuationToken = default(string?), CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("ReadChanges", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -424,7 +424,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<Object> Write(WriteRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("Write", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -455,7 +455,7 @@ public class OpenFgaApi : IDisposable {
     public async Task WriteAssertions(string authorizationModelId, WriteAssertionsRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("WriteAssertions", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -488,7 +488,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(WriteAuthorizationModelRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("WriteAuthorizationModel", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 

@@ -82,7 +82,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             async Task<ReadAuthorizationModelsResponse> ActionMissingStoreId() => await openFgaApi.ReadAuthorizationModels(null, null);
             var exception = await Assert.ThrowsAsync<FgaRequiredParamError>(ActionMissingStoreId);
-            Assert.Equal("Required parameter StoreId was not defined when calling Configuration.", exception.Message);
+            Assert.Equal("Required parameter StoreId was not defined when calling ReadAuthorizationModels.", exception.Message);
         }
 
         // /// <summary>

@@ -20,8 +20,8 @@ using System.Text.Json.Serialization;
 namespace OpenFga.Sdk.Client.Model;
 
 internal interface IClientWriteRequest {
-    public List<TupleKey>? Writes { get; set; }
-    public List<TupleKey>? Deletes { get; set; }
+    public List<ClientTupleKey>? Writes { get; set; }
+    public List<ClientTupleKey>? Deletes { get; set; }
 }
 
 /// <summary>
@@ -34,7 +34,7 @@ public class ClientWriteRequest : IClientWriteRequest, IEquatable<ClientWriteReq
     /// </summary>
     /// <param name="writes">writes.</param>
     /// <param name="deletes">deletes.</param>
-    public ClientWriteRequest(List<TupleKey>? writes = default, List<TupleKey>? deletes = default) {
+    public ClientWriteRequest(List<ClientTupleKey>? writes = default, List<ClientTupleKey>? deletes = default) {
         Writes = writes;
         Deletes = deletes;
     }
@@ -44,14 +44,14 @@ public class ClientWriteRequest : IClientWriteRequest, IEquatable<ClientWriteReq
     /// </summary>
     [DataMember(Name = "writes", EmitDefaultValue = false)]
     [JsonPropertyName("writes")]
-    public List<TupleKey>? Writes { get; set; }
+    public List<ClientTupleKey>? Writes { get; set; }
 
     /// <summary>
     ///     Gets or Sets Deletes
     /// </summary>
     [DataMember(Name = "deletes", EmitDefaultValue = false)]
     [JsonPropertyName("deletes")]
-    public List<TupleKey>? Deletes { get; set; }
+    public List<ClientTupleKey>? Deletes { get; set; }
 
     /// <summary>
     ///     Returns true if WriteRequest instances are equal

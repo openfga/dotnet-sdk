@@ -41,8 +41,8 @@ public class ApiErrorParser {
     /// <param name="response"><see cref="HttpResponseMessage"/> to parse.</param>
     /// <returns><see cref="Task"/> representing the operation and associated <see cref="ApiErrorParser"/> on
     /// successful completion.</returns>
-    public static async Task<ApiErrorParser?> Parse(HttpResponseMessage response) {
-        if (response == null || response.Content == null)
+    public static async Task<ApiErrorParser?> Parse(HttpResponseMessage? response) {
+        if (response == null || response?.Content == null)
             return null;
 
         var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

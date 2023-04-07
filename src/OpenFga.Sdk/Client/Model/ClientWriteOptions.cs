@@ -16,7 +16,7 @@ namespace OpenFga.Sdk.Client.Model;
 /// <summary>
 ///     TransactionOpts
 /// </summary>
-public interface TransactionOpts {
+public interface ITransactionOpts {
     /// <summary>
     ///     Disables full transaction mode (note: if MaxPerChunk > 1, each chunk will be a transaction)
     /// </summary>
@@ -33,8 +33,25 @@ public interface TransactionOpts {
     int? MaxParallelRequests { get; set; }
 }
 
+public class TransactionOptions : ITransactionOpts {
+    /// <summary>
+    ///     Disables full transaction mode (note: if MaxPerChunk > 1, each chunk will be a transaction)
+    /// </summary>
+    public bool Disable { get; set; }
+
+    /// <summary>
+    ///     Max number of items to send in a single request (transaction)
+    /// </summary>
+    public int? MaxPerChunk { get; set; }
+
+    /// <summary>
+    ///     Max Requests to issue in parallel
+    /// </summary>
+    public int? MaxParallelRequests { get; set; }
+}
+
 public interface IClientWriteOptions : IClientRequestOptionsWithAuthZModelId {
-    TransactionOpts Transaction { get; set; }
+    ITransactionOpts Transaction { get; set; }
 }
 
 public class ClientWriteOptions : IClientWriteOptions {
@@ -44,5 +61,5 @@ public class ClientWriteOptions : IClientWriteOptions {
     public string? AuthorizationModelId { get; set; }
 
     /// <inheritdoc />
-    public TransactionOpts Transaction { get; set; }
+    public ITransactionOpts Transaction { get; set; }
 }

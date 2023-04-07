@@ -637,8 +637,12 @@ public class OpenFgaClientTests {
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
         var body = new ClientWriteRequest() {
-            Writes = new List<TupleKey> {
-                new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")
+            Writes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:roadmap",
+                }
             },
         };
         var response = await fgaClient.Write(body, new ClientWriteOptions {
@@ -678,8 +682,12 @@ public class OpenFgaClientTests {
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
         var body = new ClientWriteRequest() {
-            Deletes = new List<TupleKey> {
-                new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")
+            Writes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:roadmap",
+                }
             },
         };
         var response = await fgaClient.Write(body, new ClientWriteOptions {
@@ -719,11 +727,19 @@ public class OpenFgaClientTests {
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
         var body = new ClientWriteRequest() {
-            Writes = new List<TupleKey> {
-                new("document:roadmap", "writer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")
+            Writes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:roadmap",
+                },
             },
-            Deletes = new List<TupleKey> {
-                new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")
+            Deletes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "writer",
+                    Object = "document:roadmap",
+                }
             },
         };
         var response = await fgaClient.Write(body, new ClientWriteOptions {
@@ -738,6 +754,78 @@ public class OpenFgaClientTests {
                 req.Method == HttpMethod.Post),
             ItExpr.IsAny<CancellationToken>()
         );
+    }
+
+    /// <summary>
+    /// Test Write (Non-transaction mode)
+    /// </summary>
+    [Fact]
+    public async Task WriteNonTransactionTest() {
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .SetupSequence<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.NotFound,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientWriteRequest() {
+            Writes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:roadmap",
+                },
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:budget",
+                }
+            },
+            Deletes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "writer",
+                    Object = "document:roadmap",
+                }
+            },
+        };
+        var options = new ClientWriteOptions {
+            AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+            Transaction = new TransactionOptions() {
+                Disable = true,
+                MaxParallelRequests = 1,
+                MaxPerChunk = 1,
+            }
+        };
+        var response = await fgaClient.Write(body, options);
+
+        mockHandler.Protected().Verify(
+            "SendAsync",
+            Times.Exactly(3),
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                req.Method == HttpMethod.Post),
+            ItExpr.IsAny<CancellationToken>()
+        );
+        Assert.IsType<ClientWriteResponse>(response);
     }
 
     /************************

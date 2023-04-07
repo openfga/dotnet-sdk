@@ -105,7 +105,7 @@ using OpenFga.Sdk.Model;
 
 namespace Example {
     public class Example {
-        public static void Main() {
+        public static async void Main() {
             try {
                 var configuration = new ClientConfiguration() {
                     ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
@@ -114,9 +114,9 @@ namespace Example {
                     AuthorizationModelId = Environment.GetEnvironmentVariable("OPENFGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
                 };
                 var fgaClient = new OpenFgaClient(configuration);
-                var response = fgaClient.ReadAuthorizationModels();
+                var response = await fgaClient.ReadAuthorizationModels();
             } catch (ApiException e) {
-                 Debug.Print("Status Code: "+ e.ErrorCode);
+                 Debug.Print("Error: "+ e);
             }
         }
     }
@@ -149,7 +149,7 @@ namespace Example {
                 var fgaClient = new OpenFgaClient(configuration);
                 var response = await fgaClient.ReadAuthorizationModels();
             } catch (ApiException e) {
-                 Debug.Print("Status Code: "+ e.ErrorCode);
+                 Debug.Print("Error: "+ e);
             }
         }
     }
@@ -185,7 +185,7 @@ namespace Example {
                 var fgaClient = new OpenFgaClient(configuration);
                 var response = await fgaClient.ReadAuthorizationModels();
             } catch (ApiException e) {
-                 Debug.Print("Status Code: "+ e.ErrorCode);
+                 Debug.Print("Error: "+ e);
             }
         }
     }
@@ -226,7 +226,7 @@ Initialize a store.
 [API Documentation](https://openfga.dev/api/service/docs/api#/Stores/CreateStore)
 
 ```csharp
-var store = await fgaClient.CreateStore(new CreateStoreRequest(){Name = "FGA Demo"})
+var store = await fgaClient.CreateStore(new ClientCreateStoreRequest(){Name = "FGA Demo"})
 
 // store.Id = "01FQH7V8BEG3GPQW93KTRFR8JB"
 
@@ -280,8 +280,8 @@ var options = new ClientReadAuthorizationModelsOptions {
 var response = await fgaClient.ReadAuthorizationModels(options);
 
 // response.AuthorizationModels = [
-// { id: "1uHxCSuTP0VKPYSnkq1pbb1jeZw", schema_version: "1.1", type_definitions: [...] },
-// { id: "GtQpMohWezFmIbyXxVEocOCxxgq", schema_version: "1.1", type_definitions: [...] }];
+// { Id: "1uHxCSuTP0VKPYSnkq1pbb1jeZw", SchemaVersion: "1.1", TypeDefinitions: [...] },
+// { Id: "GtQpMohWezFmIbyXxVEocOCxxgq", SchemaVersion: "1.1", TypeDefinitions: [...] }];
 ```
 
 ##### Write Authorization Model
@@ -346,7 +346,7 @@ var options = new ClientReadAuthorizationModelOptions {
 var response = await fgaClient.ReadAuthorizationModel(options);
 
 // response.AuthorizationModel.Id = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
-// response.SchemaVersion = "1.1"
+// response.AuthorizationModel.SchemaVersion = "1.1"
 // response.AuthorizationModel.TypeDefinitions = [{ "type": "document", "relations": { ... } }, { "type": "user", "relations": { ... }}]
 ```
 
@@ -360,7 +360,7 @@ Reads the latest authorization model versions (note: this ignores the model id i
 var response = await fgaClient.ReadLatestAuthorizationModel();
 
 // response.AuthorizationModel.Id = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
-// response.SchemaVersion = "1.1"
+// response.AuthorizationModel.SchemaVersion = "1.1"
 // response.AuthorizationModel.TypeDefinitions = [{ "type": "document", "relations": { ... } }, { "type": "user", "relations": { ... }}]
 ```
 
@@ -381,7 +381,7 @@ var options = new ClientReadChangesOptions {
 
 var response = await fgaClient.ReadChanges(body, options);
 
-// response.TontinuationToken = ...
+// response.ContinuationToken = ...
 // response.Changes = [
 //   { TupleKey: { User, Relation, Object }, Operation: TupleOperation.WRITE, Timestamp: ... },
 //   { TupleKey: { User, Relation, Object }, Operation: TupleOperation.DELETE, Timestamp: ... }
@@ -437,18 +437,34 @@ var response = await fgaClient.Read(body, options);
 
 ##### Write (Create and Delete) Relationship Tuples
 
+Create and/or delete relationship tuples to update the system state.
 
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Tuples/Write)
 
-Create and/or delete relationship tuples to update the system state.
+###### Transaction mode (default)
+
+By default, write runs in a transaction mode where any invalid operation (deleting a non-existing tuple, creating an existing tuple, one of the tuples was invalid) or a server error will fail the entire operation.
 
 ```csharp
 var body = new ClientWriteRequest() {
     Writes = new List<ClientTupleKey> {
-        new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")
+        new() {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "viewer",
+            Object = "document:roadmap",
+        },
+        new() {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "viewer",
+            Object = "document:budget",
+        }
     },
-    Writes = new List<ClientTupleKey> {
-        new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")
+    Deletes = new List<ClientTupleKey> {
+        new() {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "writer",
+            Object = "document:roadmap",
+        }
     },
 };
 var options = new ClientWriteOptions {
@@ -456,30 +472,45 @@ var options = new ClientWriteOptions {
     AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
 };
 var response = await fgaClient.Write(body, options);
-
-var body = new WriteRequest{Writes = new TupleKeys(new List<TupleKey>
-    {new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")}), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"};
-var response = await fgaClient.Write(body);
 ```
 
-#### Delete Tuples
-
-[API Documentation](https://openfga.dev/api/service#/Relationship%20Tuples/Write)
-
-```csharp
-var body = new WriteRequest{Deletes = new TupleKeys(new List<TupleKey>
-    {new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")}), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"};
-var response = await fgaClient.Write(body);
-```
-TODO
-###### Transaction mode (default)
-
-By default, write runs in a transaction mode where any invalid operation (deleting a non-exiting tuple, creating an existing tuple, one of the tuples was invalid) or a server error will fail the entire operation.
-
+Convenience `WriteTuples` and `DeleteTuples` methods are also available.
 
 ###### Non-transaction mode
 
 The SDK will split the writes into separate requests and send them sequentially to avoid violating rate limits.
+
+var body = new ClientWriteRequest() {
+    Writes = new List<ClientTupleKey> {
+        new() {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "viewer",
+            Object = "document:roadmap",
+        },
+        new() {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "viewer",
+            Object = "document:budget",
+        }
+    },
+    Deletes = new List<ClientTupleKey> {
+        new() {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "writer",
+            Object = "document:roadmap",
+        }
+    },
+};
+var options = new ClientWriteOptions {
+    // You can rely on the model id set in the configuration or override it for this specific request
+    AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+    Transaction = new TransactionOptions() {
+        Disable = true,
+        MaxParallelRequests = 5, // Maximum number of requests to issue in parallel
+        MaxPerChunk = 1, // Maximum number of requests to be sent in a transaction in a particular chunk
+    }
+};
+var response = await fgaClient.Write(body, options);
 
 #### Relationship Queries
 
@@ -494,8 +525,11 @@ var options = new ClientCheckOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
     AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
 };
-var body =
-    new CheckRequest{tupleKey: new ClientTupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"};
+var body = new ClientCheckRequest {
+    Object = "document:roadmap",
+    Relation = "writer",
+    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b"
+};
 var response = await fgaClient.Check(body, options);
 // response.Allowed = true
 ```
@@ -506,9 +540,10 @@ Run a set of [checks](#check). Batch Check will return `allowed: false` if it en
 If 429s or 5xxs are encountered, the underlying check will retry up to 15 times before giving up.
 
 ```csharp
-var options = new ClientCheckOptions {
+var options = new ClientBatchCheckOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
     AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+    MaxParallelRequests = 5, // Max number of requests to issue in parallel, defaults to 10
 };
 var body = new List<ClientCheckRequest>(){
     new() {
@@ -547,7 +582,7 @@ var body = new List<ClientCheckRequest>(){
     }
 };
 
-const response = await fgaClient.batchCheck(body, options);
+var response = await fgaClient.BatchCheck(body, options);
 
 /*
 response.Responses = [{
@@ -620,18 +655,21 @@ List the objects of a particular type a user has access to.
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Queries/ListObjects)
 
 ```csharp
-var body = new ListObjectsRequest{
+var options = new ClientListObjectsOptions {
+    // You can rely on the model id set in the configuration or override it for this specific request
     AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+};
+var body = new ClientListObjectsRequest {
     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
     Relation = "viewer",
     Type = "document",
-    ContextualTuples = new ContextualTupleKeys() {
-        TupleKeys = new List<TupleKey> {
+    ContextualTuples = new List<TupleKey>() {
+        {
             new("document:budget", "writer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")
         }
     }
 };
-var response = await fgaClient.ListObjects(body);
+var response = await fgaClient.ListObjects(body, options);
 
 // response.Objects = ["document:roadmap"]
 ```
