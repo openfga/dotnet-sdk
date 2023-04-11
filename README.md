@@ -299,29 +299,34 @@ Create a new version of the authorization model.
 ```csharp
 var body = new WriteAuthorizationModelRequest {
     SchemaVersion = "1.1",
-    TypeDefinitions = new List<TypeDefinition>() {
-        new() {
-            Type = "user",
-            Relations = new Dictionary<string, Userset>() {}
-        },
-        new() {
-            Type = "document",
-            Relations = new Dictionary<string, Userset>()
-                {
-                    {"writer", new Userset(_this: new object())},
-                    {
-                        "viewer",
-                        new Userset(union: new Usersets(new List<Userset>()
-                            {new(new object(), new ObjectRelation("", "writer"))}))
+    TypeDefinitions = new List<TypeDefinition> {
+        new() {Type = "user", Relations = new Dictionary<string, Userset>()},
+        new() {Type = "document",
+            Relations = new Dictionary<string, Userset> {
+                {"writer", new Userset {This = new object()}}, {
+                    "viewer", new Userset {
+                        Union = new Usersets {
+                            Child = new List<Userset> {
+                                new() {This = new object()},
+                                new() {ComputedUserset = new ObjectRelation {Relation = "writer"}}
+                            }
+                        }
                     }
-                },
-            Metadata = new Metadata() {
-                Relations = new Dictionary<string, RelationMetadata>() { {
-                    "viewer", new RelationMetadata() { DirectlyRelatedUserTypes = new List<RelationReference> {
-                        new () { Type = "user"}
-                    } }
-                } }
+                }
             },
+            Metadata = new Metadata {
+                Relations = new Dictionary<string, RelationMetadata> {
+                    {"writer", new RelationMetadata {
+                        DirectlyRelatedUserTypes = new List<RelationReference> {
+                            new() {Type = "user"}
+                        }
+                    }}, {"viewer", new RelationMetadata {
+                        DirectlyRelatedUserTypes = new List<RelationReference> {
+                            new() {Type = "user"}
+                        }
+                    }}
+                }
+            }
         }
     }
 };

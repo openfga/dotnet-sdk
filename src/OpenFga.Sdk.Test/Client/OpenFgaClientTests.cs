@@ -37,14 +37,17 @@ public class OpenFgaClientTests {
 
     public OpenFgaClientTests() {
         _storeId = "6c181474-aaa1-4df7-8929-6e7b3a992754-test";
-        _config = new ClientConfiguration() { StoreId = _storeId, ApiHost = _host };
+        _config = new ClientConfiguration() {
+            StoreId = _storeId, ApiHost = _host
+        };
     }
 
     private HttpResponseMessage GetCheckResponse(CheckResponse content, bool shouldRetry = false) {
         var response = new HttpResponseMessage() {
             StatusCode = shouldRetry ? HttpStatusCode.TooManyRequests : HttpStatusCode.OK,
             Content = Utils.CreateJsonStringContent(content),
-            Headers = { }
+            Headers = {
+            }
         };
 
         if (shouldRetry) {
@@ -75,7 +78,9 @@ public class OpenFgaClientTests {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         var expectedResponse = new ListStoresResponse() {
             Stores = new List<Store>() {
-                new() {Id = "45678", Name = "TestStore", CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now}
+                new() {
+                    Id = "45678", Name = "TestStore", CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now
+                }
             }
         };
         mockHandler.Protected()
@@ -88,14 +93,14 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(expectedResponse),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(expectedResponse),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
-        var response = await fgaClient.ListStores(new ClientListStoresOptions() { });
+        var response = await fgaClient.ListStores(new ClientListStoresOptions() {
+        });
         mockHandler.Protected().Verify(
             "SendAsync",
             Times.Exactly(1),
@@ -127,8 +132,7 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(content, Encoding.UTF8, "application/json")
+                StatusCode = HttpStatusCode.OK, Content = new StringContent(content, Encoding.UTF8, "application/json")
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -156,7 +160,10 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task ListStoresEmptyTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-        var expectedResponse = new ListStoresResponse() { Stores = new List<Store>() { } };
+        var expectedResponse = new ListStoresResponse() {
+            Stores = new List<Store>() {
+            }
+        };
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
@@ -167,8 +174,7 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(expectedResponse),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(expectedResponse),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -194,7 +200,9 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task CreateStoreTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-        var expectedResponse = new CreateStoreResponse() { Id = "45678", Name = "TestStore", CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now };
+        var expectedResponse = new CreateStoreResponse() {
+            Id = "45678", Name = "TestStore", CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now
+        };
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
@@ -205,14 +213,15 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(expectedResponse),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(expectedResponse),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
-        var response = await fgaClient.CreateStore(new ClientCreateStoreRequest() { Name = "FGA Test Store" });
+        var response = await fgaClient.CreateStore(new ClientCreateStoreRequest() {
+            Name = "FGA Test Store"
+        });
         mockHandler.Protected().Verify(
             "SendAsync",
             Times.Exactly(1),
@@ -231,7 +240,9 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task GetStoreTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-        var expectedResponse = new GetStoreResponse() { Id = "45678", Name = "TestStore", CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now };
+        var expectedResponse = new GetStoreResponse() {
+            Id = "45678", Name = "TestStore", CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now
+        };
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
@@ -242,8 +253,7 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(expectedResponse),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(expectedResponse),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -307,29 +317,55 @@ public class OpenFgaClientTests {
         const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
         var body = new WriteAuthorizationModelRequest {
             SchemaVersion = "1.1",
-            TypeDefinitions = new List<TypeDefinition>() {
+            TypeDefinitions = new List<TypeDefinition> {
                 new() {
-                    Type = "user",
-                    Relations = new Dictionary<string, Userset>() {}
+                    Type = "user", Relations = new Dictionary<string, Userset>()
                 },
                 new() {
                     Type = "document",
-                    Relations = new Dictionary<string, Userset>()
+                    Relations = new Dictionary<string, Userset> {
                         {
-                            {"writer", new Userset(_this: new object())},
-                            {
-                                "viewer",
-                                new Userset(union: new Usersets(new List<Userset>()
-                                    {new(new object(), new ObjectRelation("", "writer"))}))
+                            "writer", new Userset {
+                                This = new object()
                             }
-                        },
-                    Metadata = new Metadata() {
-                        Relations = new Dictionary<string, RelationMetadata>() { {
-                            "viewer", new RelationMetadata() { DirectlyRelatedUserTypes = new List<RelationReference> {
-                                new () { Type = "user"}
-                            } }
-                        } }
+                        }, {
+                            "viewer", new Userset {
+                                Union = new Usersets {
+                                    Child = new List<Userset> {
+                                        new() {
+                                            This = new object()
+                                        },
+                                        new() {
+                                            ComputedUserset = new ObjectRelation {
+                                                Relation = "writer"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
+                    Metadata = new Metadata {
+                        Relations = new Dictionary<string, RelationMetadata> {
+                            {
+                                "writer", new RelationMetadata {
+                                    DirectlyRelatedUserTypes = new List<RelationReference> {
+                                        new() {
+                                            Type = "user"
+                                        }
+                                    }
+                                }
+                            }, {
+                                "viewer", new RelationMetadata {
+                                    DirectlyRelatedUserTypes = new List<RelationReference> {
+                                        new() {
+                                            Type = "user"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         };
@@ -346,7 +382,9 @@ public class OpenFgaClientTests {
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.OK,
                 Content = Utils.CreateJsonStringContent(
-                    new WriteAuthorizationModelResponse() { AuthorizationModelId = authorizationModelId }),
+                    new WriteAuthorizationModelResponse() {
+                        AuthorizationModelId = authorizationModelId
+                    }),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -480,8 +518,10 @@ public class OpenFgaClientTests {
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.OK,
                 Content = Utils.CreateJsonStringContent(new ReadAuthorizationModelsResponse() {
-                    AuthorizationModels = new List<AuthorizationModel>() {new (id: authorizationModelId,
-                        typeDefinitions: new List<TypeDefinition>(), schemaVersion: "1.1")}
+                    AuthorizationModels = new List<AuthorizationModel>() {
+                        new(id: authorizationModelId,
+                            typeDefinitions: new List<TypeDefinition>(), schemaVersion: "1.1")
+                    }
                 }),
             });
 
@@ -533,8 +573,7 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(expectedResponse),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(expectedResponse),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -544,9 +583,10 @@ public class OpenFgaClientTests {
         var pageSize = 25;
         var continuationToken =
             "eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==";
-        var response = await fgaClient.ReadChanges(new ClientReadChangesRequest { Type = type }, new ClientReadChangesOptions {
-            PageSize = pageSize,
-            ContinuationToken = continuationToken,
+        var response = await fgaClient.ReadChanges(new ClientReadChangesRequest {
+            Type = type
+        }, new ClientReadChangesOptions {
+            PageSize = pageSize, ContinuationToken = continuationToken,
         });
 
         mockHandler.Protected().Verify(
@@ -585,19 +625,17 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(expectedResponse),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(expectedResponse),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
         var body = new ClientReadRequest() {
-            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-            Relation = "viewer",
-            Object = "document:roadmap",
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "viewer", Object = "document:roadmap",
         };
-        var options = new ClientReadOptions { };
+        var options = new ClientReadOptions {
+        };
         var response = await fgaClient.Read(body, options);
 
         mockHandler.Protected().Verify(
@@ -629,8 +667,7 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new Object()),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(new Object()),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -639,9 +676,7 @@ public class OpenFgaClientTests {
         var body = new ClientWriteRequest() {
             Writes = new List<ClientTupleKey> {
                 new() {
-                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                    Relation = "viewer",
-                    Object = "document:roadmap",
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "viewer", Object = "document:roadmap",
                 }
             },
         };
@@ -674,8 +709,7 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new Object()),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(new Object()),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -684,9 +718,7 @@ public class OpenFgaClientTests {
         var body = new ClientWriteRequest() {
             Writes = new List<ClientTupleKey> {
                 new() {
-                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                    Relation = "viewer",
-                    Object = "document:roadmap",
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "viewer", Object = "document:roadmap",
                 }
             },
         };
@@ -719,8 +751,7 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new Object()),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(new Object()),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -729,16 +760,12 @@ public class OpenFgaClientTests {
         var body = new ClientWriteRequest() {
             Writes = new List<ClientTupleKey> {
                 new() {
-                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                    Relation = "viewer",
-                    Object = "document:roadmap",
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "viewer", Object = "document:roadmap",
                 },
             },
             Deletes = new List<ClientTupleKey> {
                 new() {
-                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                    Relation = "writer",
-                    Object = "document:roadmap",
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "writer", Object = "document:roadmap",
                 }
             },
         };
@@ -771,16 +798,13 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new Object()),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(new Object()),
             })
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.NotFound,
-                Content = Utils.CreateJsonStringContent(new Object()),
+                StatusCode = HttpStatusCode.NotFound, Content = Utils.CreateJsonStringContent(new Object()),
             })
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new Object()),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(new Object()),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -789,30 +813,22 @@ public class OpenFgaClientTests {
         var body = new ClientWriteRequest() {
             Writes = new List<ClientTupleKey> {
                 new() {
-                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                    Relation = "viewer",
-                    Object = "document:roadmap",
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "viewer", Object = "document:roadmap",
                 },
                 new() {
-                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                    Relation = "viewer",
-                    Object = "document:budget",
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "viewer", Object = "document:budget",
                 }
             },
             Deletes = new List<ClientTupleKey> {
                 new() {
-                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                    Relation = "writer",
-                    Object = "document:roadmap",
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "writer", Object = "document:roadmap",
                 }
             },
         };
         var options = new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
             Transaction = new TransactionOptions() {
-                Disable = true,
-                MaxParallelRequests = 1,
-                MaxPerChunk = 1,
+                Disable = true, MaxParallelRequests = 1, MaxPerChunk = 1,
             }
         };
         var response = await fgaClient.Write(body, options);
@@ -847,7 +863,9 @@ public class OpenFgaClientTests {
             )
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                Content = Utils.CreateJsonStringContent(new CheckResponse {
+                    Allowed = true
+                }),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -859,13 +877,12 @@ public class OpenFgaClientTests {
             Object = "document:roadmap",
             ContextualTuples = new List<ClientTupleKey>() {
                 new() {
-                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                    Relation = "editor",
-                    Object = "document:roadmap",
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "editor", Object = "document:roadmap",
                 }
             },
         };
-        var options = new ClientCheckOptions { };
+        var options = new ClientCheckOptions {
+        };
         var response = await fgaClient.Check(body, options);
 
         mockHandler.Protected().Verify(
@@ -899,44 +916,49 @@ public class OpenFgaClientTests {
                 await Task.Delay(500);
                 return new HttpResponseMessage() {
                     StatusCode = HttpStatusCode.OK,
-                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                    Content = Utils.CreateJsonStringContent(new CheckResponse {
+                        Allowed = true
+                    }),
                 };
             }))
             .Returns(Task.Run(async () => {
                 await Task.Delay(500);
                 return new HttpResponseMessage() {
                     StatusCode = HttpStatusCode.OK,
-                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
+                    Content = Utils.CreateJsonStringContent(new CheckResponse {
+                        Allowed = false
+                    }),
                 };
             }))
             .Returns(Task.Run(async () => {
                 await Task.Delay(500);
                 return new HttpResponseMessage() {
                     StatusCode = HttpStatusCode.OK,
-                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                    Content = Utils.CreateJsonStringContent(new CheckResponse {
+                        Allowed = true
+                    }),
                 };
             }))
             .Returns(Task.Run(async () => {
                 await Task.Delay(500);
                 return new HttpResponseMessage() {
                     StatusCode = HttpStatusCode.NotFound,
-                    Content = Utils.CreateJsonStringContent(new Object { }),
+                    Content = Utils.CreateJsonStringContent(new Object {
+                    }),
                 };
             }));
 
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
-        var body = new List<ClientCheckRequest>(){
+        var body = new List<ClientCheckRequest>() {
             new() {
                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                 Relation = "viewer",
                 Object = "document:roadmap",
                 ContextualTuples = new List<ClientTupleKey>() {
                     new() {
-                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                        Relation = "editor",
-                        Object = "document:roadmap",
+                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "editor", Object = "document:roadmap",
                     }
                 },
             },
@@ -946,24 +968,19 @@ public class OpenFgaClientTests {
                 Object = "document:roadmap",
                 ContextualTuples = new List<ClientTupleKey>() {
                     new() {
-                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                        Relation = "editor",
-                        Object = "document:roadmap",
+                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "editor", Object = "document:roadmap",
                     }
                 },
             },
             new() {
-                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                Relation = "creator",
-                Object = "document:roadmap",
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "creator", Object = "document:roadmap",
             },
             new() {
-                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                Relation = "deleter",
-                Object = "document:roadmap",
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "deleter", Object = "document:roadmap",
             }
         };
-        var options = new ClientBatchCheckOptions { };
+        var options = new ClientBatchCheckOptions {
+        };
         var response = await fgaClient.BatchCheck(body, options);
 
         mockHandler.Protected().Verify(
@@ -1003,16 +1020,14 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = new StringContent(jsonResponse, Encoding.UTF8, "application/json"),
+                StatusCode = HttpStatusCode.OK, Content = new StringContent(jsonResponse, Encoding.UTF8, "application/json"),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
         var body = new ClientExpandRequest {
-            Relation = "viewer",
-            Object = "document:roadmap",
+            Relation = "viewer", Object = "document:roadmap",
         };
         var response = await fgaClient.Expand(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
@@ -1044,26 +1059,38 @@ public class OpenFgaClientTests {
                     union: new Nodes(
                         nodes: new List<Node>() {
                             new Node(name: "document:roadmap2#owner",
-                                leaf: new Leaf(users: new Users(users: new List<string>() {"team:product#member"}))),
+                                leaf: new Leaf(users: new Users(users: new List<string>() {
+                                    "team:product#member"
+                                }))),
                             new Node(name: "document:roadmap3#owner",
                                 leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(
                                     tupleset: "document:roadmap#owner",
-                                    computed: new List<Computed>() {new Computed(userset: "org:contoso#admin")}))),
+                                    computed: new List<Computed>() {
+                                        new Computed(userset: "org:contoso#admin")
+                                    }))),
                         }),
                     difference: new UsersetTreeDifference(
                         _base: new Node(name: "document:roadmap3#owner",
-                            leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" }))),
+                            leaf: new Leaf(users: new Users(users: new List<string>() {
+                                "team:product#member"
+                            }))),
                         subtract: new Node(name: "document:roadmap4#owner",
-                            leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" })))
+                            leaf: new Leaf(users: new Users(users: new List<string>() {
+                                "team:product#member"
+                            })))
                     ),
                     intersection: new Nodes(
                         nodes: new List<Node>() {
                             new Node(name: "document:roadmap5#owner",
-                                leaf: new Leaf(users: new Users(users: new List<string>() {"team:product#commentor"}))),
+                                leaf: new Leaf(users: new Users(users: new List<string>() {
+                                    "team:product#commentor"
+                                }))),
                             new Node(name: "document:roadmap6#owner",
                                 leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(
                                     tupleset: "document:roadmap#viewer",
-                                    computed: new List<Computed>() {new Computed(userset: "org:contoso#owner")}))),
+                                    computed: new List<Computed>() {
+                                        new Computed(userset: "org:contoso#owner")
+                                    }))),
                         }))
             ));
 
@@ -1076,16 +1103,14 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(mockResponse),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(mockResponse),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
         var body = new ClientExpandRequest {
-            Relation = "viewer",
-            Object = "document:roadmap",
+            Relation = "viewer", Object = "document:roadmap",
         };
         var response = await fgaClient.Expand(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
@@ -1110,7 +1135,11 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task ListObjectsTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-        var expectedResponse = new ListObjectsResponse { Objects = new List<string> { "document:roadmap" } };
+        var expectedResponse = new ListObjectsResponse {
+            Objects = new List<string> {
+                "document:roadmap"
+            }
+        };
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
@@ -1120,8 +1149,7 @@ public class OpenFgaClientTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(expectedResponse),
+                StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(expectedResponse),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -1132,8 +1160,7 @@ public class OpenFgaClientTests {
             Relation = "can_read",
             Type = "document",
             ContextualTuples = new List<TupleKey> {
-                new("folder:product", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-                new("document:roadmap", "parent", "folder:product")
+                new("folder:product", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), new("document:roadmap", "parent", "folder:product")
             }
         };
         var response = await fgaClient.ListObjects(body, new ClientWriteOptions {
@@ -1170,19 +1197,26 @@ public class OpenFgaClientTests {
             )
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                Content = Utils.CreateJsonStringContent(new CheckResponse {
+                    Allowed = true
+                }),
             })
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
+                Content = Utils.CreateJsonStringContent(new CheckResponse {
+                    Allowed = false
+                }),
             })
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                Content = Utils.CreateJsonStringContent(new CheckResponse {
+                    Allowed = true
+                }),
             })
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.NotFound,
-                Content = Utils.CreateJsonStringContent(new Object { }),
+                Content = Utils.CreateJsonStringContent(new Object {
+                }),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -1192,12 +1226,12 @@ public class OpenFgaClientTests {
             new ListRelationsRequest() {
                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                 Object = "document:roadmap",
-                Relations = new List<string> { "can_view", "can_edit", "can_delete", "can_rename" },
+                Relations = new List<string> {
+                    "can_view", "can_edit", "can_delete", "can_rename"
+                },
                 ContextualTuples = new List<ClientTupleKey>() {
                     new ClientTupleKey {
-                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                        Relation = "editor",
-                        Object = "document:roadmap",
+                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "editor", Object = "document:roadmap",
                     }
                 }
             };
@@ -1283,17 +1317,18 @@ public class OpenFgaClientTests {
                     req.Method == HttpMethod.Put),
                 ItExpr.IsAny<CancellationToken>()
             )
-            .ReturnsAsync(new HttpResponseMessage() { StatusCode = HttpStatusCode.NoContent, });
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.NoContent,
+            });
 
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
-        var body = new List<ClientAssertion>() {new ClientAssertion() {
-            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-            Relation = "viewer",
-            Object = "document:roadmap",
-            Expectation = true,
-        }};
+        var body = new List<ClientAssertion>() {
+            new ClientAssertion() {
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b", Relation = "viewer", Object = "document:roadmap", Expectation = true,
+            }
+        };
 
         await fgaClient.WriteAssertions(body, new ClientWriteAssertionsOptions {
             AuthorizationModelId = authorizationModelId,
