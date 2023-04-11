@@ -143,9 +143,12 @@ public class FgaApiError : ApiException {
     /// <param name="shouldRetry"></param>
     public FgaApiError(HttpResponseMessage? response, HttpRequestMessage request, string? apiName, ApiErrorParser? apiError = null, bool shouldRetry = false)
         : this((apiError == null ? (response?.StatusCode.ToString()) : apiError.Message) ?? string.Empty) {
+        var requestPaths = request.RequestUri?.LocalPath.Split("/") ?? Array.Empty<string>();
+        var storeId = requestPaths.Length > 2 ? requestPaths[2] : null;
+
         StatusCode = response?.StatusCode ?? HttpStatusCode.InternalServerError;
         ApiError = apiError ?? new ApiErrorParser();
-        StoreId = request.RequestUri?.LocalPath.Split("/")[2];
+        StoreId = storeId;
         ApiName = apiName;
         Method = request.Method;
         RequestUrl = request.RequestUri?.ToString();

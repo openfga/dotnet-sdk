@@ -1407,6 +1407,46 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.Equal(response, expectedResponse);
         }
 
+        /// <summary>
+        /// Test ListStores does not crash in error handling
+        /// </summary>
+        [Fact]
+        public async Task ListStoresResponseErrorTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri ==
+                        new Uri($"{_config.BasePath}/stores") &&
+                        req.Method == HttpMethod.Get),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.NotFound,
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            Task<ListStoresResponse> ApiError() => openFgaApi.ListStores();
+            var error = await Assert.ThrowsAsync<FgaApiNotFoundError>(ApiError);
+
+            Assert.Equal(error.Method, HttpMethod.Get);
+            Assert.Equal("ListStores", error.ApiName);
+            Assert.Equal($"{_config.BasePath}/stores", error.RequestUrl);
+            Assert.Null(error.StoreId);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores") &&
+                    req.Method == HttpMethod.Get),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
 
         /// <summary>
         /// Test ListStores with Null DateTime
