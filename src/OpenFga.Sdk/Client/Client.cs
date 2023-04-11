@@ -72,7 +72,7 @@ public class OpenFgaClient : IDisposable {
    * CreateStore - Initialize a store
    */
     public async Task<CreateStoreResponse> CreateStore(ClientCreateStoreRequest body,
-        ClientCreateStoreOptions? options = default,
+        ClientRequestOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.CreateStore(body, cancellationToken);
 
