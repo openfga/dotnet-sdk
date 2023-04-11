@@ -405,7 +405,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new CheckRequest { TupleKey = new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw" };
+            var body = new CheckRequest { TupleKey = new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1" };
 
             Task<CheckResponse> BadRequestError() => openFgaApi.Check(body);
             var error = await Assert.ThrowsAsync<FgaApiValidationError>(BadRequestError);
@@ -735,7 +735,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public async Task ReadAuthorizationModelsTest() {
-            const string authorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw";
+            const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
 
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             mockHandler.Protected()
@@ -778,7 +778,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public async Task WriteAuthorizationModelTest() {
-            const string authorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw";
+            const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
             var body = new WriteAuthorizationModelRequest {
                 SchemaVersion = "1.1",
                 TypeDefinitions = new List<TypeDefinition>() {
@@ -906,7 +906,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new CheckRequest { TupleKey = new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw" };
+            var body = new CheckRequest { TupleKey = new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1" };
             var response = await openFgaApi.Check(body);
 
             mockHandler.Protected().Verify(
@@ -946,7 +946,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var body = new WriteRequest {
                 Writes = new TupleKeys(new List<TupleKey> { new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }),
-                AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
+                AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
             var response = await openFgaApi.Write(body);
 
@@ -984,7 +984,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var body = new WriteRequest {
                 Deletes = new TupleKeys(new List<TupleKey> { new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }),
-                AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
+                AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
             var response = await openFgaApi.Write(body);
 
@@ -1023,7 +1023,7 @@ namespace OpenFga.Sdk.Test.Api {
             var body = new WriteRequest(
                 new TupleKeys(new List<TupleKey> { new("document:roadmap", "writer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }),
                 new TupleKeys(new List<TupleKey> { new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }),
-                "1uHxCSuTP0VKPYSnkq1pbb1jeZw");
+                "01GXSA8YR785C4FYS3C0RTG7B1");
             var response = await openFgaApi.Write(body);
 
             mockHandler.Protected().Verify(
@@ -1061,7 +1061,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new ExpandRequest { TupleKey = new TupleKey(_object: "document:roadmap", relation: "viewer"), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw" };
+            var body = new ExpandRequest { TupleKey = new TupleKey(_object: "document:roadmap", relation: "viewer"), AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1" };
             var response = await openFgaApi.Expand(body);
 
             mockHandler.Protected().Verify(
@@ -1288,7 +1288,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public async Task WriteAssertionsTest() {
-            const string authorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw";
+            const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             mockHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(

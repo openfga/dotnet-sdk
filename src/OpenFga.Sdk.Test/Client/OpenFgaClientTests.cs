@@ -304,7 +304,7 @@ public class OpenFgaClientTests {
     /// </summary>
     [Fact]
     public async Task WriteAuthorizationModelTest() {
-        const string authorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw";
+        const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
         var body = new WriteAuthorizationModelRequest {
             SchemaVersion = "1.1",
             TypeDefinitions = new List<TypeDefinition>() {
@@ -646,7 +646,7 @@ public class OpenFgaClientTests {
             },
         };
         var response = await fgaClient.Write(body, new ClientWriteOptions {
-            AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
         });
 
         mockHandler.Protected().Verify(
@@ -691,7 +691,7 @@ public class OpenFgaClientTests {
             },
         };
         var response = await fgaClient.Write(body, new ClientWriteOptions {
-            AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
         });
 
         mockHandler.Protected().Verify(
@@ -743,7 +743,7 @@ public class OpenFgaClientTests {
             },
         };
         var response = await fgaClient.Write(body, new ClientWriteOptions {
-            AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
         });
 
         mockHandler.Protected().Verify(
@@ -808,7 +808,7 @@ public class OpenFgaClientTests {
             },
         };
         var options = new ClientWriteOptions {
-            AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
             Transaction = new TransactionOptions() {
                 Disable = true,
                 MaxParallelRequests = 1,
@@ -1015,7 +1015,7 @@ public class OpenFgaClientTests {
             Object = "document:roadmap",
         };
         var response = await fgaClient.Expand(body, new ClientWriteOptions {
-            AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
         });
 
         mockHandler.Protected().Verify(
@@ -1088,7 +1088,7 @@ public class OpenFgaClientTests {
             Object = "document:roadmap",
         };
         var response = await fgaClient.Expand(body, new ClientWriteOptions {
-            AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
         });
 
         mockHandler.Protected().Verify(
@@ -1137,7 +1137,7 @@ public class OpenFgaClientTests {
             }
         };
         var response = await fgaClient.ListObjects(body, new ClientWriteOptions {
-            AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
         });
 
         mockHandler.Protected().Verify(
@@ -1272,7 +1272,7 @@ public class OpenFgaClientTests {
     /// </summary>
     [Fact]
     public async Task WriteAssertionsTest() {
-        const string authorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw";
+        const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(

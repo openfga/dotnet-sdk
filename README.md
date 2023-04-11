@@ -280,7 +280,7 @@ var options = new ClientReadAuthorizationModelsOptions {
 var response = await fgaClient.ReadAuthorizationModels(options);
 
 // response.AuthorizationModels = [
-// { Id: "1uHxCSuTP0VKPYSnkq1pbb1jeZw", SchemaVersion: "1.1", TypeDefinitions: [...] },
+// { Id: "01GXSA8YR785C4FYS3C0RTG7B1", SchemaVersion: "1.1", TypeDefinitions: [...] },
 // { Id: "GtQpMohWezFmIbyXxVEocOCxxgq", SchemaVersion: "1.1", TypeDefinitions: [...] }];
 ```
 
@@ -328,7 +328,7 @@ var body = new WriteAuthorizationModelRequest {
 
 var response = await fgaClient.WriteAuthorizationModel(body);
 
-// response.AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
+// response.AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
 ```
 
 #### Read a Single Authorization Model
@@ -340,12 +340,12 @@ Read a particular version of the Authorization Model.
 ```csharp
 var options = new ClientReadAuthorizationModelOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
-    AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+    AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
 };
 
 var response = await fgaClient.ReadAuthorizationModel(options);
 
-// response.AuthorizationModel.Id = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
+// response.AuthorizationModel.Id = "01GXSA8YR785C4FYS3C0RTG7B1"
 // response.AuthorizationModel.SchemaVersion = "1.1"
 // response.AuthorizationModel.TypeDefinitions = [{ "type": "document", "relations": { ... } }, { "type": "user", "relations": { ... }}]
 ```
@@ -359,7 +359,7 @@ Reads the latest authorization model versions (note: this ignores the model id i
 ```csharp
 var response = await fgaClient.ReadLatestAuthorizationModel();
 
-// response.AuthorizationModel.Id = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
+// response.AuthorizationModel.Id = "01GXSA8YR785C4FYS3C0RTG7B1"
 // response.AuthorizationModel.SchemaVersion = "1.1"
 // response.AuthorizationModel.TypeDefinitions = [{ "type": "document", "relations": { ... } }, { "type": "user", "relations": { ... }}]
 ```
@@ -469,7 +469,7 @@ var body = new ClientWriteRequest() {
 };
 var options = new ClientWriteOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
-    AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+    AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
 };
 var response = await fgaClient.Write(body, options);
 ```
@@ -503,7 +503,7 @@ var body = new ClientWriteRequest() {
 };
 var options = new ClientWriteOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
-    AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+    AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
     Transaction = new TransactionOptions() {
         Disable = true,
         MaxParallelRequests = 5, // Maximum number of requests to issue in parallel
@@ -523,7 +523,7 @@ Check if a user has a particular relation with an object.
 ```csharp
 var options = new ClientCheckOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
-    AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+    AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
 };
 var body = new ClientCheckRequest {
     Object = "document:roadmap",
@@ -542,7 +542,7 @@ If 429s or 5xxs are encountered, the underlying check will retry up to 15 times 
 ```csharp
 var options = new ClientBatchCheckOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
-    AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+    AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
     MaxParallelRequests = 5, // Max number of requests to issue in parallel, defaults to 10
 };
 var body = new List<ClientCheckRequest>(){
@@ -637,7 +637,7 @@ Expands the relationships in userset tree format.
 ```csharp
 var options = new ClientCheckOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
-    AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+    AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
 };
 var body = new ClientExpandRequest {
     Relation = "viewer",
@@ -657,7 +657,7 @@ List the objects of a particular type a user has access to.
 ```csharp
 var options = new ClientListObjectsOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
-    AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw",
+    AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
 };
 var body = new ClientListObjectsRequest {
     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
