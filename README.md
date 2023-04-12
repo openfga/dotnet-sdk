@@ -105,7 +105,7 @@ using OpenFga.Sdk.Model;
 
 namespace Example {
     public class Example {
-        public static async void Main() {
+        public static async Task Main() {
             try {
                 var configuration = new ClientConfiguration() {
                     ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
@@ -132,7 +132,7 @@ using OpenFga.Sdk.Model;
 
 namespace Example {
     public class Example {
-        public static async void Main() {
+        public static async Task Main() {
             try {
                 var configuration = new ClientConfiguration() {
                     ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
@@ -165,7 +165,7 @@ using OpenFga.Sdk.Model;
 
 namespace Example {
     public class Example {
-        public static async void Main() {
+        public static async Task Main() {
             try {
                 var configuration = new ClientConfiguration() {
                     ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
@@ -286,7 +286,7 @@ var response = await fgaClient.ReadAuthorizationModels(options);
 
 ##### Write Authorization Model
 
-Create a new version of the authorization model.
+Create a new authorization model.
 
 [API Documentation](https://openfga.dev/api/service#/Authorization%20Models/WriteAuthorizationModel)
 
@@ -339,7 +339,7 @@ var response = await fgaClient.WriteAuthorizationModel(body);
 
 #### Read a Single Authorization Model
 
-Read a particular version of the Authorization Model.
+Read a particular authorization model.
 
 [API Documentation](https://openfga.dev/api/service#/Authorization%20Models/ReadAuthorizationModel)
 
@@ -358,7 +358,7 @@ var response = await fgaClient.ReadAuthorizationModel(options);
 
 ##### Read the Latest Authorization Model
 
-Reads the latest authorization model versions (note: this ignores the model id in configuration).
+Reads the latest authorization model (note: this ignores the model id in configuration).
 
 [API Documentation](https://openfga.dev/api/service#/Authorization%20Models/ReadAuthorizationModel)
 
@@ -396,7 +396,7 @@ var response = await fgaClient.ReadChanges(body, options);
 
 ##### Read Relationship Tuples
 
-Reads the relationship tuples stored in the database. It does evaluate nor exclude invalid tuples according to the authorization model.
+Reads the relationship tuples stored in the database. It does not evaluate nor exclude invalid tuples according to the authorization model.
 
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Tuples/Read)
 
