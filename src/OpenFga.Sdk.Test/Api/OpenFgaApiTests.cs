@@ -779,7 +779,7 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public async Task WriteAuthorizationModelTest() {
             const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
-            
+
             var body = new WriteAuthorizationModelRequest {
                 SchemaVersion = "1.1",
                 TypeDefinitions = new List<TypeDefinition> {

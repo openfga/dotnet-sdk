@@ -281,7 +281,7 @@ var response = await fgaClient.ReadAuthorizationModels(options);
 
 // response.AuthorizationModels = [
 // { Id: "01GXSA8YR785C4FYS3C0RTG7B1", SchemaVersion: "1.1", TypeDefinitions: [...] },
-// { Id: "GtQpMohWezFmIbyXxVEocOCxxgq", SchemaVersion: "1.1", TypeDefinitions: [...] }];
+// { Id: "01GXSBM5PVYHCJNRNKXMB4QZTW", SchemaVersion: "1.1", TypeDefinitions: [...] }];
 ```
 
 ##### Write Authorization Model
@@ -297,6 +297,7 @@ Create a new version of the authorization model.
 > You can use the [OpenFGA Syntax Transformer](https://github.com/openfga/syntax-transformer) to convert between the friendly DSL and the JSON authorization model.
 
 ```csharp
+
 var body = new WriteAuthorizationModelRequest {
     SchemaVersion = "1.1",
     TypeDefinitions = new List<TypeDefinition> {
