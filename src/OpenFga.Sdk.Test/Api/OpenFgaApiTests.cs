@@ -13,7 +13,7 @@
 using Moq;
 using Moq.Protected;
 using OpenFga.Sdk.Api;
-using OpenFga.Sdk.Client;
+using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Exceptions.Parsers;
@@ -82,7 +82,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             async Task<ReadAuthorizationModelsResponse> ActionMissingStoreId() => await openFgaApi.ReadAuthorizationModels(null, null);
             var exception = await Assert.ThrowsAsync<FgaRequiredParamError>(ActionMissingStoreId);
-            Assert.Equal("Required parameter StoreId was not defined when calling Configuration.", exception.Message);
+            Assert.Equal("Required parameter StoreId was not defined when calling ReadAuthorizationModels.", exception.Message);
         }
 
         // /// <summary>
@@ -405,7 +405,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new CheckRequest { TupleKey = new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw" };
+            var body = new CheckRequest { TupleKey = new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1" };
 
             Task<CheckResponse> BadRequestError() => openFgaApi.Check(body);
             var error = await Assert.ThrowsAsync<FgaApiValidationError>(BadRequestError);
@@ -430,7 +430,7 @@ namespace OpenFga.Sdk.Test.Api {
         public async Task FgaApiInternalErrorTest() {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             mockHandler.Protected()
-                .Setup<Task<HttpResponseMessage>>(
+                .SetupSequence<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
@@ -439,6 +439,99 @@ namespace OpenFga.Sdk.Test.Api {
                 )
                 .ReturnsAsync(new HttpResponseMessage {
                     StatusCode = HttpStatusCode.InternalServerError,
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+
+            var config = new Configuration.Configuration() {
+                StoreId = _storeId,
+                ApiHost = _host,
+                MaxRetry = 1,
+            };
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+
+            var body = new CheckRequest(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
+
+            Task<CheckResponse> InternalApiError() => openFgaApi.Check(body);
+            var error = await Assert.ThrowsAsync<FgaApiInternalError>(InternalApiError);
+            Assert.Equal(error.Method, HttpMethod.Post);
+            Assert.Equal("Check", error.ApiName);
+            Assert.Equal($"{_config.BasePath}/stores/{_config.StoreId}/check", error.RequestUrl);
+            Assert.Equal(_config.StoreId, error.StoreId);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+
+        /// <summary>
+        /// Test 500s return FgaApiInternalError
+        /// </summary>
+        [Fact]
+        public async Task FgaApiInternalErrorRetrySuccessTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                })
+                .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, false));
+
+            var httpClient = new HttpClient(mockHandler.Object);
+
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new CheckRequest(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
+
+            var response = await openFgaApi.Check(body);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(3),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+
+            Assert.IsType<CheckResponse>(response);
+            Assert.True(response.Allowed);
+        }
+
+        /// <summary>
+        /// Test 404s return FgaApiNotFoundError
+        /// </summary>
+        [Fact]
+        public async Task FgaNotFoundErrorTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.NotFound,
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
@@ -447,8 +540,8 @@ namespace OpenFga.Sdk.Test.Api {
 
             var body = new CheckRequest(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
 
-            Task<CheckResponse> InternalApiError() => openFgaApi.Check(body);
-            var error = await Assert.ThrowsAsync<FgaApiInternalError>(InternalApiError);
+            Task<CheckResponse> ApiError() => openFgaApi.Check(body);
+            var error = await Assert.ThrowsAsync<FgaApiNotFoundError>(ApiError);
             Assert.Equal(error.Method, HttpMethod.Post);
             Assert.Equal("Check", error.ApiName);
             Assert.Equal($"{_config.BasePath}/stores/{_config.StoreId}/check", error.RequestUrl);
@@ -465,7 +558,7 @@ namespace OpenFga.Sdk.Test.Api {
         }
 
         /// <summary>
-        /// Test 500s return FgaApiError
+        /// Test unknown errors return FgaApiError
         /// </summary>
         [Fact]
         public async Task FgaApiErrorTest() {
@@ -479,7 +572,7 @@ namespace OpenFga.Sdk.Test.Api {
                     ItExpr.IsAny<CancellationToken>()
                 )
                 .ReturnsAsync(new HttpResponseMessage {
-                    StatusCode = HttpStatusCode.NotFound,
+                    StatusCode = HttpStatusCode.NotImplemented,
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
@@ -512,18 +605,27 @@ namespace OpenFga.Sdk.Test.Api {
         public async Task FgaApiRateLimitExceededErrorTest() {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             mockHandler.Protected()
-                .Setup<Task<HttpResponseMessage>>(
+                .SetupSequence<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
+                .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, true))
+                .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, true))
+                .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, true))
+                .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, true))
+                .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, true))
                 .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, true));
 
             var httpClient = new HttpClient(mockHandler.Object);
-
-            var openFgaApi = new OpenFgaApi(_config, httpClient);
+            var config = new Configuration.Configuration() {
+                StoreId = _storeId,
+                ApiHost = _host,
+                MaxRetry = 5,
+            };
+            var openFgaApi = new OpenFgaApi(config, httpClient);
 
             var body = new CheckRequest(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
 
@@ -539,12 +641,49 @@ namespace OpenFga.Sdk.Test.Api {
 
             mockHandler.Protected().Verify(
                 "SendAsync",
-                Times.Exactly(1),
+                Times.Exactly(6),
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
+        }
+        /// <summary>
+        /// Test 429s return FgaApiRateLimitExceededError
+        /// </summary>
+        [Fact]
+        public async Task FgaApiRateLimitExceededErrorRetrySuccessTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, true))
+                .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, true))
+                .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, false));
+
+            var httpClient = new HttpClient(mockHandler.Object);
+
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new CheckRequest(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"));
+
+            var response = await openFgaApi.Check(body);
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(3),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+
+            Assert.IsType<CheckResponse>(response);
+            Assert.True(response.Allowed);
         }
 
         /// <summary>
@@ -596,7 +735,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public async Task ReadAuthorizationModelsTest() {
-            const string authorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw";
+            const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
 
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             mockHandler.Protected()
@@ -639,16 +778,62 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public async Task WriteAuthorizationModelTest() {
-            const string authorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw";
-            var relations = new Dictionary<string, Userset>() {
-                {"writer", new Userset(_this: new object())}, {
-                    "viewer",
-                    new Userset(union: new Usersets(new List<Userset>() {
-                        new(new object(), new ObjectRelation("", "writer"))
-                    }))
+            const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
+
+            var body = new WriteAuthorizationModelRequest {
+                SchemaVersion = "1.1",
+                TypeDefinitions = new List<TypeDefinition> {
+                    new() {
+                        Type = "user", Relations = new Dictionary<string, Userset>()
+                    },
+                    new() {
+                        Type = "document",
+                        Relations = new Dictionary<string, Userset> {
+                            {
+                                "writer", new Userset {
+                                    This = new object()
+                                }
+                            }, {
+                                "viewer", new Userset {
+                                    Union = new Usersets {
+                                        Child = new List<Userset> {
+                                            new() {
+                                                This = new object()
+                                            },
+                                            new() {
+                                                ComputedUserset = new ObjectRelation {
+                                                    Relation = "writer"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        Metadata = new Metadata {
+                            Relations = new Dictionary<string, RelationMetadata> {
+                                {
+                                    "writer", new RelationMetadata {
+                                        DirectlyRelatedUserTypes = new List<RelationReference> {
+                                            new() {
+                                                Type = "user"
+                                            }
+                                        }
+                                    }
+                                }, {
+                                    "viewer", new RelationMetadata {
+                                        DirectlyRelatedUserTypes = new List<RelationReference> {
+                                            new() {
+                                                Type = "user"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             };
-            var body = new WriteAuthorizationModelRequest(new List<TypeDefinition>() { new("repo", relations) });
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
             mockHandler.Protected()
@@ -703,7 +888,7 @@ namespace OpenFga.Sdk.Test.Api {
                     StatusCode = HttpStatusCode.OK,
                     Content = Utils.CreateJsonStringContent(new ReadAuthorizationModelResponse() {
                         AuthorizationModel = new AuthorizationModel(id: authorizationModelId,
-                                typeDefinitions: new List<TypeDefinition>())
+                                typeDefinitions: new List<TypeDefinition>(), schemaVersion: "1.1")
                     }),
                 });
 
@@ -748,7 +933,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new CheckRequest { TupleKey = new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw" };
+            var body = new CheckRequest { TupleKey = new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1" };
             var response = await openFgaApi.Check(body);
 
             mockHandler.Protected().Verify(
@@ -788,7 +973,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var body = new WriteRequest {
                 Writes = new TupleKeys(new List<TupleKey> { new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }),
-                AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
+                AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
             var response = await openFgaApi.Write(body);
 
@@ -826,7 +1011,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var body = new WriteRequest {
                 Deletes = new TupleKeys(new List<TupleKey> { new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }),
-                AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw"
+                AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
             var response = await openFgaApi.Write(body);
 
@@ -865,7 +1050,7 @@ namespace OpenFga.Sdk.Test.Api {
             var body = new WriteRequest(
                 new TupleKeys(new List<TupleKey> { new("document:roadmap", "writer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }),
                 new TupleKeys(new List<TupleKey> { new("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b") }),
-                "1uHxCSuTP0VKPYSnkq1pbb1jeZw");
+                "01GXSA8YR785C4FYS3C0RTG7B1");
             var response = await openFgaApi.Write(body);
 
             mockHandler.Protected().Verify(
@@ -903,7 +1088,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new ExpandRequest { TupleKey = new TupleKey(_object: "document:roadmap", relation: "viewer"), AuthorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw" };
+            var body = new ExpandRequest { TupleKey = new TupleKey(_object: "document:roadmap", relation: "viewer"), AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1" };
             var response = await openFgaApi.Expand(body);
 
             mockHandler.Protected().Verify(
@@ -1130,7 +1315,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public async Task WriteAssertionsTest() {
-            const string authorizationModelId = "1uHxCSuTP0VKPYSnkq1pbb1jeZw";
+            const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             mockHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
@@ -1247,6 +1432,46 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.IsType<ListStoresResponse>(response);
             Assert.Single(response.Stores);
             Assert.Equal(response, expectedResponse);
+        }
+
+        /// <summary>
+        /// Test ListStores does not crash in error handling
+        /// </summary>
+        [Fact]
+        public async Task ListStoresResponseErrorTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri ==
+                        new Uri($"{_config.BasePath}/stores") &&
+                        req.Method == HttpMethod.Get),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.NotFound,
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            Task<ListStoresResponse> ApiError() => openFgaApi.ListStores();
+            var error = await Assert.ThrowsAsync<FgaApiNotFoundError>(ApiError);
+
+            Assert.Equal(error.Method, HttpMethod.Get);
+            Assert.Equal("ListStores", error.ApiName);
+            Assert.Equal($"{_config.BasePath}/stores", error.RequestUrl);
+            Assert.Null(error.StoreId);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores") &&
+                    req.Method == HttpMethod.Get),
+                ItExpr.IsAny<CancellationToken>()
+            );
         }
 
 

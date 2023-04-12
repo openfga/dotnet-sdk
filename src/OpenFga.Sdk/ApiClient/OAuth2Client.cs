@@ -15,7 +15,7 @@ using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Client;
+namespace OpenFga.Sdk.ApiClient;
 
 /// <summary>
 /// OAuth2 Client to exchange the credentials for an access token using the client credentials flow

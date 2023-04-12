@@ -11,7 +11,7 @@
 //
 
 
-using OpenFga.Sdk.Client;
+using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
 
@@ -19,7 +19,7 @@ namespace OpenFga.Sdk.Api;
 
 public class OpenFgaApi : IDisposable {
     private Configuration.Configuration _configuration;
-    private ApiClient _apiClient;
+    private ApiClient.ApiClient _apiClient;
 
     /// <summary>
     /// Store ID
@@ -39,7 +39,7 @@ public class OpenFgaApi : IDisposable {
         HttpClient? httpClient = null
     ) {
         this._configuration = configuration;
-        this._apiClient = new ApiClient(_configuration, httpClient);
+        this._apiClient = new ApiClient.ApiClient(_configuration, httpClient);
     }
 
     /// <summary>
@@ -52,7 +52,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<CheckResponse> Check(CheckRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("Check", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -65,7 +65,7 @@ public class OpenFgaApi : IDisposable {
             PathTemplate = "/stores/{store_id}/check",
             PathParameters = pathParams,
             Body = Utils.CreateJsonStringContent(body),
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<CheckResponse>(requestBuilder,
@@ -90,7 +90,7 @@ public class OpenFgaApi : IDisposable {
             PathTemplate = "/stores",
             PathParameters = pathParams,
             Body = Utils.CreateJsonStringContent(body),
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<CreateStoreResponse>(requestBuilder,
@@ -106,7 +106,7 @@ public class OpenFgaApi : IDisposable {
     public async Task DeleteStore(CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("DeleteStore", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -118,7 +118,7 @@ public class OpenFgaApi : IDisposable {
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}",
             PathParameters = pathParams,
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         await this._apiClient.SendRequestAsync(requestBuilder,
@@ -135,7 +135,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ExpandResponse> Expand(ExpandRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("Expand", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -148,7 +148,7 @@ public class OpenFgaApi : IDisposable {
             PathTemplate = "/stores/{store_id}/expand",
             PathParameters = pathParams,
             Body = Utils.CreateJsonStringContent(body),
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<ExpandResponse>(requestBuilder,
@@ -164,7 +164,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<GetStoreResponse> GetStore(CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("GetStore", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -176,7 +176,7 @@ public class OpenFgaApi : IDisposable {
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}",
             PathParameters = pathParams,
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<GetStoreResponse>(requestBuilder,
@@ -184,7 +184,7 @@ public class OpenFgaApi : IDisposable {
     }
 
     /// <summary>
-    /// [EXPERIMENTAL] Get all objects of the given type that the user has a relation with The ListObjects API returns a list of all the objects of the given type that the user has a relation with. To achieve this, both the store tuples and the authorization model are used. An &#x60;authorization_model_id&#x60; may be specified in the body. If it is, it will be used to decide the underlying implementation used. If it is not specified, the latest authorization model ID will be used. It is strongly recommended to specify authorization model id for better performance. You may also specify &#x60;contextual_tuples&#x60; that will be treated as regular tuples. The response will contain the related objects in an array in the \&quot;objects\&quot; field of the response and they will be strings in the object format &#x60;&lt;type&gt;:&lt;id&gt;&#x60; (e.g. \&quot;document:roadmap\&quot;)  
+    /// Get all objects of the given type that the user has a relation with The ListObjects API returns a list of all the objects of the given type that the user has a relation with. To achieve this, both the store tuples and the authorization model are used. An &#x60;authorization_model_id&#x60; may be specified in the body. If it is, it will be used to decide the underlying implementation used. If it is not specified, the latest authorization model ID will be used. It is strongly recommended to specify authorization model id for better performance. You may also specify &#x60;contextual_tuples&#x60; that will be treated as regular tuples. The response will contain the related objects in an array in the \&quot;objects\&quot; field of the response and they will be strings in the object format &#x60;&lt;type&gt;:&lt;id&gt;&#x60; (e.g. \&quot;document:roadmap\&quot;). Note: If you have &#x60;and&#x60; or &#x60;but not&#x60; in your model while using ListObjects, checkout the [caveats](https://openfga.dev/docs/interacting/relationship-queries#caveats-and-when-not-to-use-it-3). 
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="body"></param>
@@ -193,7 +193,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ListObjectsResponse> ListObjects(ListObjectsRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("ListObjects", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -206,7 +206,7 @@ public class OpenFgaApi : IDisposable {
             PathTemplate = "/stores/{store_id}/list-objects",
             PathParameters = pathParams,
             Body = Utils.CreateJsonStringContent(body),
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<ListObjectsResponse>(requestBuilder,
@@ -237,7 +237,7 @@ public class OpenFgaApi : IDisposable {
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores",
             PathParameters = pathParams,
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<ListStoresResponse>(requestBuilder,
@@ -254,7 +254,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ReadResponse> Read(ReadRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("Read", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -267,7 +267,7 @@ public class OpenFgaApi : IDisposable {
             PathTemplate = "/stores/{store_id}/read",
             PathParameters = pathParams,
             Body = Utils.CreateJsonStringContent(body),
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<ReadResponse>(requestBuilder,
@@ -284,7 +284,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ReadAssertionsResponse> ReadAssertions(string authorizationModelId, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("ReadAssertions", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -299,7 +299,7 @@ public class OpenFgaApi : IDisposable {
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/assertions/{authorization_model_id}",
             PathParameters = pathParams,
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<ReadAssertionsResponse>(requestBuilder,
@@ -316,7 +316,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ReadAuthorizationModelResponse> ReadAuthorizationModel(string id, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("ReadAuthorizationModel", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -331,7 +331,7 @@ public class OpenFgaApi : IDisposable {
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/authorization-models/{id}",
             PathParameters = pathParams,
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<ReadAuthorizationModelResponse>(requestBuilder,
@@ -349,7 +349,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ReadAuthorizationModelsResponse> ReadAuthorizationModels(int? pageSize = default(int?), string? continuationToken = default(string?), CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("ReadAuthorizationModels", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -367,7 +367,7 @@ public class OpenFgaApi : IDisposable {
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/authorization-models",
             PathParameters = pathParams,
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<ReadAuthorizationModelsResponse>(requestBuilder,
@@ -386,7 +386,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<ReadChangesResponse> ReadChanges(string? type = default(string?), int? pageSize = default(int?), string? continuationToken = default(string?), CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("ReadChanges", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -407,7 +407,7 @@ public class OpenFgaApi : IDisposable {
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/changes",
             PathParameters = pathParams,
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<ReadChangesResponse>(requestBuilder,
@@ -424,7 +424,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<Object> Write(WriteRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("Write", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -437,7 +437,7 @@ public class OpenFgaApi : IDisposable {
             PathTemplate = "/stores/{store_id}/write",
             PathParameters = pathParams,
             Body = Utils.CreateJsonStringContent(body),
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<Object>(requestBuilder,
@@ -455,7 +455,7 @@ public class OpenFgaApi : IDisposable {
     public async Task WriteAssertions(string authorizationModelId, WriteAssertionsRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("WriteAssertions", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -471,7 +471,7 @@ public class OpenFgaApi : IDisposable {
             PathTemplate = "/stores/{store_id}/assertions/{authorization_model_id}",
             PathParameters = pathParams,
             Body = Utils.CreateJsonStringContent(body),
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         await this._apiClient.SendRequestAsync(requestBuilder,
@@ -488,7 +488,7 @@ public class OpenFgaApi : IDisposable {
     public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(WriteAuthorizationModelRequest body, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(_configuration.StoreId)) {
-            throw new FgaRequiredParamError("Configuration", nameof(_configuration.StoreId));
+            throw new FgaRequiredParamError("WriteAuthorizationModel", nameof(_configuration.StoreId));
         }
         pathParams.Add("store_id", _configuration.StoreId);
 
@@ -501,7 +501,7 @@ public class OpenFgaApi : IDisposable {
             PathTemplate = "/stores/{store_id}/authorization-models",
             PathParameters = pathParams,
             Body = Utils.CreateJsonStringContent(body),
-            QueryParameters = queryParams
+            QueryParameters = queryParams,
         };
 
         return await this._apiClient.SendRequestAsync<WriteAuthorizationModelResponse>(requestBuilder,

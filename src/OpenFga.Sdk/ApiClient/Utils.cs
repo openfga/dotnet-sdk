@@ -15,7 +15,7 @@ using System.Text;
 using System.Text.Json;
 using System.Web;
 
-namespace OpenFga.Sdk.Client;
+namespace OpenFga.Sdk.ApiClient;
 
 /// <summary>
 ///

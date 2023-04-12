@@ -45,8 +45,8 @@ public class Configuration {
                 $"Configuration.ApiScheme ({ApiScheme}) and Configuration.ApiHost ({ApiHost}) do not form a valid URI ({BasePath})");
         }
 
-        if (MaxRetry > 5) {
-            throw new FgaValidationError("Configuration.MaxRetry exceeds maximum allowed limit of 5");
+        if (MaxRetry > 15) {
+            throw new FgaValidationError("Configuration.MaxRetry exceeds maximum allowed limit of 15");
         }
 
         Credentials?.IsValid();
@@ -60,7 +60,7 @@ public class Configuration {
     ///     Version of the package.
     /// </summary>
     /// <value>Version of the package.</value>
-    public const string Version = "0.2.1";
+    public const string Version = "0.2.2";
 
     #endregion Constants
 
@@ -137,7 +137,7 @@ public class Configuration {
     ///     Max number of times to retry after a request is rate limited
     /// </summary>
     /// <value>MaxRetry</value>
-    public int MaxRetry { get; set; } = 0;
+    public int MaxRetry { get; set; } = 15;
 
     /// <summary>
     ///     Minimum time in ms to wait before retrying

@@ -15,7 +15,7 @@ using OpenFga.Sdk.Exceptions;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
-namespace OpenFga.Sdk.Client;
+namespace OpenFga.Sdk.ApiClient;
 
 /// <summary>
 /// Base Client, used by the API and OAuth Clients
@@ -106,7 +106,7 @@ public class BaseClient : IDisposable {
 
         var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         {
-            if (!response.IsSuccessStatusCode) {
+            if (response == null || (response.StatusCode != null && !response.IsSuccessStatusCode)) {
                 throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
             }
 
@@ -138,7 +138,7 @@ public class BaseClient : IDisposable {
 
         var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
         {
-            if (!response.IsSuccessStatusCode) {
+            if (response == null || (response.StatusCode != null && !response.IsSuccessStatusCode)) {
                 throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
             }
         }

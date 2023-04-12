@@ -18,7 +18,7 @@ public enum CredentialsMethod {
     [EnumMember(Value = "api_token")] ApiToken,
 
     /// <summary>
-    /// Client ID, Secret, API Token Issuer & Audience for client credential flow required
+    /// Client ID, Secret, API Token Issuer and Audience for client credential flow required
     /// </summary>
     [EnumMember(Value = "client_credentials")] ClientCredentials,
 }

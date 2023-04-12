@@ -34,11 +34,11 @@ public class FgaApiAuthenticationError : FgaApiError {
         Method = HttpMethod.Post;
     }
 
-    public FgaApiAuthenticationError(HttpResponseMessage response, HttpRequestMessage request, string? apiName,
+    public FgaApiAuthenticationError(HttpResponseMessage? response, HttpRequestMessage request, string? apiName,
         ApiErrorParser? apiError = null) : base(response, request, apiName, apiError) {
     }
 
-    internal new static async Task<FgaApiAuthenticationError> CreateAsync(HttpResponseMessage response, HttpRequestMessage request, string? apiName) {
+    internal new static async Task<FgaApiAuthenticationError> CreateAsync(HttpResponseMessage? response, HttpRequestMessage request, string? apiName) {
         return new FgaApiAuthenticationError(response, request, apiName,
             await ApiErrorParser.Parse(response).ConfigureAwait(false));
     }
