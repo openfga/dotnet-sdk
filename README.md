@@ -268,7 +268,7 @@ var store = await fgaClient.DeleteStore();
 
 ##### Read Authorization Models
 
-Read all versions of the authorization model.
+Read all authorization models in the store.
 
 [API Documentation](https://openfga.dev/api/service#/Authorization%20Models/ReadAuthorizationModels)
 
@@ -396,7 +396,7 @@ var response = await fgaClient.ReadChanges(body, options);
 
 ##### Read Relationship Tuples
 
-Reads the relationship tuple stored in the database (does not evaluate according to the model).
+Reads the relationship tuples stored in the database. It does evaluate nor exclude invalid tuples according to the authorization model.
 
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Tuples/Read)
 
@@ -486,6 +486,7 @@ Convenience `WriteTuples` and `DeleteTuples` methods are also available.
 
 The SDK will split the writes into separate requests and send them sequentially to avoid violating rate limits.
 
+```csharp
 var body = new ClientWriteRequest() {
     Writes = new List<ClientTupleKey> {
         new() {
@@ -517,6 +518,7 @@ var options = new ClientWriteOptions {
     }
 };
 var response = await fgaClient.Write(body, options);
+```
 
 #### Relationship Queries
 
@@ -701,6 +703,45 @@ ListRelationsRequest body =
 var response = await fgaClient.ListRelations(body);
 
 // response.Relations = ["can_view", "can_edit"]
+```
+
+### Assertions
+
+#### Read Assertions
+
+Read assertions for a particular authorization model.
+
+[API Documentation](https://openfga.dev/api/service#/Assertions/Read%20Assertions)
+
+```csharp
+var options = new ClientReadAssertionsOptions {
+    // You can rely on the model id set in the configuration or override it for this specific request
+    AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+};
+
+var response = await fgaClient.ReadAssertions(options);
+```
+
+#### Write Assertions
+
+Update the assertions for a particular authorization model.
+
+[API Documentation](https://openfga.dev/api/service#/Assertions/Write%20Assertions)
+
+```csharp
+var options = new ClientWriteAssertionsOptions {
+    // You can rely on the model id set in the configuration or override it for this specific request
+    AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+};
+
+var body = new List<ClientAssertion>() {new ClientAssertion() {
+    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+    Relation = "viewer",
+    Object = "document:roadmap",
+    Expectation = true,
+}};
+
+await fgaClient.WriteAssertions(body, options);
 ```
 
 

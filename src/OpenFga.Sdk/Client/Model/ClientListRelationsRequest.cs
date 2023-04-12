@@ -15,7 +15,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
 namespace OpenFga.Sdk.Client.Model;
-internal interface IListRelationsRequest {
+internal interface IClientListRelationsRequest {
     public string User { get; set; }
 
     public string Object { get; set; }
@@ -26,18 +26,18 @@ internal interface IListRelationsRequest {
 }
 
 /// <summary>
-///     ListRelationsRequest
+///     ClientListRelationsRequest
 /// </summary>
-public class ListRelationsRequest : IListRelationsRequest, IEquatable<ListRelationsRequest>, IValidatableObject {
-    public ListRelationsRequest(List<string> relations) {
+public class ClientListRelationsRequest : IClientListRelationsRequest, IEquatable<ClientListRelationsRequest>, IValidatableObject {
+    public ClientListRelationsRequest(List<string> relations) {
         Relations = relations;
     }
 
-    public ListRelationsRequest() {
+    public ClientListRelationsRequest() {
         Relations = new List<string>();
     }
 
-    public bool Equals(ListRelationsRequest input) {
+    public bool Equals(ClientListRelationsRequest input) {
         if (input == null) {
             return false;
         }
@@ -78,10 +78,10 @@ public class ListRelationsRequest : IListRelationsRequest, IEquatable<ListRelati
 
     public virtual string ToJson() => JsonSerializer.Serialize(this);
 
-    public static ListRelationsRequest FromJson(string jsonString) =>
-        JsonSerializer.Deserialize<ListRelationsRequest>(jsonString) ?? throw new InvalidOperationException();
+    public static ClientListRelationsRequest FromJson(string jsonString) =>
+        JsonSerializer.Deserialize<ClientListRelationsRequest>(jsonString) ?? throw new InvalidOperationException();
 
-    public override bool Equals(object input) => Equals(input as ListRelationsRequest);
+    public override bool Equals(object input) => Equals(input as ClientListRelationsRequest);
 
     public override int GetHashCode() {
         unchecked // Overflow is fine, just wrap

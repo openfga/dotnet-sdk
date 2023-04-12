@@ -16,6 +16,7 @@ using Moq.Protected;
 using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Exceptions.Parsers;
 using OpenFga.Sdk.Model;
 using System;
@@ -1214,8 +1215,8 @@ public class OpenFgaClientTests {
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
-        ListRelationsRequest body =
-            new ListRelationsRequest() {
+        ClientListRelationsRequest body =
+            new ClientListRelationsRequest() {
                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                 Object = "document:roadmap",
                 Relations = new List<string> { "can_view", "can_edit", "can_delete", "can_rename" },
@@ -1242,6 +1243,49 @@ public class OpenFgaClientTests {
         Assert.Equal(2, response.Relations.Count);
         // TODO: Ensure the relations are correct, currently because the mocks are generic and we process in parallel,
         // we do not know what order they will be processed in
+    }
+
+    /// <summary>
+    /// Test ListRelationsNoRelationsProvided
+    /// </summary>
+    [Fact]
+    public async Task ListRelationsNoRelationsProvidedTest() {
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body =
+            new ClientListRelationsRequest() {
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                Object = "document:roadmap",
+                Relations = new List<string> {},
+            };
+
+        Task<ListRelationsResponse> ApiError() => fgaClient.ListRelations(body);
+        var error = await Assert.ThrowsAsync<FgaValidationError>(ApiError);
+        Assert.Equal("At least 1 relation to check has to be provided when calling ListRelations", error.Message);
+
+        mockHandler.Protected().Verify(
+            "SendAsync",
+            Times.Exactly(0),
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                req.Method == HttpMethod.Post),
+            ItExpr.IsAny<CancellationToken>()
+        );
     }
 
     /**************
