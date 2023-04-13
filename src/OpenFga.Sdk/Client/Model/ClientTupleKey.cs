@@ -19,7 +19,17 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Client.Model;
 
-public class ClientTupleKey : TupleKey {
+public interface IClientTupleKey {
+    public string User { get; set; }
+    public string Relation { get; set; }
+    public string Object { get; set; }
+}
+
+public interface IClientContextualTuplesWrapper {
+    public List<ClientTupleKey>? ContextualTuples { get; set; }
+}
+
+public class ClientTupleKey : IClientTupleKey {
     /// <summary>
     ///     Gets or Sets Object
     /// </summary>

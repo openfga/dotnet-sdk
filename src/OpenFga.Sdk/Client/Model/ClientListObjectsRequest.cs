@@ -10,8 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using OpenFga.Sdk.Model;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
@@ -19,11 +17,10 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Client.Model;
 
-internal interface IClientListObjectsRequest {
+public interface IClientListObjectsRequest: IClientContextualTuplesWrapper {
     public string User { get; set; }
     public string Relation { get; set; }
     public string Type { get; set; }
-    public List<TupleKey>? ContextualTuples { get; set; }
 }
 
 /// <summary>
@@ -57,7 +54,7 @@ public class ClientListObjectsRequest : IClientListObjectsRequest, IEquatable<Cl
     /// </summary>
     [DataMember(Name = "contextual_tuples", EmitDefaultValue = false)]
     [JsonPropertyName("contextual_tuples")]
-    public List<TupleKey>? ContextualTuples { get; set; }
+    public List<ClientTupleKey>? ContextualTuples { get; set; }
 
     public bool Equals(ClientListObjectsRequest input) {
         if (input == null) {

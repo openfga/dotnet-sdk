@@ -1158,9 +1158,17 @@ public class OpenFgaClientTests {
             User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
             Relation = "can_read",
             Type = "document",
-            ContextualTuples = new List<TupleKey> {
-                new("folder:product", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-                new("document:roadmap", "parent", "folder:product")
+            ContextualTuples = new List<ClientTupleKey> {
+                new() {
+                    User = "folder:product",
+                    Relation = "editor",
+                    Object = "folder:product",
+                },
+                new() {
+                    User = "folder:product",
+                    Relation = "parent",
+                    Object = "document:roadmap",
+                },
             }
         };
         var response = await fgaClient.ListObjects(body, new ClientWriteOptions {

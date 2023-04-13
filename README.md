@@ -671,11 +671,13 @@ var body = new ClientListObjectsRequest {
     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
     Relation = "viewer",
     Type = "document",
-    ContextualTuples = new List<TupleKey>() {
-        {
-            new("document:budget", "writer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b")
-        }
-    }
+    ContextualTuples = new List<ClientTupleKey> {
+        new() {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "writer",
+            Object = "document:budget",
+        },
+    },
 };
 var response = await fgaClient.ListObjects(body, options);
 

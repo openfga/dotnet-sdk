@@ -64,7 +64,7 @@ public class OpenFgaClient : IDisposable {
     /**
    * ListStores - Get a paginated list of stores.
    */
-    public async Task<ListStoresResponse> ListStores(ClientListStoresOptions? options = default,
+    public async Task<ListStoresResponse> ListStores(IClientListStoresOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.ListStores(options?.PageSize, options?.ContinuationToken, cancellationToken);
 
@@ -96,7 +96,7 @@ public class OpenFgaClient : IDisposable {
      * ReadAuthorizationModels - Read all authorization models
      */
     public async Task<ReadAuthorizationModelsResponse> ReadAuthorizationModels(
-        ClientReadAuthorizationModelsOptions? options = default,
+        IClientReadAuthorizationModelsOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.ReadAuthorizationModels(options?.PageSize, options?.ContinuationToken, cancellationToken);
 
@@ -112,7 +112,7 @@ public class OpenFgaClient : IDisposable {
      * ReadAuthorizationModel - Read the current authorization model
      */
     public async Task<ReadAuthorizationModelResponse> ReadAuthorizationModel(
-        ClientReadAuthorizationModelOptions? options = default,
+        IClientReadAuthorizationModelOptions? options = default,
         CancellationToken cancellationToken = default) {
         var authorizationModelId = GetAuthorizationModelId(options);
         if (authorizationModelId == null) {
@@ -160,7 +160,7 @@ public class OpenFgaClient : IDisposable {
     /**
      * Write - Create or delete relationship tuples
      */
-    public async Task<ClientWriteResponse> Write(ClientWriteRequest body, ClientWriteOptions? options = default,
+    public async Task<ClientWriteResponse> Write(ClientWriteRequest body, IClientWriteOptions? options = default,
         CancellationToken cancellationToken = default) {
         var maxPerChunk =
             options?.Transaction?.MaxPerChunk ??
@@ -184,10 +184,10 @@ public class OpenFgaClient : IDisposable {
             return new ClientWriteResponse {
                 Writes =
                     body.Writes?.ConvertAll(tupleKey =>
-                        new ClientWriteSingleResponse { TupleKey = tupleKey, Status = ClientWriteStatus.SUCCESS }) ??
+                        new ClientWriteSingleResponse { TupleKey = tupleKey.ToTupleKey(), Status = ClientWriteStatus.SUCCESS }) ??
                     new List<ClientWriteSingleResponse>(),
                 Deletes = body.Deletes?.ConvertAll(tupleKey => new ClientWriteSingleResponse {
-                    TupleKey = tupleKey,
+                    TupleKey = tupleKey.ToTupleKey(),
                     Status = ClientWriteStatus.SUCCESS
                 }) ?? new List<ClientWriteSingleResponse>()
             };
@@ -206,7 +206,7 @@ public class OpenFgaClient : IDisposable {
 
                     foreach (var tupleKey in writes) {
                         writeResponses.Add(new ClientWriteSingleResponse {
-                            TupleKey = tupleKey,
+                            TupleKey = tupleKey.ToTupleKey(),
                             Status = ClientWriteStatus.SUCCESS,
                         });
                     }
@@ -214,7 +214,7 @@ public class OpenFgaClient : IDisposable {
                 catch (Exception e) {
                     foreach (var tupleKey in writes) {
                         writeResponses.Add(new ClientWriteSingleResponse {
-                            TupleKey = tupleKey,
+                            TupleKey = tupleKey.ToTupleKey(),
                             Status = ClientWriteStatus.FAILURE,
                             Error = e,
                         });
@@ -230,7 +230,7 @@ public class OpenFgaClient : IDisposable {
 
                     foreach (var tupleKey in deletes) {
                         deleteResponses.Add(new ClientWriteSingleResponse {
-                            TupleKey = tupleKey,
+                            TupleKey = tupleKey.ToTupleKey(),
                             Status = ClientWriteStatus.SUCCESS,
                         });
                     }
@@ -238,7 +238,7 @@ public class OpenFgaClient : IDisposable {
                 catch (Exception e) {
                     foreach (var tupleKey in deletes) {
                         deleteResponses.Add(new ClientWriteSingleResponse {
-                            TupleKey = tupleKey,
+                            TupleKey = tupleKey.ToTupleKey(),
                             Status = ClientWriteStatus.FAILURE,
                             Error = e,
                         });
@@ -252,14 +252,14 @@ public class OpenFgaClient : IDisposable {
     /**
      * WriteTuples - Utility method to write tuples, wraps Write
      */
-    public async Task<ClientWriteResponse> WriteTuples(List<ClientTupleKey> body, ClientWriteOptions? options = default,
+    public async Task<ClientWriteResponse> WriteTuples(List<ClientTupleKey> body, IClientWriteOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await Write(new ClientWriteRequest { Writes = body }, options, cancellationToken);
 
     /**
      * DeleteTuples - Utility method to delete tuples, wraps Write
      */
-    public async Task<ClientWriteResponse> DeleteTuples(List<ClientTupleKey> body, ClientWriteOptions? options = default,
+    public async Task<ClientWriteResponse> DeleteTuples(List<ClientTupleKey> body, IClientWriteOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await Write(new ClientWriteRequest { Deletes = body }, options, cancellationToken);
 
@@ -270,7 +270,7 @@ public class OpenFgaClient : IDisposable {
     /**
    * Check - Check if a user has a particular relation with an object (evaluates)
    */
-    public async Task<CheckResponse> Check(ClientCheckRequest body,
+    public async Task<CheckResponse> Check(IClientCheckRequest body,
         IClientRequestOptionsWithAuthZModelId? options = default,
         CancellationToken cancellationToken = default) =>
         await api.Check(
@@ -313,7 +313,7 @@ public class OpenFgaClient : IDisposable {
     /**
    * Expand - Expands the relationships in userset tree format (evaluates)
    */
-    public async Task<ExpandResponse> Expand(ClientExpandRequest body,
+    public async Task<ExpandResponse> Expand(IClientExpandRequest body,
         IClientRequestOptionsWithAuthZModelId? options = default,
         CancellationToken cancellationToken = default) =>
         await api.Expand(
@@ -325,21 +325,25 @@ public class OpenFgaClient : IDisposable {
     /**
      * ListObjects - List the objects of a particular type that the user has a certain relation to (evaluates)
      */
-    public async Task<ListObjectsResponse> ListObjects(ClientListObjectsRequest body,
+    public async Task<ListObjectsResponse> ListObjects(IClientListObjectsRequest body,
         IClientRequestOptionsWithAuthZModelId? options = default,
         CancellationToken cancellationToken = default) =>
         await api.ListObjects(new ListObjectsRequest {
             User = body.User,
             Relation = body.Relation,
             Type = body.Type,
-            ContextualTuples = new ContextualTupleKeys { TupleKeys = body.ContextualTuples ?? new List<TupleKey>() },
+            ContextualTuples =
+                new ContextualTupleKeys {
+                    TupleKeys = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ??
+                                new List<TupleKey>()
+                },
             AuthorizationModelId = GetAuthorizationModelId(options)
         });
 
     /**
      * ListRelations - List all the relations a user has with an object (evaluates)
      */
-    public async Task<ListRelationsResponse> ListRelations(ClientListRelationsRequest body,
+    public async Task<ListRelationsResponse> ListRelations(IClientListRelationsRequest body,
         IClientBatchCheckOptions? options = default,
         CancellationToken cancellationToken = default) {
         if (body.Relations.Count == 0) {
@@ -377,7 +381,7 @@ public class OpenFgaClient : IDisposable {
     /**
    * ReadAssertions - Read assertions for a particular authorization model
    */
-    public async Task<ReadAssertionsResponse> ReadAssertions(ClientReadAssertionsOptions? options = default,
+    public async Task<ReadAssertionsResponse> ReadAssertions(IClientReadAssertionsOptions? options = default,
         CancellationToken cancellationToken = default) {
         var authorizationModelId = GetAuthorizationModelId(options);
         if (authorizationModelId == null) {
@@ -391,7 +395,7 @@ public class OpenFgaClient : IDisposable {
      * WriteAssertions - Updates assertions for a particular authorization model
      */
     public async Task WriteAssertions(List<ClientAssertion> body,
-        ClientWriteAssertionsOptions? options = default,
+        IClientWriteAssertionsOptions? options = default,
         CancellationToken cancellationToken = default) {
         var authorizationModelId = GetAuthorizationModelId(options);
         if (authorizationModelId == null) {
