@@ -1435,7 +1435,7 @@ namespace OpenFga.Sdk.Test.Api {
         }
 
         /// <summary>
-        /// Test ListStores does not crash in error handling
+        /// Test ListStores correctly returns FgaApiNotFoundError
         /// </summary>
         [Fact]
         public async Task ListStoresResponseErrorTest() {

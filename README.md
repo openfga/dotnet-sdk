@@ -298,7 +298,7 @@ Create a new authorization model.
 
 ```csharp
 
-var body = new WriteAuthorizationModelRequest {
+var body = new ClientWriteAuthorizationModelRequest {
     SchemaVersion = "1.1",
     TypeDefinitions = new List<TypeDefinition> {
         new() {Type = "user", Relations = new Dictionary<string, Userset>()},
@@ -720,7 +720,6 @@ var options = new ClientReadAssertionsOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
     AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
 };
-
 var response = await fgaClient.ReadAssertions(options);
 ```
 
@@ -735,14 +734,12 @@ var options = new ClientWriteAssertionsOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
     AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
 };
-
 var body = new List<ClientAssertion>() {new ClientAssertion() {
     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
     Relation = "viewer",
     Object = "document:roadmap",
     Expectation = true,
 }};
-
 await fgaClient.WriteAssertions(body, options);
 ```
 

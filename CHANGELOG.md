@@ -8,7 +8,7 @@
 - feat(client): implement `BatchCheck` to check multiple tuples in parallel
 - feat(client): implement `ListRelations` to check in one call whether a user has multiple relations to an objects
 - feat(client): add support for a non-transactional `Write`
-- chore(config): bump default max retries to `5`
+- chore(config): bump default max retries to `15`
 - fix: retry on 5xx errors
 
 ## v0.2.1

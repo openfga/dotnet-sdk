@@ -10,10 +10,12 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
+
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
 namespace OpenFga.Sdk.Client.Model;
+
 public interface IClientListRelationsRequest : IClientContextualTuplesWrapper {
     public string User { get; set; }
 

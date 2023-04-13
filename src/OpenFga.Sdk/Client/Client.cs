@@ -103,7 +103,7 @@ public class OpenFgaClient : IDisposable {
     /**
      * WriteAuthorizationModel - Create a new version of the authorization model
      */
-    public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(WriteAuthorizationModelRequest body,
+    public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(ClientWriteAuthorizationModelRequest body,
         ClientRequestOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.WriteAuthorizationModel(body, cancellationToken);
@@ -141,14 +141,14 @@ public class OpenFgaClient : IDisposable {
      * Read Changes - Read the list of historical relationship tuple writes and deletes
      */
     public async Task<ReadChangesResponse> ReadChanges(ClientReadChangesRequest body,
-        ClientReadChangesOptions? options = default,
+        IClientReadChangesOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.ReadChanges(body.Type, options?.PageSize, options?.ContinuationToken, cancellationToken);
 
     /**
      * Read - Read tuples previously written to the store (does not evaluate)
      */
-    public async Task<ReadResponse> Read(ClientReadRequest body, ClientReadOptions? options = default,
+    public async Task<ReadResponse> Read(ClientReadRequest body, IClientReadOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.Read(
             new ReadRequest {
@@ -349,7 +349,7 @@ public class OpenFgaClient : IDisposable {
         if (body.Relations.Count == 0) {
             throw new FgaValidationError("At least 1 relation to check has to be provided when calling ListRelations");
         }
-        
+
         var responses = new ListRelationsResponse();
         var batchCheckRequests = new List<ClientCheckRequest>();
         for (var index = 0; index < body.Relations.Count; index++) {
