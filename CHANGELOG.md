@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.3
+
+### [0.2.3](https://github.com/openfga/dotnet-sdk/compare/v0.2.2...v0.2.3) (2023-04-13)
+- fix: changed interface of contextual tuples in `ClientListObjects` to be `ClientTupleKey` instead of `TupleKey`
+- fix: Client `WriteAuthorizationModel` now expects `ClientWriteAuthorizationModelRequest` instead of `WriteAuthorizationModelRequest`
+- chore: changed a few interfaces to expect interfaces instead of classes
+
 ## v0.2.2
 
 ### [0.2.2](https://github.com/openfga/dotnet-sdk/compare/v0.2.1...v0.2.2) (2023-04-12)
