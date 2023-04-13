@@ -15,12 +15,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
 namespace OpenFga.Sdk.Client.Model;
-internal interface IClientListRelationsRequest {
+
+public interface IClientListRelationsRequest : IClientContextualTuplesWrapper {
     public string User { get; set; }
 
     public string Object { get; set; }
-
-    public List<ClientTupleKey> ContextualTuples { get; set; }
 
     public List<string> Relations { get; set; }
 }

@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.3
+
+### [0.2.3](https://github.com/openfga/dotnet-sdk/compare/v0.2.2...v0.2.3) (2023-04-13)
+- fix: changed interface of contextual tuples in `ClientListObjects` to be `ClientTupleKey` instead of `TupleKey`
+- fix: Client `WriteAuthorizationModel` now expects `ClientWriteAuthorizationModelRequest` instead of `WriteAuthorizationModelRequest`
+- chore: changed a few interfaces to expect interfaces instead of classes
+
 ## v0.2.2
 
 ### [0.2.2](https://github.com/openfga/dotnet-sdk/compare/v0.2.1...v0.2.2) (2023-04-12)
@@ -8,7 +15,7 @@
 - feat(client): implement `BatchCheck` to check multiple tuples in parallel
 - feat(client): implement `ListRelations` to check in one call whether a user has multiple relations to an objects
 - feat(client): add support for a non-transactional `Write`
-- chore(config): bump default max retries to `5`
+- chore(config): bump default max retries to `15`
 - fix: retry on 5xx errors
 
 ## v0.2.1

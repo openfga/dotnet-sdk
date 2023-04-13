@@ -11,8 +11,10 @@
 //
 
 
+using OpenFga.Sdk.Model;
+
 namespace OpenFga.Sdk.Client.Model;
 
-public interface IClientCreateStoreOptions : ClientRequestOptions { }
-
-public class ClientCreateStoreOptions : IClientCreateStoreOptions { }
+/// <inheritdoc />
+public class ClientWriteAuthorizationModelRequest : WriteAuthorizationModelRequest {
+}

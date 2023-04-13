@@ -18,7 +18,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Client.Model;
 
-internal interface IClientCheckRequest {
+public interface IClientCheckRequest : IClientContextualTuplesWrapper {
     public string User { get; set; }
     public string Relation { get; set; }
     public string Object { get; set; }

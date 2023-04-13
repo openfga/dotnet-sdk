@@ -306,7 +306,7 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task WriteAuthorizationModelTest() {
         const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
-        var body = new WriteAuthorizationModelRequest {
+        var body = new ClientWriteAuthorizationModelRequest {
             SchemaVersion = "1.1",
             TypeDefinitions = new List<TypeDefinition> {
                 new() {
@@ -1158,10 +1158,18 @@ public class OpenFgaClientTests {
             User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
             Relation = "can_read",
             Type = "document",
-            ContextualTuples = new List<TupleKey> {
-                new("folder:product", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-                new("document:roadmap", "parent", "folder:product")
-            }
+            ContextualTuples = new List<ClientTupleKey> {
+                new() {
+                    User = "folder:product",
+                    Relation = "editor",
+                    Object = "folder:product",
+                },
+                new() {
+                    User = "folder:product",
+                    Relation = "parent",
+                    Object = "document:roadmap",
+                },
+            },
         };
         var response = await fgaClient.ListObjects(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
@@ -1215,13 +1223,13 @@ public class OpenFgaClientTests {
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
-        ClientListRelationsRequest body =
+        var body =
             new ClientListRelationsRequest() {
                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                 Object = "document:roadmap",
                 Relations = new List<string> { "can_view", "can_edit", "can_delete", "can_rename" },
                 ContextualTuples = new List<ClientTupleKey>() {
-                    new ClientTupleKey {
+                    new() {
                         User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                         Relation = "editor",
                         Object = "document:roadmap",
@@ -1271,7 +1279,7 @@ public class OpenFgaClientTests {
             new ClientListRelationsRequest() {
                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                 Object = "document:roadmap",
-                Relations = new List<string> {},
+                Relations = new List<string> { },
             };
 
         Task<ListRelationsResponse> ApiError() => fgaClient.ListRelations(body);
