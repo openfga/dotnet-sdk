@@ -131,7 +131,7 @@ public class OAuth2Client {
 
         _authToken = new AuthToken() {
             AccessToken = accessTokenResponse.AccessToken,
-            ExpiresAt = DateTime.Now + TimeSpan.FromMilliseconds(accessTokenResponse.ExpiresIn)
+            ExpiresAt = DateTime.Now + TimeSpan.FromSeconds(accessTokenResponse.ExpiresIn)
         };
     }
 

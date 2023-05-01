@@ -303,7 +303,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             mockHandler.Protected()
-                .Setup<Task<HttpResponseMessage>>(
+                .SetupSequence<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.RequestUri == new Uri($"https://{config.Credentials.Config.ApiTokenIssuer}/oauth/token") &&
@@ -314,7 +314,15 @@ namespace OpenFga.Sdk.Test.Api {
                     StatusCode = HttpStatusCode.OK,
                     Content = Utils.CreateJsonStringContent(new OAuth2Client.AccessTokenResponse() {
                         AccessToken = "some-token",
-                        ExpiresIn = 20000,
+                        ExpiresIn = 86400,
+                        TokenType = "Bearer"
+                    }),
+                })
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new OAuth2Client.AccessTokenResponse() {
+                        AccessToken = "some-token",
+                        ExpiresIn = 86400,
                         TokenType = "Bearer"
                     }),
                 });
@@ -326,11 +334,16 @@ namespace OpenFga.Sdk.Test.Api {
                 req.Headers.Contains("Authorization") &&
                 req.Headers.Authorization.Equals(new AuthenticationHeaderValue("Bearer", "some-token")));
             mockHandler.Protected()
-                .Setup<Task<HttpResponseMessage>>(
+                .SetupSequence<Task<HttpResponseMessage>>(
                     "SendAsync",
                     readAuthorizationModelsMockExpression,
                     ItExpr.IsAny<CancellationToken>()
                 )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(
+                            new ReadAuthorizationModelsResponse() { AuthorizationModels = { } }),
+                })
                 .ReturnsAsync(new HttpResponseMessage() {
                     StatusCode = HttpStatusCode.OK,
                     Content = Utils.CreateJsonStringContent(
@@ -341,6 +354,7 @@ namespace OpenFga.Sdk.Test.Api {
             var openFgaApi = new OpenFgaApi(config, httpClient);
 
             var response = await openFgaApi.ReadAuthorizationModels(null, null);
+            var response2 = await openFgaApi.ReadAuthorizationModels(null, null);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
@@ -352,7 +366,105 @@ namespace OpenFga.Sdk.Test.Api {
             );
             mockHandler.Protected().Verify(
                 "SendAsync",
-                Times.Exactly(1),
+                Times.Exactly(2),
+                readAuthorizationModelsMockExpression,
+                ItExpr.IsAny<CancellationToken>()
+            );
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(0),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{config.BasePath}/stores/{config.StoreId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test that a network call is issued to get the token at the first request if client id is provided, and then again before the next call if expired
+        /// </summary>
+        [Fact]
+        public async Task ExchangeCredentialsAfterExpiryTest() {
+            var config = new Configuration.Configuration() {
+                StoreId = _storeId,
+                ApiHost = _host,
+                Credentials = new Credentials() {
+                    Method = CredentialsMethod.ClientCredentials,
+                    Config = new CredentialsConfig() {
+                        ClientId = "some-id",
+                        ClientSecret = "some-secret",
+                        ApiTokenIssuer = "tokenissuer.fga.example",
+                        ApiAudience = "some-audience",
+                    }
+                }
+            };
+
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"https://{config.Credentials.Config.ApiTokenIssuer}/oauth/token") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new OAuth2Client.AccessTokenResponse() {
+                        AccessToken = "some-token",
+                        ExpiresIn = 1,
+                        TokenType = "Bearer"
+                    }),
+                })
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new OAuth2Client.AccessTokenResponse() {
+                        AccessToken = "some-token",
+                        ExpiresIn = 86400,
+                        TokenType = "Bearer"
+                    }),
+                });
+
+            var readAuthorizationModelsMockExpression = ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri.ToString()
+                    .StartsWith($"{config.BasePath}/stores/{config.StoreId}/authorization-models") &&
+                req.Method == HttpMethod.Get &&
+                req.Headers.Contains("Authorization") &&
+                req.Headers.Authorization.Equals(new AuthenticationHeaderValue("Bearer", "some-token")));
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    readAuthorizationModelsMockExpression,
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(
+                            new ReadAuthorizationModelsResponse() { AuthorizationModels = { } }),
+                })
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(
+                            new ReadAuthorizationModelsResponse() { AuthorizationModels = { } }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+
+            var response = await openFgaApi.ReadAuthorizationModels(null, null);
+            var response2 = await openFgaApi.ReadAuthorizationModels(null, null);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"https://{config.Credentials.Config.ApiTokenIssuer}/oauth/token") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
                 readAuthorizationModelsMockExpression,
                 ItExpr.IsAny<CancellationToken>()
             );

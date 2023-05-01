@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.4
+
+### [0.2.4](https://github.com/openfga/dotnet-sdk/compare/v0.2.3...v0.2.4) (2023-05-01)
+- fix: client credentials token expiry period was being evaluated as ms instead of seconds, leading to token refreshes on every call
+
 ## v0.2.3
 
 ### [0.2.3](https://github.com/openfga/dotnet-sdk/compare/v0.2.2...v0.2.3) (2023-04-13)
