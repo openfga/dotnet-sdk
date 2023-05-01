@@ -26,7 +26,6 @@ public class OpenFgaClient : IDisposable {
     private string CLIENT_METHOD_HEADER = "X-OpenFGA-Client-Method";
 
     private readonly int DEFAULT_MAX_METHOD_PARALLEL_REQS = 10;
-    private readonly int DEFAULT_WAIT_TIME_BETWEEN_CHUNKS_IN_MS = 100;
 
     public OpenFgaClient(
         ClientConfiguration configuration,
