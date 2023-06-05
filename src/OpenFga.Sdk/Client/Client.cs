@@ -31,6 +31,7 @@ public class OpenFgaClient : IDisposable {
         ClientConfiguration configuration,
         HttpClient? httpClient = null
     ) {
+        configuration.IsValid();
         _configuration = configuration;
         api = new OpenFgaApi(_configuration, httpClient);
     }
@@ -53,9 +54,29 @@ public class OpenFgaClient : IDisposable {
 
     public void Dispose() => api.Dispose();
 
-    private string? GetAuthorizationModelId(AuthorizationModelIdOptions? options) =>
-        options?.AuthorizationModelId ?? AuthorizationModelId;
+    private string? GetAuthorizationModelId(AuthorizationModelIdOptions? options) {
+        var authorizationModelId = options?.AuthorizationModelId ?? AuthorizationModelId;
+        if (authorizationModelId != null && !ClientConfiguration.IsWellFormedUlidString(authorizationModelId)) {
+            throw new FgaValidationError("AuthorizationModelId is not in a valid ulid format");
+        }
+        return authorizationModelId;
+    }
 
+    /// <summary>
+    /// Performs a call to read authorization model(s) to ensure that
+    /// - 1) Store ID is valid
+    /// - 2) Authorization Model ID is valid
+    /// - 3) API Credentials are correct
+    /// </summary>
+    /// <param name="options"></param>
+    public async Task CheckValidApiConnection(IClientReadAuthorizationModelOptions? options = default) {
+        if (this.GetAuthorizationModelId(options) == null) {
+          await this.ReadAuthorizationModel(options);
+        } else {
+          await this.ReadAuthorizationModels();
+        }
+    }
+    
     /**********
      * Stores *
      **********/
@@ -192,6 +213,9 @@ public class OpenFgaClient : IDisposable {
             };
         }
 
+        // Check for a valid API connection before proceeding
+        await this.CheckValidApiConnection(new ClientReadAuthorizationModelOptions() { AuthorizationModelId = options.AuthorizationModelId });
+
         var writeChunks = body.Writes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKey[]>();
         var deleteChunks = body.Deletes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKey[]>();
 
@@ -287,8 +311,8 @@ public class OpenFgaClient : IDisposable {
    * BatchCheck - Run a set of checks (evaluates)
    */
     public async Task<BatchCheckResponse> BatchCheck(List<ClientCheckRequest> body,
-        IClientBatchCheckOptions? options = default,
-        CancellationToken cancellationToken = default) {
+        IClientBatchCheckOptions? options = default(IClientBatchCheckOptions?),
+        CancellationToken cancellationToken = default(CancellationToken)) {
         var responses = new ConcurrentBag<BatchCheckSingleResponse>();
         await Parallel.ForEachAsync(body,
             new ParallelOptions { MaxDegreeOfParallelism = options?.MaxParallelRequests ?? DEFAULT_MAX_METHOD_PARALLEL_REQS }, async (request, token) => {
@@ -296,13 +320,18 @@ public class OpenFgaClient : IDisposable {
                     var response = await Check(request, options, cancellationToken);
 
                     responses.Add(new BatchCheckSingleResponse {
-                        Allowed = response.Allowed ?? false,
-                        Request = request,
-                        Error = null
+                        Allowed = response.Allowed ?? false, Request = request, Error = null
                     });
                 }
-                catch (Exception e) {
-                    responses.Add(new BatchCheckSingleResponse { Allowed = false, Request = request, Error = e });
+                catch (Exception err) {
+                    if (err is FgaApiRateLimitExceededError or FgaApiValidationError or FgaApiInternalError) {
+                        responses.Add(new BatchCheckSingleResponse {
+                            Allowed = false, Request = request, Error = err
+                        });
+                    }
+                    else {
+                        throw;
+                    }
                 }
             });
 

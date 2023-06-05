@@ -12,6 +12,7 @@
 
 
 using OpenFga.Sdk.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace OpenFga.Sdk.Configuration;
 
@@ -25,6 +26,16 @@ public class Configuration {
         return Uri.TryCreate(uri, UriKind.Absolute, out var uriResult) &&
                ((uriResult.ToString().Equals(uri) || uriResult.ToString().Equals($"{uri}/")) &&
                 (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps));
+    }
+
+    /// <summary>
+    /// Ensures that a string is in valid [ULID](https://github.com/ulid/spec) format
+    /// </summary>
+    /// <param name="ulid"></param>
+    /// <returns></returns>
+    public static bool IsWellFormedUlidString(string ulid) {
+        var regex = new Regex("^[0-7][0-9A-HJKMNP-TV-Z]{25}$");
+        return regex.IsMatch(ulid);
     }
 
     /// <summary>
@@ -47,6 +58,10 @@ public class Configuration {
 
         if (MaxRetry > 15) {
             throw new FgaValidationError("Configuration.MaxRetry exceeds maximum allowed limit of 15");
+        }
+        
+        if (StoreId != null && !IsWellFormedUlidString(StoreId)) {
+          throw new FgaValidationError("StoreId is not in a valid ulid format");
         }
 
         Credentials?.IsValid();

@@ -12,6 +12,7 @@
 
 
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Exceptions;
 
 namespace OpenFga.Sdk.Client;
 
@@ -35,4 +36,12 @@ public class ClientConfiguration : Configuration.Configuration {
     public string? AuthorizationModelId { get; set; }
 
     public RetryParams? RetryParams { get; set; } = new();
+
+    public new void IsValid() {
+        base.IsValid();
+
+        if (AuthorizationModelId != null && !IsWellFormedUlidString(AuthorizationModelId)) {
+          throw new FgaValidationError("AuthorizationModelId is not in a valid ulid format");
+        }
+    }
 }

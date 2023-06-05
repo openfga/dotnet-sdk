@@ -37,7 +37,7 @@ public class OpenFgaClientTests {
     private readonly ClientConfiguration _config;
 
     public OpenFgaClientTests() {
-        _storeId = "6c181474-aaa1-4df7-8929-6e7b3a992754-test";
+        _storeId = "01H0H015178Y2V4CX10C2KGHF4";
         _config = new ClientConfiguration() { StoreId = _storeId, ApiHost = _host };
     }
 
@@ -62,11 +62,55 @@ public class OpenFgaClientTests {
         // Cleanup when everything is done.
     }
 
+    /// <summary>
+    /// Test StoreId validation
+    /// </summary>
+    [Fact]
+    public async Task ConfigurationInValidStoreIdTest() {
+        var config = new ClientConfiguration() {
+            ApiHost = _host, StoreId = "invalid-format"
+        };
+        void ActionInvalidId() => config.IsValid();
+        var exception = Assert.Throws<FgaValidationError>(ActionInvalidId);
+        Assert.Equal("StoreId is not in a valid ulid format", exception.Message);
+    }
+    
+    /// <summary>
+    /// Test Auth Model ID validation
+    /// </summary>
+    [Fact]
+    public async Task ConfigurationInValidAuthorizationModelIdTest() {
+        var config = new ClientConfiguration() {
+            ApiHost = _host,
+            StoreId = _config.StoreId,
+            AuthorizationModelId = "invalid-format"
+        };
+        void ActionInvalidId() => new OpenFgaClient(config);
+        var exception = Assert.Throws<FgaValidationError>(ActionInvalidId);
+        Assert.Equal("AuthorizationModelId is not in a valid ulid format", exception.Message);
+    }
+
+    /// <summary>
+    /// Test Auth Model ID validation
+    /// </summary>
+    [Fact]
+    public async Task ConfigurationInValidAuthModelIdInOptionsTest() {
+        var config = new ClientConfiguration() {
+            ApiHost = _host,
+            StoreId = _config.StoreId,
+        };
+        var openFgaClient = new OpenFgaClient(config);
+
+        async Task<ReadAuthorizationModelResponse> ActionMissingStoreId() => await openFgaClient.ReadAuthorizationModel(new ClientReadAuthorizationModelOptions() {
+            AuthorizationModelId = "invalid-format"
+        });
+        var exception = await Assert.ThrowsAsync<FgaValidationError>(ActionMissingStoreId);
+        Assert.Equal("AuthorizationModelId is not in a valid ulid format", exception.Message);
+    }
 
     /**********
      * Stores *
      **********/
-
 
     /// <summary>
     /// Test ListStores
@@ -792,9 +836,7 @@ public class OpenFgaClientTests {
         mockHandler.Protected()
             .SetupSequence<Task<HttpResponseMessage>>(
                 "SendAsync",
-                ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
-                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
@@ -803,6 +845,10 @@ public class OpenFgaClientTests {
             })
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.NotFound,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
                 Content = Utils.CreateJsonStringContent(new Object()),
             })
             .ReturnsAsync(new HttpResponseMessage() {
@@ -853,6 +899,77 @@ public class OpenFgaClientTests {
             ItExpr.IsAny<CancellationToken>()
         );
         Assert.IsType<ClientWriteResponse>(response);
+    }
+
+    /// <summary>
+    /// Test Write (Non-transaction mode) Error
+    /// </summary>
+    [Fact]
+    public async Task WriteNonTransactionErrorTest() {
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .SetupSequence<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.Unauthorized,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.NotFound,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientWriteRequest() {
+            Writes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:roadmap",
+                },
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:budget",
+                }
+            },
+            Deletes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "writer",
+                    Object = "document:roadmap",
+                }
+            },
+        };
+        var options = new ClientWriteOptions {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+            Transaction = new TransactionOptions() {
+                Disable = true,
+                MaxParallelRequests = 1,
+                MaxPerChunk = 1,
+            }
+        };
+
+        Task<ClientWriteResponse> ApiError() => fgaClient.Write(body, options);
+        var error = await Assert.ThrowsAsync<FgaApiAuthenticationError>(ApiError);
+        mockHandler.Protected().Verify(
+            "SendAsync",
+            Times.Exactly(1),
+            ItExpr.IsAny<HttpRequestMessage>(),
+            ItExpr.IsAny<CancellationToken>());
     }
 
     /************************
@@ -946,8 +1063,8 @@ public class OpenFgaClientTests {
             .Returns(Task.Run(async () => {
                 await Task.Delay(500);
                 return new HttpResponseMessage() {
-                    StatusCode = HttpStatusCode.NotFound,
-                    Content = Utils.CreateJsonStringContent(new Object { }),
+                    StatusCode = HttpStatusCode.UnprocessableEntity,
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
                 };
             }));
 
@@ -1010,6 +1127,100 @@ public class OpenFgaClientTests {
         Assert.Equal(2, notAllowedResponses.Count);
         var failedResponses = response.Responses.FindAll(res => res.Error != null);
         Assert.Single(failedResponses);
+    }
+
+    /// <summary>
+    /// Test BatchCheck
+    /// </summary>
+    [Fact]
+    public async Task BatchCheckErrorTest() {
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .SetupSequence<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .Returns(Task.Run(async () => {
+                await Task.Delay(500);
+                return new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                };
+            }))
+            .Returns(Task.Run(async () => {
+                await Task.Delay(500);
+                return new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
+                };
+            }))
+            .Returns(Task.Run(async () => {
+                await Task.Delay(500);
+                return new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                };
+            }))
+            .Returns(Task.Run(async () => {
+                await Task.Delay(500);
+                return new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.Unauthorized,
+                    Content = Utils.CreateJsonStringContent(new Object { }),
+                };
+            }));
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new List<ClientCheckRequest>(){
+            new() {
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                Relation = "viewer",
+                Object = "document:roadmap",
+                ContextualTuples = new List<ClientTupleKey>() {
+                    new() {
+                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                        Relation = "editor",
+                        Object = "document:roadmap",
+                    }
+                },
+            },
+            new() {
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                Relation = "admin",
+                Object = "document:roadmap",
+                ContextualTuples = new List<ClientTupleKey>() {
+                    new() {
+                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                        Relation = "editor",
+                        Object = "document:roadmap",
+                    }
+                },
+            },
+            new() {
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                Relation = "creator",
+                Object = "document:roadmap",
+            },
+            new() {
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                Relation = "deleter",
+                Object = "document:roadmap",
+            }
+        };
+        var options = new ClientBatchCheckOptions { };
+
+        Task<BatchCheckResponse> ApiError() => fgaClient.BatchCheck(body, options);
+        var error = await Assert.ThrowsAsync<FgaApiAuthenticationError>(ApiError);
+        mockHandler.Protected().Verify(
+            "SendAsync",
+            Times.AtLeast(1),
+            ItExpr.IsAny<HttpRequestMessage>(),
+            ItExpr.IsAny<CancellationToken>()
+        );
     }
 
     /// <summary>
@@ -1216,8 +1427,8 @@ public class OpenFgaClientTests {
                 Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
             })
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.NotFound,
-                Content = Utils.CreateJsonStringContent(new Object { }),
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -1251,6 +1462,68 @@ public class OpenFgaClientTests {
         Assert.Equal(2, response.Relations.Count);
         // TODO: Ensure the relations are correct, currently because the mocks are generic and we process in parallel,
         // we do not know what order they will be processed in
+    }
+
+    /// <summary>
+    /// Test ListRelations
+    /// </summary>
+    [Fact]
+    public async Task ListRelationsErrorTest() {
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .SetupSequence<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.InternalServerError,
+                Content = Utils.CreateJsonStringContent(new object()),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.NotFound,
+                Content = Utils.CreateJsonStringContent(new Object { }),
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body =
+            new ClientListRelationsRequest() {
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                Object = "document:roadmap",
+                Relations = new List<string> { "can_view", "can_edit", "can_delete", "can_rename" },
+                ContextualTuples = new List<ClientTupleKey>() {
+                    new() {
+                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                        Relation = "editor",
+                        Object = "document:roadmap",
+                    }
+                }
+            };
+
+        Task<ListRelationsResponse> ApiError() => fgaClient.ListRelations(body, new ClientListRelationsOptions() {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+        });
+        var error = await Assert.ThrowsAsync<FgaApiNotFoundError>(ApiError);
+        mockHandler.Protected().Verify(
+            "SendAsync",
+            Times.AtLeast(1),
+            ItExpr.IsAny<HttpRequestMessage>(),
+            ItExpr.IsAny<CancellationToken>()
+        );
     }
 
     /// <summary>

@@ -38,6 +38,7 @@ public class OpenFgaApi : IDisposable {
         Configuration.Configuration configuration,
         HttpClient? httpClient = null
     ) {
+        configuration.IsValid();
         this._configuration = configuration;
         this._apiClient = new ApiClient.ApiClient(_configuration, httpClient);
     }
