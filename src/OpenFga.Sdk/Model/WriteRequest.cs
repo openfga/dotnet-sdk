@@ -48,6 +48,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "writes", EmitDefaultValue = false)]
         [JsonPropertyName("writes")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TupleKeys? Writes { get; set; }
 
         /// <summary>
@@ -55,6 +56,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "deletes", EmitDefaultValue = false)]
         [JsonPropertyName("deletes")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TupleKeys? Deletes { get; set; }
 
         /// <summary>
@@ -62,6 +64,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
         [JsonPropertyName("authorization_model_id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? AuthorizationModelId { get; set; }
 
         /// <summary>

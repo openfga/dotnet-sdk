@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ListStoresResponse" /> class.
         /// </summary>
         /// <param name="stores">stores.</param>
-        /// <param name="continuationToken">continuationToken.</param>
+        /// <param name="continuationToken">The continuation token will be empty if there are no more stores..</param>
         public ListStoresResponse(List<Store> stores = default(List<Store>), string continuationToken = default(string)) {
             this.Stores = stores;
             this.ContinuationToken = continuationToken;
@@ -46,13 +46,16 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "stores", EmitDefaultValue = false)]
         [JsonPropertyName("stores")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public List<Store>? Stores { get; set; }
 
         /// <summary>
-        /// Gets or Sets ContinuationToken
+        /// The continuation token will be empty if there are no more stores.
         /// </summary>
+        /// <value>The continuation token will be empty if there are no more stores.</value>
         [DataMember(Name = "continuation_token", EmitDefaultValue = false)]
         [JsonPropertyName("continuation_token")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? ContinuationToken { get; set; }
 
         /// <summary>

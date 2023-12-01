@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ReadChangesResponse" /> class.
         /// </summary>
         /// <param name="changes">changes.</param>
-        /// <param name="continuationToken">continuationToken.</param>
+        /// <param name="continuationToken">The continuation token will be identical if there are no new changes..</param>
         public ReadChangesResponse(List<TupleChange> changes = default(List<TupleChange>), string continuationToken = default(string)) {
             this.Changes = changes;
             this.ContinuationToken = continuationToken;
@@ -46,13 +46,16 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "changes", EmitDefaultValue = false)]
         [JsonPropertyName("changes")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public List<TupleChange>? Changes { get; set; }
 
         /// <summary>
-        /// Gets or Sets ContinuationToken
+        /// The continuation token will be identical if there are no new changes.
         /// </summary>
+        /// <value>The continuation token will be identical if there are no new changes.</value>
         [DataMember(Name = "continuation_token", EmitDefaultValue = false)]
         [JsonPropertyName("continuation_token")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? ContinuationToken { get; set; }
 
         /// <summary>

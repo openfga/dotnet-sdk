@@ -64,6 +64,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
         [JsonPropertyName("authorization_model_id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? AuthorizationModelId { get; set; }
 
         /// <summary>
@@ -71,6 +72,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "type", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("type")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Type { get; set; }
 
         /// <summary>
@@ -78,6 +80,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "relation", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("relation")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Relation { get; set; }
 
         /// <summary>
@@ -85,6 +88,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "user", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("user")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string User { get; set; }
 
         /// <summary>
@@ -92,6 +96,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "contextual_tuples", EmitDefaultValue = false)]
         [JsonPropertyName("contextual_tuples")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ContextualTupleKeys? ContextualTuples { get; set; }
 
         /// <summary>

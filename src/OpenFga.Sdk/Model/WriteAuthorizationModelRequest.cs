@@ -50,6 +50,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "type_definitions", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("type_definitions")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public List<TypeDefinition> TypeDefinitions { get; set; }
 
         /// <summary>
@@ -57,6 +58,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "schema_version", EmitDefaultValue = false)]
         [JsonPropertyName("schema_version")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? SchemaVersion { get; set; }
 
         /// <summary>

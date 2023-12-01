@@ -46,6 +46,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tupleset", EmitDefaultValue = false)]
         [JsonPropertyName("tupleset")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Tupleset { get; set; }
 
         /// <summary>
@@ -53,6 +54,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "computed", EmitDefaultValue = false)]
         [JsonPropertyName("computed")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public List<Computed>? Computed { get; set; }
 
         /// <summary>

@@ -534,9 +534,9 @@ var options = new ClientCheckOptions {
     AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
 };
 var body = new ClientCheckRequest {
-    Object = "document:roadmap",
+    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
     Relation = "writer",
-    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b"
+    Object = "document:roadmap"
 };
 var response = await fgaClient.Check(body, options);
 // response.Allowed = true
@@ -656,7 +656,7 @@ var response = await fgaClient.Expand(body, options);
 // response.Tree.Root = {"name":"document:roadmap#viewer","leaf":{"users":{"users":["user:81684243-9356-4421-8fbf-a4f8d36aa31b","user:f52a4f7a-054d-47ff-bb6e-3ac81269988f"]}}}
 ```
 
-#### List Objects
+##### List Objects
 
 List the objects of a particular type a user has access to.
 
@@ -684,7 +684,7 @@ var response = await fgaClient.ListObjects(body, options);
 // response.Objects = ["document:roadmap"]
 ```
 
-#### List Relations
+##### List Relations
 
 List the relations a user has on an object.
 
@@ -707,9 +707,9 @@ var response = await fgaClient.ListRelations(body);
 // response.Relations = ["can_view", "can_edit"]
 ```
 
-### Assertions
+#### Assertions
 
-#### Read Assertions
+##### Read Assertions
 
 Read assertions for a particular authorization model.
 
@@ -723,7 +723,7 @@ var options = new ClientReadAssertionsOptions {
 var response = await fgaClient.ReadAssertions(options);
 ```
 
-#### Write Assertions
+##### Write Assertions
 
 Update the assertions for a particular authorization model.
 
@@ -753,7 +753,7 @@ await fgaClient.WriteAssertions(body, options);
 | [**DeleteStore**](docs/OpenFgaApi.md#deletestore) | **DELETE** /stores/{store_id} | Delete a store |
 | [**Expand**](docs/OpenFgaApi.md#expand) | **POST** /stores/{store_id}/expand | Expand all relationships in userset tree format, and following userset rewrite rules.  Useful to reason about and debug a certain relationship |
 | [**GetStore**](docs/OpenFgaApi.md#getstore) | **GET** /stores/{store_id} | Get a store |
-| [**ListObjects**](docs/OpenFgaApi.md#listobjects) | **POST** /stores/{store_id}/list-objects | Get all objects of the given type that the user has a relation with |
+| [**ListObjects**](docs/OpenFgaApi.md#listobjects) | **POST** /stores/{store_id}/list-objects | List all objects of the given type that the user has a relation with |
 | [**ListStores**](docs/OpenFgaApi.md#liststores) | **GET** /stores | List all stores |
 | [**Read**](docs/OpenFgaApi.md#read) | **POST** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules |
 | [**ReadAssertions**](docs/OpenFgaApi.md#readassertions) | **GET** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID |

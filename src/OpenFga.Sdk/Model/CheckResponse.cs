@@ -46,6 +46,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "allowed", EmitDefaultValue = true)]
         [JsonPropertyName("allowed")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool? Allowed { get; set; }
 
         /// <summary>
@@ -54,6 +55,7 @@ namespace OpenFga.Sdk.Model {
         /// <value>For internal use only.</value>
         [DataMember(Name = "resolution", EmitDefaultValue = false)]
         [JsonPropertyName("resolution")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Resolution { get; set; }
 
         /// <summary>

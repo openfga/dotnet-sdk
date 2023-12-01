@@ -44,6 +44,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "directly_related_user_types", EmitDefaultValue = false)]
         [JsonPropertyName("directly_related_user_types")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public List<RelationReference>? DirectlyRelatedUserTypes { get; set; }
 
         /// <summary>

@@ -52,6 +52,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "name", EmitDefaultValue = false)]
         [JsonPropertyName("name")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Name { get; set; }
 
         /// <summary>
@@ -59,6 +60,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "leaf", EmitDefaultValue = false)]
         [JsonPropertyName("leaf")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Leaf? Leaf { get; set; }
 
         /// <summary>
@@ -66,6 +68,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "difference", EmitDefaultValue = false)]
         [JsonPropertyName("difference")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public UsersetTreeDifference? Difference { get; set; }
 
         /// <summary>
@@ -73,6 +76,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "union", EmitDefaultValue = false)]
         [JsonPropertyName("union")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Nodes? Union { get; set; }
 
         /// <summary>
@@ -80,6 +84,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "intersection", EmitDefaultValue = false)]
         [JsonPropertyName("intersection")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Nodes? Intersection { get; set; }
 
         /// <summary>

@@ -62,6 +62,8 @@ public class Configuration {
     /// <value>Version of the package.</value>
     public const string Version = "0.2.4";
 
+    private const string DefaultUserAgent = "openfga-sdk dotnet/0.2.4";
+
     #endregion Constants
 
     #region Constructors
@@ -79,11 +81,10 @@ public class Configuration {
     /// </summary>
     /// <exception cref="FgaRequiredParamError"></exception>
     public Configuration() {
-        UserAgent = "openfga-sdk {sdkId}/{packageVersion}".Replace("{sdkId}", "dotnet").Replace("{packageVersion}", Version);
         DefaultHeaders ??= new Dictionary<string, string>();
 
         if (!DefaultHeaders.ContainsKey("User-Agent")) {
-            DefaultHeaders.Add("User-Agent", UserAgent);
+            DefaultHeaders.Add("User-Agent", DefaultUserAgent);
         }
     }
 

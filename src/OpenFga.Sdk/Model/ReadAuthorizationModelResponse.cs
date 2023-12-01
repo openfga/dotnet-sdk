@@ -44,6 +44,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "authorization_model", EmitDefaultValue = false)]
         [JsonPropertyName("authorization_model")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public AuthorizationModel? AuthorizationModel { get; set; }
 
         /// <summary>

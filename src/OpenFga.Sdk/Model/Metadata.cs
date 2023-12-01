@@ -44,6 +44,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "relations", EmitDefaultValue = false)]
         [JsonPropertyName("relations")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Dictionary<string, RelationMetadata>? Relations { get; set; }
 
         /// <summary>

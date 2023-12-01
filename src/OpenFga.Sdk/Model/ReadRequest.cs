@@ -48,6 +48,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tuple_key", EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TupleKey? TupleKey { get; set; }
 
         /// <summary>
@@ -55,6 +56,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "page_size", EmitDefaultValue = false)]
         [JsonPropertyName("page_size")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? PageSize { get; set; }
 
         /// <summary>
@@ -62,6 +64,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "continuation_token", EmitDefaultValue = false)]
         [JsonPropertyName("continuation_token")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? ContinuationToken { get; set; }
 
         /// <summary>
