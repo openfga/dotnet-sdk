@@ -1374,6 +1374,50 @@ namespace OpenFga.Sdk.Test.Api {
         }
 
         /// <summary>
+        /// Test Read With Empty Parameters
+        /// </summary>
+        [Fact]
+        public async Task ReadEmptyTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var expectedResponse = new ReadResponse() {
+                Tuples = new List<Model.Tuple>() {
+                                new(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), DateTime.Now)
+                            }
+            };
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(expectedResponse),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new ReadRequest { };
+            var response = await openFgaApi.Read(body);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+
+            Assert.IsType<ReadResponse>(response);
+            Assert.Single(response.Tuples);
+            Assert.Equal(response, expectedResponse);
+        }
+
+        /// <summary>
         /// Test ReadChanges
         /// </summary>
         [Fact]
