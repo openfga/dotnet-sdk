@@ -148,13 +148,18 @@ public class OpenFgaClient : IDisposable {
      * Read - Read tuples previously written to the store (does not evaluate)
      */
     public async Task<ReadResponse> Read(ClientReadRequest body, IClientReadOptions? options = default,
-        CancellationToken cancellationToken = default) =>
-        await api.Read(
+        CancellationToken cancellationToken = default) {
+        TupleKey tupleKey = null;
+        if (body != null && (body.User != null || body.Relation != null || body.Object != null)) {
+            tupleKey = body;
+        }
+        return await api.Read(
             new ReadRequest {
-                TupleKey = body,
+                TupleKey = tupleKey,
                 PageSize = options?.PageSize,
                 ContinuationToken = options?.ContinuationToken
             }, cancellationToken);
+    }
 
     /**
      * Write - Create or delete relationship tuples

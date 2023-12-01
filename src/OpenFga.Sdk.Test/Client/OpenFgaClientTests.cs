@@ -608,7 +608,8 @@ public class OpenFgaClientTests {
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
-                    req.Method == HttpMethod.Post),
+                    req.Method == HttpMethod.Post &&
+                    req.Content.ReadAsStringAsync().Result.Contains("tuple")),
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
@@ -632,7 +633,56 @@ public class OpenFgaClientTests {
             Times.Exactly(1),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
-                req.Method == HttpMethod.Post),
+                req.Method == HttpMethod.Post &&
+                req.Content.ReadAsStringAsync().Result.Contains("tuple")),
+            ItExpr.IsAny<CancellationToken>()
+        );
+
+        Assert.IsType<ReadResponse>(response);
+        Assert.Single(response.Tuples);
+        Assert.Equal(response, expectedResponse);
+    }
+
+    /// <summary>
+    /// Test Read with Empty Body
+    /// </summary>
+    [Fact]
+    public async Task ReadEmptyTest() {
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        var expectedResponse = new ReadResponse() {
+            Tuples = new List<Model.Tuple>() {
+                new(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
+                    DateTime.Now)
+            }
+        };
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
+                    req.Method == HttpMethod.Post &&
+                    !req.Content.ReadAsStringAsync().Result.Contains("tuple")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(expectedResponse),
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientReadRequest() { };
+        var options = new ClientReadOptions { };
+        var response = await fgaClient.Read(body, options);
+
+        mockHandler.Protected().Verify(
+            "SendAsync",
+            Times.Exactly(1),
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
+                req.Method == HttpMethod.Post &&
+                !req.Content.ReadAsStringAsync().Result.Contains("tuple")),
             ItExpr.IsAny<CancellationToken>()
         );
 
