@@ -48,6 +48,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "users", EmitDefaultValue = false)]
         [JsonPropertyName("users")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Users? Users { get; set; }
 
         /// <summary>
@@ -55,6 +56,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "computed", EmitDefaultValue = false)]
         [JsonPropertyName("computed")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Computed? Computed { get; set; }
 
         /// <summary>
@@ -62,6 +64,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tupleToUserset", EmitDefaultValue = false)]
         [JsonPropertyName("tupleToUserset")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public UsersetTreeTupleToUserset? TupleToUserset { get; set; }
 
         /// <summary>

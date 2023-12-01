@@ -48,6 +48,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tuple_keys", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("tuple_keys")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public List<TupleKey> TupleKeys { get; set; }
 
         /// <summary>

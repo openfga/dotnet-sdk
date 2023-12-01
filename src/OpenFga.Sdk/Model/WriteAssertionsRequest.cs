@@ -48,6 +48,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "assertions", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("assertions")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public List<Assertion> Assertions { get; set; }
 
         /// <summary>

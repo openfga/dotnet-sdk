@@ -52,6 +52,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "type", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("type")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Type { get; set; }
 
         /// <summary>
@@ -59,6 +60,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "relations", EmitDefaultValue = false)]
         [JsonPropertyName("relations")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Dictionary<string, Userset>? Relations { get; set; }
 
         /// <summary>
@@ -66,6 +68,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "metadata", EmitDefaultValue = false)]
         [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Metadata? Metadata { get; set; }
 
         /// <summary>

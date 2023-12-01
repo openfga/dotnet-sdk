@@ -55,6 +55,7 @@ namespace OpenFga.Sdk.Model {
         /// <value>A DirectUserset is a sentinel message for referencing the direct members specified by an object/relation mapping.</value>
         [DataMember(Name = "this", EmitDefaultValue = false)]
         [JsonPropertyName("this")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Object? This { get; set; }
 
         /// <summary>
@@ -62,6 +63,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "computedUserset", EmitDefaultValue = false)]
         [JsonPropertyName("computedUserset")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ObjectRelation? ComputedUserset { get; set; }
 
         /// <summary>
@@ -69,6 +71,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tupleToUserset", EmitDefaultValue = false)]
         [JsonPropertyName("tupleToUserset")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TupleToUserset? TupleToUserset { get; set; }
 
         /// <summary>
@@ -76,6 +79,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "union", EmitDefaultValue = false)]
         [JsonPropertyName("union")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Usersets? Union { get; set; }
 
         /// <summary>
@@ -83,6 +87,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "intersection", EmitDefaultValue = false)]
         [JsonPropertyName("intersection")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Usersets? Intersection { get; set; }
 
         /// <summary>
@@ -90,6 +95,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "difference", EmitDefaultValue = false)]
         [JsonPropertyName("difference")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Difference? Difference { get; set; }
 
         /// <summary>

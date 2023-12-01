@@ -54,6 +54,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "base", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("base")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Userset Base { get; set; }
 
         /// <summary>
@@ -61,6 +62,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "subtract", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("subtract")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Userset Subtract { get; set; }
 
         /// <summary>

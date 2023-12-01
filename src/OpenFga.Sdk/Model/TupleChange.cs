@@ -55,6 +55,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tuple_key", EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TupleKey? TupleKey { get; set; }
 
         /// <summary>
@@ -62,6 +63,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "timestamp", EmitDefaultValue = false)]
         [JsonPropertyName("timestamp")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public DateTime? Timestamp { get; set; }
 
         /// <summary>

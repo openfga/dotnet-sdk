@@ -48,6 +48,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "name", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("name")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Name { get; set; }
 
         /// <summary>

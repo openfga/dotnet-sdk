@@ -44,6 +44,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tree", EmitDefaultValue = false)]
         [JsonPropertyName("tree")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public UsersetTree? Tree { get; set; }
 
         /// <summary>

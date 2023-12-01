@@ -52,6 +52,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tuple_key", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TupleKey TupleKey { get; set; }
 
         /// <summary>
@@ -59,6 +60,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "contextual_tuples", EmitDefaultValue = false)]
         [JsonPropertyName("contextual_tuples")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ContextualTupleKeys? ContextualTuples { get; set; }
 
         /// <summary>
@@ -66,6 +68,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
         [JsonPropertyName("authorization_model_id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? AuthorizationModelId { get; set; }
 
         /// <summary>
@@ -74,6 +77,7 @@ namespace OpenFga.Sdk.Model {
         /// <value>Defaults to false. Making it true has performance implications.</value>
         [DataMember(Name = "trace", EmitDefaultValue = true)]
         [JsonPropertyName("trace")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool? Trace { get; private set; }
 
         /// <summary>

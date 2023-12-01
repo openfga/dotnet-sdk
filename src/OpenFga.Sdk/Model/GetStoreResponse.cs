@@ -50,6 +50,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "id", EmitDefaultValue = false)]
         [JsonPropertyName("id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Id { get; set; }
 
         /// <summary>
@@ -57,6 +58,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "name", EmitDefaultValue = false)]
         [JsonPropertyName("name")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Name { get; set; }
 
         /// <summary>
@@ -64,6 +66,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "created_at", EmitDefaultValue = false)]
         [JsonPropertyName("created_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public DateTime? CreatedAt { get; set; }
 
         /// <summary>
@@ -71,6 +74,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "updated_at", EmitDefaultValue = false)]
         [JsonPropertyName("updated_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>

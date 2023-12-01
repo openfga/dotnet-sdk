@@ -34,7 +34,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ReadResponse" /> class.
         /// </summary>
         /// <param name="tuples">tuples.</param>
-        /// <param name="continuationToken">continuationToken.</param>
+        /// <param name="continuationToken">The continuation token will be empty if there are no more tuples..</param>
         public ReadResponse(List<Tuple> tuples = default(List<Tuple>), string continuationToken = default(string)) {
             this.Tuples = tuples;
             this.ContinuationToken = continuationToken;
@@ -46,13 +46,16 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tuples", EmitDefaultValue = false)]
         [JsonPropertyName("tuples")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public List<Tuple>? Tuples { get; set; }
 
         /// <summary>
-        /// Gets or Sets ContinuationToken
+        /// The continuation token will be empty if there are no more tuples.
         /// </summary>
+        /// <value>The continuation token will be empty if there are no more tuples.</value>
         [DataMember(Name = "continuation_token", EmitDefaultValue = false)]
         [JsonPropertyName("continuation_token")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? ContinuationToken { get; set; }
 
         /// <summary>

@@ -50,6 +50,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "tuple_key", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public TupleKey TupleKey { get; set; }
 
         /// <summary>
@@ -57,6 +58,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
         [JsonPropertyName("authorization_model_id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? AuthorizationModelId { get; set; }
 
         /// <summary>
