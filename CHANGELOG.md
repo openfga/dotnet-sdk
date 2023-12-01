@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.5
+
+### [0.2.5](https://github.com/openfga/dotnet-sdk/compare/v0.2.4...v0.2.5) (2023-12-01)
+- fix(client): read with no filter (read all tuples)
+- chore(deps): update dependencies
+
 ## v0.2.4
 
 ### [0.2.4](https://github.com/openfga/dotnet-sdk/compare/v0.2.3...v0.2.4) (2023-05-01)
