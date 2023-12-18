@@ -71,7 +71,7 @@ public class ApiClient : IDisposable {
                 var token = await _oauth2Client.GetAccessTokenAsync();
 
                 if (!string.IsNullOrEmpty(token)) {
-                    additionalHeaders.Add("Authorization", $"Bearer {token}");
+                    _configuration.DefaultHeaders["Authorization"] = $"Bearer {token}";
                 }
             }
             catch (ApiException e) {
@@ -98,7 +98,7 @@ public class ApiClient : IDisposable {
                 var token = await _oauth2Client.GetAccessTokenAsync();
 
                 if (!string.IsNullOrEmpty(token)) {
-                    additionalHeaders.Add("Authorization", $"Bearer {token}");
+                    _configuration.DefaultHeaders["Authorization"] = $"Bearer {token}";
                 }
             }
             catch (ApiException e) {
