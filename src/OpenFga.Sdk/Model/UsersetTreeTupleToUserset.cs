@@ -33,10 +33,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersetTreeTupleToUserset" /> class.
         /// </summary>
-        /// <param name="tupleset">tupleset.</param>
-        /// <param name="computed">computed.</param>
+        /// <param name="tupleset">tupleset (required).</param>
+        /// <param name="computed">computed (required).</param>
         public UsersetTreeTupleToUserset(string tupleset = default(string), List<Computed> computed = default(List<Computed>)) {
+            // to ensure "tupleset" is required (not null)
+            if (tupleset == null) {
+                throw new ArgumentNullException("tupleset is a required property for UsersetTreeTupleToUserset and cannot be null");
+            }
             this.Tupleset = tupleset;
+            // to ensure "computed" is required (not null)
+            if (computed == null) {
+                throw new ArgumentNullException("computed is a required property for UsersetTreeTupleToUserset and cannot be null");
+            }
             this.Computed = computed;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -44,18 +52,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Tupleset
         /// </summary>
-        [DataMember(Name = "tupleset", EmitDefaultValue = false)]
+        [DataMember(Name = "tupleset", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("tupleset")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? Tupleset { get; set; }
+        public string Tupleset { get; set; }
 
         /// <summary>
         /// Gets or Sets Computed
         /// </summary>
-        [DataMember(Name = "computed", EmitDefaultValue = false)]
+        [DataMember(Name = "computed", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("computed")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<Computed>? Computed { get; set; }
+        public List<Computed> Computed { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

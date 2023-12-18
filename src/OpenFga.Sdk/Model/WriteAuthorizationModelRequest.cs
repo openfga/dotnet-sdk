@@ -34,14 +34,20 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="WriteAuthorizationModelRequest" /> class.
         /// </summary>
         /// <param name="typeDefinitions">typeDefinitions (required).</param>
-        /// <param name="schemaVersion">schemaVersion.</param>
-        public WriteAuthorizationModelRequest(List<TypeDefinition> typeDefinitions = default(List<TypeDefinition>), string schemaVersion = default(string)) {
+        /// <param name="schemaVersion">schemaVersion (required).</param>
+        /// <param name="conditions">conditions.</param>
+        public WriteAuthorizationModelRequest(List<TypeDefinition> typeDefinitions = default(List<TypeDefinition>), string schemaVersion = default(string), Dictionary<string, Condition> conditions = default(Dictionary<string, Condition>)) {
             // to ensure "typeDefinitions" is required (not null)
             if (typeDefinitions == null) {
                 throw new ArgumentNullException("typeDefinitions is a required property for WriteAuthorizationModelRequest and cannot be null");
             }
             this.TypeDefinitions = typeDefinitions;
+            // to ensure "schemaVersion" is required (not null)
+            if (schemaVersion == null) {
+                throw new ArgumentNullException("schemaVersion is a required property for WriteAuthorizationModelRequest and cannot be null");
+            }
             this.SchemaVersion = schemaVersion;
+            this.Conditions = conditions;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -56,10 +62,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets SchemaVersion
         /// </summary>
-        [DataMember(Name = "schema_version", EmitDefaultValue = false)]
+        [DataMember(Name = "schema_version", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("schema_version")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? SchemaVersion { get; set; }
+        public string SchemaVersion { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Conditions
+        /// </summary>
+        [DataMember(Name = "conditions", EmitDefaultValue = false)]
+        [JsonPropertyName("conditions")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public Dictionary<string, Condition>? Conditions { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -113,6 +127,12 @@ namespace OpenFga.Sdk.Model {
                     this.SchemaVersion == input.SchemaVersion ||
                     (this.SchemaVersion != null &&
                     this.SchemaVersion.Equals(input.SchemaVersion))
+                ) &&
+                (
+                    this.Conditions == input.Conditions ||
+                    this.Conditions != null &&
+                    input.Conditions != null &&
+                    this.Conditions.SequenceEqual(input.Conditions)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -130,6 +150,9 @@ namespace OpenFga.Sdk.Model {
                 }
                 if (this.SchemaVersion != null) {
                     hashCode = (hashCode * 9923) + this.SchemaVersion.GetHashCode();
+                }
+                if (this.Conditions != null) {
+                    hashCode = (hashCode * 9923) + this.Conditions.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

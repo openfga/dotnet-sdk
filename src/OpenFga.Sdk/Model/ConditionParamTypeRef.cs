@@ -18,38 +18,43 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// TupleKeys
+    /// ConditionParamTypeRef
     /// </summary>
-    [DataContract(Name = "TupleKeys")]
-    public partial class TupleKeys : IEquatable<TupleKeys>, IValidatableObject {
+    [DataContract(Name = "ConditionParamTypeRef")]
+    public partial class ConditionParamTypeRef : IEquatable<ConditionParamTypeRef>, IValidatableObject {
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="TupleKeys" /> class.
+        /// Gets or Sets TypeName
+        /// </summary>
+        [DataMember(Name = "type_name", IsRequired = true, EmitDefaultValue = false)]
+        [JsonPropertyName("type_name")]
+        public TypeName TypeName { get; set; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConditionParamTypeRef" /> class.
         /// </summary>
         [JsonConstructor]
-        public TupleKeys() {
+        public ConditionParamTypeRef() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TupleKeys" /> class.
+        /// Initializes a new instance of the <see cref="ConditionParamTypeRef" /> class.
         /// </summary>
-        /// <param name="tupleKeys">tupleKeys (required).</param>
-        public TupleKeys(List<TupleKey> tupleKeys = default(List<TupleKey>)) {
-            // to ensure "tupleKeys" is required (not null)
-            if (tupleKeys == null) {
-                throw new ArgumentNullException("tupleKeys is a required property for TupleKeys and cannot be null");
-            }
-            this._TupleKeys = tupleKeys;
+        /// <param name="typeName">typeName (required).</param>
+        /// <param name="genericTypes">genericTypes.</param>
+        public ConditionParamTypeRef(TypeName typeName = default(TypeName), List<ConditionParamTypeRef> genericTypes = default(List<ConditionParamTypeRef>)) {
+            this.TypeName = typeName;
+            this.GenericTypes = genericTypes;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Gets or Sets _TupleKeys
+        /// Gets or Sets GenericTypes
         /// </summary>
-        [DataMember(Name = "tuple_keys", IsRequired = true, EmitDefaultValue = false)]
-        [JsonPropertyName("tuple_keys")]
+        [DataMember(Name = "generic_types", EmitDefaultValue = false)]
+        [JsonPropertyName("generic_types")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<TupleKey> _TupleKeys { get; set; }
+        public List<ConditionParamTypeRef>? GenericTypes { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -67,11 +72,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a TupleKeys from the JSON string presentation of the object
+        /// Builds a ConditionParamTypeRef from the JSON string presentation of the object
         /// </summary>
-        /// <returns>TupleKeys</returns>
-        public static TupleKeys FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<TupleKeys>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>ConditionParamTypeRef</returns>
+        public static ConditionParamTypeRef FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<ConditionParamTypeRef>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -80,24 +85,28 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as TupleKeys);
+            return this.Equals(input as ConditionParamTypeRef);
         }
 
         /// <summary>
-        /// Returns true if TupleKeys instances are equal
+        /// Returns true if ConditionParamTypeRef instances are equal
         /// </summary>
-        /// <param name="input">Instance of TupleKeys to be compared</param>
+        /// <param name="input">Instance of ConditionParamTypeRef to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(TupleKeys input) {
+        public bool Equals(ConditionParamTypeRef input) {
             if (input == null) {
                 return false;
             }
             return
                 (
-                    this._TupleKeys == input._TupleKeys ||
-                    this._TupleKeys != null &&
-                    input._TupleKeys != null &&
-                    this._TupleKeys.SequenceEqual(input._TupleKeys)
+                    this.TypeName == input.TypeName ||
+                    this.TypeName.Equals(input.TypeName)
+                ) &&
+                (
+                    this.GenericTypes == input.GenericTypes ||
+                    this.GenericTypes != null &&
+                    input.GenericTypes != null &&
+                    this.GenericTypes.SequenceEqual(input.GenericTypes)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -110,8 +119,9 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 9661;
-                if (this._TupleKeys != null) {
-                    hashCode = (hashCode * 9923) + this._TupleKeys.GetHashCode();
+                hashCode = (hashCode * 9923) + this.TypeName.GetHashCode();
+                if (this.GenericTypes != null) {
+                    hashCode = (hashCode * 9923) + this.GenericTypes.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

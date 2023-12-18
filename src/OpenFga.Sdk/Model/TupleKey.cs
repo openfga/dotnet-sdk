@@ -33,39 +33,61 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="TupleKey" /> class.
         /// </summary>
-        /// <param name="_object">_object.</param>
-        /// <param name="relation">relation.</param>
-        /// <param name="user">user.</param>
-        public TupleKey(string _object = default(string), string relation = default(string), string user = default(string)) {
-            this.Object = _object;
-            this.Relation = relation;
+        /// <param name="user">user (required).</param>
+        /// <param name="relation">relation (required).</param>
+        /// <param name="_object">_object (required).</param>
+        /// <param name="condition">condition.</param>
+        public TupleKey(string user = default(string), string relation = default(string), string _object = default(string), RelationshipCondition condition = default(RelationshipCondition)) {
+            // to ensure "user" is required (not null)
+            if (user == null) {
+                throw new ArgumentNullException("user is a required property for TupleKey and cannot be null");
+            }
             this.User = user;
+            // to ensure "relation" is required (not null)
+            if (relation == null) {
+                throw new ArgumentNullException("relation is a required property for TupleKey and cannot be null");
+            }
+            this.Relation = relation;
+            // to ensure "_object" is required (not null)
+            if (_object == null) {
+                throw new ArgumentNullException("_object is a required property for TupleKey and cannot be null");
+            }
+            this.Object = _object;
+            this.Condition = condition;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Gets or Sets Object
+        /// Gets or Sets User
         /// </summary>
-        [DataMember(Name = "object", EmitDefaultValue = false)]
-        [JsonPropertyName("object")]
+        [DataMember(Name = "user", IsRequired = true, EmitDefaultValue = false)]
+        [JsonPropertyName("user")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? Object { get; set; }
+        public string User { get; set; }
 
         /// <summary>
         /// Gets or Sets Relation
         /// </summary>
-        [DataMember(Name = "relation", EmitDefaultValue = false)]
+        [DataMember(Name = "relation", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("relation")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? Relation { get; set; }
+        public string Relation { get; set; }
 
         /// <summary>
-        /// Gets or Sets User
+        /// Gets or Sets Object
         /// </summary>
-        [DataMember(Name = "user", EmitDefaultValue = false)]
-        [JsonPropertyName("user")]
+        [DataMember(Name = "object", IsRequired = true, EmitDefaultValue = false)]
+        [JsonPropertyName("object")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? User { get; set; }
+        public string Object { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Condition
+        /// </summary>
+        [DataMember(Name = "condition", EmitDefaultValue = false)]
+        [JsonPropertyName("condition")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public RelationshipCondition? Condition { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -110,9 +132,9 @@ namespace OpenFga.Sdk.Model {
             }
             return
                 (
-                    this.Object == input.Object ||
-                    (this.Object != null &&
-                    this.Object.Equals(input.Object))
+                    this.User == input.User ||
+                    (this.User != null &&
+                    this.User.Equals(input.User))
                 ) &&
                 (
                     this.Relation == input.Relation ||
@@ -120,9 +142,14 @@ namespace OpenFga.Sdk.Model {
                     this.Relation.Equals(input.Relation))
                 ) &&
                 (
-                    this.User == input.User ||
-                    (this.User != null &&
-                    this.User.Equals(input.User))
+                    this.Object == input.Object ||
+                    (this.Object != null &&
+                    this.Object.Equals(input.Object))
+                ) &&
+                (
+                    this.Condition == input.Condition ||
+                    (this.Condition != null &&
+                    this.Condition.Equals(input.Condition))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -135,14 +162,17 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 9661;
-                if (this.Object != null) {
-                    hashCode = (hashCode * 9923) + this.Object.GetHashCode();
+                if (this.User != null) {
+                    hashCode = (hashCode * 9923) + this.User.GetHashCode();
                 }
                 if (this.Relation != null) {
                     hashCode = (hashCode * 9923) + this.Relation.GetHashCode();
                 }
-                if (this.User != null) {
-                    hashCode = (hashCode * 9923) + this.User.GetHashCode();
+                if (this.Object != null) {
+                    hashCode = (hashCode * 9923) + this.Object.GetHashCode();
+                }
+                if (this.Condition != null) {
+                    hashCode = (hashCode * 9923) + this.Condition.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
@@ -157,9 +187,9 @@ namespace OpenFga.Sdk.Model {
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
-            // Object (string) maxLength
-            if (this.Object != null && this.Object.Length > 256) {
-                yield return new ValidationResult("Invalid value for Object, length must be less than 256.", new[] { "Object" });
+            // User (string) maxLength
+            if (this.User != null && this.User.Length > 512) {
+                yield return new ValidationResult("Invalid value for User, length must be less than 512.", new[] { "User" });
             }
 
             // Relation (string) maxLength
@@ -167,9 +197,9 @@ namespace OpenFga.Sdk.Model {
                 yield return new ValidationResult("Invalid value for Relation, length must be less than 50.", new[] { "Relation" });
             }
 
-            // User (string) maxLength
-            if (this.User != null && this.User.Length > 512) {
-                yield return new ValidationResult("Invalid value for User, length must be less than 512.", new[] { "User" });
+            // Object (string) maxLength
+            if (this.Object != null && this.Object.Length > 256) {
+                yield return new ValidationResult("Invalid value for Object, length must be less than 256.", new[] { "Object" });
             }
 
             yield break;

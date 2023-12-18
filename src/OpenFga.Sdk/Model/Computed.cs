@@ -33,8 +33,12 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Computed" /> class.
         /// </summary>
-        /// <param name="userset">userset.</param>
+        /// <param name="userset">userset (required).</param>
         public Computed(string userset = default(string)) {
+            // to ensure "userset" is required (not null)
+            if (userset == null) {
+                throw new ArgumentNullException("userset is a required property for Computed and cannot be null");
+            }
             this.Userset = userset;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -42,10 +46,10 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Userset
         /// </summary>
-        [DataMember(Name = "userset", EmitDefaultValue = false)]
+        [DataMember(Name = "userset", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("userset")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? Userset { get; set; }
+        public string Userset { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

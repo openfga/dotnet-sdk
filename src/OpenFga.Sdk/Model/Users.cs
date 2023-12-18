@@ -33,8 +33,12 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Users" /> class.
         /// </summary>
-        /// <param name="users">users.</param>
+        /// <param name="users">users (required).</param>
         public Users(List<string> users = default(List<string>)) {
+            // to ensure "users" is required (not null)
+            if (users == null) {
+                throw new ArgumentNullException("users is a required property for Users and cannot be null");
+            }
             this._Users = users;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -42,10 +46,10 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets _Users
         /// </summary>
-        [DataMember(Name = "users", EmitDefaultValue = false)]
+        [DataMember(Name = "users", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("users")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<string>? _Users { get; set; }
+        public List<string> _Users { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

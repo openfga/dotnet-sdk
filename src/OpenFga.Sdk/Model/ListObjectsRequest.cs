@@ -38,7 +38,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="relation">relation (required).</param>
         /// <param name="user">user (required).</param>
         /// <param name="contextualTuples">contextualTuples.</param>
-        public ListObjectsRequest(string authorizationModelId = default(string), string type = default(string), string relation = default(string), string user = default(string), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys)) {
+        /// <param name="context">Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation..</param>
+        public ListObjectsRequest(string authorizationModelId = default(string), string type = default(string), string relation = default(string), string user = default(string), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys), Object context = default(Object)) {
             // to ensure "type" is required (not null)
             if (type == null) {
                 throw new ArgumentNullException("type is a required property for ListObjectsRequest and cannot be null");
@@ -56,6 +57,7 @@ namespace OpenFga.Sdk.Model {
             this.User = user;
             this.AuthorizationModelId = authorizationModelId;
             this.ContextualTuples = contextualTuples;
+            this.Context = context;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -98,6 +100,15 @@ namespace OpenFga.Sdk.Model {
         [JsonPropertyName("contextual_tuples")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ContextualTupleKeys? ContextualTuples { get; set; }
+
+        /// <summary>
+        /// Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation.
+        /// </summary>
+        /// <value>Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation.</value>
+        [DataMember(Name = "context", EmitDefaultValue = false)]
+        [JsonPropertyName("context")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public Object? Context { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -165,6 +176,11 @@ namespace OpenFga.Sdk.Model {
                     this.ContextualTuples == input.ContextualTuples ||
                     (this.ContextualTuples != null &&
                     this.ContextualTuples.Equals(input.ContextualTuples))
+                ) &&
+                (
+                    this.Context == input.Context ||
+                    (this.Context != null &&
+                    this.Context.Equals(input.Context))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -191,6 +207,9 @@ namespace OpenFga.Sdk.Model {
                 }
                 if (this.ContextualTuples != null) {
                     hashCode = (hashCode * 9923) + this.ContextualTuples.GetHashCode();
+                }
+                if (this.Context != null) {
+                    hashCode = (hashCode * 9923) + this.Context.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

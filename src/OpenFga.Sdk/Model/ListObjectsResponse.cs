@@ -33,8 +33,12 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ListObjectsResponse" /> class.
         /// </summary>
-        /// <param name="objects">objects.</param>
+        /// <param name="objects">objects (required).</param>
         public ListObjectsResponse(List<string> objects = default(List<string>)) {
+            // to ensure "objects" is required (not null)
+            if (objects == null) {
+                throw new ArgumentNullException("objects is a required property for ListObjectsResponse and cannot be null");
+            }
             this.Objects = objects;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -42,10 +46,10 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Objects
         /// </summary>
-        [DataMember(Name = "objects", EmitDefaultValue = false)]
+        [DataMember(Name = "objects", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("objects")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<string>? Objects { get; set; }
+        public List<string> Objects { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

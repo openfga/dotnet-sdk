@@ -35,7 +35,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tupleKey">tupleKey (required).</param>
         /// <param name="expectation">expectation (required).</param>
-        public Assertion(TupleKey tupleKey = default(TupleKey), bool expectation = default(bool)) {
+        public Assertion(AssertionTupleKey tupleKey = default(AssertionTupleKey), bool expectation = default(bool)) {
             // to ensure "tupleKey" is required (not null)
             if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for Assertion and cannot be null");
@@ -51,7 +51,7 @@ namespace OpenFga.Sdk.Model {
         [DataMember(Name = "tuple_key", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public TupleKey TupleKey { get; set; }
+        public AssertionTupleKey TupleKey { get; set; }
 
         /// <summary>
         /// Gets or Sets Expectation

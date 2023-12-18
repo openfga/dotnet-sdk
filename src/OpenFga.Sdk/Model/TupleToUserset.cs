@@ -33,10 +33,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="TupleToUserset" /> class.
         /// </summary>
-        /// <param name="tupleset">tupleset.</param>
-        /// <param name="computedUserset">computedUserset.</param>
+        /// <param name="tupleset">tupleset (required).</param>
+        /// <param name="computedUserset">computedUserset (required).</param>
         public TupleToUserset(ObjectRelation tupleset = default(ObjectRelation), ObjectRelation computedUserset = default(ObjectRelation)) {
+            // to ensure "tupleset" is required (not null)
+            if (tupleset == null) {
+                throw new ArgumentNullException("tupleset is a required property for TupleToUserset and cannot be null");
+            }
             this.Tupleset = tupleset;
+            // to ensure "computedUserset" is required (not null)
+            if (computedUserset == null) {
+                throw new ArgumentNullException("computedUserset is a required property for TupleToUserset and cannot be null");
+            }
             this.ComputedUserset = computedUserset;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -44,18 +52,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Tupleset
         /// </summary>
-        [DataMember(Name = "tupleset", EmitDefaultValue = false)]
+        [DataMember(Name = "tupleset", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("tupleset")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ObjectRelation? Tupleset { get; set; }
+        public ObjectRelation Tupleset { get; set; }
 
         /// <summary>
         /// Gets or Sets ComputedUserset
         /// </summary>
-        [DataMember(Name = "computedUserset", EmitDefaultValue = false)]
+        [DataMember(Name = "computedUserset", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("computedUserset")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ObjectRelation? ComputedUserset { get; set; }
+        public ObjectRelation ComputedUserset { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

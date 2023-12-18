@@ -33,8 +33,12 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Usersets" /> class.
         /// </summary>
-        /// <param name="child">child.</param>
+        /// <param name="child">child (required).</param>
         public Usersets(List<Userset> child = default(List<Userset>)) {
+            // to ensure "child" is required (not null)
+            if (child == null) {
+                throw new ArgumentNullException("child is a required property for Usersets and cannot be null");
+            }
             this.Child = child;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -42,10 +46,10 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Child
         /// </summary>
-        [DataMember(Name = "child", EmitDefaultValue = false)]
+        [DataMember(Name = "child", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("child")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<Userset>? Child { get; set; }
+        public List<Userset> Child { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

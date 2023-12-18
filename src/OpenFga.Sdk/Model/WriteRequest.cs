@@ -36,7 +36,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="writes">writes.</param>
         /// <param name="deletes">deletes.</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
-        public WriteRequest(TupleKeys writes = default(TupleKeys), TupleKeys deletes = default(TupleKeys), string authorizationModelId = default(string)) {
+        public WriteRequest(WriteRequestWrites writes = default(WriteRequestWrites), WriteRequestDeletes deletes = default(WriteRequestDeletes), string authorizationModelId = default(string)) {
             this.Writes = writes;
             this.Deletes = deletes;
             this.AuthorizationModelId = authorizationModelId;
@@ -49,7 +49,7 @@ namespace OpenFga.Sdk.Model {
         [DataMember(Name = "writes", EmitDefaultValue = false)]
         [JsonPropertyName("writes")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public TupleKeys? Writes { get; set; }
+        public WriteRequestWrites? Writes { get; set; }
 
         /// <summary>
         /// Gets or Sets Deletes
@@ -57,7 +57,7 @@ namespace OpenFga.Sdk.Model {
         [DataMember(Name = "deletes", EmitDefaultValue = false)]
         [JsonPropertyName("deletes")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public TupleKeys? Deletes { get; set; }
+        public WriteRequestDeletes? Deletes { get; set; }
 
         /// <summary>
         /// Gets or Sets AuthorizationModelId

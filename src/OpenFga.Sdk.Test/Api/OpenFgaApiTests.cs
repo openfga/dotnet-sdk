@@ -1668,7 +1668,6 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.Single(response.Stores);
             Assert.Equal("xyz123", response.Stores[0].Id);
             Assert.Equal("abcdefg", response.Stores[0].Name);
-            Assert.Null(response.Stores[0].DeletedAt);
         }
 
         /// <summary>

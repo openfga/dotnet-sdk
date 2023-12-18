@@ -33,9 +33,13 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadAuthorizationModelsResponse" /> class.
         /// </summary>
-        /// <param name="authorizationModels">authorizationModels.</param>
+        /// <param name="authorizationModels">authorizationModels (required).</param>
         /// <param name="continuationToken">The continuation token will be empty if there are no more models..</param>
         public ReadAuthorizationModelsResponse(List<AuthorizationModel> authorizationModels = default(List<AuthorizationModel>), string continuationToken = default(string)) {
+            // to ensure "authorizationModels" is required (not null)
+            if (authorizationModels == null) {
+                throw new ArgumentNullException("authorizationModels is a required property for ReadAuthorizationModelsResponse and cannot be null");
+            }
             this.AuthorizationModels = authorizationModels;
             this.ContinuationToken = continuationToken;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -44,10 +48,10 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets AuthorizationModels
         /// </summary>
-        [DataMember(Name = "authorization_models", EmitDefaultValue = false)]
+        [DataMember(Name = "authorization_models", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("authorization_models")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<AuthorizationModel>? AuthorizationModels { get; set; }
+        public List<AuthorizationModel> AuthorizationModels { get; set; }
 
         /// <summary>
         /// The continuation token will be empty if there are no more models.

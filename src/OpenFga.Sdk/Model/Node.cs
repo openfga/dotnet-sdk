@@ -33,12 +33,16 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Node" /> class.
         /// </summary>
-        /// <param name="name">name.</param>
+        /// <param name="name">name (required).</param>
         /// <param name="leaf">leaf.</param>
         /// <param name="difference">difference.</param>
         /// <param name="union">union.</param>
         /// <param name="intersection">intersection.</param>
         public Node(string name = default(string), Leaf leaf = default(Leaf), UsersetTreeDifference difference = default(UsersetTreeDifference), Nodes union = default(Nodes), Nodes intersection = default(Nodes)) {
+            // to ensure "name" is required (not null)
+            if (name == null) {
+                throw new ArgumentNullException("name is a required property for Node and cannot be null");
+            }
             this.Name = name;
             this.Leaf = leaf;
             this.Difference = difference;
@@ -50,10 +54,10 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Name
         /// </summary>
-        [DataMember(Name = "name", EmitDefaultValue = false)]
+        [DataMember(Name = "name", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("name")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? Name { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or Sets Leaf
