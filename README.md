@@ -108,10 +108,10 @@ namespace Example {
         public static async Task Main() {
             try {
                 var configuration = new ClientConfiguration() {
-                    ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
-                    ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
-                    StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
-                    AuthorizationModelId = Environment.GetEnvironmentVariable("OPENFGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+                    ApiScheme = Environment.GetEnvironmentVariable("FGA_API_SCHEME"), // optional, defaults to "https"
+                    ApiHost = Environment.GetEnvironmentVariable("FGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                    StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
+                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
                 };
                 var fgaClient = new OpenFgaClient(configuration);
                 var response = await fgaClient.ReadAuthorizationModels();
@@ -135,14 +135,14 @@ namespace Example {
         public static async Task Main() {
             try {
                 var configuration = new ClientConfiguration() {
-                    ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
-                    ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
-                    StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
-                    AuthorizationModelId = Environment.GetEnvironmentVariable("OPENFGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+                    ApiScheme = Environment.GetEnvironmentVariable("FGA_API_SCHEME"), // optional, defaults to "https"
+                    ApiHost = Environment.GetEnvironmentVariable("FGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                    StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
+                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
                     Credentials = new Credentials() {
                         Method = CredentialsMethod.ApiToken,
                         Config = new CredentialsConfig() {
-                            ApiToken = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN"),  // will be passed as the "Authorization: Bearer ${ApiToken}" request header
+                            ApiToken = Environment.GetEnvironmentVariable("FGA_API_TOKEN"),  // will be passed as the "Authorization: Bearer ${ApiToken}" request header
                         }
                     }
                 };
@@ -168,17 +168,17 @@ namespace Example {
         public static async Task Main() {
             try {
                 var configuration = new ClientConfiguration() {
-                    ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
-                    ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
-                    StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
-                    AuthorizationModelId = Environment.GetEnvironmentVariable("OPENFGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+                    ApiScheme = Environment.GetEnvironmentVariable("FGA_API_SCHEME"), // optional, defaults to "https"
+                    ApiHost = Environment.GetEnvironmentVariable("FGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                    StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
+                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
                     Credentials = new Credentials() {
                         Method = CredentialsMethod.ClientCredentials,
                         Config = new CredentialsConfig() {
-                            ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"),
-                            ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"),
-                            ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"),
-                            ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"),
+                            ApiTokenIssuer = Environment.GetEnvironmentVariable("FGA_API_TOKEN_ISSUER"),
+                            ApiAudience = Environment.GetEnvironmentVariable("FGA_API_AUDIENCE"),
+                            ClientId = Environment.GetEnvironmentVariable("FGA_CLIENT_ID"),
+                            ClientSecret = Environment.GetEnvironmentVariable("FGA_CLIENT_SECRET"),
                         }
                     }
                 };
