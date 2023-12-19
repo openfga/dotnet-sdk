@@ -82,6 +82,10 @@ docs/WriteAuthorizationModelResponse.md
 docs/WriteRequest.md
 docs/WriteRequestDeletes.md
 docs/WriteRequestWrites.md
+example/Example1/Example1.cs
+example/Example1/Example1.csproj
+example/Makefile
+example/README.md
 src/OpenFga.Sdk.Test/Api/OpenFgaApiTests.cs
 src/OpenFga.Sdk.Test/Client/OpenFgaClientTests.cs
 src/OpenFga.Sdk.Test/Models/ModelTests.cs
