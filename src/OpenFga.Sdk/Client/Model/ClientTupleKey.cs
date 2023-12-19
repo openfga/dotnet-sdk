@@ -51,7 +51,9 @@ public class ClientTupleKey : IClientTupleKey {
     [JsonPropertyName("user")]
     public new string User { get; set; }
 
-    public virtual TupleKey ToTupleKey() => new TupleKey { User = User, Relation = Relation, Object = Object };
+    public virtual TupleKey ToTupleKey() => new() { User = User, Relation = Relation, Object = Object };
+
+    public virtual TupleKeyWithoutCondition ToTupleKeyWithoutCondition() => new() { User = User, Relation = Relation, Object = Object };
 
     public virtual string ToJson() => JsonSerializer.Serialize(this);
 

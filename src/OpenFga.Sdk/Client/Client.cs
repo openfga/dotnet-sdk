@@ -149,7 +149,7 @@ public class OpenFgaClient : IDisposable {
      */
     public async Task<ReadResponse> Read(ClientReadRequest body, IClientReadOptions? options = default,
         CancellationToken cancellationToken = default) {
-        TupleKey tupleKey = null;
+        ReadRequestTupleKey tupleKey = null;
         if (body != null && (body.User != null || body.Relation != null || body.Object != null)) {
             tupleKey = body;
         }
@@ -178,10 +178,10 @@ public class OpenFgaClient : IDisposable {
                 AuthorizationModelId = authorizationModelId
             };
             if (body.Writes?.Count > 0) {
-                requestBody.Writes = new TupleKeys(body.Writes.ConvertAll(key => key.ToTupleKey()));
+                requestBody.Writes = new WriteRequestWrites(body.Writes.ConvertAll(key => key.ToTupleKey()));
             }
             if (body.Deletes?.Count > 0) {
-                requestBody.Deletes = new TupleKeys(body.Deletes.ConvertAll(key => key.ToTupleKey()));
+                requestBody.Deletes = new WriteRequestDeletes(body.Deletes.ConvertAll(key => key.ToTupleKeyWithoutCondition()));
             }
 
             await api.Write(requestBody, cancellationToken);
@@ -279,7 +279,7 @@ public class OpenFgaClient : IDisposable {
         CancellationToken cancellationToken = default) =>
         await api.Check(
             new CheckRequest {
-                TupleKey = new TupleKey { User = body.User, Relation = body.Relation, Object = body.Object },
+                TupleKey = new CheckRequestTupleKey { User = body.User, Relation = body.Relation, Object = body.Object },
                 ContextualTuples =
                     new ContextualTupleKeys {
                         TupleKeys = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ??
@@ -322,7 +322,7 @@ public class OpenFgaClient : IDisposable {
         CancellationToken cancellationToken = default) =>
         await api.Expand(
             new ExpandRequest {
-                TupleKey = new TupleKey { Relation = body.Relation, Object = body.Object },
+                TupleKey = new ExpandRequestTupleKey { Relation = body.Relation, Object = body.Object },
                 AuthorizationModelId = GetAuthorizationModelId(options)
             }, cancellationToken);
 
@@ -411,7 +411,7 @@ public class OpenFgaClient : IDisposable {
         for (var index = 0; index < body.Count; index++) {
             var assertion = body[index];
             assertions.Add(new Assertion {
-                TupleKey = new TupleKey {
+                TupleKey = new AssertionTupleKey {
                     User = assertion.User,
                     Relation = assertion.Relation,
                     Object = assertion.Object
