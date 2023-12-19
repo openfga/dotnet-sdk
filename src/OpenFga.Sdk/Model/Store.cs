@@ -37,7 +37,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="name">name (required).</param>
         /// <param name="createdAt">createdAt (required).</param>
         /// <param name="updatedAt">updatedAt (required).</param>
-        /// <param name="deletedAt">deletedAt (required).</param>
+        /// <param name="deletedAt">deletedAt.</param>
         public Store(string id = default(string), string name = default(string), DateTime createdAt = default(DateTime), DateTime updatedAt = default(DateTime), DateTime deletedAt = default(DateTime)) {
             // to ensure "id" is required (not null)
             if (id == null) {
@@ -90,10 +90,10 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets DeletedAt
         /// </summary>
-        [DataMember(Name = "deleted_at", IsRequired = true, EmitDefaultValue = false)]
+        [DataMember(Name = "deleted_at", EmitDefaultValue = false)]
         [JsonPropertyName("deleted_at")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public DateTime DeletedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

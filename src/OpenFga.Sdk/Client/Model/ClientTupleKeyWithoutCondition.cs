@@ -19,16 +19,13 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Client.Model;
 
-public interface IClientTupleKey : IClientTupleKeyWithoutCondition {
-    public RelationshipCondition? Condition { get; set; }
+public interface IClientTupleKeyWithoutCondition {
+    public string User { get; set; }
+    public string Relation { get; set; }
+    public string Object { get; set; }
 }
 
-public interface IClientQueryContextWrapper {
-    public List<ClientTupleKey>? ContextualTuples { get; set; }
-    public Object? Context { get; set; }
-}
-
-public class ClientTupleKey : IClientTupleKey {
+public class ClientTupleKeyWithoutCondition : IClientTupleKeyWithoutCondition {
     /// <summary>
     ///     Gets or Sets User
     /// </summary>
@@ -50,26 +47,18 @@ public class ClientTupleKey : IClientTupleKey {
     [JsonPropertyName("object")]
     public new string Object { get; set; }
 
-    /// <summary>
-    /// Gets or Sets Condition
-    /// </summary>
-    [DataMember(Name = "condition", EmitDefaultValue = false)]
-    [JsonPropertyName("condition")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public RelationshipCondition? Condition { get; set; }
-
-    public virtual TupleKey ToTupleKey() => new() { User = User, Relation = Relation, Object = Object, Condition = Condition };
+    public virtual TupleKey ToTupleKey() => new() { User = User, Relation = Relation, Object = Object };
 
     public virtual TupleKeyWithoutCondition ToTupleKeyWithoutCondition() => new() { User = User, Relation = Relation, Object = Object };
 
     public virtual string ToJson() => JsonSerializer.Serialize(this);
 
-    public static ClientTupleKey FromJson(string jsonString) =>
-        JsonSerializer.Deserialize<ClientTupleKey>(jsonString) ?? throw new InvalidOperationException();
+    public static ClientTupleKeyWithoutCondition FromJson(string jsonString) =>
+        JsonSerializer.Deserialize<ClientTupleKeyWithoutCondition>(jsonString) ?? throw new InvalidOperationException();
 
     public override bool Equals(object input) => Equals(input as ClientTupleKey);
 
-    public bool Equals(ClientTupleKey input) {
+    public bool Equals(ClientTupleKeyWithoutCondition input) {
         if (input == null) {
             return false;
         }
@@ -89,11 +78,6 @@ public class ClientTupleKey : IClientTupleKey {
                 Object == input.Object ||
                 (Object != null &&
                  Object.Equals(input.Object))
-            ) &&
-            (
-                Condition == input.Condition ||
-                (Condition != null &&
-                 Condition.Equals(input.Condition))
             );
     }
 
@@ -112,10 +96,6 @@ public class ClientTupleKey : IClientTupleKey {
 
             if (Relation != null) {
                 hashCode = (hashCode * 9923) + Relation.GetHashCode();
-            }
-
-            if (Condition != null) {
-                hashCode = (hashCode * 9923) + Condition.GetHashCode();
             }
 
             return hashCode;

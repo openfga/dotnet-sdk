@@ -1411,7 +1411,11 @@ namespace OpenFga.Sdk.Test.Api {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var expectedResponse = new ReadResponse() {
                 Tuples = new List<Model.Tuple>() {
-                                new(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), DateTime.Now)
+                                new(new TupleKey {
+                                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                                    Relation = "viewer",
+                                    Object = "document:roadmap"
+                                }, DateTime.Now)
                             }
             };
             mockHandler.Protected()
@@ -1461,7 +1465,11 @@ namespace OpenFga.Sdk.Test.Api {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var expectedResponse = new ReadResponse() {
                 Tuples = new List<Model.Tuple>() {
-                                new(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), DateTime.Now)
+                                new(new TupleKey {
+                                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                                    Relation = "viewer",
+                                    Object = "document:roadmap"
+                                }, DateTime.Now)
                             }
             };
             mockHandler.Protected()
@@ -1505,7 +1513,11 @@ namespace OpenFga.Sdk.Test.Api {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var expectedResponse = new ReadChangesResponse() {
                 Changes = new List<TupleChange>() {
-                            new(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"), TupleOperation.WRITE, DateTime.Now),
+                            new(new TupleKey {
+                                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                                Relation = "viewer",
+                                Object = "document:roadmap"
+                            }, TupleOperation.WRITE, DateTime.Now),
                         },
                 ContinuationToken = "eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ=="
             };
@@ -1754,6 +1766,7 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.Single(response.Stores);
             Assert.Equal("xyz123", response.Stores[0].Id);
             Assert.Equal("abcdefg", response.Stores[0].Name);
+            Assert.Null(response.Stores[0].DeletedAt);
         }
 
         /// <summary>

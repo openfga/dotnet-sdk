@@ -124,12 +124,17 @@ public class OpenFgaClient : IDisposable {
     /**
      * ReadLatestAuthorizationModel - Read the latest authorization model for the current store
      */
-    public async Task<ReadAuthorizationModelResponse> ReadLatestAuthorizationModel(
+    public async Task<ReadAuthorizationModelResponse?> ReadLatestAuthorizationModel(
         IClientRequestOptionsWithAuthZModelId? options = default,
         CancellationToken cancellationToken = default) {
         var response =
             await ReadAuthorizationModels(new ClientReadAuthorizationModelsOptions { PageSize = 1 }, cancellationToken);
-        return new ReadAuthorizationModelResponse { AuthorizationModel = response.AuthorizationModels?[0] };
+
+        if (response.AuthorizationModels.Count > 0) {
+            return new ReadAuthorizationModelResponse { AuthorizationModel = response.AuthorizationModels?[0] };
+        }
+
+        return null;
     }
 
     /***********************
@@ -139,15 +144,15 @@ public class OpenFgaClient : IDisposable {
     /**
      * Read Changes - Read the list of historical relationship tuple writes and deletes
      */
-    public async Task<ReadChangesResponse> ReadChanges(ClientReadChangesRequest body,
+    public async Task<ReadChangesResponse> ReadChanges(ClientReadChangesRequest? body = default,
         IClientReadChangesOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ReadChanges(body.Type, options?.PageSize, options?.ContinuationToken, cancellationToken);
+        await api.ReadChanges(body?.Type, options?.PageSize, options?.ContinuationToken, cancellationToken);
 
     /**
      * Read - Read tuples previously written to the store (does not evaluate)
      */
-    public async Task<ReadResponse> Read(ClientReadRequest body, IClientReadOptions? options = default,
+    public async Task<ReadResponse> Read(ClientReadRequest? body = default, IClientReadOptions? options = default,
         CancellationToken cancellationToken = default) {
         ReadRequestTupleKey tupleKey = null;
         if (body != null && (body.User != null || body.Relation != null || body.Object != null)) {
@@ -198,7 +203,7 @@ public class OpenFgaClient : IDisposable {
         }
 
         var writeChunks = body.Writes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKey[]>();
-        var deleteChunks = body.Deletes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKey[]>();
+        var deleteChunks = body.Deletes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKeyWithoutCondition[]>();
 
         var writeResponses = new ConcurrentBag<ClientWriteSingleResponse>();
         var deleteResponses = new ConcurrentBag<ClientWriteSingleResponse>();
@@ -263,7 +268,7 @@ public class OpenFgaClient : IDisposable {
     /**
      * DeleteTuples - Utility method to delete tuples, wraps Write
      */
-    public async Task<ClientWriteResponse> DeleteTuples(List<ClientTupleKey> body, IClientWriteOptions? options = default,
+    public async Task<ClientWriteResponse> DeleteTuples(List<ClientTupleKeyWithoutCondition> body, IClientWriteOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await Write(new ClientWriteRequest { Deletes = body }, options, cancellationToken);
 
@@ -285,6 +290,7 @@ public class OpenFgaClient : IDisposable {
                         TupleKeys = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ??
                                     new List<TupleKey>()
                     },
+                Context = body.Context,
                 AuthorizationModelId = GetAuthorizationModelId(options)
             }, cancellationToken);
 
@@ -341,6 +347,7 @@ public class OpenFgaClient : IDisposable {
                     TupleKeys = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ??
                                 new List<TupleKey>()
                 },
+            Context = body.Context,
             AuthorizationModelId = GetAuthorizationModelId(options)
         });
 
@@ -362,7 +369,8 @@ public class OpenFgaClient : IDisposable {
                 User = body.User,
                 Relation = relation,
                 Object = body.Object,
-                ContextualTuples = body.ContextualTuples
+                ContextualTuples = body.ContextualTuples,
+                Context = body.Context
             });
         }
 

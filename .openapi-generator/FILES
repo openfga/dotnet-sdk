@@ -119,6 +119,7 @@ src/OpenFga.Sdk/Client/Model/ClientReadRequest.cs
 src/OpenFga.Sdk/Client/Model/ClientRequestOptions.cs
 src/OpenFga.Sdk/Client/Model/ClientRequestOptsWithAuthZModelId.cs
 src/OpenFga.Sdk/Client/Model/ClientTupleKey.cs
+src/OpenFga.Sdk/Client/Model/ClientTupleKeyWithoutCondition.cs
 src/OpenFga.Sdk/Client/Model/ClientWriteAssertionsOptions.cs
 src/OpenFga.Sdk/Client/Model/ClientWriteAssertionsRequest.cs
 src/OpenFga.Sdk/Client/Model/ClientWriteAuthorizationModelRequest.cs

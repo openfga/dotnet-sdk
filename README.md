@@ -465,7 +465,7 @@ var body = new ClientWriteRequest() {
             Object = "document:budget",
         }
     },
-    Deletes = new List<ClientTupleKey> {
+    Deletes = new List<ClientTupleKeyWithoutCondition> {
         new() {
             User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
             Relation = "writer",
@@ -500,7 +500,7 @@ var body = new ClientWriteRequest() {
             Object = "document:budget",
         }
     },
-    Deletes = new List<ClientTupleKey> {
+    Deletes = new List<ClientTupleKeyWithoutCondition> {
         new() {
             User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
             Relation = "writer",

@@ -37,7 +37,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="name">name (required).</param>
         /// <param name="createdAt">createdAt (required).</param>
         /// <param name="updatedAt">updatedAt (required).</param>
-        public GetStoreResponse(string id = default(string), string name = default(string), DateTime createdAt = default(DateTime), DateTime updatedAt = default(DateTime)) {
+        /// <param name="deletedAt">deletedAt.</param>
+        public GetStoreResponse(string id = default(string), string name = default(string), DateTime createdAt = default(DateTime), DateTime updatedAt = default(DateTime), DateTime deletedAt = default(DateTime)) {
             // to ensure "id" is required (not null)
             if (id == null) {
                 throw new ArgumentNullException("id is a required property for GetStoreResponse and cannot be null");
@@ -50,6 +51,7 @@ namespace OpenFga.Sdk.Model {
             this.Name = name;
             this.CreatedAt = createdAt;
             this.UpdatedAt = updatedAt;
+            this.DeletedAt = deletedAt;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -84,6 +86,14 @@ namespace OpenFga.Sdk.Model {
         [JsonPropertyName("updated_at")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public DateTime UpdatedAt { get; set; }
+
+        /// <summary>
+        /// Gets or Sets DeletedAt
+        /// </summary>
+        [DataMember(Name = "deleted_at", EmitDefaultValue = false)]
+        [JsonPropertyName("deleted_at")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public DateTime? DeletedAt { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -146,6 +156,11 @@ namespace OpenFga.Sdk.Model {
                     this.UpdatedAt == input.UpdatedAt ||
                     (this.UpdatedAt != null &&
                     this.UpdatedAt.Equals(input.UpdatedAt))
+                ) &&
+                (
+                    this.DeletedAt == input.DeletedAt ||
+                    (this.DeletedAt != null &&
+                    this.DeletedAt.Equals(input.DeletedAt))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -169,6 +184,9 @@ namespace OpenFga.Sdk.Model {
                 }
                 if (this.UpdatedAt != null) {
                     hashCode = (hashCode * 9923) + this.UpdatedAt.GetHashCode();
+                }
+                if (this.DeletedAt != null) {
+                    hashCode = (hashCode * 9923) + this.DeletedAt.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

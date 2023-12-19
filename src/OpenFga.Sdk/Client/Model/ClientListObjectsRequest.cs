@@ -18,7 +18,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Client.Model;
 
-public interface IClientListObjectsRequest : IClientContextualTuplesWrapper {
+public interface IClientListObjectsRequest : IClientQueryContextWrapper {
     public string User { get; set; }
     public string Relation { get; set; }
     public string Type { get; set; }
@@ -57,6 +57,13 @@ public class ClientListObjectsRequest : IClientListObjectsRequest, IEquatable<Cl
     [JsonPropertyName("contextual_tuples")]
     public List<ClientTupleKey>? ContextualTuples { get; set; }
 
+    /// <summary>
+    ///     Gets or Sets Context
+    /// </summary>
+    [DataMember(Name = "context", EmitDefaultValue = false)]
+    [JsonPropertyName("context")]
+    public Object? Context { get; set; }
+
     public bool Equals(ClientListObjectsRequest input) {
         if (input == null) {
             return false;
@@ -64,9 +71,9 @@ public class ClientListObjectsRequest : IClientListObjectsRequest, IEquatable<Cl
 
         return
             (
-                Type == input.Type ||
-                (Type != null &&
-                 Type.Equals(input.Type))
+                User == input.User ||
+                (User != null &&
+                 User.Equals(input.User))
             ) &&
             (
                 Relation == input.Relation ||
@@ -74,14 +81,19 @@ public class ClientListObjectsRequest : IClientListObjectsRequest, IEquatable<Cl
                  Relation.Equals(input.Relation))
             ) &&
             (
-                User == input.User ||
-                (User != null &&
-                 User.Equals(input.User))
+                Type == input.Type ||
+                (Type != null &&
+                 Type.Equals(input.Type))
             ) &&
             (
                 ContextualTuples == input.ContextualTuples ||
                 (ContextualTuples != null &&
                  ContextualTuples.Equals(input.ContextualTuples))
+            ) &&
+            (
+                this.Context == input.Context ||
+                (this.Context != null &&
+                this.Context.Equals(input.Context))
             );
     }
 
@@ -114,6 +126,10 @@ public class ClientListObjectsRequest : IClientListObjectsRequest, IEquatable<Cl
 
             if (ContextualTuples != null) {
                 hashCode = (hashCode * 9923) + ContextualTuples.GetHashCode();
+            }
+
+            if (Context != null) {
+                hashCode = (hashCode * 9923) + Context.GetHashCode();
             }
 
             return hashCode;

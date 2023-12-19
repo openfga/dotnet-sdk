@@ -148,6 +148,7 @@ public class OpenFgaClientTests {
         Assert.Single(response.Stores);
         Assert.Equal("xyz123", response.Stores[0].Id);
         Assert.Equal("abcdefg", response.Stores[0].Name);
+        Assert.Null(response.Stores[0].DeletedAt);
     }
 
     /// <summary>
@@ -543,7 +544,11 @@ public class OpenFgaClientTests {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         var expectedResponse = new ReadChangesResponse() {
             Changes = new List<TupleChange>() {
-                new(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
+                new(new TupleKey {
+                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                        Relation = "viewer",
+                        Object = "document:roadmap"
+                    },
                     TupleOperation.WRITE, DateTime.Now),
             },
             ContinuationToken =
@@ -598,7 +603,11 @@ public class OpenFgaClientTests {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         var expectedResponse = new ReadResponse() {
             Tuples = new List<Model.Tuple>() {
-                new(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
+                new(new TupleKey {
+                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                        Relation = "viewer",
+                        Object = "document:roadmap"
+                    },
                     DateTime.Now)
             }
         };
@@ -650,7 +659,11 @@ public class OpenFgaClientTests {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         var expectedResponse = new ReadResponse() {
             Tuples = new List<Model.Tuple>() {
-                new(new TupleKey("document:roadmap", "viewer", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
+                new(new TupleKey {
+                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                        Relation = "viewer",
+                        Object = "document:roadmap"
+                    },
                     DateTime.Now)
             }
         };
@@ -810,7 +823,7 @@ public class OpenFgaClientTests {
                     Object = "document:roadmap",
                 },
             },
-            Deletes = new List<ClientTupleKey> {
+            Deletes = new List<ClientTupleKeyWithoutCondition> {
                 new() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "writer",
@@ -875,7 +888,7 @@ public class OpenFgaClientTests {
                     Object = "document:budget",
                 }
             },
-            Deletes = new List<ClientTupleKey> {
+            Deletes = new List<ClientTupleKeyWithoutCondition> {
                 new() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "writer",
@@ -938,8 +951,13 @@ public class OpenFgaClientTests {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "editor",
                     Object = "document:roadmap",
+                    Condition = new RelationshipCondition() {
+                        Name = "ViewCountLessThan200",
+                        Context = new { Name = "Roadmap", Type = "document" }
+                    }
                 }
             },
+            Context = new { ViewCount = 100 }
         };
         var options = new ClientCheckOptions { };
         var response = await fgaClient.Check(body, options);

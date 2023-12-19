@@ -18,11 +18,10 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Client.Model;
 
-public interface IClientCheckRequest : IClientContextualTuplesWrapper {
+public interface IClientCheckRequest : IClientQueryContextWrapper {
     public string User { get; set; }
     public string Relation { get; set; }
     public string Object { get; set; }
-    public List<ClientTupleKey>? ContextualTuples { get; set; }
 }
 
 /// <summary>
@@ -50,11 +49,18 @@ public class ClientCheckRequest : IClientCheckRequest, IEquatable<ClientCheckReq
     public string Object { get; set; }
 
     /// <summary>
-    ///     Gets or Sets Object
+    ///     Gets or Sets Contextual Tuples
     /// </summary>
     [DataMember(Name = "contextual_tuples", EmitDefaultValue = false)]
     [JsonPropertyName("contextual_tuples")]
     public List<ClientTupleKey>? ContextualTuples { get; set; }
+
+    /// <summary>
+    ///     Gets or Sets Context
+    /// </summary>
+    [DataMember(Name = "context", EmitDefaultValue = false)]
+    [JsonPropertyName("context")]
+    public Object? Context { get; set; }
 
     public bool Equals(ClientCheckRequest input) {
         if (input == null) {
@@ -63,9 +69,9 @@ public class ClientCheckRequest : IClientCheckRequest, IEquatable<ClientCheckReq
 
         return
             (
-                Object == input.Object ||
-                (Object != null &&
-                 Object.Equals(input.Object))
+                User == input.User ||
+                (User != null &&
+                 User.Equals(input.User))
             ) &&
             (
                 Relation == input.Relation ||
@@ -73,14 +79,19 @@ public class ClientCheckRequest : IClientCheckRequest, IEquatable<ClientCheckReq
                  Relation.Equals(input.Relation))
             ) &&
             (
-                User == input.User ||
-                (User != null &&
-                 User.Equals(input.User))
+                Object == input.Object ||
+                (Object != null &&
+                 Object.Equals(input.Object))
             ) &&
             (
                 ContextualTuples == input.ContextualTuples ||
                 (ContextualTuples != null &&
                  ContextualTuples.Equals(input.ContextualTuples))
+            ) &&
+            (
+                this.Context == input.Context ||
+                (this.Context != null &&
+                this.Context.Equals(input.Context))
             );
     }
 
@@ -113,6 +124,10 @@ public class ClientCheckRequest : IClientCheckRequest, IEquatable<ClientCheckReq
 
             if (ContextualTuples != null) {
                 hashCode = (hashCode * 9923) + ContextualTuples.GetHashCode();
+            }
+
+            if (Context != null) {
+                hashCode = (hashCode * 9923) + Context.GetHashCode();
             }
 
             return hashCode;
