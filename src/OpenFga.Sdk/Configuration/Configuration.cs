@@ -32,17 +32,13 @@ public class Configuration {
     /// </summary>
     /// <exception cref="FgaRequiredParamError"></exception>
     public void IsValid() {
-        if (string.IsNullOrWhiteSpace(ApiScheme)) {
-            throw new FgaRequiredParamError("Configuration", nameof(ApiScheme));
-        }
-
-        if (string.IsNullOrWhiteSpace(ApiHost)) {
-            throw new FgaRequiredParamError("Configuration", nameof(ApiHost));
+        if (BasePath == null || BasePath == "") {
+            throw new FgaRequiredParamError("Configuration", "ApiUrl");
         }
 
         if (!IsWellFormedUriString(BasePath)) {
             throw new FgaValidationError(
-                $"Configuration.ApiScheme ({ApiScheme}) and Configuration.ApiHost ({ApiHost}) do not form a valid URI ({BasePath})");
+                $"Configuration.ApiUrl ({ApiUrl ?? BasePath}) does not form a valid URI ({BasePath})");
         }
 
         if (MaxRetry > 15) {
@@ -108,19 +104,40 @@ public class Configuration {
     ///     Gets the Base Path.
     /// </summary>
     /// <value>Base Path.</value>
-    public string BasePath => $"{ApiScheme}://{ApiHost}";
+    public string BasePath {
+        get {
+            if (ApiUrl != null && ApiUrl != "") {
+                return ApiUrl;
+            }
+
+            if (ApiHost != null && ApiUrl != "") {
+                return $"{ApiScheme ?? "https"}://{ApiHost}";
+            }
+
+            return "";
+        }
+    }
+
 
     /// <summary>
     ///     Gets or sets the API Scheme.
     /// </summary>
     /// <value>ApiScheme.</value>
+    [Obsolete("ApiScheme is deprecated, please use ApiUrl instead.")]
     public string ApiScheme { get; set; } = "https";
 
     /// <summary>
     ///     Gets or sets the API Host.
     /// </summary>
     /// <value>ApiHost.</value>
+    [Obsolete("ApiHost is deprecated, please use ApiUrl instead.")]
     public string ApiHost { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the API URL.
+    /// </summary>
+    /// <value>ApiUrl.</value>
+    public string ApiUrl { get; set; }
 
     /// <summary>
     ///     Gets or sets the Store ID.

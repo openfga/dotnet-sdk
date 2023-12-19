@@ -19,6 +19,7 @@ public class ClientConfiguration : Configuration.Configuration {
     public ClientConfiguration(Configuration.Configuration config) {
         ApiScheme = config.ApiScheme;
         ApiHost = config.ApiHost;
+        ApiUrl = config.ApiUrl;
         UserAgent = config.UserAgent;
         Credentials = config.Credentials;
         DefaultHeaders = config.DefaultHeaders;

@@ -93,7 +93,7 @@ namespace OpenFga.Sdk.Test.Api {
             var config = new Configuration.Configuration() { StoreId = _storeId };
             void ActionMissingHost() => config.IsValid();
             var exception = Assert.Throws<FgaRequiredParamError>(ActionMissingHost);
-            Assert.Equal("Required parameter ApiHost was not defined when calling Configuration.", exception.Message);
+            Assert.Equal("Required parameter ApiUrl was not defined when calling Configuration.", exception.Message);
         }
 
         // /// <summary>
@@ -104,7 +104,7 @@ namespace OpenFga.Sdk.Test.Api {
             var config = new Configuration.Configuration() { StoreId = _storeId, ApiHost = "https://api.fga.example" };
             void ActionMalformedHost() => config.IsValid();
             var exception = Assert.Throws<FgaValidationError>(ActionMalformedHost);
-            Assert.Equal("Configuration.ApiScheme (https) and Configuration.ApiHost (https://api.fga.example) do not form a valid URI (https://https://api.fga.example)", exception.Message);
+            Assert.Equal("Configuration.ApiUrl (https://https://api.fga.example) does not form a valid URI (https://https://api.fga.example)", exception.Message);
         }
 
         /// <summary>

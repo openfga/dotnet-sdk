@@ -33,12 +33,12 @@ namespace OpenFga.Sdk.Test.Client;
 
 public class OpenFgaClientTests {
     private readonly string _storeId;
-    private readonly string _host = "api.fga.example";
+    private readonly string _apiUrl = "https://api.fga.example";
     private readonly ClientConfiguration _config;
 
     public OpenFgaClientTests() {
         _storeId = "6c181474-aaa1-4df7-8929-6e7b3a992754-test";
-        _config = new ClientConfiguration() { StoreId = _storeId, ApiHost = _host };
+        _config = new ClientConfiguration() { StoreId = _storeId, ApiUrl = _apiUrl };
     }
 
     private HttpResponseMessage GetCheckResponse(CheckResponse content, bool shouldRetry = false) {
