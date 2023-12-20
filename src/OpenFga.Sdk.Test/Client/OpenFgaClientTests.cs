@@ -37,7 +37,7 @@ public class OpenFgaClientTests {
     private readonly ClientConfiguration _config;
 
     public OpenFgaClientTests() {
-        _storeId = "6c181474-aaa1-4df7-8929-6e7b3a992754-test";
+        _storeId = "01H0H015178Y2V4CX10C2KGHF4";
         _config = new ClientConfiguration() { StoreId = _storeId, ApiUrl = _apiUrl };
     }
 
@@ -62,11 +62,82 @@ public class OpenFgaClientTests {
         // Cleanup when everything is done.
     }
 
+    /// <summary>
+    /// Test StoreId validation
+    /// </summary>
+    [Fact]
+    public async Task ConfigurationInValidStoreIdTest() {
+        var config = new ClientConfiguration() {
+            ApiUrl = _apiUrl,
+            StoreId = "invalid-format"
+        };
+        void ActionInvalidId() => config.IsValid();
+        var exception = Assert.Throws<FgaValidationError>(ActionInvalidId);
+        Assert.Equal("StoreId is not in a valid ulid format", exception.Message);
+    }
+
+    /// <summary>
+    /// Test Auth Model ID validation
+    /// </summary>
+    [Fact]
+    public async Task ConfigurationInValidAuthorizationModelIdTest() {
+        var config = new ClientConfiguration() {
+            ApiUrl = _apiUrl,
+            StoreId = _config.StoreId,
+            AuthorizationModelId = "invalid-format"
+        };
+        void ActionInvalidId() => new OpenFgaClient(config);
+        var exception = Assert.Throws<FgaValidationError>(ActionInvalidId);
+        Assert.Equal("AuthorizationModelId is not in a valid ulid format", exception.Message);
+    }
+
+    /// <summary>
+    /// Test Auth Model ID validation
+    /// </summary>
+    [Fact]
+    public async Task ConfigurationInValidAuthModelIdInOptionsTest() {
+        var config = new ClientConfiguration() {
+            ApiUrl = _apiUrl,
+            StoreId = _config.StoreId,
+        };
+        var openFgaClient = new OpenFgaClient(config);
+
+        async Task<ReadAuthorizationModelResponse> ActionMissingStoreId() => await openFgaClient.ReadAuthorizationModel(new ClientReadAuthorizationModelOptions() {
+            AuthorizationModelId = "invalid-format"
+        });
+        var exception = await Assert.ThrowsAsync<FgaValidationError>(ActionMissingStoreId);
+        Assert.Equal("AuthorizationModelId is not in a valid ulid format", exception.Message);
+    }
+
+    /// <summary>
+    /// Test that updating StoreId after initialization works
+    /// </summary>
+    [Fact]
+    public void UpdateStoreIdTest() {
+        var config = new ClientConfiguration() { ApiUrl = _apiUrl };
+        var fgaClient = new OpenFgaClient(config);
+        Assert.Null(fgaClient.StoreId);
+        var storeId = "some-id";
+        fgaClient.StoreId = storeId;
+        Assert.Equal(storeId, fgaClient.StoreId);
+    }
+
+    /// <summary>
+    /// Test that updating AuthorizationModelId after initialization works
+    /// </summary>
+    [Fact]
+    public void UpdateAuthorizationModelIdTest() {
+        var config = new ClientConfiguration() { ApiUrl = _apiUrl };
+        var fgaClient = new OpenFgaClient(config);
+        Assert.Null(fgaClient.AuthorizationModelId);
+        var modelId = "some-id";
+        fgaClient.AuthorizationModelId = modelId;
+        Assert.Equal(modelId, fgaClient.AuthorizationModelId);
+    }
 
     /**********
      * Stores *
      **********/
-
 
     /// <summary>
     /// Test ListStores

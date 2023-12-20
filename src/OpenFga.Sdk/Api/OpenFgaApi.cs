@@ -22,14 +22,6 @@ public class OpenFgaApi : IDisposable {
     private ApiClient.ApiClient _apiClient;
 
     /// <summary>
-    /// Store ID
-    /// </summary>
-    public string? StoreId {
-        get => _configuration.StoreId;
-        set => _configuration.StoreId = value;
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="OpenFgaApi"/> class.
     /// </summary>
     /// <param name="configuration"></param>
@@ -38,6 +30,7 @@ public class OpenFgaApi : IDisposable {
         Configuration.Configuration configuration,
         HttpClient? httpClient = null
     ) {
+        configuration.IsValid();
         this._configuration = configuration;
         this._apiClient = new ApiClient.ApiClient(_configuration, httpClient);
     }

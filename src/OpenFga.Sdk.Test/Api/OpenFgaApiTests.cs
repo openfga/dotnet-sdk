@@ -39,8 +39,8 @@ namespace OpenFga.Sdk.Test.Api {
         private readonly Configuration.Configuration _config;
 
         public OpenFgaApiTests() {
-            _storeId = "6c181474-aaa1-4df7-8929-6e7b3a992754-test";
-            _config = new Configuration.Configuration() { StoreId = _storeId, ApiHost = _host };
+            _storeId = "01H0H015178Y2V4CX10C2KGHF4";
+            _config = new Configuration.Configuration() { ApiHost = _host };
         }
 
         private HttpResponseMessage GetCheckResponse(CheckResponse content, bool shouldRetry = false) {
@@ -383,7 +383,6 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public async Task ExchangeCredentialsAfterExpiryTest() {
             var config = new Configuration.Configuration() {
-                StoreId = _storeId,
                 ApiHost = _host,
                 Credentials = new Credentials() {
                     Method = CredentialsMethod.ClientCredentials,
@@ -475,19 +474,6 @@ namespace OpenFga.Sdk.Test.Api {
             );
         }
 
-        /// <summary>
-        /// Test that updating StoreId after initialization works
-        /// </summary>
-        [Fact]
-        public void UpdateStoreIdTest() {
-            var config = new Configuration.Configuration() { ApiHost = _host };
-            var openFgaApi = new OpenFgaApi(config);
-            Assert.Null(openFgaApi.StoreId);
-            var storeId = "some-id";
-            openFgaApi.StoreId = storeId;
-            Assert.Equal(storeId, openFgaApi.StoreId);
-        }
-
         /**
          * Errors
          */
@@ -563,7 +549,6 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
 
             var config = new Configuration.Configuration() {
-                StoreId = _storeId,
                 ApiHost = _host,
                 MaxRetry = 1,
             };

@@ -12,6 +12,8 @@
 
 
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace OpenFga.Sdk.Client;
 
@@ -41,4 +43,26 @@ public class ClientConfiguration : Configuration.Configuration {
     public string? AuthorizationModelId { get; set; }
 
     public RetryParams? RetryParams { get; set; } = new();
+
+    public new void IsValid() {
+        base.IsValid();
+
+        if (StoreId != null && !IsWellFormedUlidString(StoreId)) {
+            throw new FgaValidationError("StoreId is not in a valid ulid format");
+        }
+
+        if (AuthorizationModelId != null && AuthorizationModelId != "" && !IsWellFormedUlidString(AuthorizationModelId)) {
+            throw new FgaValidationError("AuthorizationModelId is not in a valid ulid format");
+        }
+    }
+
+    /// <summary>
+    /// Ensures that a string is in valid [ULID](https://github.com/ulid/spec) format
+    /// </summary>
+    /// <param name="ulid"></param>
+    /// <returns></returns>
+    public static bool IsWellFormedUlidString(string ulid) {
+        var regex = new Regex("^[0-7][0-9A-HJKMNP-TV-Z]{25}$");
+        return regex.IsMatch(ulid);
+    }
 }

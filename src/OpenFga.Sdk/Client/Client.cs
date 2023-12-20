@@ -31,6 +31,7 @@ public class OpenFgaClient : IDisposable {
         ClientConfiguration configuration,
         HttpClient? httpClient = null
     ) {
+        configuration.IsValid();
         _configuration = configuration;
         api = new OpenFgaApi(_configuration, httpClient);
     }
@@ -58,12 +59,21 @@ public class OpenFgaClient : IDisposable {
         if (storeId == null) {
             throw new FgaRequiredParamError("ClientConfiguration", "StoreId");
         }
+        else if (!ClientConfiguration.IsWellFormedUlidString(storeId)) {
+            throw new FgaValidationError("StoreId is not in a valid ulid format");
+        }
 
         return storeId;
     }
 
-    private string? GetAuthorizationModelId(AuthorizationModelIdOptions? options) =>
-        options?.AuthorizationModelId ?? AuthorizationModelId;
+    private string? GetAuthorizationModelId(AuthorizationModelIdOptions? options) {
+        var authorizationModelId = options?.AuthorizationModelId ?? AuthorizationModelId;
+        if (authorizationModelId != null && authorizationModelId != "" && !ClientConfiguration.IsWellFormedUlidString(authorizationModelId)) {
+            throw new FgaValidationError("AuthorizationModelId is not in a valid ulid format");
+        }
+
+        return authorizationModelId;
+    }
 
     /**********
      * Stores *
