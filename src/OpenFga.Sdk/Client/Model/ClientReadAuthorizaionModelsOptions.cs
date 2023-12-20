@@ -16,11 +16,13 @@ namespace OpenFga.Sdk.Client.Model;
 /// <summary>
 ///     ClientReadAuthorizationModelsOptions - Client Options for ReadAuthorizationModels
 /// </summary>
-public interface IClientReadAuthorizationModelsOptions : ClientRequestOptions, ClientPaginationOptions {
+public interface IClientReadAuthorizationModelsOptions : IClientRequestOptionsWithStoreId, ClientPaginationOptions {
 }
 
 /// <inheritdoc />
 public class ClientReadAuthorizationModelsOptions : IClientReadAuthorizationModelsOptions {
+    /// <inheritdoc />
+    public string? StoreId { get; set; }
 
     /// <inheritdoc />
     public int? PageSize { get; set; }

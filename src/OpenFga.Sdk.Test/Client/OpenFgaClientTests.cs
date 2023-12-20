@@ -467,6 +467,7 @@ public class OpenFgaClientTests {
 
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(new ClientConfiguration(_config) {
+            StoreId = _storeId,
             AuthorizationModelId = authorizationModelId,
         }, httpClient);
 

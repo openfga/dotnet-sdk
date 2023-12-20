@@ -68,14 +68,6 @@ public class Configuration {
     ///     Initializes a new instance of the <see cref="Configuration" /> class
     /// </summary>
     /// <exception cref="FgaRequiredParamError"></exception>
-    public Configuration(string storeId) : this() {
-        StoreId = storeId;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Configuration" /> class
-    /// </summary>
-    /// <exception cref="FgaRequiredParamError"></exception>
     public Configuration() {
         DefaultHeaders ??= new Dictionary<string, string>();
 

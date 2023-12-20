@@ -23,11 +23,16 @@ public class ClientConfiguration : Configuration.Configuration {
         UserAgent = config.UserAgent;
         Credentials = config.Credentials;
         DefaultHeaders = config.DefaultHeaders;
-        StoreId = config.StoreId;
         RetryParams = new RetryParams { MaxRetry = config.MaxRetry, MinWaitInMs = config.MinWaitInMs };
     }
 
     public ClientConfiguration() { }
+
+    /// <summary>
+    ///     Gets or sets the Store  ID.
+    /// </summary>
+    /// <value>Store ID.</value>
+    public string? StoreId { get; set; }
 
     /// <summary>
     ///     Gets or sets the Authorization Model ID.

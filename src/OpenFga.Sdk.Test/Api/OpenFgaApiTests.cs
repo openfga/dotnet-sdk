@@ -90,7 +90,7 @@ namespace OpenFga.Sdk.Test.Api {
         // /// </summary>
         [Fact]
         public void ValidHostRequired() {
-            var config = new Configuration.Configuration() { StoreId = _storeId };
+            var config = new Configuration.Configuration() { };
             void ActionMissingHost() => config.IsValid();
             var exception = Assert.Throws<FgaRequiredParamError>(ActionMissingHost);
             Assert.Equal("Required parameter ApiUrl was not defined when calling Configuration.", exception.Message);
@@ -101,7 +101,7 @@ namespace OpenFga.Sdk.Test.Api {
         // /// </summary>
         [Fact]
         public void ValidHostWellFormed() {
-            var config = new Configuration.Configuration() { StoreId = _storeId, ApiHost = "https://api.fga.example" };
+            var config = new Configuration.Configuration() { ApiHost = "https://api.fga.example" };
             void ActionMalformedHost() => config.IsValid();
             var exception = Assert.Throws<FgaValidationError>(ActionMalformedHost);
             Assert.Equal("Configuration.ApiUrl (https://https://api.fga.example) does not form a valid URI (https://https://api.fga.example)", exception.Message);
@@ -113,7 +113,6 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public void ApiTokenRequired() {
             var missingApiTokenConfig = new Configuration.Configuration() {
-                StoreId = _storeId,
                 ApiHost = _host,
                 Credentials = new Credentials() {
                     Method = CredentialsMethod.ApiToken,
@@ -133,7 +132,6 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public void ValidApiTokenIssuerWellFormed() {
             var config = new Configuration.Configuration() {
-                StoreId = _storeId,
                 ApiHost = _host,
                 Credentials = new Credentials() {
                     Method = CredentialsMethod.ClientCredentials,
@@ -157,7 +155,6 @@ namespace OpenFga.Sdk.Test.Api {
         public async Task ApiTokenSentInHeader() {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var config = new Configuration.Configuration() {
-                StoreId = _storeId,
                 ApiHost = _host,
                 Credentials = new Credentials() {
                     Method = CredentialsMethod.ApiToken,
@@ -169,7 +166,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var readAuthorizationModelsMockExpression = ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri.ToString()
-                    .StartsWith($"{config.BasePath}/stores/{config.StoreId}/authorization-models") &&
+                    .StartsWith($"{config.BasePath}/stores/{_storeId}/authorization-models") &&
                 req.Method == HttpMethod.Get &&
                 req.Headers.Contains("Authorization") &&
                 req.Headers.Authorization.Equals(new AuthenticationHeaderValue("Bearer", "some-token")));
@@ -189,7 +186,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFga = new OpenFgaApi(config, httpClient);
 
-            var response = await openFga.ReadAuthorizationModels(null, null);
+            var response = await openFga.ReadAuthorizationModels(_storeId, null, null);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
@@ -329,7 +326,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var readAuthorizationModelsMockExpression = ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri.ToString()
-                    .StartsWith($"{config.BasePath}/stores/{config.StoreId}/authorization-models") &&
+                    .StartsWith($"{config.BasePath}/stores/{_storeId}/authorization-models") &&
                 req.Method == HttpMethod.Get &&
                 req.Headers.Contains("Authorization") &&
                 req.Headers.Authorization.Equals(new AuthenticationHeaderValue("Bearer", "some-token")));
@@ -353,8 +350,8 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(config, httpClient);
 
-            var response = await openFgaApi.ReadAuthorizationModels(null, null);
-            var response2 = await openFgaApi.ReadAuthorizationModels(null, null);
+            var response = await openFgaApi.ReadAuthorizationModels(_storeId, null, null);
+            var response2 = await openFgaApi.ReadAuthorizationModels(_storeId, null, null);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
@@ -374,7 +371,7 @@ namespace OpenFga.Sdk.Test.Api {
                 "SendAsync",
                 Times.Exactly(0),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{config.BasePath}/stores/{config.StoreId}/check") &&
+                    req.RequestUri == new Uri($"{config.BasePath}/stores/{_storeId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -427,7 +424,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var readAuthorizationModelsMockExpression = ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri.ToString()
-                    .StartsWith($"{config.BasePath}/stores/{config.StoreId}/authorization-models") &&
+                    .StartsWith($"{config.BasePath}/stores/{_storeId}/authorization-models") &&
                 req.Method == HttpMethod.Get &&
                 req.Headers.Contains("Authorization") &&
                 req.Headers.Authorization.Equals(new AuthenticationHeaderValue("Bearer", "some-token")));
@@ -451,8 +448,8 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(config, httpClient);
 
-            var response = await openFgaApi.ReadAuthorizationModels(null, null);
-            var response2 = await openFgaApi.ReadAuthorizationModels(null, null);
+            var response = await openFgaApi.ReadAuthorizationModels(_storeId, null, null);
+            var response2 = await openFgaApi.ReadAuthorizationModels(_storeId, null, null);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
@@ -472,7 +469,7 @@ namespace OpenFga.Sdk.Test.Api {
                 "SendAsync",
                 Times.Exactly(0),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{config.BasePath}/stores/{config.StoreId}/check") &&
+                    req.RequestUri == new Uri($"{config.BasePath}/stores/{_storeId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -504,7 +501,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -526,17 +523,17 @@ namespace OpenFga.Sdk.Test.Api {
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
 
-            Task<CheckResponse> BadRequestError() => openFgaApi.Check(body);
+            Task<CheckResponse> BadRequestError() => openFgaApi.Check(_storeId, body);
             var error = await Assert.ThrowsAsync<FgaApiValidationError>(BadRequestError);
             Assert.Equal(error.Method, HttpMethod.Post);
             Assert.Equal("Check", error.ApiName);
-            Assert.Equal(_config.StoreId, error.StoreId);
+            Assert.Equal(_storeId, error.StoreId);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -552,7 +549,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .SetupSequence<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -581,18 +578,18 @@ namespace OpenFga.Sdk.Test.Api {
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
 
-            Task<CheckResponse> InternalApiError() => openFgaApi.Check(body);
+            Task<CheckResponse> InternalApiError() => openFgaApi.Check(_storeId, body);
             var error = await Assert.ThrowsAsync<FgaApiInternalError>(InternalApiError);
             Assert.Equal(error.Method, HttpMethod.Post);
             Assert.Equal("Check", error.ApiName);
-            Assert.Equal($"{_config.BasePath}/stores/{_config.StoreId}/check", error.RequestUrl);
-            Assert.Equal(_config.StoreId, error.StoreId);
+            Assert.Equal($"{_config.BasePath}/stores/{_storeId}/check", error.RequestUrl);
+            Assert.Equal(_storeId, error.StoreId);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(2),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -609,7 +606,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .SetupSequence<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -633,13 +630,13 @@ namespace OpenFga.Sdk.Test.Api {
                 }
             };
 
-            var response = await openFgaApi.Check(body);
+            var response = await openFgaApi.Check(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(3),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -658,7 +655,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -678,18 +675,18 @@ namespace OpenFga.Sdk.Test.Api {
                 }
             };
 
-            Task<CheckResponse> ApiError() => openFgaApi.Check(body);
+            Task<CheckResponse> ApiError() => openFgaApi.Check(_storeId, body);
             var error = await Assert.ThrowsAsync<FgaApiNotFoundError>(ApiError);
             Assert.Equal(error.Method, HttpMethod.Post);
             Assert.Equal("Check", error.ApiName);
-            Assert.Equal($"{_config.BasePath}/stores/{_config.StoreId}/check", error.RequestUrl);
-            Assert.Equal(_config.StoreId, error.StoreId);
+            Assert.Equal($"{_config.BasePath}/stores/{_storeId}/check", error.RequestUrl);
+            Assert.Equal(_storeId, error.StoreId);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -705,7 +702,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -725,18 +722,18 @@ namespace OpenFga.Sdk.Test.Api {
                 }
             };
 
-            Task<CheckResponse> ApiError() => openFgaApi.Check(body);
+            Task<CheckResponse> ApiError() => openFgaApi.Check(_storeId, body);
             var error = await Assert.ThrowsAsync<FgaApiError>(ApiError);
             Assert.Equal(error.Method, HttpMethod.Post);
             Assert.Equal("Check", error.ApiName);
-            Assert.Equal($"{_config.BasePath}/stores/{_config.StoreId}/check", error.RequestUrl);
-            Assert.Equal(_config.StoreId, error.StoreId);
+            Assert.Equal($"{_config.BasePath}/stores/{_storeId}/check", error.RequestUrl);
+            Assert.Equal(_storeId, error.StoreId);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -752,7 +749,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .SetupSequence<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -779,7 +776,7 @@ namespace OpenFga.Sdk.Test.Api {
                 }
             };
 
-            Task<CheckResponse> RateLimitExceededError() => openFgaApi.Check(body);
+            Task<CheckResponse> RateLimitExceededError() => openFgaApi.Check(_storeId, body);
             var error = await Assert.ThrowsAsync<FgaApiRateLimitExceededError>(RateLimitExceededError);
             Assert.Equal("Rate Limit Error for POST Check with API limit of 2 requests per Second.", error.Message);
             Assert.Equal(100, error.ResetInMs);
@@ -787,13 +784,13 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.Equal("Second", error.LimitUnit.ToString());
             Assert.Equal(error.Method, HttpMethod.Post);
             Assert.Equal("Check", error.ApiName);
-            Assert.Equal(_config.StoreId, error.StoreId);
+            Assert.Equal(_storeId, error.StoreId);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(6),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -808,7 +805,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .SetupSequence<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -828,12 +825,12 @@ namespace OpenFga.Sdk.Test.Api {
                 }
             };
 
-            var response = await openFgaApi.Check(body);
+            var response = await openFgaApi.Check(_storeId, body);
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(3),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -852,7 +849,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .SetupSequence<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -877,13 +874,13 @@ namespace OpenFga.Sdk.Test.Api {
                 }
             };
 
-            await openFgaApi.Check(body);
+            await openFgaApi.Check(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(3),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -905,7 +902,7 @@ namespace OpenFga.Sdk.Test.Api {
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.RequestUri.ToString()
-                            .StartsWith($"{_config.BasePath}/stores/{_config.StoreId}/authorization-models") &&
+                            .StartsWith($"{_config.BasePath}/stores/{_storeId}/authorization-models") &&
                         req.Method == HttpMethod.Get),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -919,14 +916,14 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var response = await openFgaApi.ReadAuthorizationModels(null, null);
+            var response = await openFgaApi.ReadAuthorizationModels(_storeId, null, null);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri.ToString()
-                        .StartsWith($"{_config.BasePath}/stores/{_config.StoreId}/authorization-models") &&
+                        .StartsWith($"{_config.BasePath}/stores/{_storeId}/authorization-models") &&
                     req.Method == HttpMethod.Get),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1002,7 +999,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/authorization-models") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/authorization-models") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1015,13 +1012,13 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var response = await openFgaApi.WriteAuthorizationModel(body);
+            var response = await openFgaApi.WriteAuthorizationModel(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/authorization-models") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/authorization-models") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1042,7 +1039,7 @@ namespace OpenFga.Sdk.Test.Api {
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.RequestUri ==
-                        new Uri($"{_config.BasePath}/stores/{_config.StoreId}/authorization-models/{authorizationModelId}") &&
+                        new Uri($"{_config.BasePath}/stores/{_storeId}/authorization-models/{authorizationModelId}") &&
                         req.Method == HttpMethod.Get),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1057,14 +1054,14 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var response = await openFgaApi.ReadAuthorizationModel(authorizationModelId);
+            var response = await openFgaApi.ReadAuthorizationModel(_storeId, authorizationModelId);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri ==
-                    new Uri($"{_config.BasePath}/stores/{_config.StoreId}/authorization-models/{authorizationModelId}") &&
+                    new Uri($"{_config.BasePath}/stores/{_storeId}/authorization-models/{authorizationModelId}") &&
                     req.Method == HttpMethod.Get),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1083,7 +1080,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1104,13 +1101,13 @@ namespace OpenFga.Sdk.Test.Api {
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
 
-            var response = await openFgaApi.Check(body);
+            var response = await openFgaApi.Check(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1129,7 +1126,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/write") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1149,13 +1146,13 @@ namespace OpenFga.Sdk.Test.Api {
                 } }),
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
-            var response = await openFgaApi.Write(body);
+            var response = await openFgaApi.Write(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/write") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1171,7 +1168,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/write") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1191,13 +1188,13 @@ namespace OpenFga.Sdk.Test.Api {
                 } }),
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
-            var response = await openFgaApi.Write(body);
+            var response = await openFgaApi.Write(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/write") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1213,7 +1210,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/write") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1237,13 +1234,13 @@ namespace OpenFga.Sdk.Test.Api {
                 } }),
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
-            var response = await openFgaApi.Write(body);
+            var response = await openFgaApi.Write(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/write") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1262,7 +1259,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/expand") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/expand") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1275,13 +1272,13 @@ namespace OpenFga.Sdk.Test.Api {
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
             var body = new ExpandRequest { TupleKey = new ExpandRequestTupleKey(_object: "document:roadmap", relation: "viewer"), AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1" };
-            var response = await openFgaApi.Expand(body);
+            var response = await openFgaApi.Expand(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/expand") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/expand") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1324,7 +1321,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/expand") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/expand") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1337,13 +1334,13 @@ namespace OpenFga.Sdk.Test.Api {
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
             var body = new ExpandRequest(new ExpandRequestTupleKey(_object: "document:roadmap", relation: "viewer"));
-            var response = await openFgaApi.Expand(body);
+            var response = await openFgaApi.Expand(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/expand") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/expand") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1363,7 +1360,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/list-objects") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/list-objects") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1387,13 +1384,13 @@ namespace OpenFga.Sdk.Test.Api {
                     }
                 }
             };
-            var response = await openFgaApi.ListObjects(body);
+            var response = await openFgaApi.ListObjects(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/list-objects") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/list-objects") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1422,7 +1419,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/read") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1441,13 +1438,13 @@ namespace OpenFga.Sdk.Test.Api {
                     Object = "document:roadmap"
                 },
             };
-            var response = await openFgaApi.Read(body);
+            var response = await openFgaApi.Read(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/read") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1476,7 +1473,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
-                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/read") &&
                         req.Method == HttpMethod.Post),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1489,13 +1486,13 @@ namespace OpenFga.Sdk.Test.Api {
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
             var body = new ReadRequest { };
-            var response = await openFgaApi.Read(body);
+            var response = await openFgaApi.Read(_storeId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/read") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1526,7 +1523,7 @@ namespace OpenFga.Sdk.Test.Api {
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.RequestUri.ToString()
-                            .StartsWith($"{_config.BasePath}/stores/{_config.StoreId}/changes") &&
+                            .StartsWith($"{_config.BasePath}/stores/{_storeId}/changes") &&
                         req.Method == HttpMethod.Get),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1541,14 +1538,14 @@ namespace OpenFga.Sdk.Test.Api {
             var type = "repo";
             var pageSize = 25;
             var continuationToken = "eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==";
-            var response = await openFgaApi.ReadChanges(type, pageSize, continuationToken);
+            var response = await openFgaApi.ReadChanges(_storeId, type, pageSize, continuationToken);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri.ToString()
-                        .StartsWith($"{_config.BasePath}/stores/{_config.StoreId}/changes") &&
+                        .StartsWith($"{_config.BasePath}/stores/{_storeId}/changes") &&
                     req.Method == HttpMethod.Get),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1570,7 +1567,7 @@ namespace OpenFga.Sdk.Test.Api {
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.RequestUri ==
-                        new Uri($"{_config.BasePath}/stores/{_config.StoreId}/assertions/{authorizationModelId}") &&
+                        new Uri($"{_config.BasePath}/stores/{_storeId}/assertions/{authorizationModelId}") &&
                         req.Method == HttpMethod.Put),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1590,14 +1587,14 @@ namespace OpenFga.Sdk.Test.Api {
                     })
                 },
             };
-            await openFgaApi.WriteAssertions(authorizationModelId, body);
+            await openFgaApi.WriteAssertions(_storeId, authorizationModelId, body);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri ==
-                    new Uri($"{_config.BasePath}/stores/{_config.StoreId}/assertions/{authorizationModelId}") &&
+                    new Uri($"{_config.BasePath}/stores/{_storeId}/assertions/{authorizationModelId}") &&
                     req.Method == HttpMethod.Put),
                 ItExpr.IsAny<CancellationToken>()
             );
@@ -1616,7 +1613,7 @@ namespace OpenFga.Sdk.Test.Api {
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.RequestUri ==
-                        new Uri($"{_config.BasePath}/stores/{_config.StoreId}/assertions/{authorizationModelId}") &&
+                        new Uri($"{_config.BasePath}/stores/{_storeId}/assertions/{authorizationModelId}") &&
                         req.Method == HttpMethod.Get),
                     ItExpr.IsAny<CancellationToken>()
                 )
@@ -1629,14 +1626,14 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var response = await openFgaApi.ReadAssertions(authorizationModelId);
+            var response = await openFgaApi.ReadAssertions(_storeId, authorizationModelId);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri ==
-                    new Uri($"{_config.BasePath}/stores/{_config.StoreId}/assertions/{authorizationModelId}") &&
+                    new Uri($"{_config.BasePath}/stores/{_storeId}/assertions/{authorizationModelId}") &&
                     req.Method == HttpMethod.Get),
                 ItExpr.IsAny<CancellationToken>()
             );

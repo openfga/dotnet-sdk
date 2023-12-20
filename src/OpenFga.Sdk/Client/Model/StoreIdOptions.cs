@@ -13,6 +13,9 @@
 
 namespace OpenFga.Sdk.Client.Model;
 
-/// <inheritdoc />
-public interface IClientRequestOptionsWithAuthZModelId : IClientRequestOptionsWithStoreId, AuthorizationModelIdOptions {
+public interface StoreIdOptions {
+    /// <summary>
+    ///     Overrides the StoreId in the ClientConfiguration
+    /// </summary>
+    string? StoreId { get; set; }
 }

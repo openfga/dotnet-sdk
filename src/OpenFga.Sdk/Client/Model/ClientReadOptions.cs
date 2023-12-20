@@ -16,11 +16,13 @@ namespace OpenFga.Sdk.Client.Model;
 /// <summary>
 ///     ClientReadOptions - Client Options for Read
 /// </summary>
-public interface IClientReadOptions : ClientRequestOptions, ClientPaginationOptions {
+public interface IClientReadOptions : IClientRequestOptionsWithStoreId, ClientPaginationOptions {
 }
 
 /// <inheritdoc />
 public class ClientReadOptions : IClientReadOptions {
+    /// <inheritdoc />
+    public string? StoreId { get; set; }
 
     /// <inheritdoc />
     public int? PageSize { get; set; }

@@ -122,6 +122,7 @@ src/OpenFga.Sdk/Client/Model/ClientReadOptions.cs
 src/OpenFga.Sdk/Client/Model/ClientReadRequest.cs
 src/OpenFga.Sdk/Client/Model/ClientRequestOptions.cs
 src/OpenFga.Sdk/Client/Model/ClientRequestOptsWithAuthZModelId.cs
+src/OpenFga.Sdk/Client/Model/ClientRequestOptsWithStoreId.cs
 src/OpenFga.Sdk/Client/Model/ClientTupleKey.cs
 src/OpenFga.Sdk/Client/Model/ClientTupleKeyWithoutCondition.cs
 src/OpenFga.Sdk/Client/Model/ClientWriteAssertionsOptions.cs
@@ -132,6 +133,7 @@ src/OpenFga.Sdk/Client/Model/ClientWriteRequest.cs
 src/OpenFga.Sdk/Client/Model/ClientWriteResponse.cs
 src/OpenFga.Sdk/Client/Model/ClientWriteStatus.cs
 src/OpenFga.Sdk/Client/Model/RetryParams.cs
+src/OpenFga.Sdk/Client/Model/StoreIdOptions.cs
 src/OpenFga.Sdk/Configuration/Configuration.cs
 src/OpenFga.Sdk/Configuration/Credentials.cs
 src/OpenFga.Sdk/Exceptions/ApiAuthenticationError.cs
