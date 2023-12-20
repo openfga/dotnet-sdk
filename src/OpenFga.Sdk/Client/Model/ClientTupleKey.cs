@@ -19,23 +19,22 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Client.Model;
 
-public interface IClientTupleKey {
-    public string User { get; set; }
-    public string Relation { get; set; }
-    public string Object { get; set; }
+public interface IClientTupleKey : IClientTupleKeyWithoutCondition {
+    public RelationshipCondition? Condition { get; set; }
 }
 
-public interface IClientContextualTuplesWrapper {
+public interface IClientQueryContextWrapper {
     public List<ClientTupleKey>? ContextualTuples { get; set; }
+    public Object? Context { get; set; }
 }
 
 public class ClientTupleKey : IClientTupleKey {
     /// <summary>
-    ///     Gets or Sets Object
+    ///     Gets or Sets User
     /// </summary>
-    [DataMember(Name = "object", EmitDefaultValue = false)]
-    [JsonPropertyName("object")]
-    public new string Object { get; set; }
+    [DataMember(Name = "user", EmitDefaultValue = false)]
+    [JsonPropertyName("user")]
+    public new string User { get; set; }
 
     /// <summary>
     ///     Gets or Sets Relation
@@ -45,13 +44,23 @@ public class ClientTupleKey : IClientTupleKey {
     public new string Relation { get; set; }
 
     /// <summary>
-    ///     Gets or Sets User
+    ///     Gets or Sets Object
     /// </summary>
-    [DataMember(Name = "user", EmitDefaultValue = false)]
-    [JsonPropertyName("user")]
-    public new string User { get; set; }
+    [DataMember(Name = "object", EmitDefaultValue = false)]
+    [JsonPropertyName("object")]
+    public new string Object { get; set; }
 
-    public virtual TupleKey ToTupleKey() => new TupleKey { User = User, Relation = Relation, Object = Object };
+    /// <summary>
+    /// Gets or Sets Condition
+    /// </summary>
+    [DataMember(Name = "condition", EmitDefaultValue = false)]
+    [JsonPropertyName("condition")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public RelationshipCondition? Condition { get; set; }
+
+    public virtual TupleKey ToTupleKey() => new() { User = User, Relation = Relation, Object = Object, Condition = Condition };
+
+    public virtual TupleKeyWithoutCondition ToTupleKeyWithoutCondition() => new() { User = User, Relation = Relation, Object = Object };
 
     public virtual string ToJson() => JsonSerializer.Serialize(this);
 
@@ -67,9 +76,9 @@ public class ClientTupleKey : IClientTupleKey {
 
         return
             (
-                Object == input.Object ||
-                (Object != null &&
-                 Object.Equals(input.Object))
+                User == input.User ||
+                (User != null &&
+                 User.Equals(input.User))
             ) &&
             (
                 Relation == input.Relation ||
@@ -77,9 +86,14 @@ public class ClientTupleKey : IClientTupleKey {
                  Relation.Equals(input.Relation))
             ) &&
             (
-                User == input.User ||
-                (User != null &&
-                 User.Equals(input.User))
+                Object == input.Object ||
+                (Object != null &&
+                 Object.Equals(input.Object))
+            ) &&
+            (
+                Condition == input.Condition ||
+                (Condition != null &&
+                 Condition.Equals(input.Condition))
             );
     }
 
@@ -87,6 +101,11 @@ public class ClientTupleKey : IClientTupleKey {
         unchecked // Overflow is fine, just wrap
         {
             var hashCode = 9661;
+
+            if (User != null) {
+                hashCode = (hashCode * 9923) + User.GetHashCode();
+            }
+
             if (Object != null) {
                 hashCode = (hashCode * 9923) + Object.GetHashCode();
             }
@@ -95,8 +114,8 @@ public class ClientTupleKey : IClientTupleKey {
                 hashCode = (hashCode * 9923) + Relation.GetHashCode();
             }
 
-            if (User != null) {
-                hashCode = (hashCode * 9923) + User.GetHashCode();
+            if (Condition != null) {
+                hashCode = (hashCode * 9923) + Condition.GetHashCode();
             }
 
             return hashCode;

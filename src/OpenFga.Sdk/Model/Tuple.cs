@@ -33,9 +33,13 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Tuple" /> class.
         /// </summary>
-        /// <param name="key">key.</param>
-        /// <param name="timestamp">timestamp.</param>
+        /// <param name="key">key (required).</param>
+        /// <param name="timestamp">timestamp (required).</param>
         public Tuple(TupleKey key = default(TupleKey), DateTime timestamp = default(DateTime)) {
+            // to ensure "key" is required (not null)
+            if (key == null) {
+                throw new ArgumentNullException("key is a required property for Tuple and cannot be null");
+            }
             this.Key = key;
             this.Timestamp = timestamp;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -44,18 +48,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Key
         /// </summary>
-        [DataMember(Name = "key", EmitDefaultValue = false)]
+        [DataMember(Name = "key", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("key")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public TupleKey? Key { get; set; }
+        public TupleKey Key { get; set; }
 
         /// <summary>
         /// Gets or Sets Timestamp
         /// </summary>
-        [DataMember(Name = "timestamp", EmitDefaultValue = false)]
+        [DataMember(Name = "timestamp", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("timestamp")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public DateTime? Timestamp { get; set; }
+        public DateTime Timestamp { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

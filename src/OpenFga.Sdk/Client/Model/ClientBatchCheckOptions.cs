@@ -21,6 +21,8 @@ public interface IClientBatchCheckOptions : IClientRequestOptionsWithAuthZModelI
 }
 
 public class ClientBatchCheckOptions : IClientBatchCheckOptions {
+    /// <inheritdoc />
+    public string? StoreId { get; set; }
 
     /// <inheritdoc />
     public string? AuthorizationModelId { get; set; }

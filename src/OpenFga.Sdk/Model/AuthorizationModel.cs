@@ -33,27 +33,37 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthorizationModel" /> class.
         /// </summary>
-        /// <param name="id">id.</param>
+        /// <param name="id">id (required).</param>
         /// <param name="schemaVersion">schemaVersion (required).</param>
-        /// <param name="typeDefinitions">typeDefinitions.</param>
-        public AuthorizationModel(string id = default(string), string schemaVersion = default(string), List<TypeDefinition> typeDefinitions = default(List<TypeDefinition>)) {
+        /// <param name="typeDefinitions">typeDefinitions (required).</param>
+        /// <param name="conditions">conditions.</param>
+        public AuthorizationModel(string id = default(string), string schemaVersion = default(string), List<TypeDefinition> typeDefinitions = default(List<TypeDefinition>), Dictionary<string, Condition> conditions = default(Dictionary<string, Condition>)) {
+            // to ensure "id" is required (not null)
+            if (id == null) {
+                throw new ArgumentNullException("id is a required property for AuthorizationModel and cannot be null");
+            }
+            this.Id = id;
             // to ensure "schemaVersion" is required (not null)
             if (schemaVersion == null) {
                 throw new ArgumentNullException("schemaVersion is a required property for AuthorizationModel and cannot be null");
             }
             this.SchemaVersion = schemaVersion;
-            this.Id = id;
+            // to ensure "typeDefinitions" is required (not null)
+            if (typeDefinitions == null) {
+                throw new ArgumentNullException("typeDefinitions is a required property for AuthorizationModel and cannot be null");
+            }
             this.TypeDefinitions = typeDefinitions;
+            this.Conditions = conditions;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
         /// Gets or Sets Id
         /// </summary>
-        [DataMember(Name = "id", EmitDefaultValue = false)]
+        [DataMember(Name = "id", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("id")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// Gets or Sets SchemaVersion
@@ -66,10 +76,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets TypeDefinitions
         /// </summary>
-        [DataMember(Name = "type_definitions", EmitDefaultValue = false)]
+        [DataMember(Name = "type_definitions", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("type_definitions")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<TypeDefinition>? TypeDefinitions { get; set; }
+        public List<TypeDefinition> TypeDefinitions { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Conditions
+        /// </summary>
+        [DataMember(Name = "conditions", EmitDefaultValue = false)]
+        [JsonPropertyName("conditions")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public Dictionary<string, Condition>? Conditions { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -128,6 +146,12 @@ namespace OpenFga.Sdk.Model {
                     this.TypeDefinitions != null &&
                     input.TypeDefinitions != null &&
                     this.TypeDefinitions.SequenceEqual(input.TypeDefinitions)
+                ) &&
+                (
+                    this.Conditions == input.Conditions ||
+                    this.Conditions != null &&
+                    input.Conditions != null &&
+                    this.Conditions.SequenceEqual(input.Conditions)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -148,6 +172,9 @@ namespace OpenFga.Sdk.Model {
                 }
                 if (this.TypeDefinitions != null) {
                     hashCode = (hashCode * 9923) + this.TypeDefinitions.GetHashCode();
+                }
+                if (this.Conditions != null) {
+                    hashCode = (hashCode * 9923) + this.Conditions.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

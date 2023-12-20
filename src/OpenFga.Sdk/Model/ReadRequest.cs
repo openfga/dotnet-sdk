@@ -36,7 +36,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="tupleKey">tupleKey.</param>
         /// <param name="pageSize">pageSize.</param>
         /// <param name="continuationToken">continuationToken.</param>
-        public ReadRequest(TupleKey tupleKey = default(TupleKey), int pageSize = default(int), string continuationToken = default(string)) {
+        public ReadRequest(ReadRequestTupleKey tupleKey = default(ReadRequestTupleKey), int pageSize = default(int), string continuationToken = default(string)) {
             this.TupleKey = tupleKey;
             this.PageSize = pageSize;
             this.ContinuationToken = continuationToken;
@@ -49,7 +49,7 @@ namespace OpenFga.Sdk.Model {
         [DataMember(Name = "tuple_key", EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public TupleKey? TupleKey { get; set; }
+        public ReadRequestTupleKey? TupleKey { get; set; }
 
         /// <summary>
         /// Gets or Sets PageSize

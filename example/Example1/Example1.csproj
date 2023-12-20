@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <!--  To target the released version, uncomment this section -->
+  <ItemGroup>
+    <PackageReference Include="OpenFga.Sdk" Version="0.2.5"><PrivateAssets>all</PrivateAssets></PackageReference>
+  </ItemGroup>
+
+  <!--  To target the local build, uncomment this section (make sure to build that project first) -->
+  <!--  <ItemGroup>-->
+  <!--    <Reference Include="OpenFga.Sdk">-->
+  <!--      <HintPath>..\..\src\OpenFga.Sdk\bin\Debug\net6.0\OpenFga.Sdk.dll</HintPath>-->
+  <!--    </Reference>-->
+  <!--  </ItemGroup>-->
+
+</Project>

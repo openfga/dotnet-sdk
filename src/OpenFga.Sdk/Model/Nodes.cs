@@ -33,8 +33,12 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Nodes" /> class.
         /// </summary>
-        /// <param name="nodes">nodes.</param>
+        /// <param name="nodes">nodes (required).</param>
         public Nodes(List<Node> nodes = default(List<Node>)) {
+            // to ensure "nodes" is required (not null)
+            if (nodes == null) {
+                throw new ArgumentNullException("nodes is a required property for Nodes and cannot be null");
+            }
             this._Nodes = nodes;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -42,10 +46,10 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets _Nodes
         /// </summary>
-        [DataMember(Name = "nodes", EmitDefaultValue = false)]
+        [DataMember(Name = "nodes", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("nodes")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<Node>? _Nodes { get; set; }
+        public List<Node> _Nodes { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

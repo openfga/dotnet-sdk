@@ -12,11 +12,13 @@
 
 
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Client.Model;
 
-public interface IClientListRelationsRequest : IClientContextualTuplesWrapper {
+public interface IClientListRelationsRequest : IClientQueryContextWrapper {
     public string User { get; set; }
 
     public string Object { get; set; }
@@ -36,6 +38,41 @@ public class ClientListRelationsRequest : IClientListRelationsRequest, IEquatabl
         Relations = new List<string>();
     }
 
+    /// <summary>
+    ///     Gets or Sets User
+    /// </summary>
+    [DataMember(Name = "user", EmitDefaultValue = false)]
+    [JsonPropertyName("user")]
+    public string User { get; set; }
+
+    /// <summary>
+    ///     Gets or Sets Object
+    /// </summary>
+    [DataMember(Name = "object", EmitDefaultValue = false)]
+    [JsonPropertyName("object")]
+    public string Object { get; set; }
+
+    /// <summary>
+    ///     Gets or Sets Relation
+    /// </summary>
+    [DataMember(Name = "relations", EmitDefaultValue = false)]
+    [JsonPropertyName("relations")]
+    public List<string> Relations { get; set; }
+
+    /// <summary>
+    ///     Gets or Sets Contextual Tuples
+    /// </summary>
+    [DataMember(Name = "contextual_tuples", EmitDefaultValue = false)]
+    [JsonPropertyName("contextual_tuples")]
+    public List<ClientTupleKey>? ContextualTuples { get; set; }
+
+    /// <summary>
+    ///     Gets or Sets Context
+    /// </summary>
+    [DataMember(Name = "context", EmitDefaultValue = false)]
+    [JsonPropertyName("context")]
+    public Object? Context { get; set; }
+
     public bool Equals(ClientListRelationsRequest input) {
         if (input == null) {
             return false;
@@ -43,9 +80,9 @@ public class ClientListRelationsRequest : IClientListRelationsRequest, IEquatabl
 
         return
             (
-                Object == input.Object ||
-                (Object != null &&
-                 Object.Equals(input.Object))
+                User == input.User ||
+                (User != null &&
+                 User.Equals(input.User))
             ) &&
             (
                 Relations == input.Relations ||
@@ -53,23 +90,21 @@ public class ClientListRelationsRequest : IClientListRelationsRequest, IEquatabl
                  Relations.Equals(input.Relations))
             ) &&
             (
+                Object == input.Object ||
+                (Object != null &&
+                 Object.Equals(input.Object))
+            ) &&
+            (
                 ContextualTuples == input.ContextualTuples ||
                 (ContextualTuples != null &&
                  ContextualTuples.Equals(input.ContextualTuples))
             ) &&
             (
-                User == input.User ||
-                (User != null &&
-                 User.Equals(input.User))
+                this.Context == input.Context ||
+                (this.Context != null &&
+                this.Context.Equals(input.Context))
             );
     }
-
-    public string User { get; set; }
-
-    public string Object { get; set; }
-
-    public List<ClientTupleKey> ContextualTuples { get; set; }
-    public List<string> Relations { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
         yield break;
@@ -100,6 +135,10 @@ public class ClientListRelationsRequest : IClientListRelationsRequest, IEquatabl
 
             if (ContextualTuples != null) {
                 hashCode = (hashCode * 9923) + ContextualTuples.GetHashCode();
+            }
+
+            if (Context != null) {
+                hashCode = (hashCode * 9923) + Context.GetHashCode();
             }
 
             return hashCode;

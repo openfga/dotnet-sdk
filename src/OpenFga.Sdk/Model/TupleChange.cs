@@ -26,9 +26,9 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Operation
         /// </summary>
-        [DataMember(Name = "operation", EmitDefaultValue = false)]
+        [DataMember(Name = "operation", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("operation")]
-        public TupleOperation? Operation { get; set; }
+        public TupleOperation Operation { get; set; }
         /// <summary>
         /// Initializes a new instance of the <see cref="TupleChange" /> class.
         /// </summary>
@@ -40,10 +40,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="TupleChange" /> class.
         /// </summary>
-        /// <param name="tupleKey">tupleKey.</param>
-        /// <param name="operation">operation.</param>
-        /// <param name="timestamp">timestamp.</param>
-        public TupleChange(TupleKey tupleKey = default(TupleKey), TupleOperation? operation = default(TupleOperation?), DateTime timestamp = default(DateTime)) {
+        /// <param name="tupleKey">tupleKey (required).</param>
+        /// <param name="operation">operation (required).</param>
+        /// <param name="timestamp">timestamp (required).</param>
+        public TupleChange(TupleKey tupleKey = default(TupleKey), TupleOperation operation = default(TupleOperation), DateTime timestamp = default(DateTime)) {
+            // to ensure "tupleKey" is required (not null)
+            if (tupleKey == null) {
+                throw new ArgumentNullException("tupleKey is a required property for TupleChange and cannot be null");
+            }
             this.TupleKey = tupleKey;
             this.Operation = operation;
             this.Timestamp = timestamp;
@@ -53,18 +57,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets TupleKey
         /// </summary>
-        [DataMember(Name = "tuple_key", EmitDefaultValue = false)]
+        [DataMember(Name = "tuple_key", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public TupleKey? TupleKey { get; set; }
+        public TupleKey TupleKey { get; set; }
 
         /// <summary>
         /// Gets or Sets Timestamp
         /// </summary>
-        [DataMember(Name = "timestamp", EmitDefaultValue = false)]
+        [DataMember(Name = "timestamp", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("timestamp")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public DateTime? Timestamp { get; set; }
+        public DateTime Timestamp { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

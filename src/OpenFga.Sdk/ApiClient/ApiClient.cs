@@ -40,7 +40,7 @@ public class ApiClient : IDisposable {
 
         switch (_configuration.Credentials.Method) {
             case CredentialsMethod.ApiToken:
-                _configuration.DefaultHeaders.Add("Authorization", $"Bearer {_configuration.Credentials.Config!.ApiToken}");
+                _configuration.DefaultHeaders["Authorization"] = $"Bearer {_configuration.Credentials.Config!.ApiToken}";
                 _baseClient = new BaseClient(_configuration, userHttpClient);
                 break;
             case CredentialsMethod.ClientCredentials:
@@ -71,7 +71,7 @@ public class ApiClient : IDisposable {
                 var token = await _oauth2Client.GetAccessTokenAsync();
 
                 if (!string.IsNullOrEmpty(token)) {
-                    additionalHeaders.Add("Authorization", $"Bearer {token}");
+                    additionalHeaders["Authorization"] = $"Bearer {token}";
                 }
             }
             catch (ApiException e) {
@@ -98,7 +98,7 @@ public class ApiClient : IDisposable {
                 var token = await _oauth2Client.GetAccessTokenAsync();
 
                 if (!string.IsNullOrEmpty(token)) {
-                    additionalHeaders.Add("Authorization", $"Bearer {token}");
+                    additionalHeaders["Authorization"] = $"Bearer {token}";
                 }
             }
             catch (ApiException e) {

@@ -1,5 +1,60 @@
 # Changelog
 
+## v0.3.0
+
+### [0.3.0](https://github.com/openfga/dotnet-sdk/compare/v0.2.5...v0.3.0) (2023-12-20)
+- feat!: initial support for conditions
+- feat!: allow overriding storeId per request (#33)
+- feat: support specifying a port and path for the API (You can now set the `ApiUrl` to something like: `https://api.fga.exampleL8080/some_path`)
+- feat: validate that store id and auth model id in ulid format (#23)
+- fix: exception when using the same configuration with multiple clients (#26)
+- fix: `OpenFgaClient.ReadLatestAuthorizationModel` can now return a null if no model has ever been created in that store
+- fix: `OpenFgaClient.Read` and `OpenFgaClient.ReadChanges` now allow a null body
+- chore!: use latest API interfaces
+- chore: dependency updates
+
+BREAKING CHANGES:
+Note: This release comes with substantial breaking changes, especially to the interfaces due to the protobuf changes in the last release.
+
+While the http interfaces did not break (you can still use `v0.2.5` SDK with a `v1.3.8+` server),
+the grpc interface did and this caused a few changes in the interfaces of the SDK.
+
+If you are using `OpenFgaClient`, the changes required should be smaller, if you are using `OpenFgaApi` a bit more changes will be needed.
+
+You will have to modify some parts of your code, but we hope this will be to the better as a lot of the parameters are now correctly marked as required,
+and so the Pointer-to-String conversion is no longer needed.
+
+Some of the changes to expect:
+
+- When initializing a client, please use `ApiUrl`. The separate `ApiScheme` and `ApiHost` fields have been deprecated
+```csharp
+var configuration = new ClientConfiguration() {
+    ApiUrl = Environment.GetEnvironmentVariable("FGA_API_URL"), // required, e.g. https://api.fga.example
+    StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
+    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+};
+var fgaClient = new OpenFgaClient(configuration);
+```
+- `OpenFgaApi` now requires `storeId` as first param when needed
+- `Configuration` no longer accepts `storeId` (`ClientConfiguration` is not affected)
+- The following request interfaces changed:
+    - `CheckRequest`: the `TupleKey` field is now of interface `CheckRequestTupleKey`, you can also now pass in `Context`
+    - `ExpandRequest`: the `TupleKey` field is now of interface `ExpandRequestTupleKey`
+    - `ReadRequest`: the `TupleKey` field is now of interface `ReadRequestTupleKey`
+    - `WriteRequest`: now takes `WriteRequestWrites` and `WriteRequestDeletes`, the latter of which accepts `TupleKeyWithoutCondition`
+    - And more
+- The following interfaces had fields that were pointers are are now the direct value:
+    - `CreateStoreResponse`
+    - `GetStoreResponse`
+    - `ListStoresResponse`
+    - `ListObjectsResponse`
+    - `ReadChangesResponse`
+    - `ReadResponse`
+    - `AuthorizationModel`
+    - And more
+
+Take a look at https://github.com/openfga/dotnet-sdk/commit/fa43463ded102df3f660bae6d741e1a8c1dea090 for more model changes.
+
 ## v0.2.5
 
 ### [0.2.5](https://github.com/openfga/dotnet-sdk/compare/v0.2.4...v0.2.5) (2023-12-01)

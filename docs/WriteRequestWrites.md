@@ -1,10 +1,10 @@
-# OpenFga.Sdk.Model.TupleKeys
+# OpenFga.Sdk.Model.WriteRequestWrites
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**_TupleKeys** | [**List&lt;TupleKey&gt;**](TupleKey.md) |  | 
+**TupleKeys** | [**List&lt;TupleKey&gt;**](TupleKey.md) |  | 
 
 [[Back to Model list]](../README.md#models) [[Back to API list]](../README.md#api-endpoints) [[Back to README]](../README.md)
 

@@ -33,10 +33,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ListStoresResponse" /> class.
         /// </summary>
-        /// <param name="stores">stores.</param>
-        /// <param name="continuationToken">The continuation token will be empty if there are no more stores..</param>
+        /// <param name="stores">stores (required).</param>
+        /// <param name="continuationToken">The continuation token will be empty if there are no more stores. (required).</param>
         public ListStoresResponse(List<Store> stores = default(List<Store>), string continuationToken = default(string)) {
+            // to ensure "stores" is required (not null)
+            if (stores == null) {
+                throw new ArgumentNullException("stores is a required property for ListStoresResponse and cannot be null");
+            }
             this.Stores = stores;
+            // to ensure "continuationToken" is required (not null)
+            if (continuationToken == null) {
+                throw new ArgumentNullException("continuationToken is a required property for ListStoresResponse and cannot be null");
+            }
             this.ContinuationToken = continuationToken;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -44,19 +52,19 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Stores
         /// </summary>
-        [DataMember(Name = "stores", EmitDefaultValue = false)]
+        [DataMember(Name = "stores", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("stores")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<Store>? Stores { get; set; }
+        public List<Store> Stores { get; set; }
 
         /// <summary>
         /// The continuation token will be empty if there are no more stores.
         /// </summary>
         /// <value>The continuation token will be empty if there are no more stores.</value>
-        [DataMember(Name = "continuation_token", EmitDefaultValue = false)]
+        [DataMember(Name = "continuation_token", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("continuation_token")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? ContinuationToken { get; set; }
+        public string ContinuationToken { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

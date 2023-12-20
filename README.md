@@ -108,10 +108,9 @@ namespace Example {
         public static async Task Main() {
             try {
                 var configuration = new ClientConfiguration() {
-                    ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
-                    ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
-                    StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
-                    AuthorizationModelId = Environment.GetEnvironmentVariable("OPENFGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+                    ApiUrl = Environment.GetEnvironmentVariable("FGA_API_URL") ?? "http://localhost:8080", // required, e.g. https://api.fga.example
+                    StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
+                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
                 };
                 var fgaClient = new OpenFgaClient(configuration);
                 var response = await fgaClient.ReadAuthorizationModels();
@@ -135,14 +134,13 @@ namespace Example {
         public static async Task Main() {
             try {
                 var configuration = new ClientConfiguration() {
-                    ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
-                    ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
-                    StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
-                    AuthorizationModelId = Environment.GetEnvironmentVariable("OPENFGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+                    ApiUrl = Environment.GetEnvironmentVariable("FGA_API_URL") ?? "http://localhost:8080", // required, e.g. https://api.fga.example
+                    StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
+                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
                     Credentials = new Credentials() {
                         Method = CredentialsMethod.ApiToken,
                         Config = new CredentialsConfig() {
-                            ApiToken = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN"),  // will be passed as the "Authorization: Bearer ${ApiToken}" request header
+                            ApiToken = Environment.GetEnvironmentVariable("FGA_API_TOKEN"),  // will be passed as the "Authorization: Bearer ${ApiToken}" request header
                         }
                     }
                 };
@@ -168,17 +166,16 @@ namespace Example {
         public static async Task Main() {
             try {
                 var configuration = new ClientConfiguration() {
-                    ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
-                    ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
-                    StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
-                    AuthorizationModelId = Environment.GetEnvironmentVariable("OPENFGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+                    ApiUrl = Environment.GetEnvironmentVariable("FGA_API_URL") ?? "http://localhost:8080", // required, e.g. https://api.fga.example
+                    StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
+                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
                     Credentials = new Credentials() {
                         Method = CredentialsMethod.ClientCredentials,
                         Config = new CredentialsConfig() {
-                            ApiTokenIssuer = Environment.GetEnvironmentVariable("OPENFGA_API_TOKEN_ISSUER"),
-                            ApiAudience = Environment.GetEnvironmentVariable("OPENFGA_API_AUDIENCE"),
-                            ClientId = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_ID"),
-                            ClientSecret = Environment.GetEnvironmentVariable("OPENFGA_CLIENT_SECRET"),
+                            ApiTokenIssuer = Environment.GetEnvironmentVariable("FGA_API_TOKEN_ISSUER"),
+                            ApiAudience = Environment.GetEnvironmentVariable("FGA_API_AUDIENCE"),
+                            ClientId = Environment.GetEnvironmentVariable("FGA_CLIENT_ID"),
+                            ClientSecret = Environment.GetEnvironmentVariable("FGA_CLIENT_SECRET"),
                         }
                     }
                 };
@@ -465,7 +462,7 @@ var body = new ClientWriteRequest() {
             Object = "document:budget",
         }
     },
-    Deletes = new List<ClientTupleKey> {
+    Deletes = new List<ClientTupleKeyWithoutCondition> {
         new() {
             User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
             Relation = "writer",
@@ -500,7 +497,7 @@ var body = new ClientWriteRequest() {
             Object = "document:budget",
         }
     },
-    Deletes = new List<ClientTupleKey> {
+    Deletes = new List<ClientTupleKeyWithoutCondition> {
         new() {
             User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
             Relation = "writer",
@@ -768,18 +765,24 @@ await fgaClient.WriteAssertions(body, options);
 
 ### Models
 
+ - [Model.AbortedMessageResponse](docs/AbortedMessageResponse.md)
  - [Model.Any](docs/Any.md)
  - [Model.Assertion](docs/Assertion.md)
+ - [Model.AssertionTupleKey](docs/AssertionTupleKey.md)
  - [Model.AuthorizationModel](docs/AuthorizationModel.md)
  - [Model.CheckRequest](docs/CheckRequest.md)
+ - [Model.CheckRequestTupleKey](docs/CheckRequestTupleKey.md)
  - [Model.CheckResponse](docs/CheckResponse.md)
  - [Model.Computed](docs/Computed.md)
+ - [Model.Condition](docs/Condition.md)
+ - [Model.ConditionParamTypeRef](docs/ConditionParamTypeRef.md)
  - [Model.ContextualTupleKeys](docs/ContextualTupleKeys.md)
  - [Model.CreateStoreRequest](docs/CreateStoreRequest.md)
  - [Model.CreateStoreResponse](docs/CreateStoreResponse.md)
  - [Model.Difference](docs/Difference.md)
  - [Model.ErrorCode](docs/ErrorCode.md)
  - [Model.ExpandRequest](docs/ExpandRequest.md)
+ - [Model.ExpandRequestTupleKey](docs/ExpandRequestTupleKey.md)
  - [Model.ExpandResponse](docs/ExpandResponse.md)
  - [Model.GetStoreResponse](docs/GetStoreResponse.md)
  - [Model.InternalErrorCode](docs/InternalErrorCode.md)
@@ -792,6 +795,7 @@ await fgaClient.WriteAssertions(body, options);
  - [Model.Node](docs/Node.md)
  - [Model.Nodes](docs/Nodes.md)
  - [Model.NotFoundErrorCode](docs/NotFoundErrorCode.md)
+ - [Model.NullValue](docs/NullValue.md)
  - [Model.ObjectRelation](docs/ObjectRelation.md)
  - [Model.PathUnknownErrorMessageResponse](docs/PathUnknownErrorMessageResponse.md)
  - [Model.ReadAssertionsResponse](docs/ReadAssertionsResponse.md)
@@ -799,18 +803,21 @@ await fgaClient.WriteAssertions(body, options);
  - [Model.ReadAuthorizationModelsResponse](docs/ReadAuthorizationModelsResponse.md)
  - [Model.ReadChangesResponse](docs/ReadChangesResponse.md)
  - [Model.ReadRequest](docs/ReadRequest.md)
+ - [Model.ReadRequestTupleKey](docs/ReadRequestTupleKey.md)
  - [Model.ReadResponse](docs/ReadResponse.md)
  - [Model.RelationMetadata](docs/RelationMetadata.md)
  - [Model.RelationReference](docs/RelationReference.md)
+ - [Model.RelationshipCondition](docs/RelationshipCondition.md)
  - [Model.Status](docs/Status.md)
  - [Model.Store](docs/Store.md)
  - [Model.Tuple](docs/Tuple.md)
  - [Model.TupleChange](docs/TupleChange.md)
  - [Model.TupleKey](docs/TupleKey.md)
- - [Model.TupleKeys](docs/TupleKeys.md)
+ - [Model.TupleKeyWithoutCondition](docs/TupleKeyWithoutCondition.md)
  - [Model.TupleOperation](docs/TupleOperation.md)
  - [Model.TupleToUserset](docs/TupleToUserset.md)
  - [Model.TypeDefinition](docs/TypeDefinition.md)
+ - [Model.TypeName](docs/TypeName.md)
  - [Model.Users](docs/Users.md)
  - [Model.Userset](docs/Userset.md)
  - [Model.UsersetTree](docs/UsersetTree.md)
@@ -822,6 +829,8 @@ await fgaClient.WriteAssertions(body, options);
  - [Model.WriteAuthorizationModelRequest](docs/WriteAuthorizationModelRequest.md)
  - [Model.WriteAuthorizationModelResponse](docs/WriteAuthorizationModelResponse.md)
  - [Model.WriteRequest](docs/WriteRequest.md)
+ - [Model.WriteRequestDeletes](docs/WriteRequestDeletes.md)
+ - [Model.WriteRequestWrites](docs/WriteRequestWrites.md)
 
 
 

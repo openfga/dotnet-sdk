@@ -36,7 +36,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="tupleKey">tupleKey (required).</param>
         /// <param name="contextualTuples">contextualTuples.</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
-        public CheckRequest(TupleKey tupleKey = default(TupleKey), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys), string authorizationModelId = default(string)) {
+        /// <param name="context">Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation..</param>
+        public CheckRequest(CheckRequestTupleKey tupleKey = default(CheckRequestTupleKey), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys), string authorizationModelId = default(string), Object context = default(Object)) {
             // to ensure "tupleKey" is required (not null)
             if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for CheckRequest and cannot be null");
@@ -44,6 +45,7 @@ namespace OpenFga.Sdk.Model {
             this.TupleKey = tupleKey;
             this.ContextualTuples = contextualTuples;
             this.AuthorizationModelId = authorizationModelId;
+            this.Context = context;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -53,7 +55,7 @@ namespace OpenFga.Sdk.Model {
         [DataMember(Name = "tuple_key", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public TupleKey TupleKey { get; set; }
+        public CheckRequestTupleKey TupleKey { get; set; }
 
         /// <summary>
         /// Gets or Sets ContextualTuples
@@ -87,6 +89,15 @@ namespace OpenFga.Sdk.Model {
         public bool ShouldSerializeTrace() {
             return false;
         }
+        /// <summary>
+        /// Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation.
+        /// </summary>
+        /// <value>Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation.</value>
+        [DataMember(Name = "context", EmitDefaultValue = false)]
+        [JsonPropertyName("context")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public Object? Context { get; set; }
+
         /// <summary>
         /// Gets or Sets additional properties
         /// </summary>
@@ -147,6 +158,11 @@ namespace OpenFga.Sdk.Model {
                 (
                     this.Trace == input.Trace ||
                     this.Trace.Equals(input.Trace)
+                ) &&
+                (
+                    this.Context == input.Context ||
+                    (this.Context != null &&
+                    this.Context.Equals(input.Context))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -169,6 +185,9 @@ namespace OpenFga.Sdk.Model {
                     hashCode = (hashCode * 9923) + this.AuthorizationModelId.GetHashCode();
                 }
                 hashCode = (hashCode * 9923) + this.Trace.GetHashCode();
+                if (this.Context != null) {
+                    hashCode = (hashCode * 9923) + this.Context.GetHashCode();
+                }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
                 }

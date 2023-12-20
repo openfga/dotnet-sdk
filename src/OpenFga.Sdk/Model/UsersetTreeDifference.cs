@@ -33,10 +33,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersetTreeDifference" /> class.
         /// </summary>
-        /// <param name="_base">_base.</param>
-        /// <param name="subtract">subtract.</param>
+        /// <param name="_base">_base (required).</param>
+        /// <param name="subtract">subtract (required).</param>
         public UsersetTreeDifference(Node _base = default(Node), Node subtract = default(Node)) {
+            // to ensure "_base" is required (not null)
+            if (_base == null) {
+                throw new ArgumentNullException("_base is a required property for UsersetTreeDifference and cannot be null");
+            }
             this.Base = _base;
+            // to ensure "subtract" is required (not null)
+            if (subtract == null) {
+                throw new ArgumentNullException("subtract is a required property for UsersetTreeDifference and cannot be null");
+            }
             this.Subtract = subtract;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -44,18 +52,18 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Base
         /// </summary>
-        [DataMember(Name = "base", EmitDefaultValue = false)]
+        [DataMember(Name = "base", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("base")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public Node? Base { get; set; }
+        public Node Base { get; set; }
 
         /// <summary>
         /// Gets or Sets Subtract
         /// </summary>
-        [DataMember(Name = "subtract", EmitDefaultValue = false)]
+        [DataMember(Name = "subtract", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("subtract")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public Node? Subtract { get; set; }
+        public Node Subtract { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

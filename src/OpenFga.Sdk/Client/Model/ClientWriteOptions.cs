@@ -55,6 +55,9 @@ public interface IClientWriteOptions : IClientRequestOptionsWithAuthZModelId {
 }
 
 public class ClientWriteOptions : IClientWriteOptions {
+    /// <inheritdoc />
+    public string? StoreId { get; set; }
+
     /// <summary>
     ///     Override the Authorization Model ID for this request
     /// </summary>

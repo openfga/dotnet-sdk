@@ -36,7 +36,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="type">type (required).</param>
         /// <param name="relation">relation.</param>
         /// <param name="wildcard">wildcard.</param>
-        public RelationReference(string type = default(string), string relation = default(string), Object wildcard = default(Object)) {
+        /// <param name="condition">The name of a condition that is enforced over the allowed relation..</param>
+        public RelationReference(string type = default(string), string relation = default(string), Object wildcard = default(Object), string condition = default(string)) {
             // to ensure "type" is required (not null)
             if (type == null) {
                 throw new ArgumentNullException("type is a required property for RelationReference and cannot be null");
@@ -44,6 +45,7 @@ namespace OpenFga.Sdk.Model {
             this.Type = type;
             this.Relation = relation;
             this.Wildcard = wildcard;
+            this.Condition = condition;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -70,6 +72,15 @@ namespace OpenFga.Sdk.Model {
         [JsonPropertyName("wildcard")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Object? Wildcard { get; set; }
+
+        /// <summary>
+        /// The name of a condition that is enforced over the allowed relation.
+        /// </summary>
+        /// <value>The name of a condition that is enforced over the allowed relation.</value>
+        [DataMember(Name = "condition", EmitDefaultValue = false)]
+        [JsonPropertyName("condition")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string? Condition { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -127,6 +138,11 @@ namespace OpenFga.Sdk.Model {
                     this.Wildcard == input.Wildcard ||
                     (this.Wildcard != null &&
                     this.Wildcard.Equals(input.Wildcard))
+                ) &&
+                (
+                    this.Condition == input.Condition ||
+                    (this.Condition != null &&
+                    this.Condition.Equals(input.Condition))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -147,6 +163,9 @@ namespace OpenFga.Sdk.Model {
                 }
                 if (this.Wildcard != null) {
                     hashCode = (hashCode * 9923) + this.Wildcard.GetHashCode();
+                }
+                if (this.Condition != null) {
+                    hashCode = (hashCode * 9923) + this.Condition.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

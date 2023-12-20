@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Name** | **string** |  | [optional] 
+**Name** | **string** |  | 
 **Leaf** | [**Leaf**](Leaf.md) |  | [optional] 
 **Difference** | [**UsersetTreeDifference**](UsersetTreeDifference.md) |  | [optional] 
 **Union** | [**Nodes**](Nodes.md) |  | [optional] 

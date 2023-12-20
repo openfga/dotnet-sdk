@@ -33,9 +33,13 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadChangesResponse" /> class.
         /// </summary>
-        /// <param name="changes">changes.</param>
+        /// <param name="changes">changes (required).</param>
         /// <param name="continuationToken">The continuation token will be identical if there are no new changes..</param>
         public ReadChangesResponse(List<TupleChange> changes = default(List<TupleChange>), string continuationToken = default(string)) {
+            // to ensure "changes" is required (not null)
+            if (changes == null) {
+                throw new ArgumentNullException("changes is a required property for ReadChangesResponse and cannot be null");
+            }
             this.Changes = changes;
             this.ContinuationToken = continuationToken;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -44,10 +48,10 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets Changes
         /// </summary>
-        [DataMember(Name = "changes", EmitDefaultValue = false)]
+        [DataMember(Name = "changes", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("changes")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<TupleChange>? Changes { get; set; }
+        public List<TupleChange> Changes { get; set; }
 
         /// <summary>
         /// The continuation token will be identical if there are no new changes.

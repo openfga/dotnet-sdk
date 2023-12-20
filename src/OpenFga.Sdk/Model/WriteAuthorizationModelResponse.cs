@@ -33,8 +33,12 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="WriteAuthorizationModelResponse" /> class.
         /// </summary>
-        /// <param name="authorizationModelId">authorizationModelId.</param>
+        /// <param name="authorizationModelId">authorizationModelId (required).</param>
         public WriteAuthorizationModelResponse(string authorizationModelId = default(string)) {
+            // to ensure "authorizationModelId" is required (not null)
+            if (authorizationModelId == null) {
+                throw new ArgumentNullException("authorizationModelId is a required property for WriteAuthorizationModelResponse and cannot be null");
+            }
             this.AuthorizationModelId = authorizationModelId;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -42,10 +46,10 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Gets or Sets AuthorizationModelId
         /// </summary>
-        [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
+        [DataMember(Name = "authorization_model_id", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("authorization_model_id")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? AuthorizationModelId { get; set; }
+        public string AuthorizationModelId { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties

@@ -21,7 +21,7 @@ namespace OpenFga.Sdk.Client.Model;
 
 internal interface IClientWriteRequest {
     public List<ClientTupleKey>? Writes { get; set; }
-    public List<ClientTupleKey>? Deletes { get; set; }
+    public List<ClientTupleKeyWithoutCondition>? Deletes { get; set; }
 }
 
 /// <summary>
@@ -34,7 +34,7 @@ public class ClientWriteRequest : IClientWriteRequest, IEquatable<ClientWriteReq
     /// </summary>
     /// <param name="writes">writes.</param>
     /// <param name="deletes">deletes.</param>
-    public ClientWriteRequest(List<ClientTupleKey>? writes = default, List<ClientTupleKey>? deletes = default) {
+    public ClientWriteRequest(List<ClientTupleKey>? writes = default, List<ClientTupleKeyWithoutCondition>? deletes = default) {
         Writes = writes;
         Deletes = deletes;
     }
@@ -51,7 +51,7 @@ public class ClientWriteRequest : IClientWriteRequest, IEquatable<ClientWriteReq
     /// </summary>
     [DataMember(Name = "deletes", EmitDefaultValue = false)]
     [JsonPropertyName("deletes")]
-    public List<ClientTupleKey>? Deletes { get; set; }
+    public List<ClientTupleKeyWithoutCondition>? Deletes { get; set; }
 
     /// <summary>
     ///     Returns true if WriteRequest instances are equal

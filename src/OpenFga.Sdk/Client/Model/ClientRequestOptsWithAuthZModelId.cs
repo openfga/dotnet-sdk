@@ -14,5 +14,5 @@
 namespace OpenFga.Sdk.Client.Model;
 
 /// <inheritdoc />
-public interface IClientRequestOptionsWithAuthZModelId : ClientRequestOptions, AuthorizationModelIdOptions {
+public interface IClientRequestOptionsWithAuthZModelId : IClientRequestOptionsWithStoreId, AuthorizationModelIdOptions {
 }

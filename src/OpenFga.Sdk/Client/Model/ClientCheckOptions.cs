@@ -14,6 +14,8 @@
 namespace OpenFga.Sdk.Client.Model;
 
 public class ClientCheckOptions : IClientRequestOptionsWithAuthZModelId {
+    /// <inheritdoc />
+    public string? StoreId { get; set; }
 
     /// <inheritdoc />
     public string? AuthorizationModelId { get; set; }
