@@ -28,13 +28,6 @@ public class OAuth2Client {
 
     private static readonly Random _random = new();
 
-    private class AuthRequestBody {
-        [JsonPropertyName("audience")] public string? Audience { get; set; }
-        [JsonPropertyName("client_id")] public string? ClientId { get; set; }
-        [JsonPropertyName("client_secret")] public string? ClientSecret { get; set; }
-        [JsonPropertyName("grant_type")] public string? GrantType { get; set; }
-    }
-
     /// <summary>
     /// Credentials Flow Response
     ///
@@ -78,7 +71,7 @@ public class OAuth2Client {
 
     private readonly BaseClient _httpClient;
     private AuthToken _authToken = new();
-    private AuthRequestBody _authRequest { get; set; }
+    private IDictionary<string, string> _authRequest { get; set; }
     private string _apiTokenIssuer { get; set; }
 
     #endregion
@@ -102,11 +95,11 @@ public class OAuth2Client {
 
         this._httpClient = httpClient;
         this._apiTokenIssuer = credentialsConfig.Config.ApiTokenIssuer;
-        this._authRequest = new AuthRequestBody() {
-            ClientId = credentialsConfig.Config.ClientId,
-            ClientSecret = credentialsConfig.Config.ClientSecret,
-            Audience = credentialsConfig.Config.ApiAudience,
-            GrantType = "client_credentials"
+        this._authRequest = new Dictionary<string, string>() {
+            { "client_id", credentialsConfig.Config.ClientId },
+            { "client_secret", credentialsConfig.Config.ClientSecret },
+            { "audience", credentialsConfig.Config.ApiAudience },
+            { "grant_type", "client_credentials" }
         };
     }
 
@@ -120,7 +113,7 @@ public class OAuth2Client {
             Method = HttpMethod.Post,
             BasePath = $"https://{this._apiTokenIssuer}",
             PathTemplate = "/oauth/token",
-            Body = Utils.CreateJsonStringContent(this._authRequest)
+            Body = Utils.CreateFormEncodedConent(this._authRequest),
         };
 
         var accessTokenResponse = await _httpClient.SendRequestAsync<AccessTokenResponse>(

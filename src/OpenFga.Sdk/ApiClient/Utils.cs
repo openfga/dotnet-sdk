@@ -26,6 +26,11 @@ public static class Utils {
         return new StringContent(json, Encoding.UTF8, "application/json");
     }
 
+    public static HttpContent CreateFormEncodedConent(IDictionary<string, string> parameters) {
+        return new FormUrlEncodedContent(parameters.Select(p =>
+            new KeyValuePair<string, string>(p.Key, p.Value ?? "")));
+    }
+
     public static string BuildQueryParams(IDictionary<string, string> parameters) {
         var query = "";
         foreach (var parameter in parameters) {

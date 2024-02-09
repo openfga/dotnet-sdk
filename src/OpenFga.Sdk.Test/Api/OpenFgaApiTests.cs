@@ -304,7 +304,8 @@ namespace OpenFga.Sdk.Test.Api {
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.RequestUri == new Uri($"https://{config.Credentials.Config.ApiTokenIssuer}/oauth/token") &&
-                        req.Method == HttpMethod.Post),
+                        req.Method == HttpMethod.Post &&
+                        req.Content.Headers.ContentType.ToString().Equals("application/x-www-form-urlencoded")),
                     ItExpr.IsAny<CancellationToken>()
                 )
                 .ReturnsAsync(new HttpResponseMessage() {
@@ -358,7 +359,8 @@ namespace OpenFga.Sdk.Test.Api {
                 Times.Exactly(1),
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"https://{config.Credentials.Config.ApiTokenIssuer}/oauth/token") &&
-                    req.Method == HttpMethod.Post),
+                    req.Method == HttpMethod.Post &&
+                    req.Content.Headers.ContentType.ToString().Equals("application/x-www-form-urlencoded")),
                 ItExpr.IsAny<CancellationToken>()
             );
             mockHandler.Protected().Verify(
@@ -401,7 +403,8 @@ namespace OpenFga.Sdk.Test.Api {
                     "SendAsync",
                     ItExpr.Is<HttpRequestMessage>(req =>
                         req.RequestUri == new Uri($"https://{config.Credentials.Config.ApiTokenIssuer}/oauth/token") &&
-                        req.Method == HttpMethod.Post),
+                        req.Method == HttpMethod.Post &&
+                        req.Content.Headers.ContentType.ToString().Equals("application/x-www-form-urlencoded")),
                     ItExpr.IsAny<CancellationToken>()
                 )
                 .ReturnsAsync(new HttpResponseMessage() {
@@ -455,7 +458,8 @@ namespace OpenFga.Sdk.Test.Api {
                 Times.Exactly(2),
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"https://{config.Credentials.Config.ApiTokenIssuer}/oauth/token") &&
-                    req.Method == HttpMethod.Post),
+                    req.Method == HttpMethod.Post &&
+                    req.Content.Headers.ContentType.ToString().Equals("application/x-www-form-urlencoded")),
                 ItExpr.IsAny<CancellationToken>()
             );
             mockHandler.Protected().Verify(
