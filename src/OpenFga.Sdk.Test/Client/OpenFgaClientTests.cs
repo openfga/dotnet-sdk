@@ -805,6 +805,7 @@ public class OpenFgaClientTests {
                     Object = "document:roadmap",
                 }
             },
+            Deletes = new List<ClientTupleKeyWithoutCondition>(), // should not get passed
         };
         var response = await fgaClient.Write(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
