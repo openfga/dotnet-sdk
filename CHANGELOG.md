@@ -3,7 +3,7 @@
 ## v0.3.0
 
 ### [0.3.0](https://github.com/openfga/dotnet-sdk/compare/v0.2.5...v0.3.0) (2023-12-20)
-- feat!: initial support for conditions
+- feat!: initial support for [conditions](https://openfga.dev/blog/conditional-tuples-announcement)
 - feat!: allow overriding storeId per request (#33)
 - feat: support specifying a port and path for the API (You can now set the `ApiUrl` to something like: `https://api.fga.exampleL8080/some_path`)
 - feat: validate that store id and auth model id in ulid format (#23)
@@ -12,6 +12,7 @@
 - fix: `OpenFgaClient.Read` and `OpenFgaClient.ReadChanges` now allow a null body
 - chore!: use latest API interfaces
 - chore: dependency updates
+- chore: add [example project](./example)
 
 BREAKING CHANGES:
 Note: This release comes with substantial breaking changes, especially to the interfaces due to the protobuf changes in the last release.
