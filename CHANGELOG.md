@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.1
+
+### [0.3.1](https://github.com/openfga/dotnet-sdk/compare/v0.3.0...v0.3.1) (2024-02-13)
+
+- fix: use correct content type for token request
+
 ## v0.3.0
 
 ### [0.3.0](https://github.com/openfga/dotnet-sdk/compare/v0.2.5...v0.3.0) (2023-12-20)
