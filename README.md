@@ -92,7 +92,7 @@ Search for and install `OpenFga.Sdk` in each of their respective package manager
 
 [Learn how to initialize your SDK](https://openfga.dev/docs/getting-started/setup-sdk-client)
 
-The documentation below refers to the `OpenFga.SdkClient`, to read the documentation for `OpenFga.SdkApi`, check out the [`v0.2.1` documentation](https://github.com/openfga/dotnet-sdk/tree/v0.2.1#readme).
+We strongly recommend you initialize the `OpenFgaClient` only once and then re-use it throughout your app, otherwise you will incur the cost of having to re-initialize multiple times or at every request, the cost of reduced connection pooling and re-use, and would be particularly costly in the client credentials flow, as that flow will be preformed on every request.
 
 > The `OpenFga.SdkClient` will by default retry API requests up to 15 times on 429 and 5xx errors.
 
