@@ -11,6 +11,7 @@
 //
 
 
+using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 
@@ -44,7 +45,7 @@ public class ApiClient : IDisposable {
                 _baseClient = new BaseClient(_configuration, userHttpClient);
                 break;
             case CredentialsMethod.ClientCredentials:
-                _oauth2Client = new OAuth2Client(_configuration.Credentials, _baseClient);
+                _oauth2Client = new OAuth2Client(_configuration.Credentials, _baseClient, new RetryParams { MaxRetry = _configuration.MaxRetry, MinWaitInMs = _configuration.MinWaitInMs });
                 break;
             case CredentialsMethod.None:
             default:
