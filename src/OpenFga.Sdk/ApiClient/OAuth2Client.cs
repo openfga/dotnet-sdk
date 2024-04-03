@@ -11,6 +11,7 @@
 //
 
 
+using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 using System.Text.Json.Serialization;
@@ -73,6 +74,7 @@ public class OAuth2Client {
     private AuthToken _authToken = new();
     private IDictionary<string, string> _authRequest { get; set; }
     private string _apiTokenIssuer { get; set; }
+    private RetryParams _retryParams;
 
     #endregion
 
@@ -84,7 +86,7 @@ public class OAuth2Client {
     /// <param name="credentialsConfig"></param>
     /// <param name="httpClient"></param>
     /// <exception cref="NullReferenceException"></exception>
-    public OAuth2Client(Credentials credentialsConfig, BaseClient httpClient) {
+    public OAuth2Client(Credentials credentialsConfig, BaseClient httpClient, RetryParams retryParams) {
         if (string.IsNullOrWhiteSpace(credentialsConfig.Config!.ClientId)) {
             throw new FgaRequiredParamError("OAuth2Client", "config.ClientId");
         }
@@ -101,6 +103,8 @@ public class OAuth2Client {
             { "audience", credentialsConfig.Config.ApiAudience },
             { "grant_type", "client_credentials" }
         };
+
+        this._retryParams = retryParams;
     }
 
     /// <summary>
@@ -116,16 +120,45 @@ public class OAuth2Client {
             Body = Utils.CreateFormEncodedConent(this._authRequest),
         };
 
-        var accessTokenResponse = await _httpClient.SendRequestAsync<AccessTokenResponse>(
+        var accessTokenResponse = await Retry(async () => await _httpClient.SendRequestAsync<AccessTokenResponse>(
             requestBuilder,
             null,
             "ExchangeTokenAsync",
-            cancellationToken);
+            cancellationToken));
 
         _authToken = new AuthToken() {
             AccessToken = accessTokenResponse.AccessToken,
             ExpiresAt = DateTime.Now + TimeSpan.FromSeconds(accessTokenResponse.ExpiresIn)
         };
+    }
+
+    private async Task<TResult> Retry<TResult>(Func<Task<TResult>> retryable) {
+        var numRetries = 0;
+        while (true) {
+            try {
+                numRetries++;
+
+                return await retryable();
+            }
+            catch (FgaApiRateLimitExceededError err) {
+                if (numRetries > _retryParams.MaxRetry) {
+                    throw;
+                }
+                var waitInMs = (int)((err.ResetInMs == null || err.ResetInMs < _retryParams.MinWaitInMs)
+                    ? _retryParams.MinWaitInMs
+                    : err.ResetInMs);
+
+                await Task.Delay(waitInMs);
+            }
+            catch (FgaApiError err) {
+                if (!err.ShouldRetry || numRetries > _retryParams.MaxRetry) {
+                    throw;
+                }
+                var waitInMs = _retryParams.MinWaitInMs;
+
+                await Task.Delay(waitInMs);
+            }
+        }
     }
 
     /// <summary>

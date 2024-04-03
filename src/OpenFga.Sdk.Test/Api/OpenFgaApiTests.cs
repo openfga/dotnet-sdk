@@ -478,6 +478,102 @@ namespace OpenFga.Sdk.Test.Api {
             );
         }
 
+        /// <summary>
+        /// Test that a network calls to get credentials are retried
+        /// </summary>
+        [Fact]
+        public async Task ExchangeCredentialsRetriesTest() {
+            var config = new Configuration.Configuration() {
+                ApiHost = _host,
+                Credentials = new Credentials() {
+                    Method = CredentialsMethod.ClientCredentials,
+                    Config = new CredentialsConfig() {
+                        ClientId = "some-id",
+                        ClientSecret = "some-secret",
+                        ApiTokenIssuer = "tokenissuer.fga.example",
+                        ApiAudience = "some-audience",
+                    }
+                }
+            };
+
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"https://{config.Credentials.Config.ApiTokenIssuer}/oauth/token") &&
+                        req.Method == HttpMethod.Post &&
+                        req.Content.Headers.ContentType.ToString().Equals("application/x-www-form-urlencoded")),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.TooManyRequests
+                })
+                    .ReturnsAsync(new HttpResponseMessage() {
+                        StatusCode = HttpStatusCode.InternalServerError
+                    })
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new OAuth2Client.AccessTokenResponse() {
+                        AccessToken = "some-token",
+                        ExpiresIn = 86400,
+                        TokenType = "Bearer"
+                    }),
+                });
+
+            var readAuthorizationModelsMockExpression = ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri.ToString()
+                    .StartsWith($"{config.BasePath}/stores/{_storeId}/authorization-models") &&
+                req.Method == HttpMethod.Get &&
+                req.Headers.Contains("Authorization") &&
+                req.Headers.Authorization.Equals(new AuthenticationHeaderValue("Bearer", "some-token")));
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    readAuthorizationModelsMockExpression,
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(
+                            new ReadAuthorizationModelsResponse() { AuthorizationModels = { } }),
+                })
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(
+                            new ReadAuthorizationModelsResponse() { AuthorizationModels = { } }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+
+            var response = await openFgaApi.ReadAuthorizationModels(_storeId, null, null);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(3),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"https://{config.Credentials.Config.ApiTokenIssuer}/oauth/token") &&
+                    req.Method == HttpMethod.Post &&
+                    req.Content.Headers.ContentType.ToString().Equals("application/x-www-form-urlencoded")),
+                ItExpr.IsAny<CancellationToken>()
+            );
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                readAuthorizationModelsMockExpression,
+                ItExpr.IsAny<CancellationToken>()
+            );
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(0),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
         /**
          * Errors
          */
