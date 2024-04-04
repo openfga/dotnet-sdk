@@ -27,6 +27,7 @@ docs/CheckRequestTupleKey.md
 docs/CheckResponse.md
 docs/Computed.md
 docs/Condition.md
+docs/ConditionMetadata.md
 docs/ConditionParamTypeRef.md
 docs/ContextualTupleKeys.md
 docs/CreateStoreRequest.md
@@ -61,6 +62,7 @@ docs/ReadResponse.md
 docs/RelationMetadata.md
 docs/RelationReference.md
 docs/RelationshipCondition.md
+docs/SourceInfo.md
 docs/Status.md
 docs/Store.md
 docs/Tuple.md
@@ -161,6 +163,7 @@ src/OpenFga.Sdk/Model/CheckRequestTupleKey.cs
 src/OpenFga.Sdk/Model/CheckResponse.cs
 src/OpenFga.Sdk/Model/Computed.cs
 src/OpenFga.Sdk/Model/Condition.cs
+src/OpenFga.Sdk/Model/ConditionMetadata.cs
 src/OpenFga.Sdk/Model/ConditionParamTypeRef.cs
 src/OpenFga.Sdk/Model/ContextualTupleKeys.cs
 src/OpenFga.Sdk/Model/CreateStoreRequest.cs
@@ -195,6 +198,7 @@ src/OpenFga.Sdk/Model/ReadResponse.cs
 src/OpenFga.Sdk/Model/RelationMetadata.cs
 src/OpenFga.Sdk/Model/RelationReference.cs
 src/OpenFga.Sdk/Model/RelationshipCondition.cs
+src/OpenFga.Sdk/Model/SourceInfo.cs
 src/OpenFga.Sdk/Model/Status.cs
 src/OpenFga.Sdk/Model/Store.cs
 src/OpenFga.Sdk/Model/Tuple.cs
