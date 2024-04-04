@@ -27,12 +27,19 @@ jobs:
         run: dotnet build --no-restore
 
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test --no-build --verbosity normal --collect "Code Coverage"
 
-      - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 #v4.3.1
+      - uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 #v4.3.1
         with:
           name: nuget-package
           path: src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@c16abc29c95fcf9174b58eb7e1abf4c866893bc8 # v4.1.1
+        continue-on-error: true
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: openfga/dotnet-sdk
 
   publish:
     runs-on: ubuntu-latest
@@ -58,7 +65,7 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
-      - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 #v4.3.1
+      - uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 #v4.3.1
         with:
           name: nuget-package
           path: src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg
@@ -78,7 +85,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: Roang-zero1/github-create-release-action@57eb9bdce7a964e48788b9e78b5ac766cb684803
+      - uses: Roang-zero1/github-create-release-action@57eb9bdce7a964e48788b9e78b5ac766cb684803 # v3.0.1
         with:
           version_regex: ^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
         env:
