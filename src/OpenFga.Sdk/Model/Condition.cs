@@ -36,7 +36,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="name">name (required).</param>
         /// <param name="expression">A Google CEL expression, expressed as a string. (required).</param>
         /// <param name="parameters">A map of parameter names to the parameter&#39;s defined type reference..</param>
-        public Condition(string name = default(string), string expression = default(string), Dictionary<string, ConditionParamTypeRef> parameters = default(Dictionary<string, ConditionParamTypeRef>)) {
+        /// <param name="metadata">metadata.</param>
+        public Condition(string name = default(string), string expression = default(string), Dictionary<string, ConditionParamTypeRef> parameters = default(Dictionary<string, ConditionParamTypeRef>), ConditionMetadata metadata = default(ConditionMetadata)) {
             // to ensure "name" is required (not null)
             if (name == null) {
                 throw new ArgumentNullException("name is a required property for Condition and cannot be null");
@@ -48,6 +49,7 @@ namespace OpenFga.Sdk.Model {
             }
             this.Expression = expression;
             this.Parameters = parameters;
+            this.Metadata = metadata;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -76,6 +78,14 @@ namespace OpenFga.Sdk.Model {
         [JsonPropertyName("parameters")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Dictionary<string, ConditionParamTypeRef>? Parameters { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Metadata
+        /// </summary>
+        [DataMember(Name = "metadata", EmitDefaultValue = false)]
+        [JsonPropertyName("metadata")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public ConditionMetadata? Metadata { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -134,6 +144,11 @@ namespace OpenFga.Sdk.Model {
                     this.Parameters != null &&
                     input.Parameters != null &&
                     this.Parameters.SequenceEqual(input.Parameters)
+                ) &&
+                (
+                    this.Metadata == input.Metadata ||
+                    (this.Metadata != null &&
+                    this.Metadata.Equals(input.Metadata))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -154,6 +169,9 @@ namespace OpenFga.Sdk.Model {
                 }
                 if (this.Parameters != null) {
                     hashCode = (hashCode * 9923) + this.Parameters.GetHashCode();
+                }
+                if (this.Metadata != null) {
+                    hashCode = (hashCode * 9923) + this.Metadata.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

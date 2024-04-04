@@ -34,8 +34,12 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="Metadata" /> class.
         /// </summary>
         /// <param name="relations">relations.</param>
-        public Metadata(Dictionary<string, RelationMetadata> relations = default(Dictionary<string, RelationMetadata>)) {
+        /// <param name="module">module.</param>
+        /// <param name="sourceInfo">sourceInfo.</param>
+        public Metadata(Dictionary<string, RelationMetadata> relations = default(Dictionary<string, RelationMetadata>), string module = default(string), SourceInfo sourceInfo = default(SourceInfo)) {
             this.Relations = relations;
+            this.Module = module;
+            this.SourceInfo = sourceInfo;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -46,6 +50,22 @@ namespace OpenFga.Sdk.Model {
         [JsonPropertyName("relations")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public Dictionary<string, RelationMetadata>? Relations { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Module
+        /// </summary>
+        [DataMember(Name = "module", EmitDefaultValue = false)]
+        [JsonPropertyName("module")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string? Module { get; set; }
+
+        /// <summary>
+        /// Gets or Sets SourceInfo
+        /// </summary>
+        [DataMember(Name = "source_info", EmitDefaultValue = false)]
+        [JsonPropertyName("source_info")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public SourceInfo? SourceInfo { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -94,6 +114,16 @@ namespace OpenFga.Sdk.Model {
                     this.Relations != null &&
                     input.Relations != null &&
                     this.Relations.SequenceEqual(input.Relations)
+                ) &&
+                (
+                    this.Module == input.Module ||
+                    (this.Module != null &&
+                    this.Module.Equals(input.Module))
+                ) &&
+                (
+                    this.SourceInfo == input.SourceInfo ||
+                    (this.SourceInfo != null &&
+                    this.SourceInfo.Equals(input.SourceInfo))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -108,6 +138,12 @@ namespace OpenFga.Sdk.Model {
                 int hashCode = 9661;
                 if (this.Relations != null) {
                     hashCode = (hashCode * 9923) + this.Relations.GetHashCode();
+                }
+                if (this.Module != null) {
+                    hashCode = (hashCode * 9923) + this.Module.GetHashCode();
+                }
+                if (this.SourceInfo != null) {
+                    hashCode = (hashCode * 9923) + this.SourceInfo.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

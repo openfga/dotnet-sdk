@@ -18,38 +18,28 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// RelationMetadata
+    /// ConditionMetadata
     /// </summary>
-    [DataContract(Name = "RelationMetadata")]
-    public partial class RelationMetadata : IEquatable<RelationMetadata>, IValidatableObject {
+    [DataContract(Name = "ConditionMetadata")]
+    public partial class ConditionMetadata : IEquatable<ConditionMetadata>, IValidatableObject {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RelationMetadata" /> class.
+        /// Initializes a new instance of the <see cref="ConditionMetadata" /> class.
         /// </summary>
         [JsonConstructor]
-        public RelationMetadata() {
+        public ConditionMetadata() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RelationMetadata" /> class.
+        /// Initializes a new instance of the <see cref="ConditionMetadata" /> class.
         /// </summary>
-        /// <param name="directlyRelatedUserTypes">directlyRelatedUserTypes.</param>
         /// <param name="module">module.</param>
         /// <param name="sourceInfo">sourceInfo.</param>
-        public RelationMetadata(List<RelationReference> directlyRelatedUserTypes = default(List<RelationReference>), string module = default(string), SourceInfo sourceInfo = default(SourceInfo)) {
-            this.DirectlyRelatedUserTypes = directlyRelatedUserTypes;
+        public ConditionMetadata(string module = default(string), SourceInfo sourceInfo = default(SourceInfo)) {
             this.Module = module;
             this.SourceInfo = sourceInfo;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
-
-        /// <summary>
-        /// Gets or Sets DirectlyRelatedUserTypes
-        /// </summary>
-        [DataMember(Name = "directly_related_user_types", EmitDefaultValue = false)]
-        [JsonPropertyName("directly_related_user_types")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<RelationReference>? DirectlyRelatedUserTypes { get; set; }
 
         /// <summary>
         /// Gets or Sets Module
@@ -83,11 +73,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a RelationMetadata from the JSON string presentation of the object
+        /// Builds a ConditionMetadata from the JSON string presentation of the object
         /// </summary>
-        /// <returns>RelationMetadata</returns>
-        public static RelationMetadata FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<RelationMetadata>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>ConditionMetadata</returns>
+        public static ConditionMetadata FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<ConditionMetadata>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -96,25 +86,19 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as RelationMetadata);
+            return this.Equals(input as ConditionMetadata);
         }
 
         /// <summary>
-        /// Returns true if RelationMetadata instances are equal
+        /// Returns true if ConditionMetadata instances are equal
         /// </summary>
-        /// <param name="input">Instance of RelationMetadata to be compared</param>
+        /// <param name="input">Instance of ConditionMetadata to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(RelationMetadata input) {
+        public bool Equals(ConditionMetadata input) {
             if (input == null) {
                 return false;
             }
             return
-                (
-                    this.DirectlyRelatedUserTypes == input.DirectlyRelatedUserTypes ||
-                    this.DirectlyRelatedUserTypes != null &&
-                    input.DirectlyRelatedUserTypes != null &&
-                    this.DirectlyRelatedUserTypes.SequenceEqual(input.DirectlyRelatedUserTypes)
-                ) &&
                 (
                     this.Module == input.Module ||
                     (this.Module != null &&
@@ -136,9 +120,6 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 9661;
-                if (this.DirectlyRelatedUserTypes != null) {
-                    hashCode = (hashCode * 9923) + this.DirectlyRelatedUserTypes.GetHashCode();
-                }
                 if (this.Module != null) {
                     hashCode = (hashCode * 9923) + this.Module.GetHashCode();
                 }

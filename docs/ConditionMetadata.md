@@ -1,10 +1,9 @@
-# OpenFga.Sdk.Model.Metadata
+# OpenFga.Sdk.Model.ConditionMetadata
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Relations** | [**Dictionary&lt;string, RelationMetadata&gt;**](RelationMetadata.md) |  | [optional] 
 **Module** | **string** |  | [optional] 
 **SourceInfo** | [**SourceInfo**](SourceInfo.md) |  | [optional] 
 
