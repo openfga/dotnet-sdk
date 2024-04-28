@@ -111,7 +111,7 @@ namespace Example {
                 var configuration = new ClientConfiguration() {
                     ApiUrl = Environment.GetEnvironmentVariable("FGA_API_URL") ?? "http://localhost:8080", // required, e.g. https://api.fga.example
                     StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
-                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_MODEL_ID"), // Optional, can be overridden per request
                 };
                 var fgaClient = new OpenFgaClient(configuration);
                 var response = await fgaClient.ReadAuthorizationModels();
@@ -137,7 +137,7 @@ namespace Example {
                 var configuration = new ClientConfiguration() {
                     ApiUrl = Environment.GetEnvironmentVariable("FGA_API_URL") ?? "http://localhost:8080", // required, e.g. https://api.fga.example
                     StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
-                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_MODEL_ID"), // Optional, can be overridden per request
                     Credentials = new Credentials() {
                         Method = CredentialsMethod.ApiToken,
                         Config = new CredentialsConfig() {
@@ -169,7 +169,7 @@ namespace Example {
                 var configuration = new ClientConfiguration() {
                     ApiUrl = Environment.GetEnvironmentVariable("FGA_API_URL") ?? "http://localhost:8080", // required, e.g. https://api.fga.example
                     StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
-                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_MODEL_ID"), // Optional, can be overridden per request
                     Credentials = new Credentials() {
                         Method = CredentialsMethod.ClientCredentials,
                         Config = new CredentialsConfig() {
@@ -762,7 +762,7 @@ namespace Example {
                 var configuration = new ClientConfiguration() {
                     ApiUrl = Environment.GetEnvironmentVariable("FGA_API_URL") ?? "http://localhost:8080", // required, e.g. https://api.fga.example
                     StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
-                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_MODEL_ID"), // Optional, can be overridden per request
                     RetryParams = new RetryParams() {
                         MaxRetry = 3, // retry up to 3 times on API requests
                         MinWaitInMs = 250 // wait a minimum of 250 milliseconds between requests
@@ -857,6 +857,8 @@ namespace Example {
  - [Model.TupleToUserset](docs/TupleToUserset.md)
  - [Model.TypeDefinition](docs/TypeDefinition.md)
  - [Model.TypeName](docs/TypeName.md)
+ - [Model.UnprocessableContentErrorCode](docs/UnprocessableContentErrorCode.md)
+ - [Model.UnprocessableContentMessageResponse](docs/UnprocessableContentMessageResponse.md)
  - [Model.Users](docs/Users.md)
  - [Model.Userset](docs/Userset.md)
  - [Model.UsersetTree](docs/UsersetTree.md)

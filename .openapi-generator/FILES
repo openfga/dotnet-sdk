@@ -73,6 +73,8 @@ docs/TupleOperation.md
 docs/TupleToUserset.md
 docs/TypeDefinition.md
 docs/TypeName.md
+docs/UnprocessableContentErrorCode.md
+docs/UnprocessableContentMessageResponse.md
 docs/Users.md
 docs/Userset.md
 docs/UsersetTree.md
@@ -209,6 +211,8 @@ src/OpenFga.Sdk/Model/TupleOperation.cs
 src/OpenFga.Sdk/Model/TupleToUserset.cs
 src/OpenFga.Sdk/Model/TypeDefinition.cs
 src/OpenFga.Sdk/Model/TypeName.cs
+src/OpenFga.Sdk/Model/UnprocessableContentErrorCode.cs
+src/OpenFga.Sdk/Model/UnprocessableContentMessageResponse.cs
 src/OpenFga.Sdk/Model/Users.cs
 src/OpenFga.Sdk/Model/Userset.cs
 src/OpenFga.Sdk/Model/UsersetTree.cs
