@@ -1435,6 +1435,101 @@ public class OpenFgaClientTests {
             ItExpr.IsAny<CancellationToken>()
         );
     }
+    /// <summary>
+    /// Test ListUsers
+    /// </summary>
+    [Fact]
+    public async Task ListUsersTest() {
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        var expectedResponse = new ListUsersResponse {
+            // A real API would not return all these for the filter provided, these are just for test purposes
+            Users = new List<User> {
+                new () {
+                    Object = new FgaObject {
+                        Type = "user",
+                        Id = "81684243-9356-4421-8fbf-a4f8d36aa31b"
+                    }
+                },
+                new () {
+                    Userset = new UsersetUser() {
+                        Type = "team",
+                        Id = "fga",
+                        Relation = "member"
+                    }
+                },
+                new () {
+                    Wildcard = new TypedWildcard() {
+                        Type = "user"
+                    }
+                }
+
+            },
+            ExcludedUsers = new List<ObjectOrUserset>()
+        };
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/list-users") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(expectedResponse),
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientListUsersRequest {
+            Relation = "can_read",
+            Object = new FgaObject {
+                Type = "document",
+                Id = "roadmap"
+            },
+            UserFilters = new List<UserTypeFilter> {
+                // API does not allow sending multiple filters, done here for testing purposes
+                new() {
+                    Type = "user"
+                },
+                new() {
+                    Type = "team",
+                    Relation = "member"
+                }
+            },
+            ContextualTuples = new List<ClientTupleKey> {
+                new() {
+                    User = "folder:product",
+                    Relation = "editor",
+                    Object = "folder:product",
+                },
+                new() {
+                    User = "folder:product",
+                    Relation = "parent",
+                    Object = "document:roadmap",
+                },
+            },
+            Context = new { ViewCount = 100 }
+        };
+
+        var response = await fgaClient.ListUsers(body, new ClientWriteOptions {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+        });
+
+        mockHandler.Protected().Verify(
+            "SendAsync",
+            Times.Exactly(1),
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/list-users") &&
+                req.Method == HttpMethod.Post),
+            ItExpr.IsAny<CancellationToken>()
+        );
+
+        Assert.IsType<ListUsersResponse>(response);
+        Assert.Equal(3, response.Users.Count);
+        Assert.Equal(response, expectedResponse);
+    }
 
     /**************
      * Assertions *

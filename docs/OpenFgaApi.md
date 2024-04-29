@@ -11,6 +11,7 @@ Method | HTTP request | Description
 [**GetStore**](OpenFgaApi.md#getstore) | **GET** /stores/{store_id} | Get a store
 [**ListObjects**](OpenFgaApi.md#listobjects) | **POST** /stores/{store_id}/list-objects | List all objects of the given type that the user has a relation with
 [**ListStores**](OpenFgaApi.md#liststores) | **GET** /stores | List all stores
+[**ListUsers**](OpenFgaApi.md#listusers) | **POST** /stores/{store_id}/list-users | List all users of the given type that the object has a relation with
 [**Read**](OpenFgaApi.md#read) | **POST** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
 [**ReadAssertions**](OpenFgaApi.md#readassertions) | **GET** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
 [**ReadAuthorizationModel**](OpenFgaApi.md#readauthorizationmodel) | **GET** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
@@ -552,6 +553,83 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | A successful response. |  -  |
+| **400** | Request failed due to invalid input. |  -  |
+| **404** | Request failed due to incorrect path. |  -  |
+| **409** | Request was aborted due a transaction conflict. |  -  |
+| **422** | Request timed out due to excessive request throttling. |  -  |
+| **500** | Request failed due to internal server error. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+<a name="listusers"></a>
+# **ListUsers**
+> ListUsersResponse ListUsers (ListUsersRequest body)
+
+List all users of the given type that the object has a relation with
+
+### Example
+```csharp
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net.Http;
+using OpenFga.Sdk.Api;
+using OpenFga.Sdk.Client;
+using OpenFga.Sdk.Configuration;
+using OpenFga.Sdk.Model;
+
+namespace Example
+{
+    public class ListUsersExample
+    {
+        public static void Main()
+        {
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
+            };
+            HttpClient httpClient = new HttpClient();
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+            var body = new ListUsersRequest(); // ListUsersRequest | 
+
+            try
+            {
+                // List all users of the given type that the object has a relation with
+                ListUsersResponse response = await openFgaApi.ListUsers(body);
+                Debug.WriteLine(response);
+            }
+            catch (ApiException  e)
+            {
+                Debug.Print("Exception when calling OpenFgaApi.ListUsers: " + e.Message );
+                Debug.Print("Status Code: "+ e.ErrorCode);
+                Debug.Print(e.StackTrace);
+            }
+        }
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **body** | [**ListUsersRequest**](ListUsersRequest.md)|  | 
+
+### Return type
+
+[**ListUsersResponse**](ListUsersResponse.md)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 
