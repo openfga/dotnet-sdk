@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.2
+
+### [0.3.2](https://github.com/openfga/dotnet-sdk/compare/v0.3.1...v0.3.2) (2024-04-30)
+
+- feat: support the [ListUsers](https://github.com/openfga/rfcs/blob/main/20231214-listUsers-api.md) endpoint (#57)
+- feat: add retries to client credential requests (#51)
+- feat: add support for modular models metadata (#53)
+
 ## v0.3.1
 
 ### [0.3.1](https://github.com/openfga/dotnet-sdk/compare/v0.3.0...v0.3.1) (2024-02-13)
@@ -38,7 +46,7 @@ Some of the changes to expect:
 var configuration = new ClientConfiguration() {
     ApiUrl = Environment.GetEnvironmentVariable("FGA_API_URL"), // required, e.g. https://api.fga.example
     StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
-    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_AUTHORIZATION_MODEL_ID"), // Optional, can be overridden per request
+    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_MODEL_ID"), // Optional, can be overridden per request
 };
 var fgaClient = new OpenFgaClient(configuration);
 ```

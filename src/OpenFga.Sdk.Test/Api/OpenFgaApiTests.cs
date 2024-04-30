@@ -76,7 +76,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// Test that a storeId is required when calling methods that need it
         /// </summary>
         [Fact]
-        public async void StoreIdRequiredWhenNeeded() {
+        public async Task StoreIdRequiredWhenNeeded() {
             var config = new Configuration.Configuration() { ApiHost = _host };
             var openFgaApi = new OpenFgaApi(config);
 
@@ -1482,6 +1482,87 @@ namespace OpenFga.Sdk.Test.Api {
 
             Assert.IsType<ListObjectsResponse>(response);
             Assert.Single(response.Objects);
+            Assert.Equal(response, expectedResponse);
+        }
+
+        /// <summary>
+        /// Test ListUsers
+        /// </summary>
+        [Fact]
+        public async Task ListUsersTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var expectedResponse = new ListUsersResponse {
+                // A real API would not return all these for the filter provided, these are just for test purposes
+                Users = new List<User> {
+                    new () {
+                        Object = new FgaObject {
+                            Type = "user",
+                            Id = "81684243-9356-4421-8fbf-a4f8d36aa31b"
+                        }
+                    },
+                    new () {
+                        Userset = new UsersetUser() {
+                            Type = "team",
+                            Id = "fga",
+                            Relation = "member"
+                        }
+                    },
+                    new () {
+                        Wildcard = new TypedWildcard() {
+                            Type = "user"
+                        }
+                    }
+
+                },
+                ExcludedUsers = new List<ObjectOrUserset>()
+            };
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/list-users") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(expectedResponse),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new ListUsersRequest {
+                AuthorizationModelId = "01GAHCE4YVKPQEKZQHT2R89MQV",
+                Relation = "can_read",
+                Object = new FgaObject {
+                    Type = "document",
+                    Id = "roadmap"
+                },
+                UserFilters = new List<UserTypeFilter> {
+                    // API does not allow sending multiple filters, done here for testing purposes
+                    new("user"),
+                    new("team", "member")
+                },
+                ContextualTuples = new List<TupleKey> {
+                    new("folder:product", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
+                    new("document:roadmap", "parent", "folder:product")
+                },
+                Context = new { ViewCount = 100 }
+            };
+            var response = await openFgaApi.ListUsers(_storeId, body);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(1),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/list-users") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+
+            Assert.IsType<ListUsersResponse>(response);
+            Assert.Equal(3, response.Users.Count);
             Assert.Equal(response, expectedResponse);
         }
 

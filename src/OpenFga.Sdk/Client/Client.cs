@@ -410,6 +410,22 @@ public class OpenFgaClient : IDisposable {
         return responses;
     }
 
+    /**
+     * ListUsers - List all users of the given type that the object has a relation with (evaluates)
+     */
+    public async Task<ListUsersResponse> ListUsers(IClientListUsersRequest body,
+        IClientRequestOptionsWithAuthZModelId? options = default,
+        CancellationToken cancellationToken = default) =>
+        await api.ListUsers(GetStoreId(options), new ListUsersRequest {
+            Object = body.Object,
+            Relation = body.Relation,
+            UserFilters = body.UserFilters,
+            ContextualTuples = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ??
+                                new List<TupleKey>(),
+            Context = body.Context,
+            AuthorizationModelId = GetAuthorizationModelId(options)
+        });
+
     /**************
      * Assertions *
      **************/
