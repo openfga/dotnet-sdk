@@ -18,48 +18,43 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// Assertion
+    /// UnauthenticatedResponse
     /// </summary>
-    [DataContract(Name = "Assertion")]
-    public partial class Assertion : IEquatable<Assertion>, IValidatableObject {
+    [DataContract(Name = "UnauthenticatedResponse")]
+    public partial class UnauthenticatedResponse : IEquatable<UnauthenticatedResponse>, IValidatableObject {
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="Assertion" /> class.
+        /// Gets or Sets Code
+        /// </summary>
+        [DataMember(Name = "code", EmitDefaultValue = false)]
+        [JsonPropertyName("code")]
+        public ErrorCode? Code { get; set; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UnauthenticatedResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public Assertion() {
+        public UnauthenticatedResponse() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Assertion" /> class.
+        /// Initializes a new instance of the <see cref="UnauthenticatedResponse" /> class.
         /// </summary>
-        /// <param name="tupleKey">tupleKey (required).</param>
-        /// <param name="expectation">expectation (required).</param>
-        public Assertion(AssertionTupleKey tupleKey = default(AssertionTupleKey), bool expectation = default(bool)) {
-            // to ensure "tupleKey" is required (not null)
-            if (tupleKey == null) {
-                throw new ArgumentNullException("tupleKey is a required property for Assertion and cannot be null");
-            }
-            this.TupleKey = tupleKey;
-            this.Expectation = expectation;
+        /// <param name="code">code.</param>
+        /// <param name="message">message.</param>
+        public UnauthenticatedResponse(ErrorCode? code = default(ErrorCode?), string message = default(string)) {
+            this.Code = code;
+            this.Message = message;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Gets or Sets TupleKey
+        /// Gets or Sets Message
         /// </summary>
-        [DataMember(Name = "tuple_key", IsRequired = true, EmitDefaultValue = false)]
-        [JsonPropertyName("tuple_key")]
+        [DataMember(Name = "message", EmitDefaultValue = false)]
+        [JsonPropertyName("message")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public AssertionTupleKey TupleKey { get; set; }
-
-        /// <summary>
-        /// Gets or Sets Expectation
-        /// </summary>
-        [DataMember(Name = "expectation", IsRequired = true, EmitDefaultValue = true)]
-        [JsonPropertyName("expectation")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public bool Expectation { get; set; }
+        public string? Message { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -77,11 +72,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a Assertion from the JSON string presentation of the object
+        /// Builds a UnauthenticatedResponse from the JSON string presentation of the object
         /// </summary>
-        /// <returns>Assertion</returns>
-        public static Assertion FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<Assertion>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>UnauthenticatedResponse</returns>
+        public static UnauthenticatedResponse FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<UnauthenticatedResponse>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -90,27 +85,27 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as Assertion);
+            return this.Equals(input as UnauthenticatedResponse);
         }
 
         /// <summary>
-        /// Returns true if Assertion instances are equal
+        /// Returns true if UnauthenticatedResponse instances are equal
         /// </summary>
-        /// <param name="input">Instance of Assertion to be compared</param>
+        /// <param name="input">Instance of UnauthenticatedResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Assertion input) {
+        public bool Equals(UnauthenticatedResponse input) {
             if (input == null) {
                 return false;
             }
             return
                 (
-                    this.TupleKey == input.TupleKey ||
-                    (this.TupleKey != null &&
-                    this.TupleKey.Equals(input.TupleKey))
+                    this.Code == input.Code ||
+                    this.Code.Equals(input.Code)
                 ) &&
                 (
-                    this.Expectation == input.Expectation ||
-                    this.Expectation.Equals(input.Expectation)
+                    this.Message == input.Message ||
+                    (this.Message != null &&
+                    this.Message.Equals(input.Message))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -123,10 +118,10 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 9661;
-                if (this.TupleKey != null) {
-                    hashCode = (hashCode * 9923) + this.TupleKey.GetHashCode();
+                hashCode = (hashCode * 9923) + this.Code.GetHashCode();
+                if (this.Message != null) {
+                    hashCode = (hashCode * 9923) + this.Message.GetHashCode();
                 }
-                hashCode = (hashCode * 9923) + this.Expectation.GetHashCode();
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
                 }

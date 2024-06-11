@@ -1,7 +1,7 @@
 //
 // OpenFGA/.NET SDK for OpenFGA
 //
-// API version: 0.1
+// API version: 1.x
 // Website: https://openfga.dev
 // Documentation: https://openfga.dev/docs
 // Support: https://openfga.dev/community
@@ -36,7 +36,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="authorizationModelId">authorizationModelId.</param>
         /// <param name="_object">_object (required).</param>
         /// <param name="relation">relation (required).</param>
-        /// <param name="userFilters">userFilters (required).</param>
+        /// <param name="userFilters">The type of results returned. Only accepts exactly one value. (required).</param>
         /// <param name="contextualTuples">contextualTuples.</param>
         /// <param name="context">Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation..</param>
         public ListUsersRequest(string authorizationModelId = default(string), FgaObject _object = default(FgaObject), string relation = default(string), List<UserTypeFilter> userFilters = default(List<UserTypeFilter>), List<TupleKey> contextualTuples = default(List<TupleKey>), Object context = default(Object)) {
@@ -86,8 +86,9 @@ namespace OpenFga.Sdk.Model {
         public string Relation { get; set; }
 
         /// <summary>
-        /// Gets or Sets UserFilters
+        /// The type of results returned. Only accepts exactly one value.
         /// </summary>
+        /// <value>The type of results returned. Only accepts exactly one value.</value>
         [DataMember(Name = "user_filters", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("user_filters")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]

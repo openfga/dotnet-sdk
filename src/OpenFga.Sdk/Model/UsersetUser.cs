@@ -1,7 +1,7 @@
 //
 // OpenFGA/.NET SDK for OpenFGA
 //
-// API version: 0.1
+// API version: 1.x
 // Website: https://openfga.dev
 // Documentation: https://openfga.dev/docs
 // Support: https://openfga.dev/community
@@ -18,7 +18,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// UsersetUser
+    /// Userset.  A set or group of users, represented in the &#x60;&lt;type&gt;:&lt;id&gt;#&lt;relation&gt;&#x60; format  &#x60;group:fga#member&#x60; represents all members of group FGA, not to be confused by &#x60;group:fga&#x60; which represents the group itself as a specific object.  See: https://openfga.dev/docs/modeling/building-blocks/usersets#what-is-a-userset
     /// </summary>
     [DataContract(Name = "UsersetUser")]
     public partial class UsersetUser : IEquatable<UsersetUser>, IValidatableObject {
