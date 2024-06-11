@@ -78,6 +78,7 @@ docs/TupleToUserset.md
 docs/TypeDefinition.md
 docs/TypeName.md
 docs/TypedWildcard.md
+docs/UnauthenticatedResponse.md
 docs/UnprocessableContentErrorCode.md
 docs/UnprocessableContentMessageResponse.md
 docs/User.md
@@ -225,6 +226,7 @@ src/OpenFga.Sdk/Model/TupleToUserset.cs
 src/OpenFga.Sdk/Model/TypeDefinition.cs
 src/OpenFga.Sdk/Model/TypeName.cs
 src/OpenFga.Sdk/Model/TypedWildcard.cs
+src/OpenFga.Sdk/Model/UnauthenticatedResponse.cs
 src/OpenFga.Sdk/Model/UnprocessableContentErrorCode.cs
 src/OpenFga.Sdk/Model/UnprocessableContentMessageResponse.cs
 src/OpenFga.Sdk/Model/User.cs

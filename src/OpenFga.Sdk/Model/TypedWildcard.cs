@@ -1,7 +1,7 @@
 //
 // OpenFGA/.NET SDK for OpenFGA
 //
-// API version: 0.1
+// API version: 1.x
 // Website: https://openfga.dev
 // Documentation: https://openfga.dev/docs
 // Support: https://openfga.dev/community
@@ -18,7 +18,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// TypedWildcard
+    /// Type bound public access.  Normally represented using the &#x60;&lt;type&gt;:*&#x60; syntax  &#x60;employee:*&#x60; represents every object of type &#x60;employee&#x60;, including those not currently present in the system  See https://openfga.dev/docs/concepts#what-is-type-bound-public-access
     /// </summary>
     [DataContract(Name = "TypedWildcard")]
     public partial class TypedWildcard : IEquatable<TypedWildcard>, IValidatableObject {

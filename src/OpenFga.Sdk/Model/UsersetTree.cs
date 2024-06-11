@@ -1,7 +1,7 @@
 //
 // OpenFGA/.NET SDK for OpenFGA
 //
-// API version: 0.1
+// API version: 1.x
 // Website: https://openfga.dev
 // Documentation: https://openfga.dev/docs
 // Support: https://openfga.dev/community

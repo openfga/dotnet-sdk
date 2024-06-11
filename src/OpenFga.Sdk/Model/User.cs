@@ -1,7 +1,7 @@
 //
 // OpenFGA/.NET SDK for OpenFGA
 //
-// API version: 0.1
+// API version: 1.x
 // Website: https://openfga.dev
 // Documentation: https://openfga.dev/docs
 // Support: https://openfga.dev/community
@@ -18,7 +18,7 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// User
+    /// User.  Represents any possible value for a user (subject or principal). Can be a: - Specific user object e.g.: &#39;user:will&#39;, &#39;folder:marketing&#39;, &#39;org:contoso&#39;, ...) - Specific userset (e.g. &#39;group:engineering#member&#39;) - Public-typed wildcard (e.g. &#39;user:*&#39;)  See https://openfga.dev/docs/concepts#what-is-a-user
     /// </summary>
     [DataContract(Name = "User")]
     public partial class User : IEquatable<User>, IValidatableObject {

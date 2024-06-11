@@ -11,7 +11,7 @@ Method | HTTP request | Description
 [**GetStore**](OpenFgaApi.md#getstore) | **GET** /stores/{store_id} | Get a store
 [**ListObjects**](OpenFgaApi.md#listobjects) | **POST** /stores/{store_id}/list-objects | List all objects of the given type that the user has a relation with
 [**ListStores**](OpenFgaApi.md#liststores) | **GET** /stores | List all stores
-[**ListUsers**](OpenFgaApi.md#listusers) | **POST** /stores/{store_id}/list-users | List all users of the given type that the object has a relation with
+[**ListUsers**](OpenFgaApi.md#listusers) | **POST** /stores/{store_id}/list-users | [EXPERIMENTAL] List the users matching the provided filter who have a certain relation to a particular type.
 [**Read**](OpenFgaApi.md#read) | **POST** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules
 [**ReadAssertions**](OpenFgaApi.md#readassertions) | **GET** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID
 [**ReadAuthorizationModel**](OpenFgaApi.md#readauthorizationmodel) | **GET** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
@@ -28,7 +28,7 @@ Method | HTTP request | Description
 
 Check whether a user is authorized to access an object
 
-The Check API returns whether a given user has a relationship with a given object in a given store. The `user` field of the request can be a specific target, such as `user:anne`, or a userset (set of users) such as `group:marketing#member` or a type-bound public access `user:*`. To arrive at a result, the API uses: an authorization model, explicit tuples written through the Write API, contextual tuples present in the request, and implicit tuples that exist by virtue of applying set theory (such as `document:2021-budget#viewer@document:2021-budget#viewer`; the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`). A `contextual_tuples` object may also be included in the body of the request. This object contains one field `tuple_keys`, which is an array of tuple keys. Each of these tuples may have an associated `condition`. You may also provide an `authorization_model_id` in the body. This will be used to assert that the input `tuple_key` is valid for the model specified. If not specified, the assertion will be made against the latest authorization model ID. It is strongly recommended to specify authorization model id for better performance. You may also provide a `context` object that will be used to evaluate the conditioned tuples in the system. It is strongly recommended to provide a value for all the input parameters of all the conditions, to ensure that all tuples be evaluated correctly. The response will return whether the relationship exists in the field `allowed`.  Some exceptions apply, but in general, if a Check API responds with `{allowed: true}`, then you can expect the equivalent ListObjects query to return the object, and viceversa.  For example, if `Check(user:anne, reader, document:2021-budget)` responds with `{allowed: true}`, then `ListObjects(user:anne, reader, document)` may include `document:2021-budget` in the response. ## Examples ### Querying with contextual tuples In order to check if user `user:anne` of type `user` has a `reader` relationship with object `document:2021-budget` given the following contextual tuple ```json {   \"user\": \"user:anne\",   \"relation\": \"member\",   \"object\": \"time_slot:office_hours\" } ``` the Check API can be used with the following request body: ```json {   \"tuple_key\": {     \"user\": \"user:anne\",     \"relation\": \"reader\",     \"object\": \"document:2021-budget\"   },   \"contextual_tuples\": {     \"tuple_keys\": [       {         \"user\": \"user:anne\",         \"relation\": \"member\",         \"object\": \"time_slot:office_hours\"       }     ]   },   \"authorization_model_id\": \"01G50QVV17PECNVAHX1GG4Y5NC\" } ``` ### Querying usersets Some Checks will always return `true`, even without any tuples. For example, for the following authorization model ```python model   schema 1.1 type user type document   relations     define reader: [user] ``` the following query ```json {   \"tuple_key\": {      \"user\": \"document:2021-budget#reader\",      \"relation\": \"reader\",      \"object\": \"document:2021-budget\"   } } ``` will always return `{ \"allowed\": true }`. This is because usersets are self-defining: the userset `document:2021-budget#reader` will always have the `reader` relation with `document:2021-budget`. ### Querying usersets with exclusion in the model A Check for a userset can yield results that must be treated carefully if the model involves exclusion. For example, for the following authorization model ```python model   schema 1.1 type user type group   relations     define member: [user] type document   relations     define blocked: [user]     define reader: [group#member] but not blocked ``` the following query ```json {   \"tuple_key\": {      \"user\": \"group:finance#member\",      \"relation\": \"reader\",      \"object\": \"document:2021-budget\"   },   \"contextual_tuples\": {     \"tuple_keys\": [       {         \"user\": \"user:anne\",         \"relation\": \"member\",         \"object\": \"group:finance\"       },       {         \"user\": \"group:finance#member\",         \"relation\": \"reader\",         \"object\": \"document:2021-budget\"       },       {         \"user\": \"user:anne\",         \"relation\": \"blocked\",         \"object\": \"document:2021-budget\"       }     ]   }, } ``` will return `{ \"allowed\": true }`, even though a specific user of the userset `group:finance#member` does not have the `reader` relationship with the given object. 
+The Check API returns whether a given user has a relationship with a given object in a given store. The `user` field of the request can be a specific target, such as `user:anne`, or a userset (set of users) such as `group:marketing#member` or a type-bound public access `user:*`. To arrive at a result, the API uses: an authorization model, explicit tuples written through the Write API, contextual tuples present in the request, and implicit tuples that exist by virtue of applying set theory (such as `document:2021-budget#viewer@document:2021-budget#viewer`; the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`). A `contextual_tuples` object may also be included in the body of the request. This object contains one field `tuple_keys`, which is an array of tuple keys. Each of these tuples may have an associated `condition`. You may also provide an `authorization_model_id` in the body. This will be used to assert that the input `tuple_key` is valid for the model specified. If not specified, the assertion will be made against the latest authorization model ID. It is strongly recommended to specify authorization model id for better performance. You may also provide a `context` object that will be used to evaluate the conditioned tuples in the system. It is strongly recommended to provide a value for all the input parameters of all the conditions, to ensure that all tuples be evaluated correctly. The response will return whether the relationship exists in the field `allowed`.  Some exceptions apply, but in general, if a Check API responds with `{allowed: true}`, then you can expect the equivalent ListObjects query to return the object, and viceversa.  For example, if `Check(user:anne, reader, document:2021-budget)` responds with `{allowed: true}`, then `ListObjects(user:anne, reader, document)` may include `document:2021-budget` in the response. ## Examples ### Querying with contextual tuples In order to check if user `user:anne` of type `user` has a `reader` relationship with object `document:2021-budget` given the following contextual tuple ```json {   \"user\": \"user:anne\",   \"relation\": \"member\",   \"object\": \"time_slot:office_hours\" } ``` the Check API can be used with the following request body: ```json {   \"tuple_key\": {     \"user\": \"user:anne\",     \"relation\": \"reader\",     \"object\": \"document:2021-budget\"   },   \"contextual_tuples\": {     \"tuple_keys\": [       {         \"user\": \"user:anne\",         \"relation\": \"member\",         \"object\": \"time_slot:office_hours\"       }     ]   },   \"authorization_model_id\": \"01G50QVV17PECNVAHX1GG4Y5NC\" } ``` ### Querying usersets Some Checks will always return `true`, even without any tuples. For example, for the following authorization model ```python model   schema 1.1 type user type document   relations     define reader: [user] ``` the following query ```json {   \"tuple_key\": {      \"user\": \"document:2021-budget#reader\",      \"relation\": \"reader\",      \"object\": \"document:2021-budget\"   } } ``` will always return `{ \"allowed\": true }`. This is because usersets are self-defining: the userset `document:2021-budget#reader` will always have the `reader` relation with `document:2021-budget`. ### Querying usersets with difference in the model A Check for a userset can yield results that must be treated carefully if the model involves difference. For example, for the following authorization model ```python model   schema 1.1 type user type group   relations     define member: [user] type document   relations     define blocked: [user]     define reader: [group#member] but not blocked ``` the following query ```json {   \"tuple_key\": {      \"user\": \"group:finance#member\",      \"relation\": \"reader\",      \"object\": \"document:2021-budget\"   },   \"contextual_tuples\": {     \"tuple_keys\": [       {         \"user\": \"user:anne\",         \"relation\": \"member\",         \"object\": \"group:finance\"       },       {         \"user\": \"group:finance#member\",         \"relation\": \"reader\",         \"object\": \"document:2021-budget\"       },       {         \"user\": \"user:anne\",         \"relation\": \"blocked\",         \"object\": \"document:2021-budget\"       }     ]   }, } ``` will return `{ \"allowed\": true }`, even though a specific user of the userset `group:finance#member` does not have the `reader` relationship with the given object. 
 
 ### Example
 ```csharp
@@ -94,6 +94,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -171,6 +172,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **201** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -247,6 +249,7 @@ void (empty response body)
 |-------------|-------------|------------------|
 | **204** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -326,6 +329,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -403,6 +407,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -482,6 +487,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -561,6 +567,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -572,7 +579,9 @@ Name | Type | Description  | Notes
 # **ListUsers**
 > ListUsersResponse ListUsers (ListUsersRequest body)
 
-List all users of the given type that the object has a relation with
+[EXPERIMENTAL] List the users matching the provided filter who have a certain relation to a particular type.
+
+The ListUsers API returns a list of all the users of a specific type that have a relation to a given object.  This API is available in an experimental capacity and can be enabled with the `- -experimentals enable-list-users` flag.  To arrive at a result, the API uses: an authorization model, explicit tuples written through the Write API, contextual tuples present in the request, and implicit tuples that exist by virtue of applying set theory (such as `document:2021-budget#viewer@document:2021-budget#viewer`; the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`). An `authorization_model_id` may be specified in the body. If it is not specified, the latest authorization model ID will be used. It is strongly recommended to specify authorization model id for better performance. You may also specify `contextual_tuples` that will be treated as regular tuples. Each of these tuples may have an associated `condition`. You may also provide a `context` object that will be used to evaluate the conditioned tuples in the system. It is strongly recommended to provide a value for all the input parameters of all the conditions, to ensure that all tuples be evaluated correctly. The response will contain the related users in an array in the \"users\" field of the response. These results may include specific objects, usersets  or type-bound public access. Each of these types of results is encoded in its own type and not represented as a string.In certain cases of negation via the `but not` operator, some results are marked as excluded from the main set of results. These exclusions  are returned in the `excluded_users` property and should be handled appropriately at the point of implementation.The number of users in the response array will be limited by the execution timeout specified in the flag OPENFGA_LIST_USERS_DEADLINE and by the upper bound specified in the flag OPENFGA_LIST_USERS_MAX_RESULTS, whichever is hit first. The returned users will not be sorted, and therefore two identical calls may yield different sets of users.
 
 ### Example
 ```csharp
@@ -601,7 +610,7 @@ namespace Example
 
             try
             {
-                // List all users of the given type that the object has a relation with
+                // [EXPERIMENTAL] List the users matching the provided filter who have a certain relation to a particular type.
                 ListUsersResponse response = await openFgaApi.ListUsers(body);
                 Debug.WriteLine(response);
             }
@@ -638,6 +647,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -717,6 +727,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -796,6 +807,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -875,6 +887,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -956,6 +969,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -1039,6 +1053,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -1118,6 +1133,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -1198,6 +1214,7 @@ void (empty response body)
 |-------------|-------------|------------------|
 | **204** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
@@ -1277,6 +1294,7 @@ Name | Type | Description  | Notes
 |-------------|-------------|------------------|
 | **201** | A successful response. |  -  |
 | **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
 | **404** | Request failed due to incorrect path. |  -  |
 | **409** | Request was aborted due a transaction conflict. |  -  |
 | **422** | Request timed out due to excessive request throttling. |  -  |
