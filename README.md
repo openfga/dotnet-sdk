@@ -746,7 +746,6 @@ const response = await fgaClient.listUsers({
 }, options);
 
 // response.users = [{object: {type: "user", id: "81684243-9356-4421-8fbf-a4f8d36aa31b"}}, {userset: { type: "user" }}, ...]
-// response.excluded_users = [ {object: {type: "user", id: "4a455e27-d15a-4434-82e0-136f9c2aa4cf"}}, ... ]
 ```
 
 #### Assertions
@@ -882,7 +881,6 @@ namespace Example {
  - [Model.Nodes](docs/Nodes.md)
  - [Model.NotFoundErrorCode](docs/NotFoundErrorCode.md)
  - [Model.NullValue](docs/NullValue.md)
- - [Model.ObjectOrUserset](docs/ObjectOrUserset.md)
  - [Model.ObjectRelation](docs/ObjectRelation.md)
  - [Model.PathUnknownErrorMessageResponse](docs/PathUnknownErrorMessageResponse.md)
  - [Model.ReadAssertionsResponse](docs/ReadAssertionsResponse.md)

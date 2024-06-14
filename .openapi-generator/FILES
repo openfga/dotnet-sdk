@@ -52,7 +52,6 @@ docs/Node.md
 docs/Nodes.md
 docs/NotFoundErrorCode.md
 docs/NullValue.md
-docs/ObjectOrUserset.md
 docs/ObjectRelation.md
 docs/OpenFgaApi.md
 docs/PathUnknownErrorMessageResponse.md
@@ -201,7 +200,6 @@ src/OpenFga.Sdk/Model/Node.cs
 src/OpenFga.Sdk/Model/Nodes.cs
 src/OpenFga.Sdk/Model/NotFoundErrorCode.cs
 src/OpenFga.Sdk/Model/NullValue.cs
-src/OpenFga.Sdk/Model/ObjectOrUserset.cs
 src/OpenFga.Sdk/Model/ObjectRelation.cs
 src/OpenFga.Sdk/Model/PathUnknownErrorMessageResponse.cs
 src/OpenFga.Sdk/Model/ReadAssertionsResponse.cs

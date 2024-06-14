@@ -1514,7 +1514,6 @@ namespace OpenFga.Sdk.Test.Api {
                     }
 
                 },
-                ExcludedUsers = new List<ObjectOrUserset>()
             };
             mockHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
