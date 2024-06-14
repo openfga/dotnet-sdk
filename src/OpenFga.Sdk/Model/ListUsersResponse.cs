@@ -34,18 +34,12 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ListUsersResponse" /> class.
         /// </summary>
         /// <param name="users">users (required).</param>
-        /// <param name="excludedUsers">excludedUsers (required).</param>
-        public ListUsersResponse(List<User> users = default(List<User>), List<ObjectOrUserset> excludedUsers = default(List<ObjectOrUserset>)) {
+        public ListUsersResponse(List<User> users = default(List<User>)) {
             // to ensure "users" is required (not null)
             if (users == null) {
                 throw new ArgumentNullException("users is a required property for ListUsersResponse and cannot be null");
             }
             this.Users = users;
-            // to ensure "excludedUsers" is required (not null)
-            if (excludedUsers == null) {
-                throw new ArgumentNullException("excludedUsers is a required property for ListUsersResponse and cannot be null");
-            }
-            this.ExcludedUsers = excludedUsers;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -56,14 +50,6 @@ namespace OpenFga.Sdk.Model {
         [JsonPropertyName("users")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public List<User> Users { get; set; }
-
-        /// <summary>
-        /// Gets or Sets ExcludedUsers
-        /// </summary>
-        [DataMember(Name = "excluded_users", IsRequired = true, EmitDefaultValue = false)]
-        [JsonPropertyName("excluded_users")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<ObjectOrUserset> ExcludedUsers { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -112,12 +98,6 @@ namespace OpenFga.Sdk.Model {
                     this.Users != null &&
                     input.Users != null &&
                     this.Users.SequenceEqual(input.Users)
-                ) &&
-                (
-                    this.ExcludedUsers == input.ExcludedUsers ||
-                    this.ExcludedUsers != null &&
-                    input.ExcludedUsers != null &&
-                    this.ExcludedUsers.SequenceEqual(input.ExcludedUsers)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -132,9 +112,6 @@ namespace OpenFga.Sdk.Model {
                 int hashCode = 9661;
                 if (this.Users != null) {
                     hashCode = (hashCode * 9923) + this.Users.GetHashCode();
-                }
-                if (this.ExcludedUsers != null) {
-                    hashCode = (hashCode * 9923) + this.ExcludedUsers.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

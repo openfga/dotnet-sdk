@@ -1464,7 +1464,6 @@ public class OpenFgaClientTests {
                 }
 
             },
-            ExcludedUsers = new List<ObjectOrUserset>()
         };
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
