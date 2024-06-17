@@ -56,9 +56,9 @@ public class Configuration {
     ///     Version of the package.
     /// </summary>
     /// <value>Version of the package.</value>
-    public const string Version = "0.3.2";
+    public const string Version = "0.4.0";
 
-    private const string DefaultUserAgent = "openfga-sdk dotnet/0.3.2";
+    private const string DefaultUserAgent = "openfga-sdk dotnet/0.4.0";
 
     #endregion Constants
 
