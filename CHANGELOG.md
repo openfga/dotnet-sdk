@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.4.0
+
+### [0.4.0](https://github.com/openfga/dotnet-sdk/compare/v0.3.2...v0.4.0) (2024-06-14)
+- chore!: remove excluded users from ListUsers response
+
+BREAKING CHANGE:
+
+This version removes the `ExcludedUsers` field from the `ListUsersResponse` and `ClientListUsersResponse` classes,
+for more details see the [associated API change](https://github.com/openfga/api/pull/171).
+
 ## v0.3.2
 
 ### [0.3.2](https://github.com/openfga/dotnet-sdk/compare/v0.3.1...v0.3.2) (2024-04-30)
