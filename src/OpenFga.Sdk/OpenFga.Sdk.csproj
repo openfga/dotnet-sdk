@@ -28,9 +28,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models" />
-    <None Include="../../assets/FGAIcon.png" Pack="true" Visible="false" PackagePath="" />
-    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <Folder Include="Models"/>
+    <None Include="../../assets/FGAIcon.png" Pack="true" Visible="false" PackagePath=""/>
+    <None Include="../../README.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenTelemetry.Api" Version="1.9.0"/>
   </ItemGroup>
 
 </Project>

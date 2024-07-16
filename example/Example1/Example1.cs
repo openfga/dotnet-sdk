@@ -15,7 +15,7 @@ public class Example1 {
                 credentials.Method = CredentialsMethod.ClientCredentials;
                 credentials.Config = new CredentialsConfig() {
                     ApiAudience = Environment.GetEnvironmentVariable("FGA_API_AUDIENCE"),
-                    ApiTokenIssuer = Environment.GetEnvironmentVariable("FGA_TOKEN_ISSUER"),
+                    ApiTokenIssuer = Environment.GetEnvironmentVariable("FGA_API_TOKEN_ISSUER"),
                     ClientId = Environment.GetEnvironmentVariable("FGA_CLIENT_ID"),
                     ClientSecret = Environment.GetEnvironmentVariable("FGA_CLIENT_SECRET")
                 };

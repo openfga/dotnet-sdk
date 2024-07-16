@@ -16,16 +16,31 @@ using OpenFga.Sdk.Exceptions;
 namespace OpenFga.Sdk.Configuration;
 
 /// <summary>
-/// Setup OpenFGA Configuration
+///     Setup OpenFGA Configuration
 /// </summary>
 public class Configuration {
+    #region Constructors
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Configuration" /> class
+    /// </summary>
+    /// <exception cref="FgaRequiredParamError"></exception>
+    public Configuration() {
+        DefaultHeaders ??= new Dictionary<string, string>();
+
+        if (!DefaultHeaders.ContainsKey("User-Agent")) {
+            DefaultHeaders.Add("User-Agent", DefaultUserAgent);
+        }
+    }
+
+    #endregion Constructors
+
     #region Methods
 
-    private static bool IsWellFormedUriString(string uri) {
-        return Uri.TryCreate(uri, UriKind.Absolute, out var uriResult) &&
-               ((uriResult.ToString().Equals(uri) || uriResult.ToString().Equals($"{uri}/")) &&
-                (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps));
-    }
+    private static bool IsWellFormedUriString(string uri) =>
+        Uri.TryCreate(uri, UriKind.Absolute, out var uriResult) &&
+        (uriResult.ToString().Equals(uri) || uriResult.ToString().Equals($"{uri}/")) &&
+        (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
 
     /// <summary>
     ///     Checks if the configuration is valid
@@ -46,6 +61,7 @@ public class Configuration {
         }
 
         Credentials?.IsValid();
+        Telemetry?.IsValid();
     }
 
     #endregion
@@ -61,22 +77,6 @@ public class Configuration {
     private const string DefaultUserAgent = "openfga-sdk dotnet/0.5.0";
 
     #endregion Constants
-
-    #region Constructors
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Configuration" /> class
-    /// </summary>
-    /// <exception cref="FgaRequiredParamError"></exception>
-    public Configuration() {
-        DefaultHeaders ??= new Dictionary<string, string>();
-
-        if (!DefaultHeaders.ContainsKey("User-Agent")) {
-            DefaultHeaders.Add("User-Agent", DefaultUserAgent);
-        }
-    }
-
-    #endregion Constructors
 
 
     #region Properties
@@ -154,6 +154,11 @@ public class Configuration {
     /// </summary>
     /// <value>MinWaitInMs</value>
     public int MinWaitInMs { get; set; } = 100;
+
+    /// <summary>
+    ///     Gets or sets the telemetry configuration.
+    /// </summary>
+    public TelemetryConfig? Telemetry { get; set; }
 
     #endregion Properties
 }
