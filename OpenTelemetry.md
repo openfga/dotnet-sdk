@@ -26,11 +26,8 @@ In cases when metrics events are sent, they will not be viewable outside of infr
 | `fga-client.request.model_id`  | `string` | The authorization model ID that was sent as part of the request, if any                                                 |
 | `fga-client.request.client_id` | `string` | The client ID associated with the request, if any                                                                       |
 | `fga-client.user`              | `string` | The user that is associated with the action of the request for check and list objects                                   |
-| `fga-client.request.retries`   | `int`    | The number of retries attempted (starting from 1 for the original request). Deprecated, use `http.request.resend_count` |
 | `http.request.resend_count`    | `int`    | The number of retries attempted (starting from 1 for the original request)                                              |
-| `http.status_code`             | `int`    | The status code of the response. Deprecated, use `http.response.status_code`                                            |
 | `http.response.status_code`    | `int`    | The status code of the response                                                                                         |
-| `http.method`                  | `string` | The HTTP method for the request. Deprecated, use `http.request.method`                                                  |
 | `http.request.method`          | `string` | The HTTP method for the request                                                                                         |
 | `http.host`                    | `string` | Host identifier of the origin the request was sent to                                                                   |
 | `url.scheme`                   | `string` | HTTP Scheme of the request (`http`/`https`)                                                                             |

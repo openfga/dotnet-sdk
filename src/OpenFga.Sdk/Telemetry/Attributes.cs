@@ -76,15 +76,7 @@ public class Attributes {
     private const string AttributeHttpServerRequestDuration = "http.server.request.duration";
 
     // The HTTP method for the request
-    [Obsolete("Deprecated - use AttributeHttpMethod.")]
-    private const string AttributeHttpMethodOld = "http.method";
-
-    // The HTTP method for the request
     private const string AttributeHttpMethod = "http.request.method";
-
-    // The status code of the response
-    [Obsolete("Deprecated - use AttributeHttpStatus.")]
-    private const string AttributeHttpStatusOld = "http.status_code";
 
     // The status code of the response
     private const string AttributeHttpStatus = "http.response.status_code";
@@ -100,10 +92,6 @@ public class Attributes {
 
     // User Agent used in the query
     private const string AttributeHttpUserAgent = "user_agent.original";
-
-    // The number of retries attempted (starting from 1 for the original request)
-    [Obsolete("Deprecated - use AttributeRequestRetryCount.")]
-    private const string AttributeRequestRetryCountOld = "fga-client.request.retries";
 
     // The number of retries attempted (starting from 1 for the original request)
     private const string AttributeRequestRetryCount = "http.request.resend_count";
@@ -195,14 +183,11 @@ public class Attributes {
 
         if (response.StatusCode != null) {
             attributes.Add(new KeyValuePair<string, object>(AttributeHttpStatus, (int)response.StatusCode));
-            attributes.Add(new KeyValuePair<string, object>(AttributeHttpStatusOld, (int)response.StatusCode));
         }
 
         if (response.RequestMessage != null) {
             if (response.RequestMessage.Method != null) {
                 attributes.Add(new KeyValuePair<string, object>(AttributeHttpMethod, response.RequestMessage.Method));
-                attributes.Add(new KeyValuePair<string, object>(AttributeHttpMethodOld,
-                    response.RequestMessage.Method));
             }
 
             if (response.RequestMessage.RequestUri != null) {
@@ -248,7 +233,6 @@ public class Attributes {
             requestDuration.ElapsedMilliseconds));
 
         attributes.Add(new KeyValuePair<string, object>(AttributeRequestRetryCount, retryCount));
-        attributes.Add(new KeyValuePair<string, object>(AttributeRequestRetryCountOld, retryCount));
 
         return attributes.ToArray();
     }
