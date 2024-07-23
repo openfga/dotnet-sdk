@@ -118,8 +118,7 @@ public class Attributes {
         var attributes = new List<KeyValuePair<string, object>>();
 
         // To match the JS SDK, we are converting the method name to camelCase
-        attributes.Add(new KeyValuePair<string, object>(AttributeRequestMethod,
-            char.ToLowerInvariant(apiName[0]) + apiName.Substring(1)));
+        attributes.Add(new KeyValuePair<string, object>(AttributeRequestMethod, apiName));
 
         if (requestBuilder.PathParameters.ContainsKey("store_id")) {
             var storeId = requestBuilder.PathParameters.GetValueOrDefault("store_id");

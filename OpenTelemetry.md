@@ -21,7 +21,7 @@ In cases when metrics events are sent, they will not be viewable outside of infr
 | Attribute Name                 | Type     | Description                                                                                                             |
 |--------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------|
 | `fga-client.response.model_id` | `string` | The authorization model ID that the FGA server used                                                                     |
-| `fga-client.request.method`    | `string` | The FGA method/action that was performed (e.g. `check`, `listObjects`, ...) in camelCase                                |
+| `fga-client.request.method`    | `string` | The FGA method/action that was performed (e.g. `Check`, `ListObjects`, ...) in TitleCase                                |
 | `fga-client.request.store_id`  | `string` | The store ID that was sent as part of the request                                                                       |
 | `fga-client.request.model_id`  | `string` | The authorization model ID that was sent as part of the request, if any                                                 |
 | `fga-client.request.client_id` | `string` | The client ID associated with the request, if any                                                                       |
