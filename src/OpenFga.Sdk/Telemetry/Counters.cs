@@ -11,6 +11,7 @@
 //
 
 
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
 namespace OpenFga.Sdk.Telemetry;
@@ -29,5 +30,5 @@ public class TelemetryCounters {
             description: "The count of token exchange requests");
     }
 
-    public void buildForResponse(KeyValuePair<string, object>[] attributes) => tokenExchangeCounter.Add(1, attributes!);
+    public void buildForResponse(TagList attributes) => tokenExchangeCounter.Add(1, attributes!);
 }

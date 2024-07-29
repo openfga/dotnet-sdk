@@ -112,18 +112,16 @@ public class Attributes {
      * @param methodAttributes - Extra attributes that the method (i.e. check, listObjects) wishes to have included. Any custom attributes should use the common names.
      * @returns {Attributes}
      */
-    public static KeyValuePair<string, object>[] buildAttributesForResponse(string apiName,
+    public static TagList buildAttributesForResponse(string apiName,
         HttpResponseMessage response, RequestBuilder requestBuilder, Credentials? credentials,
         Stopwatch requestDuration, int retryCount) {
-        var attributes = new List<KeyValuePair<string, object>>();
-
-        // To match the JS SDK, we are converting the method name to camelCase
-        attributes.Add(new KeyValuePair<string, object>(AttributeRequestMethod, apiName));
+        var attributes = new TagList {
+            new (AttributeRequestMethod, apiName) };
 
         if (requestBuilder.PathParameters.ContainsKey("store_id")) {
             var storeId = requestBuilder.PathParameters.GetValueOrDefault("store_id");
             if (!string.IsNullOrEmpty(storeId)) {
-                attributes.Add(new KeyValuePair<string, object>(AttributeRequestStoreId, storeId));
+                attributes.Add(new KeyValuePair<string, object?>(AttributeRequestStoreId, storeId));
             }
         }
 
@@ -132,7 +130,7 @@ public class Attributes {
         if (requestBuilder.PathParameters.ContainsKey("authorization_model_id")) {
             modelId = requestBuilder.PathParameters.GetValueOrDefault("authorization_model_id");
             if (!string.IsNullOrEmpty(modelId)) {
-                attributes.Add(new KeyValuePair<string, object>(AttributeRequestModelId, modelId));
+                attributes.Add(new KeyValuePair<string, object?>(AttributeRequestModelId, modelId));
             }
         }
         // In the case of ReadAuthorizationModel, the path param is called ID
@@ -140,7 +138,7 @@ public class Attributes {
                  requestBuilder.PathParameters.ContainsKey("id")) {
             modelId = requestBuilder.PathParameters.GetValueOrDefault("id");
             if (!string.IsNullOrEmpty(modelId)) {
-                attributes.Add(new KeyValuePair<string, object>(AttributeRequestModelId, modelId));
+                attributes.Add(new KeyValuePair<string, object?>(AttributeRequestModelId, modelId));
             }
         }
         // In many endpoints authorization_model_id is sent as a field in the body
@@ -152,14 +150,14 @@ public class Attributes {
                     JsonSerializer.Deserialize<IPartialApiRequest>(requestBuilder.Body?.ToString()!);
 
                 if (!string.IsNullOrEmpty(partialApiResquest?.AuthorizationModelId)) {
-                    attributes.Add(new KeyValuePair<string, object>(AttributeRequestModelId,
+                    attributes.Add(new KeyValuePair<string, object?>(AttributeRequestModelId,
                         partialApiResquest.AuthorizationModelId));
                 }
 
                 switch (apiName) {
                     case "Check": {
                             if (!string.IsNullOrEmpty(partialApiResquest?.TupleKeyUser)) {
-                                attributes.Add(new KeyValuePair<string, object>(AttributeFgaRequestUser,
+                                attributes.Add(new KeyValuePair<string, object?>(AttributeFgaRequestUser,
                                     partialApiResquest.TupleKeyUser));
                             }
 
@@ -167,7 +165,7 @@ public class Attributes {
                         }
                     case "ListObjects": {
                             if (!string.IsNullOrEmpty(partialApiResquest?.User)) {
-                                attributes.Add(new KeyValuePair<string, object>(AttributeFgaRequestUser,
+                                attributes.Add(new KeyValuePair<string, object?>(AttributeFgaRequestUser,
                                     partialApiResquest.User));
                             }
 
@@ -181,58 +179,58 @@ public class Attributes {
 
 
         if (response.StatusCode != null) {
-            attributes.Add(new KeyValuePair<string, object>(AttributeHttpStatus, (int)response.StatusCode));
+            attributes.Add(new KeyValuePair<string, object?>(AttributeHttpStatus, (int)response.StatusCode));
         }
 
         if (response.RequestMessage != null) {
             if (response.RequestMessage.Method != null) {
-                attributes.Add(new KeyValuePair<string, object>(AttributeHttpMethod, response.RequestMessage.Method));
+                attributes.Add(new KeyValuePair<string, object?>(AttributeHttpMethod, response.RequestMessage.Method));
             }
 
             if (response.RequestMessage.RequestUri != null) {
-                attributes.Add(new KeyValuePair<string, object>(AttributeHttpScheme,
+                attributes.Add(new KeyValuePair<string, object?>(AttributeHttpScheme,
                     response.RequestMessage.RequestUri.Scheme));
-                attributes.Add(new KeyValuePair<string, object>(AttributeHttpHost,
+                attributes.Add(new KeyValuePair<string, object?>(AttributeHttpHost,
                     response.RequestMessage.RequestUri.Host));
-                attributes.Add(new KeyValuePair<string, object>(AttributeHttpUrl,
+                attributes.Add(new KeyValuePair<string, object?>(AttributeHttpUrl,
                     response.RequestMessage.RequestUri.AbsoluteUri));
             }
 
             if (response.RequestMessage.Headers.UserAgent != null &&
                 !string.IsNullOrEmpty(response.RequestMessage.Headers.UserAgent.ToString())) {
-                attributes.Add(new KeyValuePair<string, object>(AttributeHttpUserAgent,
+                attributes.Add(new KeyValuePair<string, object?>(AttributeHttpUserAgent,
                     response.RequestMessage.Headers.UserAgent.ToString()));
             }
         }
 
         var responseModelId = GetHeaderValueIfValid(response.Headers, "openfga-authorization-model-id");
         if (!string.IsNullOrEmpty(responseModelId)) {
-            attributes.Add(new KeyValuePair<string, object>(AttributeResponseModelId, responseModelId));
+            attributes.Add(new KeyValuePair<string, object?>(AttributeResponseModelId, responseModelId));
         }
         else {
             responseModelId = GetHeaderValueIfValid(response.Headers, "fga-authorization-model-id");
             if (!string.IsNullOrEmpty(responseModelId)) {
-                attributes.Add(new KeyValuePair<string, object>(AttributeResponseModelId, responseModelId));
+                attributes.Add(new KeyValuePair<string, object?>(AttributeResponseModelId, responseModelId));
             }
         }
 
         if (credentials is { Method: CredentialsMethod.ClientCredentials, Config.ClientId: not null }) {
-            attributes.Add(new KeyValuePair<string, object>(AttributeRequestClientId, credentials.Config.ClientId));
+            attributes.Add(new KeyValuePair<string, object?>(AttributeRequestClientId, credentials.Config.ClientId));
         }
 
         var durationHeader = GetHeaderValueIfValid(response.Headers, "fga-query-duration-ms");
         if (!string.IsNullOrEmpty(durationHeader)) {
             var success = float.TryParse(durationHeader, out var durationFloat);
             if (success) {
-                attributes.Add(new KeyValuePair<string, object>(AttributeHttpServerRequestDuration, durationFloat));
+                attributes.Add(new KeyValuePair<string, object?>(AttributeHttpServerRequestDuration, durationFloat));
             }
         }
 
-        attributes.Add(new KeyValuePair<string, object>(AttributeHttpClientRequestDuration,
+        attributes.Add(new KeyValuePair<string, object?>(AttributeHttpClientRequestDuration,
             requestDuration.ElapsedMilliseconds));
 
-        attributes.Add(new KeyValuePair<string, object>(AttributeRequestRetryCount, retryCount));
+        attributes.Add(new KeyValuePair<string, object?>(AttributeRequestRetryCount, retryCount));
 
-        return attributes.ToArray();
+        return attributes;
     }
 }

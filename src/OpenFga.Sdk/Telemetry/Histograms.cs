@@ -37,7 +37,7 @@ public class TelemetryHistograms {
             description: "The duration of queries on the FGA server", unit: "milliseconds");
     }
 
-    public void buildForResponse(HttpResponseMessage response, KeyValuePair<string, object>[] attributes,
+    public void buildForResponse(HttpResponseMessage response, TagList attributes,
         Stopwatch requestDuration) {
         if (response.Headers.Contains("fga-query-duration-ms")) {
             var durationHeader = response.Headers.GetValues("fga-query-duration-ms").ToString();
