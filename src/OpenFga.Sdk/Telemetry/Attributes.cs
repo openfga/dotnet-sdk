@@ -15,28 +15,9 @@ using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Configuration;
 using System.Diagnostics;
 using System.Net.Http.Headers;
-using System.Runtime.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
 
 namespace OpenFga.Sdk.Telemetry;
-
-internal interface IPartialApiRequest {
-    [DataMember(Name = "authorization_model_id", IsRequired = false, EmitDefaultValue = false)]
-    [JsonPropertyName("authorization_model_id")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string AuthorizationModelId { get; set; }
-
-    [DataMember(Name = "user", IsRequired = false, EmitDefaultValue = false)]
-    [JsonPropertyName("user")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string User { get; set; }
-
-    [DataMember(Name = "tuple_key.user", IsRequired = false, EmitDefaultValue = false)]
-    [JsonPropertyName("tuple_key.user")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string TupleKeyUser { get; set; }
-}
 
 public class Attributes {
     /**
@@ -112,11 +93,10 @@ public class Attributes {
      * @param methodAttributes - Extra attributes that the method (i.e. check, listObjects) wishes to have included. Any custom attributes should use the common names.
      * @returns {Attributes}
      */
-    public static TagList buildAttributesForResponse(string apiName,
-        HttpResponseMessage response, RequestBuilder requestBuilder, Credentials? credentials,
+    public static TagList buildAttributesForResponse<T>(string apiName,
+        HttpResponseMessage response, RequestBuilder<T> requestBuilder, Credentials? credentials,
         Stopwatch requestDuration, int retryCount) {
-        var attributes = new TagList {
-            new (AttributeRequestMethod, apiName) };
+        var attributes = new TagList { new(AttributeRequestMethod, apiName) };
 
         if (requestBuilder.PathParameters.ContainsKey("store_id")) {
             var storeId = requestBuilder.PathParameters.GetValueOrDefault("store_id");
@@ -146,37 +126,46 @@ public class Attributes {
         // if the apiName is Write, Expand or ListUsers we want to parse it to get the model ID
         else if (apiName is "Check" or "ListObjects" or "Write" or "Expand" or "ListUsers") {
             try {
-                var partialApiResquest =
-                    JsonSerializer.Deserialize<IPartialApiRequest>(requestBuilder.Body?.ToString()!);
+                if (requestBuilder.JsonBody != null) {
+                    var apiRequest = JsonNode.Parse(requestBuilder.JsonBody!)!;
 
-                if (!string.IsNullOrEmpty(partialApiResquest?.AuthorizationModelId)) {
-                    attributes.Add(new KeyValuePair<string, object?>(AttributeRequestModelId,
-                        partialApiResquest.AuthorizationModelId));
-                }
+                    try {
+                        var authModelId = (string)apiRequest!["authorization_model_id"]!;
 
-                switch (apiName) {
-                    case "Check": {
-                            if (!string.IsNullOrEmpty(partialApiResquest?.TupleKeyUser)) {
-                                attributes.Add(new KeyValuePair<string, object?>(AttributeFgaRequestUser,
-                                    partialApiResquest.TupleKeyUser));
-                            }
-
-                            break;
+                        if (!string.IsNullOrEmpty(authModelId)) {
+                            attributes.Add(new KeyValuePair<string, object?>(AttributeRequestModelId,
+                                authModelId));
                         }
-                    case "ListObjects": {
-                            if (!string.IsNullOrEmpty(partialApiResquest?.User)) {
-                                attributes.Add(new KeyValuePair<string, object?>(AttributeFgaRequestUser,
-                                    partialApiResquest.User));
-                            }
+                    }
+                    catch { }
 
-                            break;
-                        }
+                    switch (apiName) {
+                        case "Check": {
+                                var tupleKey = apiRequest!["tuple_key"]!;
+                                var fgaUser = (string)tupleKey!["user"]!;
+
+                                if (!string.IsNullOrEmpty(fgaUser)) {
+                                    attributes.Add(new KeyValuePair<string, object?>(AttributeFgaRequestUser,
+                                        fgaUser));
+                                }
+
+                                break;
+                            }
+                        case "ListObjects": {
+                                var fgaUser = (string)apiRequest!["user"]!;
+
+                                if (!string.IsNullOrEmpty(fgaUser)) {
+                                    attributes.Add(new KeyValuePair<string, object?>(AttributeFgaRequestUser,
+                                        fgaUser));
+                                }
+
+                                break;
+                            }
+                    }
                 }
             }
-            catch {
-            }
+            catch { }
         }
-
 
         if (response.StatusCode != null) {
             attributes.Add(new KeyValuePair<string, object?>(AttributeHttpStatus, (int)response.StatusCode));

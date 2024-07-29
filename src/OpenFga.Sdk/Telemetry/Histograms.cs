@@ -39,8 +39,9 @@ public class TelemetryHistograms {
 
     public void buildForResponse(HttpResponseMessage response, TagList attributes,
         Stopwatch requestDuration) {
-        if (response.Headers.Contains("fga-query-duration-ms")) {
-            var durationHeader = response.Headers.GetValues("fga-query-duration-ms").ToString();
+        if (response.Headers.Contains("fga-query-duration-ms") &&
+            response.Headers.GetValues("fga-query-duration-ms").Any()) {
+            var durationHeader = response.Headers.GetValues("fga-query-duration-ms").First();
             if (!string.IsNullOrEmpty(durationHeader)) {
                 var success = float.TryParse(durationHeader, out var durationFloat);
                 if (success) {

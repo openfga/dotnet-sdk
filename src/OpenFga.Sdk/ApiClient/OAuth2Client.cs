@@ -11,7 +11,6 @@
 //
 
 
-
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
@@ -117,19 +116,20 @@ public class OAuth2Client {
     /// <exception cref="NullReferenceException"></exception>
     /// <exception cref="Exception"></exception>
     private async Task ExchangeTokenAsync(CancellationToken cancellationToken = default) {
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<IDictionary<string, string>> {
             Method = HttpMethod.Post,
             BasePath = $"https://{_apiTokenIssuer}",
             PathTemplate = "/oauth/token",
-            Body = Utils.CreateFormEncodedConent(_authRequest)
+            Body = _authRequest
         };
 
         var sw = Stopwatch.StartNew();
-        var accessTokenResponse = await Retry(async () => await _httpClient.SendRequestAsync<AccessTokenResponse>(
-            requestBuilder,
-            null,
-            "ExchangeTokenAsync",
-            cancellationToken));
+        var accessTokenResponse = await Retry(async () =>
+            await _httpClient.SendRequestAsync<IDictionary<string, string>, AccessTokenResponse>(
+                requestBuilder,
+                null,
+                "ExchangeTokenAsync",
+                cancellationToken));
 
         sw.Stop();
         metrics.buildForClientCredentialsResponse(accessTokenResponse.rawResponse, requestBuilder, _credentialsConfig,

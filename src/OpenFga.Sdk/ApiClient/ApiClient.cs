@@ -69,7 +69,7 @@ public class ApiClient : IDisposable {
     /// <typeparam name="T">Response Type</typeparam>
     /// <returns></returns>
     /// <exception cref="FgaApiAuthenticationError"></exception>
-    public async Task<T> SendRequestAsync<T>(RequestBuilder requestBuilder, string apiName,
+    public async Task<TRes> SendRequestAsync<TReq, TRes>(RequestBuilder<TReq> requestBuilder, string apiName,
         CancellationToken cancellationToken = default) {
         IDictionary<string, string> additionalHeaders = new Dictionary<string, string>();
 
@@ -88,7 +88,8 @@ public class ApiClient : IDisposable {
         }
 
         var response = await Retry(async () =>
-            await _baseClient.SendRequestAsync<T>(requestBuilder, additionalHeaders, apiName, cancellationToken));
+            await _baseClient.SendRequestAsync<TReq, TRes>(requestBuilder, additionalHeaders, apiName,
+                cancellationToken));
 
         sw.Stop();
         metrics.buildForResponse(apiName, response.rawResponse, requestBuilder, _configuration.Credentials, sw,
@@ -105,7 +106,7 @@ public class ApiClient : IDisposable {
     /// <param name="apiName"></param>
     /// <param name="cancellationToken"></param>
     /// <exception cref="FgaApiAuthenticationError"></exception>
-    public async Task SendRequestAsync(RequestBuilder requestBuilder, string apiName,
+    public async Task SendRequestAsync<TReq>(RequestBuilder<TReq> requestBuilder, string apiName,
         CancellationToken cancellationToken = default) {
         IDictionary<string, string> additionalHeaders = new Dictionary<string, string>();
 
@@ -124,7 +125,8 @@ public class ApiClient : IDisposable {
         }
 
         var response = await Retry(async () =>
-            await _baseClient.SendRequestAsync<object>(requestBuilder, additionalHeaders, apiName, cancellationToken));
+            await _baseClient.SendRequestAsync<TReq, object>(requestBuilder, additionalHeaders, apiName,
+                cancellationToken));
 
         sw.Stop();
         metrics.buildForResponse(apiName, response.rawResponse, requestBuilder, _configuration.Credentials, sw,

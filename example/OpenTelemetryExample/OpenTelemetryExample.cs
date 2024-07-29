@@ -19,11 +19,12 @@ public class OpenTelemetryExample {
                 credentials.Method = CredentialsMethod.ClientCredentials;
                 credentials.Config = new CredentialsConfig {
                     ApiAudience = Environment.GetEnvironmentVariable("FGA_API_AUDIENCE"),
-                    ApiTokenIssuer = Environment.GetEnvironmentVariable("FGA_TOKEN_ISSUER"),
+                    ApiTokenIssuer = Environment.GetEnvironmentVariable("FGA_API_TOKEN_ISSUER"),
                     ClientId = Environment.GetEnvironmentVariable("FGA_CLIENT_ID"),
                     ClientSecret = Environment.GetEnvironmentVariable("FGA_CLIENT_SECRET")
                 };
-            } else if (Environment.GetEnvironmentVariable("FGA_API_TOKEN") != null) {
+            }
+            else if (Environment.GetEnvironmentVariable("FGA_API_TOKEN") != null) {
                 credentials.Method = CredentialsMethod.ApiToken;
                 credentials.Config = new CredentialsConfig {
                     ApiToken = Environment.GetEnvironmentVariable("FGA_API_TOKEN")
@@ -55,28 +56,32 @@ public class OpenTelemetryExample {
                 .AddConsoleExporter() // Only needed to export the metrics to the console (e.g. when debugging)
                 .Build();
 
-            // ListStores
-            Console.WriteLine("Listing Stores");
-            var stores1 = await fgaClient.ListStores();
-            Console.WriteLine("Stores Count: " + stores1.Stores?.Count());
+            var performStoreActions = configuration.StoreId == null;
+            GetStoreResponse? currentStore = null;
+            if (performStoreActions) {
+                // ListStores
+                Console.WriteLine("Listing Stores");
+                var stores1 = await fgaClient.ListStores();
+                Console.WriteLine("Stores Count: " + stores1.Stores?.Count());
 
-            // CreateStore
-            Console.WriteLine("Creating Test Store");
-            var store = await fgaClient.CreateStore(new ClientCreateStoreRequest { Name = "Test Store" });
-            Console.WriteLine("Test Store ID: " + store.Id);
+                // CreateStore
+                Console.WriteLine("Creating Test Store");
+                var store = await fgaClient.CreateStore(new ClientCreateStoreRequest { Name = "Test Store" });
+                Console.WriteLine("Test Store ID: " + store.Id);
 
-            // Set the store id
-            fgaClient.StoreId = store.Id;
+                // Set the store id
+                fgaClient.StoreId = store.Id;
 
-            // ListStores after Create
-            Console.WriteLine("Listing Stores");
-            var stores = await fgaClient.ListStores();
-            Console.WriteLine("Stores Count: " + stores.Stores?.Count());
+                // ListStores after Create
+                Console.WriteLine("Listing Stores");
+                var stores = await fgaClient.ListStores();
+                Console.WriteLine("Stores Count: " + stores.Stores?.Count());
 
-            // GetStore
-            Console.WriteLine("Getting Current Store");
-            var currentStore = await fgaClient.GetStore();
-            Console.WriteLine("Current Store Name: " + currentStore.Name);
+                // GetStore
+                Console.WriteLine("Getting Current Store");
+                currentStore = await fgaClient.GetStore();
+                Console.WriteLine("Current Store Name: " + currentStore.Name);
+            }
 
             // ReadAuthorizationModels
             Console.WriteLine("Reading Authorization Models");
@@ -152,6 +157,7 @@ public class OpenTelemetryExample {
                 }
             };
             var authorizationModel = await fgaClient.WriteAuthorizationModel(body);
+            Thread.Sleep(1000);
             Console.WriteLine("Authorization Model ID " + authorizationModel.AuthorizationModelId);
 
             // ReadAuthorizationModels - after Write
@@ -165,6 +171,23 @@ public class OpenTelemetryExample {
 
             // Set the model ID
             fgaClient.AuthorizationModelId = latestAuthorizationModel?.AuthorizationModel?.Id;
+
+            var contToken = "";
+            do {
+                // Read All Tuples
+                Console.WriteLine("Reading All Tuples (paginated)");
+                var existingTuples =
+                    await fgaClient.Read(null, new ClientReadOptions { ContinuationToken = contToken });
+                contToken = existingTuples.ContinuationToken;
+
+                // Deleting All Tuples
+                Console.WriteLine("Deleting All Tuples (paginated)");
+                var tuplesToDelete = new List<ClientTupleKeyWithoutCondition>();
+                existingTuples.Tuples.ForEach(tuple => tuplesToDelete.Add(new ClientTupleKeyWithoutCondition {
+                    User = tuple.Key.User, Relation = tuple.Key.Relation, Object = tuple.Key.Object
+                }));
+                await fgaClient.DeleteTuples(tuplesToDelete);
+            } while (contToken != "");
 
             // Write
             Console.WriteLine("Writing Tuples");
@@ -225,20 +248,25 @@ public class OpenTelemetryExample {
             Console.WriteLine("Assertions " + assertions.ToJson());
 
             // Checking for access w/ context in a loop
-            Random rnd = new Random();
-            int randomNumber = rnd.Next(1, 1000);
+            var rnd = new Random();
+            var randomNumber = rnd.Next(1, 1000);
             Console.WriteLine($"Checking for access with context in a loop ({randomNumber} times)");
-            for (int index = 0; index < randomNumber; index++) {
+            for (var index = 0; index < randomNumber; index++) {
                 checkResponse = await fgaClient.Check(new ClientCheckRequest {
-                    User = "user:anne", Relation = "viewer", Object = "document:roadmap", Context = new { ViewCount = 100 }
+                    User = "user:anne",
+                    Relation = "viewer",
+                    Object = "document:roadmap",
+                    Context = new { ViewCount = 100 }
                 });
                 Console.WriteLine("Allowed: " + checkResponse.Allowed);
             }
 
-            // DeleteStore
-            Console.WriteLine("Deleting Current Store");
-            await fgaClient.DeleteStore();
-            Console.WriteLine("Deleted Store: " + currentStore.Name);
+            if (performStoreActions) {
+                // DeleteStore
+                Console.WriteLine("Deleting Current Store");
+                await fgaClient.DeleteStore();
+                Console.WriteLine("Deleted Store: " + currentStore?.Name);
+            }
         }
         catch (ApiException e) {
             Console.WriteLine("Error: " + e);

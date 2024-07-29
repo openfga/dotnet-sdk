@@ -29,13 +29,13 @@ public class Metrics {
         counters = new TelemetryCounters(meter);
     }
 
-    public void buildForResponse(string apiName, HttpResponseMessage response, RequestBuilder requestBuilder,
+    public void buildForResponse<T>(string apiName, HttpResponseMessage response, RequestBuilder<T> requestBuilder,
         Credentials? credentials, Stopwatch requestDuration, int retryCount) => histograms.buildForResponse(response,
         Attributes.buildAttributesForResponse(apiName, response, requestBuilder, credentials, requestDuration,
             retryCount),
         requestDuration);
 
-    public void buildForClientCredentialsResponse(HttpResponseMessage response, RequestBuilder requestBuilder,
+    public void buildForClientCredentialsResponse<T>(HttpResponseMessage response, RequestBuilder<T> requestBuilder,
         Credentials? credentials, Stopwatch requestDuration, int retryCount) => counters.buildForResponse(
         Attributes.buildAttributesForResponse("ClientCredentialsExchange", response, requestBuilder, credentials,
             requestDuration, retryCount));

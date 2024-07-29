@@ -64,14 +64,15 @@ public class BaseClient : IDisposable {
     /// <param name="additionalHeaders"></param>
     /// <param name="apiName"></param>
     /// <param name="cancellationToken"></param>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TReq"></typeparam>
+    /// <typeparam name="TRes"></typeparam>
     /// <returns></returns>
-    public async Task<ResponseWrapper<T>> SendRequestAsync<T>(RequestBuilder requestBuilder,
+    public async Task<ResponseWrapper<TRes>> SendRequestAsync<TReq, TRes>(RequestBuilder<TReq> requestBuilder,
         IDictionary<string, string>? additionalHeaders = null,
         string? apiName = null, CancellationToken cancellationToken = default) {
         var request = requestBuilder.BuildRequest();
 
-        return await SendRequestAsync<T>(request, additionalHeaders, apiName, cancellationToken);
+        return await SendRequestAsync<TRes>(request, additionalHeaders, apiName, cancellationToken);
     }
 
     // /// <summary>
