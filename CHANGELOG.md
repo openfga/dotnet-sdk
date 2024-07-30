@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.1
+
+### [0.4.1](https://github.com/openfga/dotnet-sdk/compare/v0.4.0...v0.4.1) (2024-07-30)
+- feat: export OpenTelemetry metrics. Refer to the [https://github.com/openfga/dotnet-sdk/blob/main/OpenTelemetry.md](documentation) for more.
+
 ## v0.4.0
 
 ### [0.4.0](https://github.com/openfga/dotnet-sdk/compare/v0.3.2...v0.4.0) (2024-06-14)

@@ -1,0 +1,93 @@
+# OpenTelemetry
+
+This SDK produces [metrics](https://opentelemetry.io/docs/concepts/signals/metrics/) using [OpenTelemetry](https://opentelemetry.io/) that allow you to view data such as request timings. These metrics also include attributes for the model and store ID, as well as the API called to allow you to build reporting.
+
+When an OpenTelemetry SDK instance is configured, the metrics will be exported and sent to the collector configured as part of your applications configuration. If you are not using OpenTelemetry, the metric functionality is a no-op and the events are never sent.
+
+In cases when metrics events are sent, they will not be viewable outside of infrastructure configured in your application, and are never available to the OpenFGA team or contributors.
+
+## Metrics
+
+### Supported Metrics
+
+| Metric Name                     | Type      | Description                                                                          |
+|---------------------------------|-----------|--------------------------------------------------------------------------------------|
+| `fga-client.request.duration`   | Histogram | The total request time for FGA requests                                              |
+| `fga-client.query.duration`     | Histogram | The amount of time the FGA server took to internally process nd evaluate the request |
+|` fga-client.credentials.request`| Counter   | The total number of times a new token was requested when using ClientCredentials     |
+
+### Supported attributes
+
+| Attribute Name                 | Type     | Description                                                                                                                                                 |
+|--------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `fga-client.response.model_id` | `string` | The authorization model ID that the FGA server used                                                                                                         |
+| `fga-client.request.method`    | `string` | The FGA method/action that was performed (e.g. `Check`, `ListObjects`, ...) in TitleCase                                                                    |
+| `fga-client.request.store_id`  | `string` | The store ID that was sent as part of the request                                                                                                           |
+| `fga-client.request.model_id`  | `string` | The authorization model ID that was sent as part of the request, if any                                                                                     |
+| `fga-client.request.client_id` | `string` | The client ID associated with the request, if any                                                                                                           |
+| `fga-client.user`              | `string` | The user that is associated with the action of the request for check and list objects                                                                       |
+| `http.request.resend_count`    | `int`    | The number of retries attempted (Only sent if the request was retried. Count of `1` means the request was retried once in addition to the original request) |
+| `http.response.status_code`    | `int`    | The status code of the response                                                                                                                             |
+| `http.request.method`          | `string` | The HTTP method for the request                                                                                                                             |
+| `http.host`                    | `string` | Host identifier of the origin the request was sent to                                                                                                       |
+| `url.scheme`                   | `string` | HTTP Scheme of the request (`http`/`https`)                                                                                                                 |
+| `url.full`                     | `string` | Full URL of the request                                                                                                                                     |
+| `user_agent.original`          | `string` | User Agent used in the query                                                                                                                                |
+| `http.client.request.duration` | `int`    | The total request time for FGA requests                                                                                                                     |
+| `http.server.request.duration` | `int`    | The amount of time the FGA server took to internally process nd evaluate the request                                                                        |
+
+## Configuration
+
+See the OpenTelemetry docs on [Customizing the SDK](https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/docs/metrics/customizing-the-sdk/README.md).
+
+```csharp
+using OpenFga.Sdk.Client;
+using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Model;
+using OpenFga.Sdk.Telemetry;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using System.Diagnostics;
+
+namespace Example {
+    public class Example {
+        public static async Task Main() {
+            try {
+                // Setup OpenTelemetry Metrics
+                using var meterProvider = Sdk.CreateMeterProviderBuilder()
+                    .AddHttpClientInstrumentation() // To instrument the default http client
+                    .AddMeter(Metrics.name) // .AddMeter("OpenFga.Sdk") also works
+                    .ConfigureResource(resourceBuilder => resourceBuilder.AddService("openfga-dotnet-example"))
+                    .AddOtlpExporter() // Required to export to an OTLP compatible endpoint
+                    .AddConsoleExporter() // Only needed to export the metrics to the console (e.g. when debugging)
+                    .Build();
+
+                // Configure the OpenFGA SDK
+                var configuration = new ClientConfiguration() {
+                    ApiUrl = Environment.GetEnvironmentVariable("FGA_API_URL") ?? "http://localhost:8080", // required, e.g. https://api.fga.example
+                    StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
+                    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_MODEL_ID"), // Optional, can be overridden per request
+                    // Credentials = ... // If needed
+                };
+                var fgaClient = new OpenFgaClient(configuration);
+
+                // Call the SDK normally
+                var response = await fgaClient.ReadAuthorizationModels();
+            } catch (ApiException e) {
+                 Debug.Print("Error: "+ e);
+            }
+        }
+    }
+}
+```
+
+### More Resources
+* [OpenTelemetry.Instrumentation.Http](https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/main/src/OpenTelemetry.Instrumentation.Http/README.md) for instrumenting the HttpClient.
+* If you are using .NET 8+, checkout the built-in metrics.
+
+A number of these metrics are baked into .NET 8+ as well:
+
+## Example
+
+There is an [example project](https://github.com/openfga/dotnet-sdk/blob/main/example/OpenTelemetryExample) that provides some guidance on how to configure OpenTelemetry available in the examples directory.
