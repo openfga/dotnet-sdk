@@ -39,8 +39,29 @@ public class RequestBuilder<TReq> {
 
     public string? JsonBody => Body == null ? null : JsonSerializer.Serialize(Body);
 
+    public HttpContent? FormEncodedBody {
+        get {
+            if (Body == null) {
+                return null;
+            }
+
+            if (ContentType != "application/x-www-form-urlencode") {
+                throw new Exception(
+                    "Content type must be \"application/x-www-form-urlencode\" in order to get the FormEncoded representation");
+            }
+
+            var body = (IDictionary<string, string>)Body;
+
+            return new FormUrlEncodedContent(body.Select(p =>
+                new KeyValuePair<string, string>(p.Key, p.Value ?? "")));
+        }
+    }
+
     private HttpContent? HttpContentBody =>
-        Body == null ? null : new StringContent(JsonBody, Encoding.UTF8, "application/json");
+        Body == null ? null :
+        ContentType == "application/json" ? new StringContent(JsonBody, Encoding.UTF8, ContentType) : FormEncodedBody;
+
+    public string ContentType { get; set; } = "application/json";
 
     public string BuildPathString() {
         if (PathTemplate == null) {

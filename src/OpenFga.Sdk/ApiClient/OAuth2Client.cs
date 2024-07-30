@@ -120,7 +120,8 @@ public class OAuth2Client {
             Method = HttpMethod.Post,
             BasePath = $"https://{_apiTokenIssuer}",
             PathTemplate = "/oauth/token",
-            Body = _authRequest
+            Body = _authRequest,
+            ContentType = "application/x-www-form-urlencode"
         };
 
         var sw = Stopwatch.StartNew();
