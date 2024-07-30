@@ -18,23 +18,23 @@ In cases when metrics events are sent, they will not be viewable outside of infr
 
 ### Supported attributes
 
-| Attribute Name                 | Type     | Description                                                                                                             |
-|--------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------|
-| `fga-client.response.model_id` | `string` | The authorization model ID that the FGA server used                                                                     |
-| `fga-client.request.method`    | `string` | The FGA method/action that was performed (e.g. `Check`, `ListObjects`, ...) in TitleCase                                |
-| `fga-client.request.store_id`  | `string` | The store ID that was sent as part of the request                                                                       |
-| `fga-client.request.model_id`  | `string` | The authorization model ID that was sent as part of the request, if any                                                 |
-| `fga-client.request.client_id` | `string` | The client ID associated with the request, if any                                                                       |
-| `fga-client.user`              | `string` | The user that is associated with the action of the request for check and list objects                                   |
-| `http.request.resend_count`    | `int`    | The number of retries attempted (starting from 1 for the original request)                                              |
-| `http.response.status_code`    | `int`    | The status code of the response                                                                                         |
-| `http.request.method`          | `string` | The HTTP method for the request                                                                                         |
-| `http.host`                    | `string` | Host identifier of the origin the request was sent to                                                                   |
-| `url.scheme`                   | `string` | HTTP Scheme of the request (`http`/`https`)                                                                             |
-| `url.full`                     | `string` | Full URL of the request                                                                                                 |
-| `user_agent.original`          | `string` | User Agent used in the query                                                                                            |
-| `http.client.request.duration` | `int`    | The total request time for FGA requests                                                                                 |
-| `http.server.request.duration` | `int`    | The amount of time the FGA server took to internally process nd evaluate the request                                    |
+| Attribute Name                 | Type     | Description                                                                                                                                                 |
+|--------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `fga-client.response.model_id` | `string` | The authorization model ID that the FGA server used                                                                                                         |
+| `fga-client.request.method`    | `string` | The FGA method/action that was performed (e.g. `Check`, `ListObjects`, ...) in TitleCase                                                                    |
+| `fga-client.request.store_id`  | `string` | The store ID that was sent as part of the request                                                                                                           |
+| `fga-client.request.model_id`  | `string` | The authorization model ID that was sent as part of the request, if any                                                                                     |
+| `fga-client.request.client_id` | `string` | The client ID associated with the request, if any                                                                                                           |
+| `fga-client.user`              | `string` | The user that is associated with the action of the request for check and list objects                                                                       |
+| `http.request.resend_count`    | `int`    | The number of retries attempted (Only sent if the request was retried. Count of `1` means the request was retried once in addition to the original request) |
+| `http.response.status_code`    | `int`    | The status code of the response                                                                                                                             |
+| `http.request.method`          | `string` | The HTTP method for the request                                                                                                                             |
+| `http.host`                    | `string` | Host identifier of the origin the request was sent to                                                                                                       |
+| `url.scheme`                   | `string` | HTTP Scheme of the request (`http`/`https`)                                                                                                                 |
+| `url.full`                     | `string` | Full URL of the request                                                                                                                                     |
+| `user_agent.original`          | `string` | User Agent used in the query                                                                                                                                |
+| `http.client.request.duration` | `int`    | The total request time for FGA requests                                                                                                                     |
+| `http.server.request.duration` | `int`    | The amount of time the FGA server took to internally process nd evaluate the request                                                                        |
 
 ## Configuration
 

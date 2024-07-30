@@ -134,19 +134,19 @@ public class ApiClient : IDisposable {
     }
 
     private async Task<ResponseWrapper<TResult>> Retry<TResult>(Func<Task<ResponseWrapper<TResult>>> retryable) {
-        var numRetries = 0;
+        var requestCount = 0;
         while (true) {
             try {
-                numRetries++;
+                requestCount++;
 
                 var response = await retryable();
 
-                response.retryCount = numRetries;
+                response.retryCount = requestCount - 1; // OTEL spec specifies that the original request is not included in the count
 
                 return response;
             }
             catch (FgaApiRateLimitExceededError err) {
-                if (numRetries > _configuration.MaxRetry) {
+                if (requestCount > _configuration.MaxRetry) {
                     throw;
                 }
 
@@ -157,7 +157,7 @@ public class ApiClient : IDisposable {
                 await Task.Delay(waitInMs);
             }
             catch (FgaApiError err) {
-                if (!err.ShouldRetry || numRetries > _configuration.MaxRetry) {
+                if (!err.ShouldRetry || requestCount > _configuration.MaxRetry) {
                     throw;
                 }
 

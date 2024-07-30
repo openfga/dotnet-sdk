@@ -74,7 +74,7 @@ public class Attributes {
     // User Agent used in the query
     private const string AttributeHttpUserAgent = "user_agent.original";
 
-    // The number of retries attempted (starting from 1 for the original request)
+    // The number of retries attempted (Only sent if the request was retried. Count of `1` means the request was retried once in addition to the original request)
     private const string AttributeRequestRetryCount = "http.request.resend_count";
 
     private static string? GetHeaderValueIfValid(HttpResponseHeaders headers, string headerName) {
@@ -218,7 +218,10 @@ public class Attributes {
         attributes.Add(new KeyValuePair<string, object?>(AttributeHttpClientRequestDuration,
             requestDuration.ElapsedMilliseconds));
 
-        attributes.Add(new KeyValuePair<string, object?>(AttributeRequestRetryCount, retryCount));
+        // OTEL specifies that this value should be conditionally sent if a retry occurred
+        if (retryCount > 0) {
+            attributes.Add(new KeyValuePair<string, object?>(AttributeRequestRetryCount, retryCount));
+        }
 
         return attributes;
     }
