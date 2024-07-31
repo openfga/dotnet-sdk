@@ -29,6 +29,7 @@ docs/Computed.md
 docs/Condition.md
 docs/ConditionMetadata.md
 docs/ConditionParamTypeRef.md
+docs/ConsistencyPreference.md
 docs/ContextualTupleKeys.md
 docs/CreateStoreRequest.md
 docs/CreateStoreResponse.md
@@ -176,6 +177,7 @@ src/OpenFga.Sdk/Model/Computed.cs
 src/OpenFga.Sdk/Model/Condition.cs
 src/OpenFga.Sdk/Model/ConditionMetadata.cs
 src/OpenFga.Sdk/Model/ConditionParamTypeRef.cs
+src/OpenFga.Sdk/Model/ConsistencyPreference.cs
 src/OpenFga.Sdk/Model/ContextualTupleKeys.cs
 src/OpenFga.Sdk/Model/CreateStoreRequest.cs
 src/OpenFga.Sdk/Model/CreateStoreResponse.cs

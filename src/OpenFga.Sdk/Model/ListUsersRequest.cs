@@ -22,6 +22,13 @@ namespace OpenFga.Sdk.Model {
     /// </summary>
     [DataContract(Name = "ListUsers_request")]
     public partial class ListUsersRequest : IEquatable<ListUsersRequest>, IValidatableObject {
+
+        /// <summary>
+        /// Gets or Sets Consistency
+        /// </summary>
+        [DataMember(Name = "consistency", EmitDefaultValue = false)]
+        [JsonPropertyName("consistency")]
+        public ConsistencyPreference? Consistency { get; set; }
         /// <summary>
         /// Initializes a new instance of the <see cref="ListUsersRequest" /> class.
         /// </summary>
@@ -39,7 +46,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="userFilters">The type of results returned. Only accepts exactly one value. (required).</param>
         /// <param name="contextualTuples">contextualTuples.</param>
         /// <param name="context">Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation..</param>
-        public ListUsersRequest(string authorizationModelId = default(string), FgaObject _object = default(FgaObject), string relation = default(string), List<UserTypeFilter> userFilters = default(List<UserTypeFilter>), List<TupleKey> contextualTuples = default(List<TupleKey>), Object context = default(Object)) {
+        /// <param name="consistency">consistency.</param>
+        public ListUsersRequest(string authorizationModelId = default(string), FgaObject _object = default(FgaObject), string relation = default(string), List<UserTypeFilter> userFilters = default(List<UserTypeFilter>), List<TupleKey> contextualTuples = default(List<TupleKey>), Object context = default(Object), ConsistencyPreference? consistency = default(ConsistencyPreference?)) {
             // to ensure "_object" is required (not null)
             if (_object == null) {
                 throw new ArgumentNullException("_object is a required property for ListUsersRequest and cannot be null");
@@ -58,6 +66,7 @@ namespace OpenFga.Sdk.Model {
             this.AuthorizationModelId = authorizationModelId;
             this.ContextualTuples = contextualTuples;
             this.Context = context;
+            this.Consistency = consistency;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -184,6 +193,10 @@ namespace OpenFga.Sdk.Model {
                     this.Context == input.Context ||
                     (this.Context != null &&
                     this.Context.Equals(input.Context))
+                ) &&
+                (
+                    this.Consistency == input.Consistency ||
+                    this.Consistency.Equals(input.Consistency)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -214,6 +227,7 @@ namespace OpenFga.Sdk.Model {
                 if (this.Context != null) {
                     hashCode = (hashCode * 9923) + this.Context.GetHashCode();
                 }
+                hashCode = (hashCode * 9923) + this.Consistency.GetHashCode();
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
                 }

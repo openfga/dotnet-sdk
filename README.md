@@ -832,7 +832,7 @@ namespace Example {
 | [**GetStore**](docs/OpenFgaApi.md#getstore) | **GET** /stores/{store_id} | Get a store |
 | [**ListObjects**](docs/OpenFgaApi.md#listobjects) | **POST** /stores/{store_id}/list-objects | List all objects of the given type that the user has a relation with |
 | [**ListStores**](docs/OpenFgaApi.md#liststores) | **GET** /stores | List all stores |
-| [**ListUsers**](docs/OpenFgaApi.md#listusers) | **POST** /stores/{store_id}/list-users | [EXPERIMENTAL] List the users matching the provided filter who have a certain relation to a particular type. |
+| [**ListUsers**](docs/OpenFgaApi.md#listusers) | **POST** /stores/{store_id}/list-users | List the users matching the provided filter who have a certain relation to a particular type. |
 | [**Read**](docs/OpenFgaApi.md#read) | **POST** /stores/{store_id}/read | Get tuples from the store that matches a query, without following userset rewrite rules |
 | [**ReadAssertions**](docs/OpenFgaApi.md#readassertions) | **GET** /stores/{store_id}/assertions/{authorization_model_id} | Read assertions for an authorization model ID |
 | [**ReadAuthorizationModel**](docs/OpenFgaApi.md#readauthorizationmodel) | **GET** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model |
@@ -858,6 +858,7 @@ namespace Example {
  - [Model.Condition](docs/Condition.md)
  - [Model.ConditionMetadata](docs/ConditionMetadata.md)
  - [Model.ConditionParamTypeRef](docs/ConditionParamTypeRef.md)
+ - [Model.ConsistencyPreference](docs/ConsistencyPreference.md)
  - [Model.ContextualTupleKeys](docs/ContextualTupleKeys.md)
  - [Model.CreateStoreRequest](docs/CreateStoreRequest.md)
  - [Model.CreateStoreResponse](docs/CreateStoreResponse.md)
