@@ -22,6 +22,13 @@ namespace OpenFga.Sdk.Model {
     /// </summary>
     [DataContract(Name = "Expand_request")]
     public partial class ExpandRequest : IEquatable<ExpandRequest>, IValidatableObject {
+
+        /// <summary>
+        /// Gets or Sets Consistency
+        /// </summary>
+        [DataMember(Name = "consistency", EmitDefaultValue = false)]
+        [JsonPropertyName("consistency")]
+        public ConsistencyPreference? Consistency { get; set; }
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpandRequest" /> class.
         /// </summary>
@@ -35,13 +42,15 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tupleKey">tupleKey (required).</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
-        public ExpandRequest(ExpandRequestTupleKey tupleKey = default(ExpandRequestTupleKey), string authorizationModelId = default(string)) {
+        /// <param name="consistency">consistency.</param>
+        public ExpandRequest(ExpandRequestTupleKey tupleKey = default(ExpandRequestTupleKey), string authorizationModelId = default(string), ConsistencyPreference? consistency = default(ConsistencyPreference?)) {
             // to ensure "tupleKey" is required (not null)
             if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for ExpandRequest and cannot be null");
             }
             this.TupleKey = tupleKey;
             this.AuthorizationModelId = authorizationModelId;
+            this.Consistency = consistency;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -112,6 +121,10 @@ namespace OpenFga.Sdk.Model {
                     this.AuthorizationModelId == input.AuthorizationModelId ||
                     (this.AuthorizationModelId != null &&
                     this.AuthorizationModelId.Equals(input.AuthorizationModelId))
+                ) &&
+                (
+                    this.Consistency == input.Consistency ||
+                    this.Consistency.Equals(input.Consistency)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -130,6 +143,7 @@ namespace OpenFga.Sdk.Model {
                 if (this.AuthorizationModelId != null) {
                     hashCode = (hashCode * 9923) + this.AuthorizationModelId.GetHashCode();
                 }
+                hashCode = (hashCode * 9923) + this.Consistency.GetHashCode();
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
                 }

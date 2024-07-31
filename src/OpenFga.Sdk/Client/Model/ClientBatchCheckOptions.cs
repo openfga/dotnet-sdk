@@ -11,9 +11,11 @@
 //
 
 
+using OpenFga.Sdk.Model;
+
 namespace OpenFga.Sdk.Client.Model;
 
-public interface IClientBatchCheckOptions : IClientRequestOptionsWithAuthZModelId {
+public interface IClientBatchCheckOptions : IClientCheckOptions {
     /// <summary>
     ///     Max Requests to issue in parallel
     /// </summary>
@@ -31,4 +33,7 @@ public class ClientBatchCheckOptions : IClientBatchCheckOptions {
     ///     Max Requests to issue in parallel
     /// </summary>
     public int? MaxParallelRequests { get; set; }
+
+    /// <inheritdoc />
+    public ConsistencyPreference? Consistency { get; set; }
 }

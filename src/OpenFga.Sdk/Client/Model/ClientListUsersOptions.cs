@@ -15,22 +15,15 @@ using OpenFga.Sdk.Model;
 
 namespace OpenFga.Sdk.Client.Model;
 
-/// <summary>
-///     ClientReadOptions - Client Options for Read
-/// </summary>
-public interface IClientReadOptions : IClientRequestOptionsWithStoreId, ClientPaginationOptions, IClientConsistencyOptions {
+public interface IClientListUsersOptions : IClientRequestOptionsWithAuthZModelIdAndConsistency {
 }
 
-/// <inheritdoc />
-public class ClientReadOptions : IClientReadOptions {
+public class ClientListUsersOptions : IClientListUsersOptions {
     /// <inheritdoc />
     public string? StoreId { get; set; }
 
     /// <inheritdoc />
-    public int? PageSize { get; set; }
-
-    /// <inheritdoc />
-    public string? ContinuationToken { get; set; }
+    public string? AuthorizationModelId { get; set; }
 
     /// <inheritdoc />
     public ConsistencyPreference? Consistency { get; set; }
