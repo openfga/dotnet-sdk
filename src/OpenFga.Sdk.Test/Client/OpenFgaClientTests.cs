@@ -994,7 +994,7 @@ public class OpenFgaClientTests {
      * Relationship Queries *
      ************************/
     /// <summary>
-    /// Test Batch Check
+    /// Test Check
     /// </summary>
     [Fact]
     public async Task CheckTest() {
@@ -1047,6 +1047,65 @@ public class OpenFgaClientTests {
         Assert.IsType<CheckResponse>(response);
         Assert.True(response.Allowed);
     }
+    
+    /// <summary>
+    /// Test Check with Consistency
+    /// </summary>
+    [Fact]
+    public async Task CheckWithConsistencyTest() {
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.Method == HttpMethod.Post &&
+                    req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientCheckRequest {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "viewer",
+            Object = "document:roadmap",
+            ContextualTuples = new List<ClientTupleKey>() {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "editor",
+                    Object = "document:roadmap",
+                    Condition = new RelationshipCondition() {
+                        Name = "ViewCountLessThan200",
+                        Context = new { Name = "Roadmap", Type = "document" }
+                    }
+                }
+            },
+            Context = new { ViewCount = 100 },
+        };
+        var options = new ClientCheckOptions {
+            Consistency = ConsistencyPreference.MINIMIZELATENCY
+        };
+        var response = await fgaClient.Check(body, options);
+
+        mockHandler.Protected().Verify(
+            "SendAsync",
+            Times.Exactly(1),
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                req.Method == HttpMethod.Post &&
+                req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
+            ItExpr.IsAny<CancellationToken>()
+        );
+
+        Assert.IsType<CheckResponse>(response);
+        Assert.True(response.Allowed);
+    }
 
     /// <summary>
     /// Test BatchCheck
@@ -1059,7 +1118,8 @@ public class OpenFgaClientTests {
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                    req.Method == HttpMethod.Post),
+                    req.Method == HttpMethod.Post &&
+                    req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
                 ItExpr.IsAny<CancellationToken>()
             )
             .Returns(Task.Run(async () => {
@@ -1130,7 +1190,9 @@ public class OpenFgaClientTests {
                 Object = "document:roadmap",
             }
         };
-        var options = new ClientBatchCheckOptions { };
+        var options = new ClientBatchCheckOptions {
+            Consistency = ConsistencyPreference.HIGHERCONSISTENCY
+        };
         var response = await fgaClient.BatchCheck(body, options);
 
         mockHandler.Protected().Verify(
@@ -1138,7 +1200,8 @@ public class OpenFgaClientTests {
             Times.Exactly(4),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                req.Method == HttpMethod.Post),
+                req.Method == HttpMethod.Post &&
+                req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
             ItExpr.IsAny<CancellationToken>()
         );
 
@@ -1166,7 +1229,8 @@ public class OpenFgaClientTests {
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/expand") &&
-                    req.Method == HttpMethod.Post),
+                    req.Method == HttpMethod.Post &&
+                    req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
@@ -1181,8 +1245,9 @@ public class OpenFgaClientTests {
             Relation = "viewer",
             Object = "document:roadmap",
         };
-        var response = await fgaClient.Expand(body, new ClientWriteOptions {
+        var response = await fgaClient.Expand(body, new ClientExpandOptions() {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+            Consistency = ConsistencyPreference.HIGHERCONSISTENCY
         });
 
         mockHandler.Protected().Verify(
@@ -1190,7 +1255,8 @@ public class OpenFgaClientTests {
             Times.Exactly(1),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/expand") &&
-                req.Method == HttpMethod.Post),
+                req.Method == HttpMethod.Post &&
+                req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
             ItExpr.IsAny<CancellationToken>()
         );
 
@@ -1254,7 +1320,7 @@ public class OpenFgaClientTests {
             Relation = "viewer",
             Object = "document:roadmap",
         };
-        var response = await fgaClient.Expand(body, new ClientWriteOptions {
+        var response = await fgaClient.Expand(body, new ClientExpandOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
         });
 
@@ -1283,7 +1349,8 @@ public class OpenFgaClientTests {
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/list-objects") &&
-                    req.Method == HttpMethod.Post),
+                    req.Method == HttpMethod.Post &&
+                    req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
@@ -1311,8 +1378,9 @@ public class OpenFgaClientTests {
                 },
             },
         };
-        var response = await fgaClient.ListObjects(body, new ClientWriteOptions {
+        var response = await fgaClient.ListObjects(body, new ClientListObjectsOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+            Consistency = ConsistencyPreference.HIGHERCONSISTENCY
         });
 
         mockHandler.Protected().Verify(
@@ -1320,7 +1388,8 @@ public class OpenFgaClientTests {
             Times.Exactly(1),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/list-objects") &&
-                req.Method == HttpMethod.Post),
+                req.Method == HttpMethod.Post &&
+                req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
             ItExpr.IsAny<CancellationToken>()
         );
 
@@ -1340,7 +1409,8 @@ public class OpenFgaClientTests {
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                    req.Method == HttpMethod.Post),
+                    req.Method == HttpMethod.Post &&
+                    req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage() {
@@ -1376,14 +1446,16 @@ public class OpenFgaClientTests {
                     }
                 }
             };
-        var response = await fgaClient.ListRelations(body);
+        var options = new ClientListRelationsOptions { Consistency = ConsistencyPreference.MINIMIZELATENCY };
+        var response = await fgaClient.ListRelations(body, options);
 
         mockHandler.Protected().Verify(
             "SendAsync",
             Times.Exactly(4),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                req.Method == HttpMethod.Post),
+                req.Method == HttpMethod.Post &&
+                req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
             ItExpr.IsAny<CancellationToken>()
         );
 
@@ -1512,7 +1584,7 @@ public class OpenFgaClientTests {
             Context = new { ViewCount = 100 }
         };
 
-        var response = await fgaClient.ListUsers(body, new ClientWriteOptions {
+        var response = await fgaClient.ListUsers(body, new ClientListUsersOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
         });
 

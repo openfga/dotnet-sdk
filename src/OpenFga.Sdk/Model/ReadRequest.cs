@@ -22,6 +22,13 @@ namespace OpenFga.Sdk.Model {
     /// </summary>
     [DataContract(Name = "Read_request")]
     public partial class ReadRequest : IEquatable<ReadRequest>, IValidatableObject {
+
+        /// <summary>
+        /// Gets or Sets Consistency
+        /// </summary>
+        [DataMember(Name = "consistency", EmitDefaultValue = false)]
+        [JsonPropertyName("consistency")]
+        public ConsistencyPreference? Consistency { get; set; }
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadRequest" /> class.
         /// </summary>
@@ -36,10 +43,12 @@ namespace OpenFga.Sdk.Model {
         /// <param name="tupleKey">tupleKey.</param>
         /// <param name="pageSize">pageSize.</param>
         /// <param name="continuationToken">continuationToken.</param>
-        public ReadRequest(ReadRequestTupleKey tupleKey = default(ReadRequestTupleKey), int pageSize = default(int), string continuationToken = default(string)) {
+        /// <param name="consistency">consistency.</param>
+        public ReadRequest(ReadRequestTupleKey tupleKey = default(ReadRequestTupleKey), int pageSize = default(int), string continuationToken = default(string), ConsistencyPreference? consistency = default(ConsistencyPreference?)) {
             this.TupleKey = tupleKey;
             this.PageSize = pageSize;
             this.ContinuationToken = continuationToken;
+            this.Consistency = consistency;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -122,6 +131,10 @@ namespace OpenFga.Sdk.Model {
                     this.ContinuationToken == input.ContinuationToken ||
                     (this.ContinuationToken != null &&
                     this.ContinuationToken.Equals(input.ContinuationToken))
+                ) &&
+                (
+                    this.Consistency == input.Consistency ||
+                    this.Consistency.Equals(input.Consistency)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -141,6 +154,7 @@ namespace OpenFga.Sdk.Model {
                 if (this.ContinuationToken != null) {
                     hashCode = (hashCode * 9923) + this.ContinuationToken.GetHashCode();
                 }
+                hashCode = (hashCode * 9923) + this.Consistency.GetHashCode();
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
                 }
