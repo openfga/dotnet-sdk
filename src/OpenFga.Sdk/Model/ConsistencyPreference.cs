@@ -25,7 +25,7 @@ namespace OpenFga.Sdk.Model {
         /// Enum UNSPECIFIED for value: UNSPECIFIED
         /// </summary>
         [EnumMember(Value = "UNSPECIFIED")]
-        CONSISTENCY_PREFERENCE_UNSPECIFIED = 1,
+        UNSPECIFIED = 1,
 
         /// <summary>
         /// Enum MINIMIZELATENCY for value: MINIMIZE_LATENCY
