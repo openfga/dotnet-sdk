@@ -379,6 +379,7 @@ public class OpenFgaClient : IDisposable {
             Consistency = options?.Consistency,
         }, cancellationToken);
 
+
     /**
      * ListRelations - List all the relations a user has with an object (evaluates)
      */
@@ -428,8 +429,8 @@ public class OpenFgaClient : IDisposable {
                                 new List<TupleKey>(),
             Context = body.Context,
             AuthorizationModelId = GetAuthorizationModelId(options),
-            Consistency = options?.Consistency,
-        }, cancellationToken);
+            Consistency = options?.Consistency
+        });
 
     /**************
      * Assertions *

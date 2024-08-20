@@ -1047,7 +1047,7 @@ public class OpenFgaClientTests {
         Assert.IsType<CheckResponse>(response);
         Assert.True(response.Allowed);
     }
-    
+
     /// <summary>
     /// Test Check with Consistency
     /// </summary>
@@ -1106,7 +1106,6 @@ public class OpenFgaClientTests {
         Assert.IsType<CheckResponse>(response);
         Assert.True(response.Allowed);
     }
-
     /// <summary>
     /// Test BatchCheck
     /// </summary>
