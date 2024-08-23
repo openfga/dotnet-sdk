@@ -40,7 +40,7 @@ public class JsonStringEnumMemberConverter<EnumTemplate> : JsonConverter<EnumTem
 
             _stringToEnum.Add(value.ToString(), value);
 
-            if (attr?.Value != null) {
+            if (attr?.Value != null && value.ToString() != attr?.Value) {
                 _stringToEnum.Add(attr.Value, value);
                 _enumToString.Add(value, attr.Value);
             }

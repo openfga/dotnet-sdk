@@ -182,7 +182,8 @@ public class OpenFgaClient : IDisposable {
             new ReadRequest {
                 TupleKey = tupleKey,
                 PageSize = options?.PageSize,
-                ContinuationToken = options?.ContinuationToken
+                ContinuationToken = options?.ContinuationToken,
+                Consistency = options?.Consistency,
             }, cancellationToken);
     }
 
@@ -302,7 +303,7 @@ public class OpenFgaClient : IDisposable {
    * Check - Check if a user has a particular relation with an object (evaluates)
    */
     public async Task<CheckResponse> Check(IClientCheckRequest body,
-        IClientRequestOptionsWithAuthZModelId? options = default,
+        IClientCheckOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.Check(
             GetStoreId(options),
@@ -314,7 +315,8 @@ public class OpenFgaClient : IDisposable {
                                     new List<TupleKey>()
                     },
                 Context = body.Context,
-                AuthorizationModelId = GetAuthorizationModelId(options)
+                AuthorizationModelId = GetAuthorizationModelId(options),
+                Consistency = options?.Consistency,
             }, cancellationToken);
 
     /**
@@ -347,20 +349,21 @@ public class OpenFgaClient : IDisposable {
    * Expand - Expands the relationships in userset tree format (evaluates)
    */
     public async Task<ExpandResponse> Expand(IClientExpandRequest body,
-        IClientRequestOptionsWithAuthZModelId? options = default,
+        IClientExpandOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.Expand(
             GetStoreId(options),
             new ExpandRequest {
                 TupleKey = new ExpandRequestTupleKey { Relation = body.Relation, Object = body.Object },
-                AuthorizationModelId = GetAuthorizationModelId(options)
+                AuthorizationModelId = GetAuthorizationModelId(options),
+                Consistency = options?.Consistency
             }, cancellationToken);
 
     /**
      * ListObjects - List the objects of a particular type that the user has a certain relation to (evaluates)
      */
     public async Task<ListObjectsResponse> ListObjects(IClientListObjectsRequest body,
-        IClientRequestOptionsWithAuthZModelId? options = default,
+        IClientListObjectsOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.ListObjects(GetStoreId(options), new ListObjectsRequest {
             User = body.User,
@@ -372,8 +375,10 @@ public class OpenFgaClient : IDisposable {
                                 new List<TupleKey>()
                 },
             Context = body.Context,
-            AuthorizationModelId = GetAuthorizationModelId(options)
-        });
+            AuthorizationModelId = GetAuthorizationModelId(options),
+            Consistency = options?.Consistency,
+        }, cancellationToken);
+
 
     /**
      * ListRelations - List all the relations a user has with an object (evaluates)
@@ -414,7 +419,7 @@ public class OpenFgaClient : IDisposable {
      * ListUsers - List all users of the given type that the object has a relation with (evaluates)
      */
     public async Task<ListUsersResponse> ListUsers(IClientListUsersRequest body,
-        IClientRequestOptionsWithAuthZModelId? options = default,
+        IClientListUsersOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.ListUsers(GetStoreId(options), new ListUsersRequest {
             Object = body.Object,
@@ -423,7 +428,8 @@ public class OpenFgaClient : IDisposable {
             ContextualTuples = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ??
                                 new List<TupleKey>(),
             Context = body.Context,
-            AuthorizationModelId = GetAuthorizationModelId(options)
+            AuthorizationModelId = GetAuthorizationModelId(options),
+            Consistency = options?.Consistency
         });
 
     /**************

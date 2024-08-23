@@ -11,12 +11,20 @@
 //
 
 
+using OpenFga.Sdk.Model;
+
 namespace OpenFga.Sdk.Client.Model;
 
-public class ClientCheckOptions : IClientRequestOptionsWithAuthZModelId {
+public interface IClientCheckOptions : IClientRequestOptionsWithAuthZModelIdAndConsistency {
+}
+
+public class ClientCheckOptions : IClientCheckOptions {
     /// <inheritdoc />
     public string? StoreId { get; set; }
 
     /// <inheritdoc />
     public string? AuthorizationModelId { get; set; }
+
+    /// <inheritdoc />
+    public ConsistencyPreference? Consistency { get; set; }
 }

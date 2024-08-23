@@ -11,11 +11,13 @@
 //
 
 
+using OpenFga.Sdk.Model;
+
 namespace OpenFga.Sdk.Client.Model;
 
-/// <inheritdoc />
-public interface IClientRequestOptionsWithAuthZModelId : IClientRequestOptionsWithStoreId, AuthorizationModelIdOptions {
-}
-
-public interface IClientRequestOptionsWithAuthZModelIdAndConsistency : IClientRequestOptionsWithAuthZModelId, IClientConsistencyOptions {
+public interface IClientConsistencyOptions {
+    /// <summary>
+    ///     ConsistencyPreference - Can be used to indicate preference for lower latency or higher consistency
+    /// </summary>
+    public ConsistencyPreference? Consistency { get; set; }
 }
