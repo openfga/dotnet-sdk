@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.0
+
+### [0.5.0](https://github.com/openfga/dotnet-sdk/compare/v0.4.0...v0.5.0) (2024-08-28)
+
+- feat: support consistency parameter (#70)
+Note: To use this feature, you need to be running OpenFGA v1.5.7+ with the experimental flag `enable-consistency-params` enabled. 
+See the [v1.5.7 release notes](https://github.com/openfga/openfga/releases/tag/v1.5.7) for details.
+
 ## v0.4.0
 
 ### [0.4.0](https://github.com/openfga/dotnet-sdk/compare/v0.3.2...v0.4.0) (2024-06-14)
