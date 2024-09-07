@@ -66,11 +66,11 @@ public class ClientConfiguration : Configuration.Configuration {
     public RetryParams? RetryParams { get; set; } = new();
 
     /// <summary>
-    /// Validates the configuration settings.
+    /// Ensures the configuration is valid, otherwise throws an error.
     /// </summary>
     /// <exception cref="FgaValidationError">Thrown when the Store ID or Authorization Model ID is not in a valid ULID format.</exception>
-    public new void IsValid() {
-        base.IsValid();
+    public new void EnsureValid() {
+        base.EnsureValid();
 
         if (StoreId != null && !IsWellFormedUlidString(StoreId)) {
             throw new FgaValidationError("StoreId is not in a valid ulid format");

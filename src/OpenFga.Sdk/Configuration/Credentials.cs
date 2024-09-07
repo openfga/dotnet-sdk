@@ -96,10 +96,10 @@ public class Credentials : IAuthCredentialsConfig {
     }
 
     /// <summary>
-    ///     Checks if the credentials configuration is valid
+    ///     Ensures the credentials configuration is valid otherwise throws an error
     /// </summary>
     /// <exception cref="FgaRequiredParamError"></exception>
-    public void IsValid() {
+    public void EnsureValid() {
         switch (Method) {
             case CredentialsMethod.ApiToken:
                 if (string.IsNullOrWhiteSpace(Config?.ApiToken)) {
@@ -140,7 +140,7 @@ public class Credentials : IAuthCredentialsConfig {
     /// </summary>
     /// <exception cref="FgaRequiredParamError"></exception>
     public Credentials() {
-        this.IsValid();
+        this.EnsureValid();
     }
 
     static Credentials Init(IAuthCredentialsConfig config) {

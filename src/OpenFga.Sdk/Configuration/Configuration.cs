@@ -43,10 +43,11 @@ public class Configuration {
         (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
 
     /// <summary>
-    ///     Checks if the configuration is valid
+    ///     Ensures that the configuration is valid otherwise throws an error
     /// </summary>
     /// <exception cref="FgaRequiredParamError"></exception>
-    public void IsValid() {
+    /// <exception cref="FgaValidationError"></exception>
+    public void EnsureValid() {
         if (BasePath == null || BasePath == "") {
             throw new FgaRequiredParamError("Configuration", "ApiUrl");
         }
@@ -60,8 +61,8 @@ public class Configuration {
             throw new FgaValidationError("Configuration.MaxRetry exceeds maximum allowed limit of 15");
         }
 
-        Credentials?.IsValid();
-        Telemetry?.IsValid();
+        Credentials?.EnsureValid();
+        Telemetry?.EnsureValid();
     }
 
     #endregion

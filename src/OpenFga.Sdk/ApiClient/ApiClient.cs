@@ -34,7 +34,7 @@ public class ApiClient : IDisposable {
     /// <param name="configuration">Client Configuration</param>
     /// <param name="userHttpClient">User Http Client - Allows Http Client reuse</param>
     public ApiClient(Configuration.Configuration configuration, HttpClient? userHttpClient = null) {
-        configuration.IsValid();
+        configuration.EnsureValid();
         _configuration = configuration;
         _baseClient = new BaseClient(configuration, userHttpClient);
 

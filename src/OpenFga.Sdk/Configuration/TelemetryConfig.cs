@@ -77,7 +77,11 @@ public class TelemetryConfig {
         };
     }
 
-    public void IsValid() {
+    /// <summary>
+    ///    Validates the telemetry configuration.
+    /// </summary>
+    /// <exception cref="FgaValidationError"></exception>
+    public void EnsureValid() {
         if (Metrics == null) {
             return;
         }

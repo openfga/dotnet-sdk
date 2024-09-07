@@ -31,7 +31,7 @@ public class OpenFgaClient : IDisposable {
         ClientConfiguration configuration,
         HttpClient? httpClient = null
     ) {
-        configuration.IsValid();
+        configuration.EnsureValid();
         _configuration = configuration;
         api = new OpenFgaApi(_configuration, httpClient);
     }
