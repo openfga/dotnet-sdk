@@ -29,9 +29,9 @@ In cases when metrics events are sent, they will not be viewable outside of infr
 | `fga-client.user`              | `string` | No                 | The user that is associated with the action of the request for check and list objects                                                                       |
 | `http.request.resend_count`    | `int`    | Yes                | The number of retries attempted (Only sent if the request was retried. Count of `1` means the request was retried once in addition to the original request) |
 | `http.response.status_code`    | `int`    | Yes                | The status code of the response                                                                                                                             |
-| `http.request.method`          | `string` | Yes                | The HTTP method for the request                                                                                                                             |
+| `http.request.method`          | `string` | No                 | The HTTP method for the request                                                                                                                             |
 | `http.host`                    | `string` | Yes                | Host identifier of the origin the request was sent to                                                                                                       |
-| `url.scheme`                   | `string` | Yes                | HTTP Scheme of the request (`http`/`https`)                                                                                                                 |
+| `url.scheme`                   | `string` | No                 | HTTP Scheme of the request (`http`/`https`)                                                                                                                 |
 | `url.full`                     | `string` | No                 | Full URL of the request                                                                                                                                     |
 | `user_agent.original`          | `string` | Yes                | User Agent used in the query                                                                                                                                |
 
