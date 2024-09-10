@@ -12,7 +12,7 @@
     <Description>.NET SDK for OpenFGA</Description>
     <Copyright>OpenFGA</Copyright>
     <RootNamespace>OpenFga.Sdk</RootNamespace>
-    <Version>0.5.0</Version>
+    <Version>0.5.1</Version>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\OpenFga.Sdk.xml</DocumentationFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -28,9 +28,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models" />
-    <None Include="../../assets/FGAIcon.png" Pack="true" Visible="false" PackagePath="" />
-    <None Include="../../README.md" Pack="true" PackagePath="" />
+    <Folder Include="Models"/>
+    <None Include="../../assets/FGAIcon.png" Pack="true" Visible="false" PackagePath=""/>
+    <None Include="../../README.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenTelemetry.Api" Version="1.9.0"/>
   </ItemGroup>
 
 </Project>

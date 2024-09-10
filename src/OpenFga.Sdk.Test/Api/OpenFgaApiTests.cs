@@ -69,7 +69,7 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public void StoreIdNotRequired() {
             var storeIdRequiredConfig = new Configuration.Configuration() { ApiHost = _host };
-            storeIdRequiredConfig.IsValid();
+            storeIdRequiredConfig.EnsureValid();
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public void ValidHostRequired() {
             var config = new Configuration.Configuration() { };
-            void ActionMissingHost() => config.IsValid();
+            void ActionMissingHost() => config.EnsureValid();
             var exception = Assert.Throws<FgaRequiredParamError>(ActionMissingHost);
             Assert.Equal("Required parameter ApiUrl was not defined when calling Configuration.", exception.Message);
         }
@@ -102,7 +102,7 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public void ValidHostWellFormed() {
             var config = new Configuration.Configuration() { ApiHost = "https://api.fga.example" };
-            void ActionMalformedHost() => config.IsValid();
+            void ActionMalformedHost() => config.EnsureValid();
             var exception = Assert.Throws<FgaValidationError>(ActionMalformedHost);
             Assert.Equal("Configuration.ApiUrl (https://https://api.fga.example) does not form a valid URI (https://https://api.fga.example)", exception.Message);
         }
@@ -119,7 +119,7 @@ namespace OpenFga.Sdk.Test.Api {
                 }
             };
             void ActionMissingApiToken() =>
-                missingApiTokenConfig.IsValid();
+                missingApiTokenConfig.EnsureValid();
             var exceptionMissingApiToken =
                 Assert.Throws<FgaRequiredParamError>(ActionMissingApiToken);
             Assert.Equal("Required parameter ApiToken was not defined when calling Configuration.",
@@ -143,7 +143,7 @@ namespace OpenFga.Sdk.Test.Api {
                     }
                 }
             };
-            void ActionMalformedApiTokenIssuer() => config.IsValid();
+            void ActionMalformedApiTokenIssuer() => config.EnsureValid();
             var exception = Assert.Throws<FgaValidationError>(ActionMalformedApiTokenIssuer);
             Assert.Equal("Configuration.ApiTokenIssuer does not form a valid URI (https://https://tokenissuer.fga.example)", exception.Message);
         }
@@ -214,7 +214,7 @@ namespace OpenFga.Sdk.Test.Api {
                 }
             };
             void ActionMissingClientId() =>
-                missingClientIdConfig.IsValid();
+                missingClientIdConfig.EnsureValid();
             var exceptionMissingClientId =
                 Assert.Throws<FgaRequiredParamError>(ActionMissingClientId);
             Assert.Equal("Required parameter ClientId was not defined when calling Configuration.",
@@ -233,7 +233,7 @@ namespace OpenFga.Sdk.Test.Api {
                 }
             };
             void ActionMissingClientSecret() =>
-                missingClientSecretConfig.IsValid();
+                missingClientSecretConfig.EnsureValid();
             var exceptionMissingClientSecret =
                 Assert.Throws<FgaRequiredParamError>(ActionMissingClientSecret);
             Assert.Equal("Required parameter ClientSecret was not defined when calling Configuration.",
@@ -252,7 +252,7 @@ namespace OpenFga.Sdk.Test.Api {
                 }
             };
             void ActionMissingApiTokenIssuer() =>
-                missingApiTokenIssuerConfig.IsValid();
+                missingApiTokenIssuerConfig.EnsureValid();
             var exceptionMissingApiTokenIssuer =
                 Assert.Throws<FgaRequiredParamError>(ActionMissingApiTokenIssuer);
             Assert.Equal("Required parameter ApiTokenIssuer was not defined when calling Configuration.",
@@ -272,7 +272,7 @@ namespace OpenFga.Sdk.Test.Api {
             };
 
             void ActionMissingApiAudience() =>
-                missingApiAudienceConfig.IsValid();
+                missingApiAudienceConfig.EnsureValid();
             var exceptionMissingApiAudience =
                 Assert.Throws<FgaRequiredParamError>(ActionMissingApiAudience);
             Assert.Equal("Required parameter ApiAudience was not defined when calling Configuration.",

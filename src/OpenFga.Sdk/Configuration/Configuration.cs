@@ -16,52 +16,9 @@ using OpenFga.Sdk.Exceptions;
 namespace OpenFga.Sdk.Configuration;
 
 /// <summary>
-/// Setup OpenFGA Configuration
+///     Setup OpenFGA Configuration
 /// </summary>
 public class Configuration {
-    #region Methods
-
-    private static bool IsWellFormedUriString(string uri) {
-        return Uri.TryCreate(uri, UriKind.Absolute, out var uriResult) &&
-               ((uriResult.ToString().Equals(uri) || uriResult.ToString().Equals($"{uri}/")) &&
-                (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps));
-    }
-
-    /// <summary>
-    ///     Checks if the configuration is valid
-    /// </summary>
-    /// <exception cref="FgaRequiredParamError"></exception>
-    public void IsValid() {
-        if (BasePath == null || BasePath == "") {
-            throw new FgaRequiredParamError("Configuration", "ApiUrl");
-        }
-
-        if (!IsWellFormedUriString(BasePath)) {
-            throw new FgaValidationError(
-                $"Configuration.ApiUrl ({ApiUrl ?? BasePath}) does not form a valid URI ({BasePath})");
-        }
-
-        if (MaxRetry > 15) {
-            throw new FgaValidationError("Configuration.MaxRetry exceeds maximum allowed limit of 15");
-        }
-
-        Credentials?.IsValid();
-    }
-
-    #endregion
-
-    #region Constants
-
-    /// <summary>
-    ///     Version of the package.
-    /// </summary>
-    /// <value>Version of the package.</value>
-    public const string Version = "0.5.0";
-
-    private const string DefaultUserAgent = "openfga-sdk dotnet/0.5.0";
-
-    #endregion Constants
-
     #region Constructors
 
     /// <summary>
@@ -77,6 +34,50 @@ public class Configuration {
     }
 
     #endregion Constructors
+
+    #region Methods
+
+    private static bool IsWellFormedUriString(string uri) =>
+        Uri.TryCreate(uri, UriKind.Absolute, out var uriResult) &&
+        (uriResult.ToString().Equals(uri) || uriResult.ToString().Equals($"{uri}/")) &&
+        (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+
+    /// <summary>
+    ///     Ensures that the configuration is valid otherwise throws an error
+    /// </summary>
+    /// <exception cref="FgaRequiredParamError"></exception>
+    /// <exception cref="FgaValidationError"></exception>
+    public void EnsureValid() {
+        if (BasePath == null || BasePath == "") {
+            throw new FgaRequiredParamError("Configuration", "ApiUrl");
+        }
+
+        if (!IsWellFormedUriString(BasePath)) {
+            throw new FgaValidationError(
+                $"Configuration.ApiUrl ({ApiUrl ?? BasePath}) does not form a valid URI ({BasePath})");
+        }
+
+        if (MaxRetry > 15) {
+            throw new FgaValidationError("Configuration.MaxRetry exceeds maximum allowed limit of 15");
+        }
+
+        Credentials?.EnsureValid();
+        Telemetry?.EnsureValid();
+    }
+
+    #endregion
+
+    #region Constants
+
+    /// <summary>
+    ///     Version of the package.
+    /// </summary>
+    /// <value>Version of the package.</value>
+    public const string Version = "0.5.1";
+
+    private const string DefaultUserAgent = "openfga-sdk dotnet/0.5.1";
+
+    #endregion Constants
 
 
     #region Properties
@@ -154,6 +155,11 @@ public class Configuration {
     /// </summary>
     /// <value>MinWaitInMs</value>
     public int MinWaitInMs { get; set; } = 100;
+
+    /// <summary>
+    ///     Gets or sets the telemetry configuration.
+    /// </summary>
+    public TelemetryConfig? Telemetry { get; set; }
 
     #endregion Properties
 }

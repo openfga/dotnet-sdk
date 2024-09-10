@@ -18,11 +18,11 @@ using OpenFga.Sdk.Model;
 namespace OpenFga.Sdk.Api;
 
 public class OpenFgaApi : IDisposable {
-    private Configuration.Configuration _configuration;
-    private ApiClient.ApiClient _apiClient;
+    private readonly ApiClient.ApiClient _apiClient;
+    private readonly Configuration.Configuration _configuration;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="OpenFgaApi"/> class.
+    ///     Initializes a new instance of the <see cref="OpenFgaApi"/> class.
     /// </summary>
     /// <param name="configuration"></param>
     /// <param name="httpClient"></param>
@@ -30,9 +30,9 @@ public class OpenFgaApi : IDisposable {
         Configuration.Configuration configuration,
         HttpClient? httpClient = null
     ) {
-        configuration.IsValid();
-        this._configuration = configuration;
-        this._apiClient = new ApiClient.ApiClient(_configuration, httpClient);
+        configuration.EnsureValid();
+        _configuration = configuration;
+        _apiClient = new ApiClient.ApiClient(_configuration, httpClient);
     }
 
     /// <summary>
@@ -54,16 +54,16 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<CheckRequest> {
             Method = new HttpMethod("POST"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/check",
             PathParameters = pathParams,
-            Body = Utils.CreateJsonStringContent(body),
+            Body = body,
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<CheckResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<CheckRequest, CheckResponse>(requestBuilder,
             "Check", cancellationToken);
     }
 
@@ -79,16 +79,16 @@ public class OpenFgaApi : IDisposable {
 
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<CreateStoreRequest> {
             Method = new HttpMethod("POST"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores",
             PathParameters = pathParams,
-            Body = Utils.CreateJsonStringContent(body),
+            Body = body,
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<CreateStoreResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<CreateStoreRequest, CreateStoreResponse>(requestBuilder,
             "CreateStore", cancellationToken);
     }
 
@@ -110,7 +110,7 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<Any> {
             Method = new HttpMethod("DELETE"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}",
@@ -118,7 +118,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        await this._apiClient.SendRequestAsync(requestBuilder,
+        await _apiClient.SendRequestAsync(requestBuilder,
             "DeleteStore", cancellationToken);
     }
 
@@ -141,16 +141,16 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<ExpandRequest> {
             Method = new HttpMethod("POST"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/expand",
             PathParameters = pathParams,
-            Body = Utils.CreateJsonStringContent(body),
+            Body = body,
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<ExpandResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<ExpandRequest, ExpandResponse>(requestBuilder,
             "Expand", cancellationToken);
     }
 
@@ -172,7 +172,7 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<Any> {
             Method = new HttpMethod("GET"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}",
@@ -180,7 +180,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<GetStoreResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<Any, GetStoreResponse>(requestBuilder,
             "GetStore", cancellationToken);
     }
 
@@ -203,16 +203,16 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<ListObjectsRequest> {
             Method = new HttpMethod("POST"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/list-objects",
             PathParameters = pathParams,
-            Body = Utils.CreateJsonStringContent(body),
+            Body = body,
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<ListObjectsResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<ListObjectsRequest, ListObjectsResponse>(requestBuilder,
             "ListObjects", cancellationToken);
     }
 
@@ -235,7 +235,7 @@ public class OpenFgaApi : IDisposable {
             queryParams.Add("continuation_token", continuationToken.ToString());
         }
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<Any> {
             Method = new HttpMethod("GET"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores",
@@ -243,7 +243,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<ListStoresResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<Any, ListStoresResponse>(requestBuilder,
             "ListStores", cancellationToken);
     }
 
@@ -266,16 +266,16 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<ListUsersRequest> {
             Method = new HttpMethod("POST"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/list-users",
             PathParameters = pathParams,
-            Body = Utils.CreateJsonStringContent(body),
+            Body = body,
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<ListUsersResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<ListUsersRequest, ListUsersResponse>(requestBuilder,
             "ListUsers", cancellationToken);
     }
 
@@ -298,16 +298,16 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<ReadRequest> {
             Method = new HttpMethod("POST"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/read",
             PathParameters = pathParams,
-            Body = Utils.CreateJsonStringContent(body),
+            Body = body,
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<ReadResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<ReadRequest, ReadResponse>(requestBuilder,
             "Read", cancellationToken);
     }
 
@@ -333,7 +333,7 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<Any> {
             Method = new HttpMethod("GET"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/assertions/{authorization_model_id}",
@@ -341,7 +341,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<ReadAssertionsResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<Any, ReadAssertionsResponse>(requestBuilder,
             "ReadAssertions", cancellationToken);
     }
 
@@ -367,7 +367,7 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<Any> {
             Method = new HttpMethod("GET"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/authorization-models/{id}",
@@ -375,7 +375,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<ReadAuthorizationModelResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<Any, ReadAuthorizationModelResponse>(requestBuilder,
             "ReadAuthorizationModel", cancellationToken);
     }
 
@@ -405,7 +405,7 @@ public class OpenFgaApi : IDisposable {
             queryParams.Add("continuation_token", continuationToken.ToString());
         }
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<Any> {
             Method = new HttpMethod("GET"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/authorization-models",
@@ -413,7 +413,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<ReadAuthorizationModelsResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<Any, ReadAuthorizationModelsResponse>(requestBuilder,
             "ReadAuthorizationModels", cancellationToken);
     }
 
@@ -447,7 +447,7 @@ public class OpenFgaApi : IDisposable {
             queryParams.Add("continuation_token", continuationToken.ToString());
         }
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<Any> {
             Method = new HttpMethod("GET"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/changes",
@@ -455,7 +455,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<ReadChangesResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<Any, ReadChangesResponse>(requestBuilder,
             "ReadChanges", cancellationToken);
     }
 
@@ -478,16 +478,16 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<WriteRequest> {
             Method = new HttpMethod("POST"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/write",
             PathParameters = pathParams,
-            Body = Utils.CreateJsonStringContent(body),
+            Body = body,
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<Object>(requestBuilder,
+        return await _apiClient.SendRequestAsync<WriteRequest, Object>(requestBuilder,
             "Write", cancellationToken);
     }
 
@@ -514,16 +514,16 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<WriteAssertionsRequest> {
             Method = new HttpMethod("PUT"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/assertions/{authorization_model_id}",
             PathParameters = pathParams,
-            Body = Utils.CreateJsonStringContent(body),
+            Body = body,
             QueryParameters = queryParams,
         };
 
-        await this._apiClient.SendRequestAsync(requestBuilder,
+        await _apiClient.SendRequestAsync(requestBuilder,
             "WriteAssertions", cancellationToken);
     }
 
@@ -546,16 +546,16 @@ public class OpenFgaApi : IDisposable {
         }
         var queryParams = new Dictionary<string, string>();
 
-        var requestBuilder = new RequestBuilder {
+        var requestBuilder = new RequestBuilder<WriteAuthorizationModelRequest> {
             Method = new HttpMethod("POST"),
             BasePath = _configuration.BasePath,
             PathTemplate = "/stores/{store_id}/authorization-models",
             PathParameters = pathParams,
-            Body = Utils.CreateJsonStringContent(body),
+            Body = body,
             QueryParameters = queryParams,
         };
 
-        return await this._apiClient.SendRequestAsync<WriteAuthorizationModelResponse>(requestBuilder,
+        return await _apiClient.SendRequestAsync<WriteAuthorizationModelRequest, WriteAuthorizationModelResponse>(requestBuilder,
             "WriteAuthorizationModel", cancellationToken);
     }
 

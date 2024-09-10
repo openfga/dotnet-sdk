@@ -71,7 +71,7 @@ public class OpenFgaClientTests {
             ApiUrl = _apiUrl,
             StoreId = "invalid-format"
         };
-        void ActionInvalidId() => config.IsValid();
+        void ActionInvalidId() => config.EnsureValid();
         var exception = Assert.Throws<FgaValidationError>(ActionInvalidId);
         Assert.Equal("StoreId is not in a valid ulid format", exception.Message);
     }

@@ -6,7 +6,6 @@
 .github/ISSUE_TEMPLATE/config.yaml
 .github/ISSUE_TEMPLATE/feature_request.yaml
 .github/dependabot.yaml
-.github/workflows/main.yaml
 .github/workflows/semgrep.yaml
 .gitignore
 CHANGELOG.md
@@ -14,6 +13,7 @@ CONTRIBUTING.md
 LICENSE
 NOTICE.txt
 OpenFga.Sdk.sln
+OpenTelemetry.md
 README.md
 VERSION.txt
 assets/FGAIcon.png
@@ -100,6 +100,9 @@ docs/WriteRequestWrites.md
 example/Example1/Example1.cs
 example/Example1/Example1.csproj
 example/Makefile
+example/OpenTelemetryExample/.env.example
+example/OpenTelemetryExample/OpenTelemetryExample.cs
+example/OpenTelemetryExample/OpenTelemetryExample.csproj
 example/README.md
 src/OpenFga.Sdk.Test/Api/OpenFgaApiTests.cs
 src/OpenFga.Sdk.Test/Client/OpenFgaClientTests.cs
@@ -250,3 +253,7 @@ src/OpenFga.Sdk/Model/WriteRequest.cs
 src/OpenFga.Sdk/Model/WriteRequestDeletes.cs
 src/OpenFga.Sdk/Model/WriteRequestWrites.cs
 src/OpenFga.Sdk/OpenFga.Sdk.csproj
+src/OpenFga.Sdk/Telemetry/Attributes.cs
+src/OpenFga.Sdk/Telemetry/Counters.cs
+src/OpenFga.Sdk/Telemetry/Histograms.cs
+src/OpenFga.Sdk/Telemetry/Metrics.cs
