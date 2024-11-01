@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee # v4.0.1
+        uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25 # v4.1.0
         with:
           dotnet-version: 6.0.x
 
@@ -32,7 +32,7 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
-      - uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 #v4.3.1
+      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 #v4.3.1
         with:
           name: nuget-package
           path: src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg
@@ -55,7 +55,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee # v4.0.1
+        uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25 # v4.1.0
         with:
           dotnet-version: 6.0.x
           source-url: https://api.nuget.org/v3/index.json
@@ -68,7 +68,7 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
-      - uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 #v4.3.1
+      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 #v4.3.1
         with:
           name: nuget-package
           path: src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg
