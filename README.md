@@ -689,8 +689,8 @@ var response = await fgaClient.ListObjects(body, options);
 List the relations a user has on an object.
 
 ```csharp
-ListRelationsRequest body =
-    new ListRelationsRequest() {
+ClientListRelationsRequest body =
+    new ClientListRelationsRequest() {
         User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
         Object = "document:roadmap",
         Relations = new List<string> {"can_view", "can_edit", "can_delete", "can_rename"},
