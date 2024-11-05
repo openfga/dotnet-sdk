@@ -10,6 +10,7 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
+
 using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Configuration;
 using System.Diagnostics;

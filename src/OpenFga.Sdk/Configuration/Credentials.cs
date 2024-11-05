@@ -99,6 +99,7 @@ public class Credentials : IAuthCredentialsConfig {
     ///     Ensures the credentials configuration is valid otherwise throws an error
     /// </summary>
     /// <exception cref="FgaRequiredParamError"></exception>
+    /// <exception cref="FgaValidationError"></exception>
     public void EnsureValid() {
         switch (Method) {
             case CredentialsMethod.ApiToken:

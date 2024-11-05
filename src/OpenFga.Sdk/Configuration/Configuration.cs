@@ -16,7 +16,7 @@ using OpenFga.Sdk.Exceptions;
 namespace OpenFga.Sdk.Configuration;
 
 /// <summary>
-///     Setup OpenFGA Configuration
+///     Setup OpenFga.Sdk Configuration
 /// </summary>
 public class Configuration {
     #region Constructors
@@ -65,7 +65,7 @@ public class Configuration {
         Telemetry?.EnsureValid();
     }
 
-    #endregion
+    #endregion Methods
 
     #region Constants
 

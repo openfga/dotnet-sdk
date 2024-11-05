@@ -159,6 +159,7 @@ src/OpenFga.Sdk/Client/Model/RetryParams.cs
 src/OpenFga.Sdk/Client/Model/StoreIdOptions.cs
 src/OpenFga.Sdk/Configuration/Configuration.cs
 src/OpenFga.Sdk/Configuration/Credentials.cs
+src/OpenFga.Sdk/Configuration/TelemetryConfig.cs
 src/OpenFga.Sdk/Exceptions/ApiAuthenticationError.cs
 src/OpenFga.Sdk/Exceptions/ApiError.cs
 src/OpenFga.Sdk/Exceptions/ApiException.cs
@@ -256,4 +257,5 @@ src/OpenFga.Sdk/OpenFga.Sdk.csproj
 src/OpenFga.Sdk/Telemetry/Attributes.cs
 src/OpenFga.Sdk/Telemetry/Counters.cs
 src/OpenFga.Sdk/Telemetry/Histograms.cs
+src/OpenFga.Sdk/Telemetry/Meters.cs
 src/OpenFga.Sdk/Telemetry/Metrics.cs
