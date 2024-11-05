@@ -10,6 +10,7 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
+
 using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Configuration;
 using System.Diagnostics;
@@ -306,8 +307,7 @@ public class Attributes {
             }
         }
 
-        if (enabledAttributes.Contains(TelemetryAttribute.RequestClientId) && credentials is
-                { Method: CredentialsMethod.ClientCredentials, Config.ClientId: not null }) {
+        if (enabledAttributes.Contains(TelemetryAttribute.RequestClientId) && credentials is { Method: CredentialsMethod.ClientCredentials, Config.ClientId: not null }) {
             attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestClientId,
                 credentials.Config.ClientId));
         }

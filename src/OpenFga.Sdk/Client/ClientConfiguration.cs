@@ -10,8 +10,8 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
+
 using OpenFga.Sdk.Client.Model;
-using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 using System.Text.RegularExpressions;
 
@@ -24,7 +24,7 @@ public class Telemetry {
 }
 
 /// <summary>
-/// Configuration class for the OpenFGA client.
+/// Configuration class for the OpenFga.Sdk client.
 /// </summary>
 public class ClientConfiguration : Configuration.Configuration {
     /// <summary>

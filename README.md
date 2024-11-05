@@ -207,7 +207,7 @@ If your server is configured with [authentication enabled](https://openfga.dev/d
 
 Get a paginated list of stores.
 
-[API Documentation](https://openfga.dev/api/service/docs/api#/Stores/ListStores)
+[API Documentation](https://openfga.dev/api/service#/Stores/ListStores)
 
 ```csharp
 var options = new ClientListStoresOptions {
@@ -223,7 +223,7 @@ var response = await fgaClient.ListStores(options);
 
 Initialize a store.
 
-[API Documentation](https://openfga.dev/api/service/docs/api#/Stores/CreateStore)
+[API Documentation](https://openfga.dev/api/service#/Stores/CreateStore)
 
 ```csharp
 var store = await fgaClient.CreateStore(new ClientCreateStoreRequest(){Name = "FGA Demo"})
@@ -242,7 +242,7 @@ fgaClient.StoreId = storeId;
 
 Get information about the current store.
 
-[API Documentation](https://openfga.dev/api/service/docs/api#/Stores/GetStore)
+[API Documentation](https://openfga.dev/api/service#/Stores/GetStore)
 
 > Requires a client initialized with a storeId
 
@@ -256,7 +256,7 @@ var store = await fgaClient.GetStore();
 
 Delete a store.
 
-[API Documentation](https://openfga.dev/api/service/docs/api#/Stores/DeleteStore)
+[API Documentation](https://openfga.dev/api/service#/Stores/DeleteStore)
 
 > Requires a client initialized with a storeId
 

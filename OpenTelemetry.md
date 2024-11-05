@@ -41,9 +41,6 @@ Not all metrics and attributes are enabled by default.
 
 Some attributes, like `fga-client.user` have been disabled by default due to their high cardinality, which may result for very high costs when using some SaaS metric collectors.
 If you expect to have a high cardinality for a specific attribute, you can disable it by updating the `TelemetryConfig` accordingly.
-
-```csharp
-
 ## Configuration
 
 See the OpenTelemetry docs on [Customizing the SDK](https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/docs/metrics/customizing-the-sdk/README.md).
