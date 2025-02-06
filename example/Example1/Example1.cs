@@ -160,7 +160,7 @@ public class Example1 {
                     new() {
                         User = "user:anne",
                         Relation = "writer",
-                        Object = "document:roadmap",
+                        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                         Condition = new RelationshipCondition() {
                             Name = "ViewCountLessThan200",
                             Context = new { Name = "Roadmap", Type = "document" }
@@ -188,7 +188,7 @@ public class Example1 {
                 var failingCheckResponse = await fgaClient.Check(new ClientCheckRequest {
                     User = "user:anne",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 });
                 Console.WriteLine("Allowed: " + failingCheckResponse.Allowed);
             }
@@ -201,7 +201,7 @@ public class Example1 {
             var checkResponse = await fgaClient.Check(new ClientCheckRequest {
                 User = "user:anne",
                 Relation = "viewer",
-                Object = "document:roadmap",
+                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 Context = new { ViewCount = 100 }
             });
             Console.WriteLine("Allowed: " + checkResponse.Allowed);
@@ -217,7 +217,7 @@ public class Example1 {
                 new ClientAssertion() {
                     User = "user:anne",
                     Relation = "viewer",
-                    Object = "document:roadmap",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                     Expectation = false,
                 }
             });
