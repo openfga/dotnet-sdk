@@ -991,7 +991,7 @@ Name | Type | Description  | Notes
 
 <a name="readchanges"></a>
 # **ReadChanges**
-> ReadChangesResponse ReadChanges (string? type = null, int? pageSize = null, string? continuationToken = null)
+> ReadChangesResponse ReadChanges (string? type = null, int? pageSize = null, string? continuationToken = null, DateTime? startTime = null)
 
 Return a list of all the tuple changes
 
@@ -1023,11 +1023,12 @@ namespace Example
             var type = "type_example";  // string? |  (optional) 
             var pageSize = 56;  // int? |  (optional) 
             var continuationToken = "continuationToken_example";  // string? |  (optional) 
+            var startTime = DateTime.Parse("2013-10-20T19:20:30+01:00");  // DateTime? | Start date and time of changes to read. Format: ISO 8601 timestamp (e.g., 2022-01-01T00:00:00Z) If a continuation_token is provided along side start_time, the continuation_token will take precedence over start_time. (optional) 
 
             try
             {
                 // Return a list of all the tuple changes
-                ReadChangesResponse response = await openFgaApi.ReadChanges(type, pageSize, continuationToken);
+                ReadChangesResponse response = await openFgaApi.ReadChanges(type, pageSize, continuationToken, startTime);
                 Debug.WriteLine(response);
             }
             catch (ApiException  e)
@@ -1049,6 +1050,7 @@ Name | Type | Description  | Notes
  **type** | **string?**|  | [optional] 
  **pageSize** | **int?**|  | [optional] 
  **continuationToken** | **string?**|  | [optional] 
+ **startTime** | **DateTime?**| Start date and time of changes to read. Format: ISO 8601 timestamp (e.g., 2022-01-01T00:00:00Z) If a continuation_token is provided along side start_time, the continuation_token will take precedence over start_time. | [optional] 
 
 ### Return type
 

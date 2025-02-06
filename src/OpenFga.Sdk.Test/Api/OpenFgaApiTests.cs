@@ -1702,8 +1702,9 @@ namespace OpenFga.Sdk.Test.Api {
 
             var type = "repo";
             var pageSize = 25;
+            var startTime = DateTime.Parse("2022-01-01T00:00:00Z");
             var continuationToken = "eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==";
-            var response = await openFgaApi.ReadChanges(_storeId, type, pageSize, continuationToken);
+            var response = await openFgaApi.ReadChanges(_storeId, type, pageSize, continuationToken, startTime);
 
             mockHandler.Protected().Verify(
                 "SendAsync",
