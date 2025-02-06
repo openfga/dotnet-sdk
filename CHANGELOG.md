@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.5.1...HEAD)
+- feat: support start time option in read changes requests
+- feat: change default retry policy - thanks @ovindu-a
 
 ## v0.5.1
 
