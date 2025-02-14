@@ -164,9 +164,9 @@ public class OpenFgaClient : IDisposable {
      * Read Changes - Read the list of historical relationship tuple writes and deletes
      */
     public async Task<ReadChangesResponse> ReadChanges(ClientReadChangesRequest? body = default,
-        IClientReadChangesOptions? options = default,
+        ClientReadChangesOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ReadChanges(GetStoreId(options), body?.Type, options?.PageSize, options?.ContinuationToken, cancellationToken);
+        await api.ReadChanges(GetStoreId(options), body?.Type, options?.PageSize, options?.ContinuationToken, body?.StartTime, cancellationToken);
 
     /**
      * Read - Read tuples previously written to the store (does not evaluate)
