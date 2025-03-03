@@ -306,7 +306,19 @@ namespace OpenFga.Sdk.Model {
         /// Enum UnsupportedSchemaVersion for value: unsupported_schema_version
         /// </summary>
         [EnumMember(Value = "unsupported_schema_version")]
-        UnsupportedSchemaVersion = 48
+        UnsupportedSchemaVersion = 48,
+
+        /// <summary>
+        /// Enum Cancelled for value: cancelled
+        /// </summary>
+        [EnumMember(Value = "cancelled")]
+        Cancelled = 49,
+
+        /// <summary>
+        /// Enum InvalidStartTime for value: invalid_start_time
+        /// </summary>
+        [EnumMember(Value = "invalid_start_time")]
+        InvalidStartTime = 50
 
     }
 
