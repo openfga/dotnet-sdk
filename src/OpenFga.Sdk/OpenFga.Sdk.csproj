@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTelemetry.Api" Version="1.11.1"/>
+    <PackageReference Include="OpenTelemetry.Api" Version="1.11.2"/>
   </ItemGroup>
 
 </Project>
