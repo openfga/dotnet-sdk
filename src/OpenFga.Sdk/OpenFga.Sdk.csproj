@@ -33,8 +33,4 @@
     <None Include="../../README.md" Pack="true" PackagePath=""/>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="OpenTelemetry.Api" Version="1.11.1"/>
-  </ItemGroup>
-
 </Project>
