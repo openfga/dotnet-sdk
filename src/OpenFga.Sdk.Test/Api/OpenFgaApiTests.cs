@@ -604,7 +604,7 @@ namespace OpenFga.Sdk.Test.Api {
                 TupleKey = new CheckRequestTupleKey() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 },
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
@@ -658,7 +658,7 @@ namespace OpenFga.Sdk.Test.Api {
                 TupleKey = new CheckRequestTupleKey() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 },
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
@@ -711,7 +711,7 @@ namespace OpenFga.Sdk.Test.Api {
                 TupleKey = new CheckRequestTupleKey() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 }
             };
 
@@ -756,7 +756,7 @@ namespace OpenFga.Sdk.Test.Api {
                 TupleKey = new CheckRequestTupleKey() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 }
             };
 
@@ -803,7 +803,7 @@ namespace OpenFga.Sdk.Test.Api {
                 TupleKey = new CheckRequestTupleKey() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 }
             };
 
@@ -857,7 +857,7 @@ namespace OpenFga.Sdk.Test.Api {
                 TupleKey = new CheckRequestTupleKey() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 }
             };
 
@@ -906,7 +906,7 @@ namespace OpenFga.Sdk.Test.Api {
                 TupleKey = new CheckRequestTupleKey() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 }
             };
 
@@ -955,7 +955,7 @@ namespace OpenFga.Sdk.Test.Api {
                 TupleKey = new CheckRequestTupleKey() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 }
             };
 
@@ -1181,7 +1181,7 @@ namespace OpenFga.Sdk.Test.Api {
                 TupleKey = new CheckRequestTupleKey() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 },
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
@@ -1227,7 +1227,7 @@ namespace OpenFga.Sdk.Test.Api {
                 Writes = new WriteRequestWrites(new List<TupleKey> { new () {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 } }),
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
@@ -1269,7 +1269,7 @@ namespace OpenFga.Sdk.Test.Api {
                 Deletes = new WriteRequestDeletes(new List<TupleKeyWithoutCondition> { new () {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 } }),
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
@@ -1311,11 +1311,11 @@ namespace OpenFga.Sdk.Test.Api {
                 Writes = new WriteRequestWrites(new List<TupleKey> { new () {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "writer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 }, new () {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 } }),
                 AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
             };
@@ -1339,7 +1339,7 @@ namespace OpenFga.Sdk.Test.Api {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
             var jsonResponse =
-                "{\"tree\":{\"root\":{\"name\":\"document:roadmap#owner\", \"union\":{\"nodes\":[{\"name\":\"document:roadmap#owner\", \"leaf\":{\"users\":{\"users\":[\"team:product#member\"]}}}, {\"name\":\"document:roadmap#owner\", \"leaf\":{\"tupleToUserset\":{\"tupleset\":\"document:roadmap#owner\", \"computed\":[{\"userset\":\"org:contoso#admin\"}]}}}]}}}}";
+                "{\"tree\":{\"root\":{\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"union\":{\"nodes\":[{\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"leaf\":{\"users\":{\"users\":[\"team:product#member\"]}}}, {\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"leaf\":{\"tupleToUserset\":{\"tupleset\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"computed\":[{\"userset\":\"org:contoso#admin\"}]}}}]}}}}";
             mockHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
@@ -1356,7 +1356,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new ExpandRequest { TupleKey = new ExpandRequestTupleKey(_object: "document:roadmap", relation: "viewer"), AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1" };
+            var body = new ExpandRequest { TupleKey = new ExpandRequestTupleKey(_object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a", relation: "viewer"), AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1" };
             var response = await openFgaApi.Expand(_storeId, body);
 
             mockHandler.Protected().Verify(
@@ -1381,22 +1381,22 @@ namespace OpenFga.Sdk.Test.Api {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var mockResponse = new ExpandResponse(
                 tree: new UsersetTree(
-                root: new Node(name: "document:roadmap1#owner",
+                root: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a1#owner",
                 union: new Nodes(
                     nodes: new List<Node>() {
-                        new Node(name: "document:roadmap2#owner", leaf: new Leaf(users: new Users(users: new List<string>(){"team:product#member"}))),
-                        new Node(name: "document:roadmap3#owner", leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(tupleset: "document:roadmap#owner", computed: new List<Computed>(){
+                        new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a2#owner", leaf: new Leaf(users: new Users(users: new List<string>(){"team:product#member"}))),
+                        new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a3#owner", leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(tupleset: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner", computed: new List<Computed>(){
                         new Computed(userset: "org:contoso#admin")
                     }))),
                 }),
                 difference: new UsersetTreeDifference(
-                    _base: new Node(name: "document:roadmap3#owner", leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" }))),
-                    subtract: new Node(name: "document:roadmap4#owner", leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" })))
+                    _base: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a3#owner", leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" }))),
+                    subtract: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a4#owner", leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" })))
                 ),
                 intersection: new Nodes(
                     nodes: new List<Node>() {
-                        new Node(name: "document:roadmap5#owner", leaf: new Leaf(users: new Users(users: new List<string>(){"team:product#commentor"}))),
-                        new Node(name: "document:roadmap6#owner", leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(tupleset: "document:roadmap#viewer", computed: new List<Computed>(){
+                        new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a5#owner", leaf: new Leaf(users: new Users(users: new List<string>(){"team:product#commentor"}))),
+                        new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a6#owner", leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(tupleset: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#viewer", computed: new List<Computed>(){
                         new Computed(userset: "org:contoso#owner")
                     }))),
                 }))
@@ -1418,7 +1418,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new ExpandRequest(new ExpandRequestTupleKey(_object: "document:roadmap", relation: "viewer"));
+            var body = new ExpandRequest(new ExpandRequestTupleKey(_object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a", relation: "viewer"));
             var response = await openFgaApi.Expand(_storeId, body);
 
             mockHandler.Protected().Verify(
@@ -1440,7 +1440,7 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public async Task ListObjectsTest() {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-            var expectedResponse = new ListObjectsResponse { Objects = new List<string> { "document:roadmap" } };
+            var expectedResponse = new ListObjectsResponse { Objects = new List<string> { "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a" } };
             mockHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
@@ -1465,7 +1465,7 @@ namespace OpenFga.Sdk.Test.Api {
                 ContextualTuples = new ContextualTupleKeys() {
                     TupleKeys = new List<TupleKey> {
                         new("folder:product", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-                        new("document:roadmap", "parent", "folder:product")
+                        new("document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a", "parent", "folder:product")
                     }
                 }
             };
@@ -1545,7 +1545,7 @@ namespace OpenFga.Sdk.Test.Api {
                 },
                 ContextualTuples = new List<TupleKey> {
                     new("folder:product", "editor", "user:81684243-9356-4421-8fbf-a4f8d36aa31b"),
-                    new("document:roadmap", "parent", "folder:product")
+                    new("document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a", "parent", "folder:product")
                 },
                 Context = new { ViewCount = 100 }
             };
@@ -1576,7 +1576,7 @@ namespace OpenFga.Sdk.Test.Api {
                                 new(new TupleKey {
                                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                                     Relation = "viewer",
-                                    Object = "document:roadmap"
+                                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                                 }, DateTime.Now)
                             }
             };
@@ -1600,7 +1600,7 @@ namespace OpenFga.Sdk.Test.Api {
                 TupleKey = new ReadRequestTupleKey {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap"
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                 },
             };
             var response = await openFgaApi.Read(_storeId, body);
@@ -1630,7 +1630,7 @@ namespace OpenFga.Sdk.Test.Api {
                                 new(new TupleKey {
                                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                                     Relation = "viewer",
-                                    Object = "document:roadmap"
+                                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                                 }, DateTime.Now)
                             }
             };
@@ -1678,7 +1678,7 @@ namespace OpenFga.Sdk.Test.Api {
                             new(new TupleKey {
                                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                                 Relation = "viewer",
-                                Object = "document:roadmap"
+                                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                             }, TupleOperation.WRITE, DateTime.Now),
                         },
                 ContinuationToken = "eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ=="
@@ -1748,7 +1748,7 @@ namespace OpenFga.Sdk.Test.Api {
                     new (new AssertionTupleKey {
                         User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                         Relation = "viewer",
-                        Object = "document:roadmap"
+                        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                     })
                 },
             };
