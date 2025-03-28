@@ -425,9 +425,10 @@ public class OpenFgaApi : IDisposable {
     /// <param name="type"> (optional)</param>
     /// <param name="pageSize"> (optional)</param>
     /// <param name="continuationToken"> (optional)</param>
+    /// <param name="startTime">Start date and time of changes to read. Format: ISO 8601 timestamp (e.g., 2022-01-01T00:00:00Z) If a continuation_token is provided along side start_time, the continuation_token will take precedence over start_time. (optional)</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ReadChangesResponse</returns>
-    public async Task<ReadChangesResponse> ReadChanges(string storeId, string? type = default(string?), int? pageSize = default(int?), string? continuationToken = default(string?), CancellationToken cancellationToken = default) {
+    public async Task<ReadChangesResponse> ReadChanges(string storeId, string? type = default(string?), int? pageSize = default(int?), string? continuationToken = default(string?), DateTime? startTime = default(DateTime?), CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("ReadChanges", "StoreId");
@@ -445,6 +446,9 @@ public class OpenFgaApi : IDisposable {
         }
         if (continuationToken != null) {
             queryParams.Add("continuation_token", continuationToken.ToString());
+        }
+        if (startTime != null) {
+            queryParams.Add("start_time", startTime.ToString());
         }
 
         var requestBuilder = new RequestBuilder<Any> {

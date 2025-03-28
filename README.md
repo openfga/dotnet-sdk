@@ -379,7 +379,8 @@ Reads the list of historical relationship tuple writes and deletes.
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Tuples/ReadChanges)
 
 ```csharp
-var body = new ClientReadChangesRequest { Type = "document" };
+var startTime = DateTime.Parse("2022-01-01T00:00:00Z");
+var body = new ClientReadChangesRequest { Type = "document", StartTime = startTime };
 var options = new ClientReadChangesOptions {
     PageSize = 10,
     ContinuationToken = "...",

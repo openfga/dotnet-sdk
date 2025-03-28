@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.5.1...HEAD)
+
+- feat: add support for `start_time` parameter in `ReadChanges` endpoint
+
 ## v0.5.1
 
 ### [0.5.1](https://github.com/openfga/dotnet-sdk/compare/v0.5.0...v0.5.1) (2024-09-09)
