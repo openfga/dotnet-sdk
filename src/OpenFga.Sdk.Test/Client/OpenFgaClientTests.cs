@@ -1204,7 +1204,7 @@ public class OpenFgaClientTests {
             ItExpr.IsAny<CancellationToken>()
         );
 
-        Assert.IsType<BatchCheckResponse>(response);
+        Assert.IsType<ClientBatchCheckClientResponse>(response);
 
         var allowedResponses = response.Responses.FindAll(res => res.Allowed);
         Assert.Equal(2, allowedResponses.Count);

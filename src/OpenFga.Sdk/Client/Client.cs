@@ -322,7 +322,7 @@ public class OpenFgaClient : IDisposable {
     /**
    * BatchCheck - Run a set of checks (evaluates)
    */
-    public async Task<BatchCheckResponse> BatchCheck(List<ClientCheckRequest> body,
+    public async Task<ClientBatchCheckClientResponse> BatchCheck(List<ClientCheckRequest> body,
         IClientBatchCheckOptions? options = default,
         CancellationToken cancellationToken = default) {
         var responses = new ConcurrentBag<BatchCheckSingleResponse>();
@@ -342,7 +342,7 @@ public class OpenFgaClient : IDisposable {
                 }
             });
 
-        return new BatchCheckResponse { Responses = responses.ToList() };
+        return new ClientBatchCheckClientResponse { Responses = responses.ToList() };
     }
 
     /**

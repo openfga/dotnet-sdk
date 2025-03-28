@@ -107,6 +107,7 @@ example/OpenTelemetryExample/OpenTelemetryExample.csproj
 example/README.md
 src/OpenFga.Sdk.Test/Api/OpenFgaApiTests.cs
 src/OpenFga.Sdk.Test/Client/OpenFgaClientTests.cs
+src/OpenFga.Sdk.Test/Models/Client/ClientBatchCheckResponseTest.cs
 src/OpenFga.Sdk.Test/Models/ModelTests.cs
 src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj
 src/OpenFga.Sdk/Api/OpenFgaApi.cs
