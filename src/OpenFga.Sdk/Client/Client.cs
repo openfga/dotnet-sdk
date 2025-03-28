@@ -405,8 +405,12 @@ public class OpenFgaClient : IDisposable {
 
         var batchCheckResponse = await BatchCheck(batchCheckRequests, options, cancellationToken);
 
-        for (var index = 0; index < batchCheckResponse.Responses.Count; index++) {
-            var batchCheckSingleResponse = batchCheckResponse.Responses[index];
+        foreach (var batchCheckSingleResponse in batchCheckResponse.Responses)
+        {
+            if (batchCheckSingleResponse.Error != null) {
+                throw batchCheckSingleResponse.Error;
+            }
+
             if (batchCheckSingleResponse.Allowed && batchCheckSingleResponse.Request?.Relation != null) {
                 responses.AddRelation(batchCheckSingleResponse.Request.Relation);
             }

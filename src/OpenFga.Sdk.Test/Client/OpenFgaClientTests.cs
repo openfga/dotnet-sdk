@@ -1426,8 +1426,8 @@ public class OpenFgaClientTests {
                 Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
             })
             .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.NotFound,
-                Content = Utils.CreateJsonStringContent(new Object { }),
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -1463,6 +1463,70 @@ public class OpenFgaClientTests {
         Assert.Equal(2, response.Relations.Count);
         // TODO: Ensure the relations are correct, currently because the mocks are generic and we process in parallel,
         // we do not know what order they will be processed in
+    }
+
+
+    /// <summary>
+    /// Test ListRelations: One of the relations is not found
+    /// </summary>
+    [Fact]
+    public async Task ListRelationsRelationNotFoundTest() {
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .SetupSequence<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                    req.Method == HttpMethod.Post &&
+                    req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+            })
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.NotFound,
+                Content = Utils.CreateJsonStringContent(new Object { }),
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body =
+            new ClientListRelationsRequest() {
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                Relations = new List<string> { "can_view", "can_edit", "can_delete", "can_rename" },
+                ContextualTuples = new List<ClientTupleKey>() {
+                    new() {
+                        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                        Relation = "editor",
+                        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                    }
+                }
+            };
+        var options = new ClientListRelationsOptions { Consistency = ConsistencyPreference.MINIMIZELATENCY };
+        Task<ListRelationsResponse> ApiError() => fgaClient.ListRelations(body, options);
+        var error = await Assert.ThrowsAsync<FgaApiNotFoundError>(ApiError);
+
+        mockHandler.Protected().Verify(
+            "SendAsync",
+            Times.Exactly(4),
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
+                req.Method == HttpMethod.Post &&
+                req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
+            ItExpr.IsAny<CancellationToken>()
+        );
     }
 
     /// <summary>
