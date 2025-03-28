@@ -6,8 +6,6 @@
 .github/ISSUE_TEMPLATE/config.yaml
 .github/ISSUE_TEMPLATE/feature_request.yaml
 .github/dependabot.yaml
-.github/workflows/main.yaml
-.github/workflows/semgrep.yaml
 .gitignore
 CHANGELOG.md
 CONTRIBUTING.md
@@ -22,6 +20,7 @@ docs/AbortedMessageResponse.md
 docs/Any.md
 docs/Assertion.md
 docs/AssertionTupleKey.md
+docs/AuthErrorCode.md
 docs/AuthorizationModel.md
 docs/CheckRequest.md
 docs/CheckRequestTupleKey.md
@@ -40,6 +39,7 @@ docs/ExpandRequest.md
 docs/ExpandRequestTupleKey.md
 docs/ExpandResponse.md
 docs/FgaObject.md
+docs/ForbiddenResponse.md
 docs/GetStoreResponse.md
 docs/InternalErrorCode.md
 docs/InternalErrorMessageResponse.md
@@ -178,6 +178,7 @@ src/OpenFga.Sdk/Model/AbstractOpenAPISchema.cs
 src/OpenFga.Sdk/Model/Any.cs
 src/OpenFga.Sdk/Model/Assertion.cs
 src/OpenFga.Sdk/Model/AssertionTupleKey.cs
+src/OpenFga.Sdk/Model/AuthErrorCode.cs
 src/OpenFga.Sdk/Model/AuthorizationModel.cs
 src/OpenFga.Sdk/Model/CheckRequest.cs
 src/OpenFga.Sdk/Model/CheckRequestTupleKey.cs
@@ -196,6 +197,7 @@ src/OpenFga.Sdk/Model/ExpandRequest.cs
 src/OpenFga.Sdk/Model/ExpandRequestTupleKey.cs
 src/OpenFga.Sdk/Model/ExpandResponse.cs
 src/OpenFga.Sdk/Model/FgaObject.cs
+src/OpenFga.Sdk/Model/ForbiddenResponse.cs
 src/OpenFga.Sdk/Model/GetStoreResponse.cs
 src/OpenFga.Sdk/Model/InternalErrorCode.cs
 src/OpenFga.Sdk/Model/InternalErrorMessageResponse.cs
