@@ -72,7 +72,7 @@ namespace OpenFga.Sdk.Test.Models {
         [Fact]
         public void DeserializeReadChangesResponse() {
             var jsonResponse =
-                "{\"changes\":[{\"tuple_key\":{\"object\":\"document:planning\",\"relation\":\"viewer\",\"user\":\"user:jane\"},\"operation\":\"TUPLE_OPERATION_WRITE\",\"timestamp\":\"2022-01-01T00:00:00.000000000Z\"},{\"tuple_key\":{\"object\":\"document:roadmap\",\"relation\":\"owner\",\"user\":\"user:anna\"},\"operation\":\"TUPLE_OPERATION_DELETE\",\"timestamp\":\"2022-01-01T00:00:00.000000000Z\"}],\"continuation_token\":\"abcxyz==\"}";
+                "{\"changes\":[{\"tuple_key\":{\"object\":\"document:planning\",\"relation\":\"viewer\",\"user\":\"user:jane\"},\"operation\":\"TUPLE_OPERATION_WRITE\",\"timestamp\":\"2022-01-01T00:00:00.000000000Z\"},{\"tuple_key\":{\"object\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a\",\"relation\":\"owner\",\"user\":\"user:anna\"},\"operation\":\"TUPLE_OPERATION_DELETE\",\"timestamp\":\"2022-01-01T00:00:00.000000000Z\"}],\"continuation_token\":\"abcxyz==\"}";
 
             JsonSerializer.Deserialize<ReadChangesResponse>(jsonResponse);
         }
@@ -94,7 +94,7 @@ namespace OpenFga.Sdk.Test.Models {
         [Fact]
         public void DeserializeReadAssertionsResponse() {
             var jsonResponse =
-                "{\"authorization_model_id\":\"01FQHMTEX3ASF7TAGZZ828KSQ2\",\"assertions\":[{\"tuple_key\":{\"object\":\"document:roadmap\",\"relation\":\"viewer\",\"user\":\"carlos\"},\"expectation\":true}]}";
+                "{\"authorization_model_id\":\"01FQHMTEX3ASF7TAGZZ828KSQ2\",\"assertions\":[{\"tuple_key\":{\"object\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a\",\"relation\":\"viewer\",\"user\":\"carlos\"},\"expectation\":true}]}";
 
             JsonSerializer.Deserialize<ReadAssertionsResponse>(jsonResponse);
         }
@@ -105,7 +105,7 @@ namespace OpenFga.Sdk.Test.Models {
         [Fact]
         public void DeserializeExpandResponse() {
             var jsonResponse =
-                "{\"tree\":{\"root\":{\"name\":\"document:roadmap#owner\", \"union\":{\"nodes\":[{\"name\":\"document:roadmap#owner\", \"leaf\":{\"users\":{\"users\":[\"team:product#member\"]}}}, {\"name\":\"document:roadmap#owner\", \"leaf\":{\"tupleToUserset\":{\"tupleset\":\"document:roadmap#owner\", \"computed\":[{\"userset\":\"org:contoso#admin\"}]}}}]}}}}";
+                "{\"tree\":{\"root\":{\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"union\":{\"nodes\":[{\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"leaf\":{\"users\":{\"users\":[\"team:product#member\"]}}}, {\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"leaf\":{\"tupleToUserset\":{\"tupleset\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"computed\":[{\"userset\":\"org:contoso#admin\"}]}}}]}}}}";
 
             JsonSerializer.Deserialize<ExpandResponse>(jsonResponse);
         }
