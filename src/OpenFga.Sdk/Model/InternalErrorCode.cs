@@ -33,58 +33,52 @@ namespace OpenFga.Sdk.Model {
         InternalError = 2,
 
         /// <summary>
-        /// Enum Cancelled for value: cancelled
-        /// </summary>
-        [EnumMember(Value = "cancelled")]
-        Cancelled = 3,
-
-        /// <summary>
         /// Enum DeadlineExceeded for value: deadline_exceeded
         /// </summary>
         [EnumMember(Value = "deadline_exceeded")]
-        DeadlineExceeded = 4,
+        DeadlineExceeded = 3,
 
         /// <summary>
         /// Enum AlreadyExists for value: already_exists
         /// </summary>
         [EnumMember(Value = "already_exists")]
-        AlreadyExists = 5,
+        AlreadyExists = 4,
 
         /// <summary>
         /// Enum ResourceExhausted for value: resource_exhausted
         /// </summary>
         [EnumMember(Value = "resource_exhausted")]
-        ResourceExhausted = 6,
+        ResourceExhausted = 5,
 
         /// <summary>
         /// Enum FailedPrecondition for value: failed_precondition
         /// </summary>
         [EnumMember(Value = "failed_precondition")]
-        FailedPrecondition = 7,
+        FailedPrecondition = 6,
 
         /// <summary>
         /// Enum Aborted for value: aborted
         /// </summary>
         [EnumMember(Value = "aborted")]
-        Aborted = 8,
+        Aborted = 7,
 
         /// <summary>
         /// Enum OutOfRange for value: out_of_range
         /// </summary>
         [EnumMember(Value = "out_of_range")]
-        OutOfRange = 9,
+        OutOfRange = 8,
 
         /// <summary>
         /// Enum Unavailable for value: unavailable
         /// </summary>
         [EnumMember(Value = "unavailable")]
-        Unavailable = 10,
+        Unavailable = 9,
 
         /// <summary>
         /// Enum DataLoss for value: data_loss
         /// </summary>
         [EnumMember(Value = "data_loss")]
-        DataLoss = 11
+        DataLoss = 10
 
     }
 
