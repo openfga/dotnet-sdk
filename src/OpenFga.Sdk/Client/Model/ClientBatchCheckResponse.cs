@@ -55,8 +55,7 @@ public class BatchCheckSingleResponse : IEquatable<BatchCheckSingleResponse>, IV
     public Exception? Error { get; set; }
 
     /// <inheritdoc />
-    public bool Equals(BatchCheckSingleResponse? other)
-    {
+    public bool Equals(BatchCheckSingleResponse? other) {
         if (other == null) return false;
         if (ReferenceEquals(this, other)) return true;
 
@@ -66,10 +65,8 @@ public class BatchCheckSingleResponse : IEquatable<BatchCheckSingleResponse>, IV
     }
 
     /// <inheritdoc />
-    public override bool Equals(object obj)
-    {
-        if (obj is BatchCheckSingleResponse other)
-        {
+    public override bool Equals(object obj) {
+        if (obj is BatchCheckSingleResponse other) {
             return Equals(other);
         }
         return false;
@@ -77,6 +74,10 @@ public class BatchCheckSingleResponse : IEquatable<BatchCheckSingleResponse>, IV
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
         throw new NotImplementedException();
+
+    public override int GetHashCode() {
+        throw new NotImplementedException();
+    }
 }
 
 /// <summary>
@@ -103,8 +104,7 @@ public class ClientBatchCheckClientResponse : IEquatable<ClientBatchCheckClientR
     public List<BatchCheckSingleResponse> Responses { get; set; }
 
     /// <inheritdoc />
-    public bool Equals(ClientBatchCheckClientResponse? other)
-    {
+    public bool Equals(ClientBatchCheckClientResponse? other) {
         if (other == null) return false;
         if (ReferenceEquals(this, other)) return true;
 
@@ -112,10 +112,8 @@ public class ClientBatchCheckClientResponse : IEquatable<ClientBatchCheckClientR
     }
 
     /// <inheritdoc />
-    public override bool Equals(object obj)
-    {
-        if (obj is ClientBatchCheckClientResponse other)
-        {
+    public override bool Equals(object obj) {
+        if (obj is ClientBatchCheckClientResponse other) {
             return Equals(other);
         }
         return false;
@@ -129,4 +127,8 @@ public class ClientBatchCheckClientResponse : IEquatable<ClientBatchCheckClientR
     /// </summary>
     /// <param name="response"></param>
     public void AppendResponse(BatchCheckSingleResponse response) => Responses.Add(response);
+
+    public override int GetHashCode() {
+        throw new NotImplementedException();
+    }
 }

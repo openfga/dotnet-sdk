@@ -100,9 +100,9 @@ public class OpenFgaClientTests {
             ApiUrl = _apiUrl,
             StoreId = _config.StoreId,
         };
-        var openFgaClient = new OpenFgaClient(config);
+        var fgaClient = new OpenFgaClient(config);
 
-        async Task<ReadAuthorizationModelResponse> ActionMissingStoreId() => await openFgaClient.ReadAuthorizationModel(new ClientReadAuthorizationModelOptions() {
+        async Task<ReadAuthorizationModelResponse> ActionMissingStoreId() => await fgaClient.ReadAuthorizationModel(new ClientReadAuthorizationModelOptions() {
             AuthorizationModelId = "invalid-format"
         });
         var exception = await Assert.ThrowsAsync<FgaValidationError>(ActionMissingStoreId);
@@ -1244,6 +1244,13 @@ public class OpenFgaClientTests {
         var body = new ClientExpandRequest {
             Relation = "viewer",
             Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+            ContextualTuples = new List<ClientTupleKey>() {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "editor",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                }
+            },
         };
         var response = await fgaClient.Expand(body, new ClientExpandOptions() {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
@@ -1256,7 +1263,8 @@ public class OpenFgaClientTests {
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/expand") &&
                 req.Method == HttpMethod.Post &&
-                req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
+                req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY") &&
+                req.Content.ReadAsStringAsync().Result.Contains("user:81684243-9356-4421-8fbf-a4f8d36aa31b")),
             ItExpr.IsAny<CancellationToken>()
         );
 
@@ -1465,7 +1473,6 @@ public class OpenFgaClientTests {
         // we do not know what order they will be processed in
     }
 
-
     /// <summary>
     /// Test ListRelations: One of the relations is not found
     /// </summary>
@@ -1571,6 +1578,7 @@ public class OpenFgaClientTests {
             ItExpr.IsAny<CancellationToken>()
         );
     }
+
     /// <summary>
     /// Test ListUsers
     /// </summary>
