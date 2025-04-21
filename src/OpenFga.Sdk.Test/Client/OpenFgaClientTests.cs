@@ -154,8 +154,7 @@ public class OpenFgaClientTests {
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri ==
-                    new Uri($"{_config.BasePath}/stores") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores?name=TestStore&") &&
                     req.Method == HttpMethod.Get),
                 ItExpr.IsAny<CancellationToken>()
             )
@@ -167,12 +166,18 @@ public class OpenFgaClientTests {
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
-        var response = await fgaClient.ListStores(new ClientListStoresOptions() { });
+        var response = await fgaClient.ListStores(
+            new ClientListStoresRequest() {
+                Name = "TestStore"
+            },
+            new ClientListStoresOptions() { }
+        );
+
         mockHandler.Protected().Verify(
             "SendAsync",
             Times.Exactly(1),
             ItExpr.Is<HttpRequestMessage>(req =>
-                req.RequestUri == new Uri($"{_config.BasePath}/stores") &&
+                req.RequestUri == new Uri($"{_config.BasePath}/stores?name=TestStore&") &&
                 req.Method == HttpMethod.Get),
             ItExpr.IsAny<CancellationToken>()
         );
@@ -206,7 +211,7 @@ public class OpenFgaClientTests {
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
-        var response = await fgaClient.ListStores();
+        var response = await fgaClient.ListStores(new ClientListStoresRequest());
         mockHandler.Protected().Verify(
             "SendAsync",
             Times.Exactly(1),
@@ -246,7 +251,7 @@ public class OpenFgaClientTests {
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
 
-        var response = await fgaClient.ListStores();
+        var response = await fgaClient.ListStores(new ClientListStoresRequest());
         mockHandler.Protected().Verify(
             "SendAsync",
             Times.Exactly(1),

@@ -5,11 +5,16 @@
 - feat: add support for `start_time` parameter in `ReadChanges` endpoint
 - feat: update API definitions
 - feat: support assertions context and contextual tuples
-- feat: support contextual tuples in Expand
+- feat: support contextual tuples in `Expand`
+- feat!: support passing in name to filter in `ListStores`
 - fix: remove dependency on OpenTelemetry.Api (#100) - thanks @m4tchl0ck
-- fix: limit default retries to 3 from 15 (https://github.com/openfga/sdk-generator/pull/420) - thanks @ovindu-a
-- fix: ListRelations should not swallow errors
+- fix: limit default retries to `3` from `15` (https://github.com/openfga/sdk-generator/pull/420) - thanks @ovindu-a
+- fix: `ListRelations` should not swallow errors
 - chore(docs): replace readable names with uuid to discourage storing PII in OpenFGA (https://github.com/openfga/sdk-generator/pull/433) - thanks @sccalabr
+
+[!WARNING]
+BREAKING CHANGES:
+- The `ListStores` method now accepts a body parameter with an optional `Name` to filter the stores. This is a breaking change as it changes the method contract to allow passing in a body with the name.
 
 ## v0.5.1
 

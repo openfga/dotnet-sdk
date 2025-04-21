@@ -82,9 +82,9 @@ public class OpenFgaClient : IDisposable {
     /**
    * ListStores - Get a paginated list of stores.
    */
-    public async Task<ListStoresResponse> ListStores(IClientListStoresOptions? options = default,
+    public async Task<ListStoresResponse> ListStores(IClientListStoresRequest? body, IClientListStoresOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ListStores(options?.PageSize, options?.ContinuationToken, cancellationToken);
+        await api.ListStores(options?.PageSize, options?.ContinuationToken, body?.Name, cancellationToken);
 
     /**
    * CreateStore - Initialize a store

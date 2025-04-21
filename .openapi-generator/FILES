@@ -22,6 +22,11 @@ docs/Assertion.md
 docs/AssertionTupleKey.md
 docs/AuthErrorCode.md
 docs/AuthorizationModel.md
+docs/BatchCheckItem.md
+docs/BatchCheckRequest.md
+docs/BatchCheckResponse.md
+docs/BatchCheckSingleResult.md
+docs/CheckError.md
 docs/CheckRequest.md
 docs/CheckRequestTupleKey.md
 docs/CheckResponse.md
@@ -135,6 +140,7 @@ src/OpenFga.Sdk/Client/Model/ClientListRelationsOptions.cs
 src/OpenFga.Sdk/Client/Model/ClientListRelationsRequest.cs
 src/OpenFga.Sdk/Client/Model/ClientListRelationsResponse.cs
 src/OpenFga.Sdk/Client/Model/ClientListStoresOptions.cs
+src/OpenFga.Sdk/Client/Model/ClientListStoresRequest.cs
 src/OpenFga.Sdk/Client/Model/ClientListUsersOptions.cs
 src/OpenFga.Sdk/Client/Model/ClientListUsersRequest.cs
 src/OpenFga.Sdk/Client/Model/ClientPaginationOptions.cs
@@ -181,6 +187,11 @@ src/OpenFga.Sdk/Model/Assertion.cs
 src/OpenFga.Sdk/Model/AssertionTupleKey.cs
 src/OpenFga.Sdk/Model/AuthErrorCode.cs
 src/OpenFga.Sdk/Model/AuthorizationModel.cs
+src/OpenFga.Sdk/Model/BatchCheckItem.cs
+src/OpenFga.Sdk/Model/BatchCheckRequest.cs
+src/OpenFga.Sdk/Model/BatchCheckResponse.cs
+src/OpenFga.Sdk/Model/BatchCheckSingleResult.cs
+src/OpenFga.Sdk/Model/CheckError.cs
 src/OpenFga.Sdk/Model/CheckRequest.cs
 src/OpenFga.Sdk/Model/CheckRequestTupleKey.cs
 src/OpenFga.Sdk/Model/CheckResponse.cs

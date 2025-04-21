@@ -827,6 +827,7 @@ namespace Example {
 
 | Method | HTTP request | Description |
 | ------------- | ------------- | ------------- |
+| [**BatchCheck**](docs/OpenFgaApi.md#batchcheck) | **POST** /stores/{store_id}/batch-check | Send a list of &#x60;check&#x60; operations in a single request |
 | [**Check**](docs/OpenFgaApi.md#check) | **POST** /stores/{store_id}/check | Check whether a user is authorized to access an object |
 | [**CreateStore**](docs/OpenFgaApi.md#createstore) | **POST** /stores | Create a store |
 | [**DeleteStore**](docs/OpenFgaApi.md#deletestore) | **DELETE** /stores/{store_id} | Delete a store |
@@ -854,6 +855,11 @@ namespace Example {
  - [Model.AssertionTupleKey](docs/AssertionTupleKey.md)
  - [Model.AuthErrorCode](docs/AuthErrorCode.md)
  - [Model.AuthorizationModel](docs/AuthorizationModel.md)
+ - [Model.BatchCheckItem](docs/BatchCheckItem.md)
+ - [Model.BatchCheckRequest](docs/BatchCheckRequest.md)
+ - [Model.BatchCheckResponse](docs/BatchCheckResponse.md)
+ - [Model.BatchCheckSingleResult](docs/BatchCheckSingleResult.md)
+ - [Model.CheckError](docs/CheckError.md)
  - [Model.CheckRequest](docs/CheckRequest.md)
  - [Model.CheckRequestTupleKey](docs/CheckRequestTupleKey.md)
  - [Model.CheckResponse](docs/CheckResponse.md)
