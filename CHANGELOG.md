@@ -3,6 +3,13 @@
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.5.1...HEAD)
 
 - feat: add support for `start_time` parameter in `ReadChanges` endpoint
+- feat: update API definitions
+- feat: support assertions context and contextual tuples
+- feat: support contextual tuples in Expand
+- fix: remove dependency on OpenTelemetry.Api (#100) - thanks @m4tchl0ck
+- fix: limit default retries to 3 from 15 (https://github.com/openfga/sdk-generator/pull/420) - thanks @ovindu-a
+- fix: ListRelations should not swallow errors
+- chore(docs): replace readable names with uuid to discourage storing PII in OpenFGA (https://github.com/openfga/sdk-generator/pull/433) - thanks @sccalabr
 
 ## v0.5.1
 
