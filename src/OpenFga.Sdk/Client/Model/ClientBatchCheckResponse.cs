@@ -10,11 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Client.Model;
 
 [DataContract(Name = "BatchCheckSingleResponse")]
@@ -63,19 +58,19 @@ public class BatchCheckSingleResponse : IEquatable<BatchCheckSingleResponse>, IV
 /// <summary>
 ///     CheckResponse
 /// </summary>
-[DataContract(Name = "BatchCheckResponse")]
-public class BatchCheckResponse : IEquatable<BatchCheckResponse>, IValidatableObject {
+[DataContract(Name = "ClientBatchCheckClientResponse")]
+public class ClientBatchCheckClientResponse : IEquatable<ClientBatchCheckClientResponse>, IValidatableObject {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="BatchCheckResponse" /> class.
+    ///     Initializes a new instance of the <see cref="ClientBatchCheckClientResponse" /> class.
     /// </summary>
-    public BatchCheckResponse() {
+    public ClientBatchCheckClientResponse() {
         Responses = new List<BatchCheckSingleResponse>();
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="BatchCheckResponse" /> class.
+    ///     Initializes a new instance of the <see cref="ClientBatchCheckClientResponse" /> class.
     /// </summary>
-    public BatchCheckResponse(List<BatchCheckSingleResponse> responses) {
+    public ClientBatchCheckClientResponse(List<BatchCheckSingleResponse> responses) {
         Responses = responses;
     }
 
@@ -83,7 +78,7 @@ public class BatchCheckResponse : IEquatable<BatchCheckResponse>, IValidatableOb
     [JsonPropertyName("responses")]
     public List<BatchCheckSingleResponse> Responses { get; set; }
 
-    public bool Equals(BatchCheckResponse? other) => throw new NotImplementedException();
+    public bool Equals(ClientBatchCheckClientResponse? other) => throw new NotImplementedException();
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
         throw new NotImplementedException();

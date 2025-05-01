@@ -10,12 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Model {
     /// <summary>
     /// ReadRequest
@@ -168,6 +162,16 @@ namespace OpenFga.Sdk.Model {
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+            // PageSize (int) maximum
+            if (this.PageSize > 100) {
+                yield return new ValidationResult("Invalid value for PageSize, must be a value less than or equal to 100.", new[] { "PageSize" });
+            }
+
+            // PageSize (int) minimum
+            if (this.PageSize < 1) {
+                yield return new ValidationResult("Invalid value for PageSize, must be a value greater than or equal to 1.", new[] { "PageSize" });
+            }
+
             yield break;
         }
 

@@ -148,7 +148,7 @@ public class Configuration {
     ///     Max number of times to retry after a request is rate limited
     /// </summary>
     /// <value>MaxRetry</value>
-    public int MaxRetry { get; set; } = 15;
+    public int MaxRetry { get; set; } = 3;
 
     /// <summary>
     ///     Minimum time in ms to wait before retrying

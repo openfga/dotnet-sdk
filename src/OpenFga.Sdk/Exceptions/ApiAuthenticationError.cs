@@ -12,7 +12,6 @@
 
 
 using OpenFga.Sdk.Exceptions.Parsers;
-using System.Net;
 
 namespace OpenFga.Sdk.Exceptions;
 

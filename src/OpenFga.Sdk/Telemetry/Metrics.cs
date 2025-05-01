@@ -14,7 +14,6 @@
 using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Configuration;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 
 namespace OpenFga.Sdk.Telemetry;
 

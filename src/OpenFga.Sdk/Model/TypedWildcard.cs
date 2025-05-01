@@ -10,12 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Type bound public access.  Normally represented using the &#x60;&lt;type&gt;:*&#x60; syntax  &#x60;employee:*&#x60; represents every object of type &#x60;employee&#x60;, including those not currently present in the system  See https://openfga.dev/docs/concepts#what-is-type-bound-public-access

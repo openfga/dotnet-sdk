@@ -10,7 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
 namespace OpenFga.Sdk.Telemetry;
 
 /// <summary>
@@ -46,11 +45,11 @@ public static class TelemetryMeter {
     /// Return all supported meter names
     /// </summary>
     public static HashSet<string> GetAllMeters() {
-        return new() {
-            RequestDuration,
-            QueryDuration,
-            TokenExchangeCount,
-            RequestCount
-        };
+        var meters = new HashSet<string>();
+        meters.Add(RequestDuration);
+        meters.Add(QueryDuration);
+        meters.Add(TokenExchangeCount);
+        meters.Add(RequestCount);
+        return meters;
     }
 }

@@ -12,10 +12,9 @@
 
 
 using OpenFga.Sdk.ApiClient;
+using OpenFga.Sdk.Client; // For extensions
 using OpenFga.Sdk.Configuration;
 using System.Diagnostics;
-using System.Net.Http.Headers;
-using System.Text.Json;
 
 namespace OpenFga.Sdk.Telemetry;
 
@@ -46,6 +45,41 @@ public static class TelemetryAttribute {
     /// </summary>
     public static readonly string RequestClientId = "fga-client.request.client_id";
 
+    /// <summary>
+    ///     The internal retry count for an API request.
+    /// </summary>
+    public static readonly string RequestRetryCount = "fga-client.request.retry-count";
+
+    /// <summary>
+    ///     The HTTP host for an API request
+    /// </summary>
+    public static readonly string HttpHost = "http.host";
+
+    /// <summary>
+    ///     The HTTP status for an API request
+    /// </summary>
+    public static readonly string HttpStatus = "http.status";
+
+    /// <summary>
+    ///     The HTTP user agent for an API request
+    /// </summary>
+    public static readonly string HttpUserAgent = "http.user_agent";
+
+    /// <summary>
+    ///     The HTTP scheme for an API request
+    /// </summary>
+    public static readonly string HttpScheme = "http.scheme";
+
+    /// <summary>
+    ///     The HTTP method for an API request
+    /// </summary>
+    public static readonly string HttpMethod = "http.method";
+
+    /// <summary>
+    ///     The HTTP URL for an API request
+    /// </summary>
+    public static readonly string HttpUrl = "http.url";
+
     // Attributes (tags) associated with the response //
 
     /// <summary>
@@ -60,98 +94,89 @@ public static class TelemetryAttribute {
     /// </summary>
     public static readonly string FgaRequestUser = "fga-client.user";
 
-    // OTEL Semantic Attributes (tags) //
-
     /// <summary>
-    ///     The HTTP method for the request.
+    ///     The context/condition that is associated with the action of the request for check and list objects.
     /// </summary>
-    public static readonly string HttpMethod = "http.request.method";
+    public static readonly string FgaRequestContext = "fga-client.context";
 
     /// <summary>
-    ///     The status code of the response.
+    ///     The object that is associated with the action of the request for check and list relations.
     /// </summary>
-    public static readonly string HttpStatus = "http.response.status_code";
+    public static readonly string FgaRequestObject = "fga-client.object";
 
     /// <summary>
-    ///     Host identifier of the origin the request was sent to.
+    ///     The relation that is associated with the action of the request for check and list objects.
     /// </summary>
-    public static readonly string HttpHost = "http.host";
+    public static readonly string FgaRequestRelation = "fga-client.relation";
 
     /// <summary>
-    ///     HTTP Scheme of the request (`http`/`https`).
+    ///     The type that is associated with the action of the request for list objects.
     /// </summary>
-    public static readonly string HttpScheme = "url.scheme";
+    public static readonly string FgaRequestType = "fga-client.type";
 
     /// <summary>
-    ///     Full URL of the request.
+    ///     The internal retry count for an API request.
     /// </summary>
-    public static readonly string HttpUrl = "url.full";
+    public static readonly string RetryCount = "fga-client.retry-count";
 
     /// <summary>
-    ///     User Agent used in the query.
+    ///     The HTTP status returned for an API request
     /// </summary>
-    public static readonly string HttpUserAgent = "user_agent.original";
+    public static readonly string ResponseStatus = "fga-client.response.status";
 
     /// <summary>
-    ///     The number of retries attempted (Only sent if the request was retried. Count of `1` means the request was retried
-    ///     once in addition to the original request).
+    ///     Indicates if an API request was successful
     /// </summary>
-    public static readonly string RequestRetryCount = "http.request.resend_count";
+    public static readonly string ResponseSuccess = "fga-client.response.success";
 
     /// <summary>
-    /// Return all supported attributes
+    ///     Return all supported attribute names for the client
     /// </summary>
     public static HashSet<string> GetAllAttributes() {
-        return new() {
-            RequestMethod,
-            RequestStoreId,
-            RequestModelId,
-            RequestClientId,
-            ResponseModelId,
-            FgaRequestUser,
-            HttpMethod,
-            HttpStatus,
-            HttpHost,
-            HttpScheme,
-            HttpUrl,
-            HttpUserAgent,
-            RequestRetryCount
-        };
+        var attributes = new HashSet<string>();
+        attributes.Add(RequestMethod);
+        attributes.Add(RequestStoreId);
+        attributes.Add(RequestModelId);
+        attributes.Add(RequestClientId);
+        attributes.Add(RequestRetryCount);
+        attributes.Add(HttpHost);
+        attributes.Add(HttpStatus);
+        attributes.Add(HttpUserAgent);
+        attributes.Add(HttpScheme);
+        attributes.Add(HttpMethod);
+        attributes.Add(HttpUrl);
+        attributes.Add(ResponseModelId);
+        attributes.Add(FgaRequestUser);
+        attributes.Add(FgaRequestContext);
+        attributes.Add(FgaRequestObject);
+        attributes.Add(FgaRequestRelation);
+        attributes.Add(FgaRequestType);
+        attributes.Add(RetryCount);
+        attributes.Add(ResponseStatus);
+        attributes.Add(ResponseSuccess);
+        return attributes;
     }
 }
 
 /// <summary>
-///     Class for building attributes for telemetry.
+///     Helper class for building attribute tags for telemetry
 /// </summary>
-public class Attributes {
+public static class Attributes {
     /// <summary>
-    ///     Gets the header value if valid.
+    ///     Filter all attributes against the allowed attributes hash set
     /// </summary>
-    /// <param name="headers">The HTTP response headers.</param>
-    /// <param name="headerName">The name of the header.</param>
-    /// <returns>The header value if valid, otherwise null.</returns>
-    private static string? GetHeaderValueIfValid(HttpResponseHeaders headers, string headerName) {
-        if (headers.Contains(headerName) && headers.GetValues(headerName).Any()) {
-            return headers.GetValues(headerName).First();
+    /// <param name="fullAttributes">The full attributes to be filtered</param>
+    /// <param name="allowedAttributes">The hashset of allowed attribute names</param>
+    /// <returns>A tag list containing only the allowed attributes</returns>
+    public static TagList FilterAttributes(TagList fullAttributes, HashSet<string>? allowedAttributes) {
+        if (allowedAttributes == null || allowedAttributes.Count == 0) {
+            return new TagList();
         }
 
-        return null;
-    }
-
-    /// <summary>
-    ///     Filters the attributes based on the enabled attributes.
-    /// </summary>
-    /// <param name="attributes">The list of attributes to filter.</param>
-    /// <param name="enabledAttributes">The dictionary of enabled attributes.</param>
-    /// <returns>A filtered list of attributes.</returns>
-    public static TagList FilterAttributes(TagList attributes, HashSet<string>? enabledAttributes) {
         var filteredAttributes = new TagList();
-
-        if (enabledAttributes != null && enabledAttributes.Count != 0) {
-            foreach (var attribute in attributes) {
-                if (enabledAttributes.Contains(attribute.Key)) {
-                    filteredAttributes.Add(attribute);
-                }
+        foreach (var attribute in fullAttributes) {
+            if (allowedAttributes.Contains(attribute.Key)) {
+                filteredAttributes.Add(attribute.Key, attribute.Value);
             }
         }
 
@@ -159,163 +184,170 @@ public class Attributes {
     }
 
     /// <summary>
-    ///     Builds an object of attributes that can be used to report alongside an OpenTelemetry metric event.
+    ///     Builds the attribute tags for metrics for client credentials exchange requests
     /// </summary>
-    /// <typeparam name="T">The type of the request builder.</typeparam>
-    /// <param name="enabledAttributes">The list of enabled attributes.</param>
-    /// <param name="credentials">The credentials object.</param>
-    /// <param name="apiName">The GRPC method name.</param>
-    /// <param name="response">The HTTP response message.</param>
-    /// <param name="requestBuilder">The request builder.</param>
-    /// <param name="requestDuration">The stopwatch measuring the request duration.</param>
-    /// <param name="retryCount">The number of retries attempted.</param>
-    /// <returns>A TagList of attributes.</returns>
-    public static TagList BuildAttributesForResponse<T>(
-        HashSet<string> enabledAttributes, Credentials? credentials,
-        string apiName, HttpResponseMessage response, RequestBuilder<T> requestBuilder,
-        Stopwatch requestDuration, int retryCount) {
-        var attributes = new TagList();
-
-        attributes = AddRequestAttributes(enabledAttributes, apiName, requestBuilder, attributes);
-        attributes = AddResponseAttributes(enabledAttributes, response, attributes);
-        attributes = AddCommonAttributes(enabledAttributes, response, requestBuilder, credentials, retryCount, attributes);
-
-        return attributes;
-    }
-
-    private static TagList AddRequestAttributes<T>(
-        HashSet<string> enabledAttributes, string apiName, RequestBuilder<T> requestBuilder, TagList attributes) {
-        // var attributes = new TagList();
-        if (enabledAttributes.Contains(TelemetryAttribute.RequestMethod)) {
-            attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestMethod, apiName));
+    /// <param name="enabledAttributeNames">The enabled attribute names (must be a subset of <see cref="TelemetryAttribute.GetAllAttributes"/>)</param>
+    /// <param name="credentials">The client credentials used make the API call</param>
+    /// <param name="requestDuration">Measures the total request time</param>
+    /// <param name="retryCount">How many times the token request was retried</param>
+    /// <returns>Attributes for telemetry</returns>
+    public static TagList BuildAttributesForClientCredentials(HashSet<string> enabledAttributeNames, Credentials? credentials,
+        Stopwatch requestDuration, int retryCount = 0) {
+        if (enabledAttributeNames.Count == 0) {
+            return new TagList();
         }
 
-        if (enabledAttributes.Contains(TelemetryAttribute.RequestStoreId) &&
-            requestBuilder.PathParameters.ContainsKey("store_id")) {
-            var storeId = requestBuilder.PathParameters.GetValueOrDefault("store_id");
-            if (!string.IsNullOrEmpty(storeId)) {
-                attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestStoreId, storeId));
+        var tagList = new TagList();
+        if (enabledAttributeNames.Contains(TelemetryAttribute.RequestMethod)) {
+            tagList.Add(TelemetryAttribute.RequestMethod, "ClientCredentialsExchange");
+        }
+
+        if (enabledAttributeNames.Contains(TelemetryAttribute.RetryCount)) {
+            tagList.Add(TelemetryAttribute.RetryCount, retryCount);
+        }
+
+        if (enabledAttributeNames.Contains(TelemetryAttribute.RequestClientId)) {
+            var clientId = credentials?.Config?.ClientId ?? null;
+            if (clientId != null) {
+                tagList.Add(TelemetryAttribute.RequestClientId, clientId);
             }
         }
 
-        if (enabledAttributes.Contains(TelemetryAttribute.RequestModelId)) {
-            attributes = AddRequestModelIdAttributes(requestBuilder, apiName, attributes);
-        }
-
-        return attributes;
+        return tagList;
     }
 
-    private static TagList AddRequestModelIdAttributes<T>(
-        RequestBuilder<T> requestBuilder, string apiName, TagList attributes) {
-        string? modelId = null;
-
-        if (requestBuilder.PathParameters.ContainsKey("authorization_model_id")) {
-            modelId = requestBuilder.PathParameters.GetValueOrDefault("authorization_model_id");
-        }
-        else if (requestBuilder.PathTemplate == "/stores/{store_id}/authorization-models/{id}" &&
-                 requestBuilder.PathParameters.ContainsKey("id")) {
-            modelId = requestBuilder.PathParameters.GetValueOrDefault("id");
-        }
-
-        if (!string.IsNullOrEmpty(modelId)) {
-            attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestModelId, modelId));
-        }
-
-        if (apiName is "Check" or "ListObjects" or "Write" or "Expand" or "ListUsers") {
-            AddRequestBodyAttributes(requestBuilder, apiName, attributes);
+    /// <summary>
+    ///     Builds the attribute tags for metrics for a response
+    /// </summary>
+    /// <param name="enabledAttributeNames">The enabled attribute names (must be a subset of <see cref="TelemetryAttribute.GetAllAttributes"/>)</param>
+    /// <param name="credentials">The client credentials used make the API call</param>
+    /// <param name="apiName">The API method which is being called.</param>
+    /// <param name="response">The response of the call which is being made</param>
+    /// <param name="requestBuilder">The request builder used to make the call</param>
+    /// <param name="requestDuration">Measures the total request time</param>
+    /// <param name="retryCount">How many times the API request was retried</param>
+    /// <typeparam name="T">The type of the request, required for API calls</typeparam>
+    /// <returns>Attributes for telemetry</returns>
+    public static TagList BuildAttributesForResponse<T>(HashSet<string> enabledAttributeNames, Credentials? credentials,
+        string? apiName, HttpResponseMessage response, RequestBuilder<T> requestBuilder, Stopwatch requestDuration, int retryCount = 0) {
+        if (enabledAttributeNames.Count == 0) {
+            return new TagList();
         }
 
-        return attributes;
-    }
+        var tagList = new TagList();
 
-    private static TagList AddRequestBodyAttributes<T>(
-        RequestBuilder<T> requestBuilder, string apiName, TagList attributes) {
-        try {
-            if (requestBuilder.JsonBody != null) {
-                using (var document = JsonDocument.Parse(requestBuilder.JsonBody)) {
-                    var root = document.RootElement;
+        if (enabledAttributeNames.Contains(TelemetryAttribute.RequestMethod) && apiName != null) {
+            tagList.Add(TelemetryAttribute.RequestMethod, apiName);
+        }
 
-                    if (root.TryGetProperty("authorization_model_id", out var authModelId) &&
-                        !string.IsNullOrEmpty(authModelId.GetString())) {
-                        attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestModelId,
-                            authModelId.GetString()));
+        if (enabledAttributeNames.Contains(TelemetryAttribute.RetryCount)) {
+            tagList.Add(TelemetryAttribute.RetryCount, retryCount);
+        }
+
+        if (enabledAttributeNames.Contains(TelemetryAttribute.ResponseStatus)) {
+            tagList.Add(TelemetryAttribute.ResponseStatus, (int)response.StatusCode);
+        }
+
+        if (enabledAttributeNames.Contains(TelemetryAttribute.ResponseSuccess)) {
+            tagList.Add(TelemetryAttribute.ResponseSuccess, response.IsSuccessStatusCode);
+        }
+
+        if (enabledAttributeNames.Contains(TelemetryAttribute.RequestClientId)) {
+            var clientId = credentials?.Config?.ClientId ?? null;
+            if (clientId != null) {
+                tagList.Add(TelemetryAttribute.RequestClientId, clientId);
+            }
+        }
+
+        if (enabledAttributeNames.Contains(TelemetryAttribute.RequestStoreId) &&
+            requestBuilder.PathParameters.TryGetValue("store_id", out var storeId) &&
+            !string.IsNullOrEmpty(storeId)) {
+            tagList.Add(TelemetryAttribute.RequestStoreId, storeId);
+        }
+
+        if (enabledAttributeNames.Contains(TelemetryAttribute.RequestModelId) && enabledAttributeNames.Contains(TelemetryAttribute.ResponseModelId)) {
+            // Try to read the model ID from the path params
+            var modelIdParam = requestBuilder.PathParameters.GetValueOrDefault("authorization_model_id");
+            if (!string.IsNullOrEmpty(modelIdParam)) {
+                tagList.Add(TelemetryAttribute.RequestModelId, modelIdParam);
+                tagList.Add(TelemetryAttribute.ResponseModelId, modelIdParam);
+            }
+            else {
+                // Try to read the model ID from the query params
+                var modelIdQuery = requestBuilder.QueryParameters.GetValueOrDefault("authorization_model_id");
+                if (!string.IsNullOrEmpty(modelIdQuery)) {
+                    tagList.Add(TelemetryAttribute.RequestModelId, modelIdQuery);
+                    tagList.Add(TelemetryAttribute.ResponseModelId, modelIdQuery);
+                }
+                else if (requestBuilder.Body != null) {
+                    // Try to read the model ID from the request body
+                    var requestBodyJson = requestBuilder.JsonBody;
+                    if (!string.IsNullOrEmpty(requestBodyJson) && requestBodyJson.Contains("authorization_model_id")) {
+                        try {
+                            var bodyDoc = JsonDocument.Parse(requestBodyJson);
+                            if (bodyDoc.RootElement.TryGetProperty("authorization_model_id", out var modelIdJsonElement)) {
+                                var modelIdValue = modelIdJsonElement.GetString();
+                                if (!string.IsNullOrEmpty(modelIdValue)) {
+                                    tagList.Add(TelemetryAttribute.RequestModelId, modelIdValue);
+                                    tagList.Add(TelemetryAttribute.ResponseModelId, modelIdValue);
+                                }
+                            }
+                        }
+                        catch {
+                            // This is just for metrics, it's safe to ignore parsing failures.
+                        }
+                    }
+                }
+            }
+        }
+
+        if (requestBuilder.Body != null) {
+            var bodyWithTupleKey = requestBuilder.JsonBody;
+            if (!string.IsNullOrEmpty(bodyWithTupleKey) && bodyWithTupleKey.Contains("tuple_key")) {
+                try {
+                    var bodyDoc = JsonDocument.Parse(bodyWithTupleKey);
+                    if (bodyDoc.RootElement.TryGetProperty("tuple_key", out var tupleKeyElement)) {
+                        if (enabledAttributeNames.Contains(TelemetryAttribute.FgaRequestUser) && tupleKeyElement.TryGetProperty("user", out var userElement)) {
+                            var userValue = userElement.GetString();
+                            if (!string.IsNullOrEmpty(userValue)) {
+                                tagList.Add(TelemetryAttribute.FgaRequestUser, userValue);
+                            }
+                        }
+
+                        if (enabledAttributeNames.Contains(TelemetryAttribute.FgaRequestRelation) && tupleKeyElement.TryGetProperty("relation", out var relationElement)) {
+                            var relationValue = relationElement.GetString();
+                            if (!string.IsNullOrEmpty(relationValue)) {
+                                tagList.Add(TelemetryAttribute.FgaRequestRelation, relationValue);
+                            }
+                        }
+
+                        if (enabledAttributeNames.Contains(TelemetryAttribute.FgaRequestObject) && tupleKeyElement.TryGetProperty("object", out var objectElement)) {
+                            var objectValue = objectElement.GetString();
+                            if (!string.IsNullOrEmpty(objectValue)) {
+                                tagList.Add(TelemetryAttribute.FgaRequestObject, objectValue);
+                            }
+                        }
                     }
 
-                    if (apiName is "Check" or "ListObjects" && root.TryGetProperty("user", out var fgaUser) &&
-                        !string.IsNullOrEmpty(fgaUser.GetString())) {
-                        attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.FgaRequestUser,
-                            fgaUser.GetString()));
+                    if (bodyDoc.RootElement.TryGetProperty("context", out var contextElement) &&
+                        enabledAttributeNames.Contains(TelemetryAttribute.FgaRequestContext) &&
+                        !contextElement.ValueKind.Equals(JsonValueKind.Null)) {
+                        tagList.Add(TelemetryAttribute.FgaRequestContext, true);
+                    }
+
+                    if (bodyDoc.RootElement.TryGetProperty("type", out var typeElement)) {
+                        var typeValue = typeElement.GetString();
+                        if (!string.IsNullOrEmpty(typeValue) && enabledAttributeNames.Contains(TelemetryAttribute.FgaRequestType)) {
+                            tagList.Add(TelemetryAttribute.FgaRequestType, typeValue);
+                        }
                     }
                 }
-            }
-        }
-        catch {
-            // Handle parsing errors if necessary
-        }
-
-        return attributes;
-    }
-
-    private static TagList AddResponseAttributes(
-        HashSet<string> enabledAttributes, HttpResponseMessage response, TagList attributes) {
-        if (enabledAttributes.Contains(TelemetryAttribute.HttpStatus) && response.StatusCode != null) {
-            attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.HttpStatus, (int)response.StatusCode));
-        }
-
-        if (enabledAttributes.Contains(TelemetryAttribute.ResponseModelId)) {
-            var responseModelId = GetHeaderValueIfValid(response.Headers, "openfga-authorization-model-id") ??
-                                  GetHeaderValueIfValid(response.Headers, "fga-authorization-model-id");
-            if (!string.IsNullOrEmpty(responseModelId)) {
-                attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.ResponseModelId, responseModelId));
-            }
-        }
-
-        return attributes;
-    }
-
-    private static TagList AddCommonAttributes<T>(
-        HashSet<string> enabledAttributes, HttpResponseMessage response, RequestBuilder<T> requestBuilder,
-        Credentials? credentials, int retryCount, TagList attributes) {
-        if (response.RequestMessage != null) {
-            if (enabledAttributes.Contains(TelemetryAttribute.HttpMethod) && response.RequestMessage.Method != null) {
-                attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.HttpMethod,
-                    response.RequestMessage.Method));
-            }
-
-            if (response.RequestMessage.RequestUri != null) {
-                if (enabledAttributes.Contains(TelemetryAttribute.HttpScheme)) {
-                    attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.HttpScheme,
-                        response.RequestMessage.RequestUri.Scheme));
-                }
-
-                if (enabledAttributes.Contains(TelemetryAttribute.HttpHost)) {
-                    attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.HttpHost,
-                        response.RequestMessage.RequestUri.Host));
-                }
-
-                if (enabledAttributes.Contains(TelemetryAttribute.HttpUrl)) {
-                    attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.HttpUrl,
-                        response.RequestMessage.RequestUri.AbsoluteUri));
+                catch {
+                    // This is just for metrics, it's safe to ignore parsing failures.
                 }
             }
-
-            if (enabledAttributes.Contains(TelemetryAttribute.HttpUserAgent) &&
-                response.RequestMessage.Headers.UserAgent != null &&
-                !string.IsNullOrEmpty(response.RequestMessage.Headers.UserAgent.ToString())) {
-                attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.HttpUserAgent,
-                    response.RequestMessage.Headers.UserAgent.ToString()));
-            }
         }
 
-        if (enabledAttributes.Contains(TelemetryAttribute.RequestClientId) && credentials is { Method: CredentialsMethod.ClientCredentials, Config.ClientId: not null }) {
-            attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestClientId,
-                credentials.Config.ClientId));
-        }
-
-        if (enabledAttributes.Contains(TelemetryAttribute.RequestRetryCount) && retryCount > 0) {
-            attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestRetryCount, retryCount));
-        }
-
-        return attributes;
+        return tagList;
     }
 }

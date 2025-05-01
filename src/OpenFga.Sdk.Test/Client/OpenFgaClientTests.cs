@@ -147,7 +147,7 @@ public class OpenFgaClientTests {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         var expectedResponse = new ListStoresResponse() {
             Stores = new List<Store>() {
-                new() {Id = "45678", Name = "TestStore", CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now}
+                new Store() {Id = "45678", Name = "TestStore", CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now}
             }
         };
         mockHandler.Protected()
@@ -619,7 +619,7 @@ public class OpenFgaClientTests {
                 new(new TupleKey {
                         User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                         Relation = "viewer",
-                        Object = "document:roadmap"
+                        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                     },
                     TupleOperation.WRITE, DateTime.Now),
             },
@@ -645,9 +645,10 @@ public class OpenFgaClientTests {
 
         var type = "repo";
         var pageSize = 25;
+        var startTime = DateTime.Parse("2022-01-01T00:00:00Z");
         var continuationToken =
             "eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==";
-        var response = await fgaClient.ReadChanges(new ClientReadChangesRequest { Type = type }, new ClientReadChangesOptions {
+        var response = await fgaClient.ReadChanges(new ClientReadChangesRequest { Type = type, StartTime = startTime }, new ClientReadChangesOptions {
             PageSize = pageSize,
             ContinuationToken = continuationToken,
         });
@@ -678,7 +679,7 @@ public class OpenFgaClientTests {
                 new(new TupleKey {
                         User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                         Relation = "viewer",
-                        Object = "document:roadmap"
+                        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                     },
                     DateTime.Now)
             }
@@ -703,7 +704,7 @@ public class OpenFgaClientTests {
         var body = new ClientReadRequest() {
             User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
             Relation = "viewer",
-            Object = "document:roadmap",
+            Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
         };
         var options = new ClientReadOptions { };
         var response = await fgaClient.Read(body, options);
@@ -734,7 +735,7 @@ public class OpenFgaClientTests {
                 new(new TupleKey {
                         User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                         Relation = "viewer",
-                        Object = "document:roadmap"
+                        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                     },
                     DateTime.Now)
             }
@@ -802,7 +803,7 @@ public class OpenFgaClientTests {
                 new() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 }
             },
             Deletes = new List<ClientTupleKeyWithoutCondition>(), // should not get passed
@@ -848,7 +849,7 @@ public class OpenFgaClientTests {
                 new() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 }
             },
         };
@@ -893,14 +894,14 @@ public class OpenFgaClientTests {
                 new() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 },
             },
             Deletes = new List<ClientTupleKeyWithoutCondition> {
                 new() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "writer",
-                    Object = "document:roadmap",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 }
             },
         };
@@ -953,7 +954,7 @@ public class OpenFgaClientTests {
                 new() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "viewer",
-                    Object = "document:roadmap",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 },
                 new() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
@@ -965,7 +966,7 @@ public class OpenFgaClientTests {
                 new() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "writer",
-                    Object = "document:roadmap",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 }
             },
         };
@@ -1018,12 +1019,12 @@ public class OpenFgaClientTests {
         var body = new ClientCheckRequest {
             User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
             Relation = "viewer",
-            Object = "document:roadmap",
+            Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
             ContextualTuples = new List<ClientTupleKey>() {
                 new() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "editor",
-                    Object = "document:roadmap",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                     Condition = new RelationshipCondition() {
                         Name = "ViewCountLessThan200",
                         Context = new { Name = "Roadmap", Type = "document" }
@@ -1074,12 +1075,12 @@ public class OpenFgaClientTests {
         var body = new ClientCheckRequest {
             User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
             Relation = "viewer",
-            Object = "document:roadmap",
+            Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
             ContextualTuples = new List<ClientTupleKey>() {
                 new() {
                     User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                     Relation = "editor",
-                    Object = "document:roadmap",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                     Condition = new RelationshipCondition() {
                         Name = "ViewCountLessThan200",
                         Context = new { Name = "Roadmap", Type = "document" }
@@ -1157,36 +1158,36 @@ public class OpenFgaClientTests {
             new() {
                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                 Relation = "viewer",
-                Object = "document:roadmap",
+                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 ContextualTuples = new List<ClientTupleKey>() {
                     new() {
                         User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                         Relation = "editor",
-                        Object = "document:roadmap",
+                        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                     }
                 },
             },
             new() {
                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                 Relation = "admin",
-                Object = "document:roadmap",
+                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 ContextualTuples = new List<ClientTupleKey>() {
                     new() {
                         User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                         Relation = "editor",
-                        Object = "document:roadmap",
+                        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                     }
                 },
             },
             new() {
                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                 Relation = "creator",
-                Object = "document:roadmap",
+                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
             },
             new() {
                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                 Relation = "deleter",
-                Object = "document:roadmap",
+                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
             }
         };
         var options = new ClientBatchCheckOptions {
@@ -1204,7 +1205,7 @@ public class OpenFgaClientTests {
             ItExpr.IsAny<CancellationToken>()
         );
 
-        Assert.IsType<BatchCheckResponse>(response);
+        Assert.IsType<ClientBatchCheckClientResponse>(response);
 
         var allowedResponses = response.Responses.FindAll(res => res.Allowed);
         Assert.Equal(2, allowedResponses.Count);
@@ -1222,7 +1223,7 @@ public class OpenFgaClientTests {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
 
         var jsonResponse =
-            "{\"tree\":{\"root\":{\"name\":\"document:roadmap#owner\", \"union\":{\"nodes\":[{\"name\":\"document:roadmap#owner\", \"leaf\":{\"users\":{\"users\":[\"team:product#member\"]}}}, {\"name\":\"document:roadmap#owner\", \"leaf\":{\"tupleToUserset\":{\"tupleset\":\"document:roadmap#owner\", \"computed\":[{\"userset\":\"org:contoso#admin\"}]}}}]}}}}";
+            "{\"tree\":{\"root\":{\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"union\":{\"nodes\":[{\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"leaf\":{\"users\":{\"users\":[\"team:product#member\"]}}}, {\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"leaf\":{\"tupleToUserset\":{\"tupleset\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"computed\":[{\"userset\":\"org:contoso#admin\"}]}}}]}}}}";
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
@@ -1242,7 +1243,7 @@ public class OpenFgaClientTests {
 
         var body = new ClientExpandRequest {
             Relation = "viewer",
-            Object = "document:roadmap",
+            Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
         };
         var response = await fgaClient.Expand(body, new ClientExpandOptions() {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
@@ -1272,29 +1273,29 @@ public class OpenFgaClientTests {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         var mockResponse = new ExpandResponse(
             tree: new UsersetTree(
-                root: new Node(name: "document:roadmap1#owner",
+                root: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a1#owner",
                     union: new Nodes(
                         nodes: new List<Node>() {
-                            new Node(name: "document:roadmap2#owner",
+                            new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a2#owner",
                                 leaf: new Leaf(users: new Users(users: new List<string>() {"team:product#member"}))),
-                            new Node(name: "document:roadmap3#owner",
+                            new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a3#owner",
                                 leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(
-                                    tupleset: "document:roadmap#owner",
+                                    tupleset: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner",
                                     computed: new List<Computed>() {new Computed(userset: "org:contoso#admin")}))),
                         }),
                     difference: new UsersetTreeDifference(
-                        _base: new Node(name: "document:roadmap3#owner",
+                        _base: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a3#owner",
                             leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" }))),
-                        subtract: new Node(name: "document:roadmap4#owner",
+                        subtract: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a4#owner",
                             leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" })))
                     ),
                     intersection: new Nodes(
                         nodes: new List<Node>() {
-                            new Node(name: "document:roadmap5#owner",
+                            new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a5#owner",
                                 leaf: new Leaf(users: new Users(users: new List<string>() {"team:product#commentor"}))),
-                            new Node(name: "document:roadmap6#owner",
+                            new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a6#owner",
                                 leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(
-                                    tupleset: "document:roadmap#viewer",
+                                    tupleset: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#viewer",
                                     computed: new List<Computed>() {new Computed(userset: "org:contoso#owner")}))),
                         }))
             ));
@@ -1317,7 +1318,7 @@ public class OpenFgaClientTests {
 
         var body = new ClientExpandRequest {
             Relation = "viewer",
-            Object = "document:roadmap",
+            Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
         };
         var response = await fgaClient.Expand(body, new ClientExpandOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
@@ -1342,7 +1343,7 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task ListObjectsTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-        var expectedResponse = new ListObjectsResponse { Objects = new List<string> { "document:roadmap" } };
+        var expectedResponse = new ListObjectsResponse { Objects = new List<string> { "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a" } };
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
@@ -1373,7 +1374,7 @@ public class OpenFgaClientTests {
                 new() {
                     User = "folder:product",
                     Relation = "parent",
-                    Object = "document:roadmap",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 },
             },
         };
@@ -1435,13 +1436,13 @@ public class OpenFgaClientTests {
         var body =
             new ClientListRelationsRequest() {
                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                Object = "document:roadmap",
+                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 Relations = new List<string> { "can_view", "can_edit", "can_delete", "can_rename" },
                 ContextualTuples = new List<ClientTupleKey>() {
                     new() {
                         User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                         Relation = "editor",
-                        Object = "document:roadmap",
+                        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                     }
                 }
             };
@@ -1489,7 +1490,7 @@ public class OpenFgaClientTests {
         var body =
             new ClientListRelationsRequest() {
                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                Object = "document:roadmap",
+                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 Relations = new List<string> { },
             };
 
@@ -1515,20 +1516,20 @@ public class OpenFgaClientTests {
         var expectedResponse = new ListUsersResponse {
             // A real API would not return all these for the filter provided, these are just for test purposes
             Users = new List<User> {
-                new () {
+                new User() {
                     Object = new FgaObject {
                         Type = "user",
                         Id = "81684243-9356-4421-8fbf-a4f8d36aa31b"
                     }
                 },
-                new () {
+                new User() {
                     Userset = new UsersetUser() {
                         Type = "team",
                         Id = "fga",
                         Relation = "member"
                     }
                 },
-                new () {
+                new User() {
                     Wildcard = new TypedWildcard() {
                         Type = "user"
                     }
@@ -1577,7 +1578,7 @@ public class OpenFgaClientTests {
                 new() {
                     User = "folder:product",
                     Relation = "parent",
-                    Object = "document:roadmap",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
                 },
             },
             Context = new { ViewCount = 100 }
@@ -1674,7 +1675,7 @@ public class OpenFgaClientTests {
         var body = new List<ClientAssertion>() {new ClientAssertion() {
             User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
             Relation = "viewer",
-            Object = "document:roadmap",
+            Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
             Expectation = true,
         }};
 

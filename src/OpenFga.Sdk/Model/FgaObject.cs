@@ -10,12 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Object represents an OpenFGA Object.  An Object is composed of a type and identifier (e.g. &#39;document:1&#39;)  See https://openfga.dev/docs/concepts#what-is-an-object

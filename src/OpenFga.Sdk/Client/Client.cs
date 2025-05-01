@@ -164,9 +164,9 @@ public class OpenFgaClient : IDisposable {
      * Read Changes - Read the list of historical relationship tuple writes and deletes
      */
     public async Task<ReadChangesResponse> ReadChanges(ClientReadChangesRequest? body = default,
-        IClientReadChangesOptions? options = default,
+        ClientReadChangesOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ReadChanges(GetStoreId(options), body?.Type, options?.PageSize, options?.ContinuationToken, cancellationToken);
+        await api.ReadChanges(GetStoreId(options), body?.Type, options?.PageSize, options?.ContinuationToken, body?.StartTime, cancellationToken);
 
     /**
      * Read - Read tuples previously written to the store (does not evaluate)
@@ -225,58 +225,56 @@ public class OpenFgaClient : IDisposable {
 
         var clientWriteOpts = new ClientWriteOptions() { StoreId = StoreId, AuthorizationModelId = authorizationModelId };
 
-        var writeChunks = body.Writes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKey[]>();
-        var deleteChunks = body.Deletes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKeyWithoutCondition[]>();
+        var writeChunks = body.Writes == null ? new List<List<ClientTupleKey>>() : body.Writes.Chunk(maxPerChunk).ToList();
+        var deleteChunks = body.Deletes == null ? new List<List<ClientTupleKeyWithoutCondition>>() : body.Deletes.Chunk(maxPerChunk).ToList();
 
         var writeResponses = new ConcurrentBag<ClientWriteSingleResponse>();
         var deleteResponses = new ConcurrentBag<ClientWriteSingleResponse>();
-        await Parallel.ForEachAsync(writeChunks,
-            new ParallelOptions { MaxDegreeOfParallelism = maxParallelReqs }, async (request, token) => {
-                var writes = request.ToList();
-                try {
-                    await this.Write(new ClientWriteRequest() { Writes = writes }, clientWriteOpts, cancellationToken);
+        await writeChunks.ForEachAsync(async (request) => {
+            var writes = request.ToList();
+            try {
+                await this.Write(new ClientWriteRequest() { Writes = writes }, clientWriteOpts, cancellationToken);
 
-                    foreach (var tupleKey in writes) {
-                        writeResponses.Add(new ClientWriteSingleResponse {
-                            TupleKey = tupleKey.ToTupleKey(),
-                            Status = ClientWriteStatus.SUCCESS,
-                        });
-                    }
+                foreach (var tupleKey in writes) {
+                    writeResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.SUCCESS,
+                    });
                 }
-                catch (Exception e) {
-                    foreach (var tupleKey in writes) {
-                        writeResponses.Add(new ClientWriteSingleResponse {
-                            TupleKey = tupleKey.ToTupleKey(),
-                            Status = ClientWriteStatus.FAILURE,
-                            Error = e,
-                        });
-                    }
+            }
+            catch (Exception e) {
+                foreach (var tupleKey in writes) {
+                    writeResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
+                    });
                 }
-            });
+            }
+        });
 
-        await Parallel.ForEachAsync(deleteChunks,
-            new ParallelOptions { MaxDegreeOfParallelism = maxParallelReqs }, async (request, token) => {
-                var deletes = request.ToList();
-                try {
-                    await this.Write(new ClientWriteRequest() { Deletes = deletes }, clientWriteOpts, cancellationToken);
+        await deleteChunks.ForEachAsync(async (request) => {
+            var deletes = request.ToList();
+            try {
+                await this.Write(new ClientWriteRequest() { Deletes = deletes }, clientWriteOpts, cancellationToken);
 
-                    foreach (var tupleKey in deletes) {
-                        deleteResponses.Add(new ClientWriteSingleResponse {
-                            TupleKey = tupleKey.ToTupleKey(),
-                            Status = ClientWriteStatus.SUCCESS,
-                        });
-                    }
+                foreach (var tupleKey in deletes) {
+                    deleteResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.SUCCESS,
+                    });
                 }
-                catch (Exception e) {
-                    foreach (var tupleKey in deletes) {
-                        deleteResponses.Add(new ClientWriteSingleResponse {
-                            TupleKey = tupleKey.ToTupleKey(),
-                            Status = ClientWriteStatus.FAILURE,
-                            Error = e,
-                        });
-                    }
+            }
+            catch (Exception e) {
+                foreach (var tupleKey in deletes) {
+                    deleteResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
+                    });
                 }
-            });
+            }
+        });
 
         return new ClientWriteResponse { Writes = writeResponses.ToList(), Deletes = deleteResponses.ToList() };
     }
@@ -322,27 +320,26 @@ public class OpenFgaClient : IDisposable {
     /**
    * BatchCheck - Run a set of checks (evaluates)
    */
-    public async Task<BatchCheckResponse> BatchCheck(List<ClientCheckRequest> body,
+    public async Task<ClientBatchCheckClientResponse> BatchCheck(List<ClientCheckRequest> body,
         IClientBatchCheckOptions? options = default,
         CancellationToken cancellationToken = default) {
         var responses = new ConcurrentBag<BatchCheckSingleResponse>();
-        await Parallel.ForEachAsync(body,
-            new ParallelOptions { MaxDegreeOfParallelism = options?.MaxParallelRequests ?? DEFAULT_MAX_METHOD_PARALLEL_REQS }, async (request, token) => {
-                try {
-                    var response = await Check(request, options, cancellationToken);
+        await body.ForEachAsync(async (request) => {
+            try {
+                var response = await Check(request, options, cancellationToken);
 
-                    responses.Add(new BatchCheckSingleResponse {
-                        Allowed = response.Allowed ?? false,
-                        Request = request,
-                        Error = null
-                    });
-                }
-                catch (Exception e) {
-                    responses.Add(new BatchCheckSingleResponse { Allowed = false, Request = request, Error = e });
-                }
-            });
+                responses.Add(new BatchCheckSingleResponse {
+                    Allowed = response.Allowed ?? false,
+                    Request = request,
+                    Error = null
+                });
+            }
+            catch (Exception e) {
+                responses.Add(new BatchCheckSingleResponse { Allowed = false, Request = request, Error = e });
+            }
+        });
 
-        return new BatchCheckResponse { Responses = responses.ToList() };
+        return new ClientBatchCheckClientResponse { Responses = responses.ToList() };
     }
 
     /**

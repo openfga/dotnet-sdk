@@ -10,12 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Userset.  A set or group of users, represented in the &#x60;&lt;type&gt;:&lt;id&gt;#&lt;relation&gt;&#x60; format  &#x60;group:fga#member&#x60; represents all members of group FGA, not to be confused by &#x60;group:fga&#x60; which represents the group itself as a specific object.  See: https://openfga.dev/docs/modeling/building-blocks/usersets#what-is-a-userset

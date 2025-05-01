@@ -10,19 +10,17 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
-
 namespace OpenFga.Sdk.Client.Model;
 
 public interface IClientReadChangesRequest {
     string Type { get; set; }
+    DateTime? StartTime { get; set; }
 }
 
 public class ClientReadChangesRequest : IClientReadChangesRequest, IEquatable<ClientReadChangesRequest>,
     IValidatableObject {
     public string Type { get; set; }
+    public DateTime? StartTime { get; set; }
 
     public bool Equals(ClientReadChangesRequest input) {
         if (input == null) {

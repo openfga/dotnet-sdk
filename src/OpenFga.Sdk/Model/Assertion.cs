@@ -10,12 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Assertion
@@ -35,13 +29,17 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tupleKey">tupleKey (required).</param>
         /// <param name="expectation">expectation (required).</param>
-        public Assertion(AssertionTupleKey tupleKey = default(AssertionTupleKey), bool expectation = default(bool)) {
+        /// <param name="contextualTuples">contextualTuples.</param>
+        /// <param name="context">Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation..</param>
+        public Assertion(AssertionTupleKey tupleKey = default(AssertionTupleKey), bool expectation = default(bool), List<TupleKey> contextualTuples = default(List<TupleKey>), Object context = default(Object)) {
             // to ensure "tupleKey" is required (not null)
             if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for Assertion and cannot be null");
             }
             this.TupleKey = tupleKey;
             this.Expectation = expectation;
+            this.ContextualTuples = contextualTuples;
+            this.Context = context;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -60,6 +58,23 @@ namespace OpenFga.Sdk.Model {
         [JsonPropertyName("expectation")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool Expectation { get; set; }
+
+        /// <summary>
+        /// Gets or Sets ContextualTuples
+        /// </summary>
+        [DataMember(Name = "contextual_tuples", EmitDefaultValue = false)]
+        [JsonPropertyName("contextual_tuples")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public List<TupleKey>? ContextualTuples { get; set; }
+
+        /// <summary>
+        /// Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation.
+        /// </summary>
+        /// <value>Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation.</value>
+        [DataMember(Name = "context", EmitDefaultValue = false)]
+        [JsonPropertyName("context")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public Object? Context { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -111,6 +126,17 @@ namespace OpenFga.Sdk.Model {
                 (
                     this.Expectation == input.Expectation ||
                     this.Expectation.Equals(input.Expectation)
+                ) &&
+                (
+                    this.ContextualTuples == input.ContextualTuples ||
+                    this.ContextualTuples != null &&
+                    input.ContextualTuples != null &&
+                    this.ContextualTuples.SequenceEqual(input.ContextualTuples)
+                ) &&
+                (
+                    this.Context == input.Context ||
+                    (this.Context != null &&
+                    this.Context.Equals(input.Context))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -127,6 +153,12 @@ namespace OpenFga.Sdk.Model {
                     hashCode = (hashCode * 9923) + this.TupleKey.GetHashCode();
                 }
                 hashCode = (hashCode * 9923) + this.Expectation.GetHashCode();
+                if (this.ContextualTuples != null) {
+                    hashCode = (hashCode * 9923) + this.ContextualTuples.GetHashCode();
+                }
+                if (this.Context != null) {
+                    hashCode = (hashCode * 9923) + this.Context.GetHashCode();
+                }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
                 }

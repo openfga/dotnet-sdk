@@ -10,10 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.Runtime.Serialization;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Client.Model;
 
 /// <summary>

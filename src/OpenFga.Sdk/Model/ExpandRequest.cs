@@ -10,12 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Model {
     /// <summary>
     /// ExpandRequest
@@ -43,7 +37,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="tupleKey">tupleKey (required).</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
         /// <param name="consistency">consistency.</param>
-        public ExpandRequest(ExpandRequestTupleKey tupleKey = default(ExpandRequestTupleKey), string authorizationModelId = default(string), ConsistencyPreference? consistency = default(ConsistencyPreference?)) {
+        /// <param name="contextualTuples">contextualTuples.</param>
+        public ExpandRequest(ExpandRequestTupleKey tupleKey = default(ExpandRequestTupleKey), string authorizationModelId = default(string), ConsistencyPreference? consistency = default(ConsistencyPreference?), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys)) {
             // to ensure "tupleKey" is required (not null)
             if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for ExpandRequest and cannot be null");
@@ -51,6 +46,7 @@ namespace OpenFga.Sdk.Model {
             this.TupleKey = tupleKey;
             this.AuthorizationModelId = authorizationModelId;
             this.Consistency = consistency;
+            this.ContextualTuples = contextualTuples;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -69,6 +65,14 @@ namespace OpenFga.Sdk.Model {
         [JsonPropertyName("authorization_model_id")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? AuthorizationModelId { get; set; }
+
+        /// <summary>
+        /// Gets or Sets ContextualTuples
+        /// </summary>
+        [DataMember(Name = "contextual_tuples", EmitDefaultValue = false)]
+        [JsonPropertyName("contextual_tuples")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public ContextualTupleKeys? ContextualTuples { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -125,6 +129,11 @@ namespace OpenFga.Sdk.Model {
                 (
                     this.Consistency == input.Consistency ||
                     this.Consistency.Equals(input.Consistency)
+                ) &&
+                (
+                    this.ContextualTuples == input.ContextualTuples ||
+                    (this.ContextualTuples != null &&
+                    this.ContextualTuples.Equals(input.ContextualTuples))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -144,6 +153,9 @@ namespace OpenFga.Sdk.Model {
                     hashCode = (hashCode * 9923) + this.AuthorizationModelId.GetHashCode();
                 }
                 hashCode = (hashCode * 9923) + this.Consistency.GetHashCode();
+                if (this.ContextualTuples != null) {
+                    hashCode = (hashCode * 9923) + this.ContextualTuples.GetHashCode();
+                }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
                 }

@@ -10,11 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.Text;
-using System.Text.Json;
-using System.Web;
-
 namespace OpenFga.Sdk.ApiClient;
 
 /// <summary>
