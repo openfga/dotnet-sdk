@@ -12,7 +12,6 @@
 
 
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 
 namespace OpenFga.Sdk.Telemetry;
 

@@ -13,7 +13,6 @@
 
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Exceptions;
-using System.Text.RegularExpressions;
 
 namespace OpenFga.Sdk.Client;
 

@@ -10,10 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.Net.Http.Headers;
-using System.Runtime.Serialization;
-
 namespace OpenFga.Sdk.Exceptions.Parsers;
 
 /// <summary>

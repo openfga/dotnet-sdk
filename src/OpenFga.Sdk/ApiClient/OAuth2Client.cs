@@ -16,7 +16,6 @@ using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Telemetry;
 using System.Diagnostics;
-using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.ApiClient;
 

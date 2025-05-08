@@ -1,7 +1,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-VisualStudioVersion = 12.0.0.0
-MinimumVisualStudioVersion = 10.0.0.1
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{59de7a42-91d3-40f9-b967-84ff8236d62a}") = "OpenFga.Sdk", "src\OpenFga.Sdk\OpenFga.Sdk.csproj", "{b8d9e3e9-0156-4948-9de7-5e0d3f9c4d9e}"
 EndProject
 Project("{59de7a42-91d3-40f9-b967-84ff8236d62a}") = "OpenFga.Sdk.Test", "src\OpenFga.Sdk.Test\OpenFga.Sdk.Test.csproj", "{d119dfae-509a-4eba-a973-645b739356fc}"
