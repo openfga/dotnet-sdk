@@ -242,6 +242,51 @@ public class OpenFgaClient : IDisposable {
                     });
                 }
             }
+            catch (FgaApiAuthenticationError e) {
+                foreach (var tupleKey in writes) {
+                    writeResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
+                    });
+                }
+            }
+            catch (FgaApiInternalError e) {
+                foreach (var tupleKey in writes) {
+                    writeResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
+                    });
+                }
+            }
+            catch (FgaApiValidationError e) {
+                foreach (var tupleKey in writes) {
+                    writeResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
+                    });
+                }
+            }
+            catch (FgaApiNotFoundError e) {
+                foreach (var tupleKey in writes) {
+                    writeResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
+                    });
+                }
+            }
+            catch (FgaApiRateLimitExceededError e) {
+                foreach (var tupleKey in writes) {
+                    writeResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
+                    });
+                }
+            }
             catch (Exception e) {
                 foreach (var tupleKey in writes) {
                     writeResponses.Add(new ClientWriteSingleResponse {
@@ -262,6 +307,51 @@ public class OpenFgaClient : IDisposable {
                     deleteResponses.Add(new ClientWriteSingleResponse {
                         TupleKey = tupleKey.ToTupleKey(),
                         Status = ClientWriteStatus.SUCCESS,
+                    });
+                }
+            }
+            catch (FgaApiAuthenticationError e) {
+                foreach (var tupleKey in deletes) {
+                    deleteResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
+                    });
+                }
+            }
+            catch (FgaApiInternalError e) {
+                foreach (var tupleKey in deletes) {
+                    deleteResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
+                    });
+                }
+            }
+            catch (FgaApiValidationError e) {
+                foreach (var tupleKey in deletes) {
+                    deleteResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
+                    });
+                }
+            }
+            catch (FgaApiNotFoundError e) {
+                foreach (var tupleKey in deletes) {
+                    deleteResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
+                    });
+                }
+            }
+            catch (FgaApiRateLimitExceededError e) {
+                foreach (var tupleKey in deletes) {
+                    deleteResponses.Add(new ClientWriteSingleResponse {
+                        TupleKey = tupleKey.ToTupleKey(),
+                        Status = ClientWriteStatus.FAILURE,
+                        Error = e,
                     });
                 }
             }
@@ -333,6 +423,21 @@ public class OpenFgaClient : IDisposable {
                     Request = request,
                     Error = null
                 });
+            }
+            catch (FgaApiAuthenticationError e) {
+                responses.Add(new BatchCheckSingleResponse { Allowed = false, Request = request, Error = e });
+            }
+            catch (FgaApiInternalError e) {
+                responses.Add(new BatchCheckSingleResponse { Allowed = false, Request = request, Error = e });
+            }
+            catch (FgaApiValidationError e) {
+                responses.Add(new BatchCheckSingleResponse { Allowed = false, Request = request, Error = e });
+            }
+            catch (FgaApiNotFoundError e) {
+                responses.Add(new BatchCheckSingleResponse { Allowed = false, Request = request, Error = e });
+            }
+            catch (FgaApiRateLimitExceededError e) {
+                responses.Add(new BatchCheckSingleResponse { Allowed = false, Request = request, Error = e });
             }
             catch (Exception e) {
                 responses.Add(new BatchCheckSingleResponse { Allowed = false, Request = request, Error = e });

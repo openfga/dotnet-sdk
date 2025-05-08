@@ -88,7 +88,17 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as Difference);
+            // Proper type checking in the Equals method - don't use 'as' operator
+            if (input == null)
+                return false;
+
+            if (ReferenceEquals(this, input))
+                return true;
+
+            if (this.GetType() != input.GetType())
+                return false;
+
+            return Equals((Difference)input);
         }
 
         /// <summary>
@@ -100,18 +110,60 @@ namespace OpenFga.Sdk.Model {
             if (input == null) {
                 return false;
             }
-            return
-                (
-                    this.Base == input.Base ||
-                    (this.Base != null &&
-                    this.Base.Equals(input.Base))
-                ) &&
-                (
-                    this.Subtract == input.Subtract ||
-                    (this.Subtract != null &&
-                    this.Subtract.Equals(input.Subtract))
-                )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+
+            return ArePropertiesEqual(input);
+        }
+
+        // Helper methods for property equality
+        private bool ArePropertiesEqual(Difference input) {
+
+            if (!IsPropertyEqual(this.Base, input.Base)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.Subtract, input.Subtract)) {
+                return false;
+            }
+
+
+            // Check if additional properties are equal
+            if (!AreAdditionalPropertiesEqual(input)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool AreAdditionalPropertiesEqual(Difference input) {
+            if (this.AdditionalProperties.Count != input.AdditionalProperties.Count) {
+                return false;
+            }
+
+            return !this.AdditionalProperties.Except(input.AdditionalProperties).Any();
+        }
+
+        private bool IsPropertyEqual<T>(T thisValue, T otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.Equals(otherValue);
+        }
+
+        private bool IsCollectionPropertyEqual<T>(IEnumerable<T> thisValue, IEnumerable<T> otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.SequenceEqual(otherValue);
         }
 
         /// <summary>

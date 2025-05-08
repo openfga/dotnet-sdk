@@ -121,7 +121,17 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as Userset);
+            // Proper type checking in the Equals method - don't use 'as' operator
+            if (input == null)
+                return false;
+
+            if (ReferenceEquals(this, input))
+                return true;
+
+            if (this.GetType() != input.GetType())
+                return false;
+
+            return Equals((Userset)input);
         }
 
         /// <summary>
@@ -133,38 +143,76 @@ namespace OpenFga.Sdk.Model {
             if (input == null) {
                 return false;
             }
-            return
-                (
-                    this.This == input.This ||
-                    (this.This != null &&
-                    this.This.Equals(input.This))
-                ) &&
-                (
-                    this.ComputedUserset == input.ComputedUserset ||
-                    (this.ComputedUserset != null &&
-                    this.ComputedUserset.Equals(input.ComputedUserset))
-                ) &&
-                (
-                    this.TupleToUserset == input.TupleToUserset ||
-                    (this.TupleToUserset != null &&
-                    this.TupleToUserset.Equals(input.TupleToUserset))
-                ) &&
-                (
-                    this.Union == input.Union ||
-                    (this.Union != null &&
-                    this.Union.Equals(input.Union))
-                ) &&
-                (
-                    this.Intersection == input.Intersection ||
-                    (this.Intersection != null &&
-                    this.Intersection.Equals(input.Intersection))
-                ) &&
-                (
-                    this.Difference == input.Difference ||
-                    (this.Difference != null &&
-                    this.Difference.Equals(input.Difference))
-                )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+
+            return ArePropertiesEqual(input);
+        }
+
+        // Helper methods for property equality
+        private bool ArePropertiesEqual(Userset input) {
+
+            if (!IsPropertyEqual(this.This, input.This)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.ComputedUserset, input.ComputedUserset)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.TupleToUserset, input.TupleToUserset)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.Union, input.Union)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.Intersection, input.Intersection)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.Difference, input.Difference)) {
+                return false;
+            }
+
+
+            // Check if additional properties are equal
+            if (!AreAdditionalPropertiesEqual(input)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool AreAdditionalPropertiesEqual(Userset input) {
+            if (this.AdditionalProperties.Count != input.AdditionalProperties.Count) {
+                return false;
+            }
+
+            return !this.AdditionalProperties.Except(input.AdditionalProperties).Any();
+        }
+
+        private bool IsPropertyEqual<T>(T thisValue, T otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.Equals(otherValue);
+        }
+
+        private bool IsCollectionPropertyEqual<T>(IEnumerable<T> thisValue, IEnumerable<T> otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.SequenceEqual(otherValue);
         }
 
         /// <summary>

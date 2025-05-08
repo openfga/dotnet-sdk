@@ -61,7 +61,17 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as Any);
+            // Proper type checking in the Equals method - don't use 'as' operator
+            if (input == null)
+                return false;
+
+            if (ReferenceEquals(this, input))
+                return true;
+
+            if (this.GetType() != input.GetType())
+                return false;
+
+            return Equals((Any)input);
         }
 
         /// <summary>
@@ -73,12 +83,49 @@ namespace OpenFga.Sdk.Model {
             if (input == null) {
                 return false;
             }
-            return base.Equals(input) &&
-                (
-                    this.Type == input.Type ||
-                    (this.Type != null &&
-                    this.Type.Equals(input.Type))
-                );
+
+            return ArePropertiesEqual(input);
+        }
+
+        // Helper methods for property equality
+        private bool ArePropertiesEqual(Any input) {
+
+            if (!base.Equals(input)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.Type, input.Type)) {
+                return false;
+            }
+
+
+
+            return true;
+        }
+
+
+        private bool IsPropertyEqual<T>(T thisValue, T otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.Equals(otherValue);
+        }
+
+        private bool IsCollectionPropertyEqual<T>(IEnumerable<T> thisValue, IEnumerable<T> otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.SequenceEqual(otherValue);
         }
 
         /// <summary>

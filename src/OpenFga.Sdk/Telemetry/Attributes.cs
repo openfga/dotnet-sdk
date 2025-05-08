@@ -293,8 +293,11 @@ public static class Attributes {
                                 }
                             }
                         }
-                        catch {
-                            // This is just for metrics, it's safe to ignore parsing failures.
+                        catch (JsonException) {
+                            // Safe to ignore parsing failures for telemetry
+                        }
+                        catch (InvalidOperationException) {
+                            // Safe to ignore for telemetry
                         }
                     }
                 }
@@ -342,8 +345,11 @@ public static class Attributes {
                         }
                     }
                 }
-                catch {
-                    // This is just for metrics, it's safe to ignore parsing failures.
+                catch (JsonException) {
+                    // Safe to ignore parsing failures for telemetry
+                }
+                catch (InvalidOperationException) {
+                    // Safe to ignore for telemetry
                 }
             }
         }

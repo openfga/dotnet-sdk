@@ -110,7 +110,17 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as Condition);
+            // Proper type checking in the Equals method - don't use 'as' operator
+            if (input == null)
+                return false;
+
+            if (ReferenceEquals(this, input))
+                return true;
+
+            if (this.GetType() != input.GetType())
+                return false;
+
+            return Equals((Condition)input);
         }
 
         /// <summary>
@@ -122,29 +132,68 @@ namespace OpenFga.Sdk.Model {
             if (input == null) {
                 return false;
             }
-            return
-                (
-                    this.Name == input.Name ||
-                    (this.Name != null &&
-                    this.Name.Equals(input.Name))
-                ) &&
-                (
-                    this.Expression == input.Expression ||
-                    (this.Expression != null &&
-                    this.Expression.Equals(input.Expression))
-                ) &&
-                (
-                    this.Parameters == input.Parameters ||
-                    this.Parameters != null &&
-                    input.Parameters != null &&
-                    this.Parameters.SequenceEqual(input.Parameters)
-                ) &&
-                (
-                    this.Metadata == input.Metadata ||
-                    (this.Metadata != null &&
-                    this.Metadata.Equals(input.Metadata))
-                )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+
+            return ArePropertiesEqual(input);
+        }
+
+        // Helper methods for property equality
+        private bool ArePropertiesEqual(Condition input) {
+
+            if (!IsPropertyEqual(this.Name, input.Name)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.Expression, input.Expression)) {
+                return false;
+            }
+
+            if (!IsCollectionPropertyEqual(this.Parameters, input.Parameters)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.Metadata, input.Metadata)) {
+                return false;
+            }
+
+
+            // Check if additional properties are equal
+            if (!AreAdditionalPropertiesEqual(input)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool AreAdditionalPropertiesEqual(Condition input) {
+            if (this.AdditionalProperties.Count != input.AdditionalProperties.Count) {
+                return false;
+            }
+
+            return !this.AdditionalProperties.Except(input.AdditionalProperties).Any();
+        }
+
+        private bool IsPropertyEqual<T>(T thisValue, T otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.Equals(otherValue);
+        }
+
+        private bool IsCollectionPropertyEqual<T>(IEnumerable<T> thisValue, IEnumerable<T> otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.SequenceEqual(otherValue);
         }
 
         /// <summary>

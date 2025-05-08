@@ -80,7 +80,17 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as ConditionMetadata);
+            // Proper type checking in the Equals method - don't use 'as' operator
+            if (input == null)
+                return false;
+
+            if (ReferenceEquals(this, input))
+                return true;
+
+            if (this.GetType() != input.GetType())
+                return false;
+
+            return Equals((ConditionMetadata)input);
         }
 
         /// <summary>
@@ -92,18 +102,60 @@ namespace OpenFga.Sdk.Model {
             if (input == null) {
                 return false;
             }
-            return
-                (
-                    this.Module == input.Module ||
-                    (this.Module != null &&
-                    this.Module.Equals(input.Module))
-                ) &&
-                (
-                    this.SourceInfo == input.SourceInfo ||
-                    (this.SourceInfo != null &&
-                    this.SourceInfo.Equals(input.SourceInfo))
-                )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+
+            return ArePropertiesEqual(input);
+        }
+
+        // Helper methods for property equality
+        private bool ArePropertiesEqual(ConditionMetadata input) {
+
+            if (!IsPropertyEqual(this.Module, input.Module)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.SourceInfo, input.SourceInfo)) {
+                return false;
+            }
+
+
+            // Check if additional properties are equal
+            if (!AreAdditionalPropertiesEqual(input)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool AreAdditionalPropertiesEqual(ConditionMetadata input) {
+            if (this.AdditionalProperties.Count != input.AdditionalProperties.Count) {
+                return false;
+            }
+
+            return !this.AdditionalProperties.Except(input.AdditionalProperties).Any();
+        }
+
+        private bool IsPropertyEqual<T>(T thisValue, T otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.Equals(otherValue);
+        }
+
+        private bool IsCollectionPropertyEqual<T>(IEnumerable<T> thisValue, IEnumerable<T> otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.SequenceEqual(otherValue);
         }
 
         /// <summary>
