@@ -82,9 +82,9 @@ public class OpenFgaClient : IDisposable {
     /**
    * ListStores - Get a paginated list of stores.
    */
-    public async Task<ListStoresResponse> ListStores(IClientListStoresOptions? options = default,
+    public async Task<ListStoresResponse> ListStores(IClientListStoresRequest? body, IClientListStoresOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ListStores(options?.PageSize, options?.ContinuationToken, cancellationToken);
+        await api.ListStores(options?.PageSize, options?.ContinuationToken, body?.Name, cancellationToken);
 
     /**
    * CreateStore - Initialize a store
@@ -164,9 +164,9 @@ public class OpenFgaClient : IDisposable {
      * Read Changes - Read the list of historical relationship tuple writes and deletes
      */
     public async Task<ReadChangesResponse> ReadChanges(ClientReadChangesRequest? body = default,
-        IClientReadChangesOptions? options = default,
+        ClientReadChangesOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ReadChanges(GetStoreId(options), body?.Type, options?.PageSize, options?.ContinuationToken, cancellationToken);
+        await api.ReadChanges(GetStoreId(options), body?.Type, options?.PageSize, options?.ContinuationToken, body?.StartTime, cancellationToken);
 
     /**
      * Read - Read tuples previously written to the store (does not evaluate)
@@ -322,7 +322,7 @@ public class OpenFgaClient : IDisposable {
     /**
    * BatchCheck - Run a set of checks (evaluates)
    */
-    public async Task<BatchCheckResponse> BatchCheck(List<ClientCheckRequest> body,
+    public async Task<ClientBatchCheckClientResponse> BatchCheck(List<ClientCheckRequest> body,
         IClientBatchCheckOptions? options = default,
         CancellationToken cancellationToken = default) {
         var responses = new ConcurrentBag<BatchCheckSingleResponse>();
@@ -342,7 +342,7 @@ public class OpenFgaClient : IDisposable {
                 }
             });
 
-        return new BatchCheckResponse { Responses = responses.ToList() };
+        return new ClientBatchCheckClientResponse { Responses = responses.ToList() };
     }
 
     /**
@@ -355,6 +355,11 @@ public class OpenFgaClient : IDisposable {
             GetStoreId(options),
             new ExpandRequest {
                 TupleKey = new ExpandRequestTupleKey { Relation = body.Relation, Object = body.Object },
+                ContextualTuples =
+                    new ContextualTupleKeys {
+                        TupleKeys = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ??
+                                    new List<TupleKey>()
+                    },
                 AuthorizationModelId = GetAuthorizationModelId(options),
                 Consistency = options?.Consistency
             }, cancellationToken);
@@ -405,8 +410,12 @@ public class OpenFgaClient : IDisposable {
 
         var batchCheckResponse = await BatchCheck(batchCheckRequests, options, cancellationToken);
 
-        for (var index = 0; index < batchCheckResponse.Responses.Count; index++) {
-            var batchCheckSingleResponse = batchCheckResponse.Responses[index];
+
+        foreach (var batchCheckSingleResponse in batchCheckResponse.Responses) {
+            if (batchCheckSingleResponse.Error != null) {
+                throw batchCheckSingleResponse.Error;
+            }
+
             if (batchCheckSingleResponse.Allowed && batchCheckSingleResponse.Request?.Relation != null) {
                 responses.AddRelation(batchCheckSingleResponse.Request.Relation);
             }

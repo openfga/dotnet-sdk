@@ -6,8 +6,6 @@
 .github/ISSUE_TEMPLATE/config.yaml
 .github/ISSUE_TEMPLATE/feature_request.yaml
 .github/dependabot.yaml
-.github/workflows/main.yaml
-.github/workflows/semgrep.yaml
 .gitignore
 CHANGELOG.md
 CONTRIBUTING.md
@@ -22,7 +20,13 @@ docs/AbortedMessageResponse.md
 docs/Any.md
 docs/Assertion.md
 docs/AssertionTupleKey.md
+docs/AuthErrorCode.md
 docs/AuthorizationModel.md
+docs/BatchCheckItem.md
+docs/BatchCheckRequest.md
+docs/BatchCheckResponse.md
+docs/BatchCheckSingleResult.md
+docs/CheckError.md
 docs/CheckRequest.md
 docs/CheckRequestTupleKey.md
 docs/CheckResponse.md
@@ -40,6 +44,7 @@ docs/ExpandRequest.md
 docs/ExpandRequestTupleKey.md
 docs/ExpandResponse.md
 docs/FgaObject.md
+docs/ForbiddenResponse.md
 docs/GetStoreResponse.md
 docs/InternalErrorCode.md
 docs/InternalErrorMessageResponse.md
@@ -107,6 +112,7 @@ example/OpenTelemetryExample/OpenTelemetryExample.csproj
 example/README.md
 src/OpenFga.Sdk.Test/Api/OpenFgaApiTests.cs
 src/OpenFga.Sdk.Test/Client/OpenFgaClientTests.cs
+src/OpenFga.Sdk.Test/Models/Client/ClientBatchCheckResponseTest.cs
 src/OpenFga.Sdk.Test/Models/ModelTests.cs
 src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj
 src/OpenFga.Sdk/Api/OpenFgaApi.cs
@@ -134,6 +140,7 @@ src/OpenFga.Sdk/Client/Model/ClientListRelationsOptions.cs
 src/OpenFga.Sdk/Client/Model/ClientListRelationsRequest.cs
 src/OpenFga.Sdk/Client/Model/ClientListRelationsResponse.cs
 src/OpenFga.Sdk/Client/Model/ClientListStoresOptions.cs
+src/OpenFga.Sdk/Client/Model/ClientListStoresRequest.cs
 src/OpenFga.Sdk/Client/Model/ClientListUsersOptions.cs
 src/OpenFga.Sdk/Client/Model/ClientListUsersRequest.cs
 src/OpenFga.Sdk/Client/Model/ClientPaginationOptions.cs
@@ -178,7 +185,13 @@ src/OpenFga.Sdk/Model/AbstractOpenAPISchema.cs
 src/OpenFga.Sdk/Model/Any.cs
 src/OpenFga.Sdk/Model/Assertion.cs
 src/OpenFga.Sdk/Model/AssertionTupleKey.cs
+src/OpenFga.Sdk/Model/AuthErrorCode.cs
 src/OpenFga.Sdk/Model/AuthorizationModel.cs
+src/OpenFga.Sdk/Model/BatchCheckItem.cs
+src/OpenFga.Sdk/Model/BatchCheckRequest.cs
+src/OpenFga.Sdk/Model/BatchCheckResponse.cs
+src/OpenFga.Sdk/Model/BatchCheckSingleResult.cs
+src/OpenFga.Sdk/Model/CheckError.cs
 src/OpenFga.Sdk/Model/CheckRequest.cs
 src/OpenFga.Sdk/Model/CheckRequestTupleKey.cs
 src/OpenFga.Sdk/Model/CheckResponse.cs
@@ -196,6 +209,7 @@ src/OpenFga.Sdk/Model/ExpandRequest.cs
 src/OpenFga.Sdk/Model/ExpandRequestTupleKey.cs
 src/OpenFga.Sdk/Model/ExpandResponse.cs
 src/OpenFga.Sdk/Model/FgaObject.cs
+src/OpenFga.Sdk/Model/ForbiddenResponse.cs
 src/OpenFga.Sdk/Model/GetStoreResponse.cs
 src/OpenFga.Sdk/Model/InternalErrorCode.cs
 src/OpenFga.Sdk/Model/InternalErrorMessageResponse.cs

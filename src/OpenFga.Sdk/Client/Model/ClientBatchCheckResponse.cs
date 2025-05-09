@@ -54,28 +54,48 @@ public class BatchCheckSingleResponse : IEquatable<BatchCheckSingleResponse>, IV
     [JsonPropertyName("error")]
     public Exception? Error { get; set; }
 
-    public bool Equals(BatchCheckSingleResponse? other) => throw new NotImplementedException();
+    /// <inheritdoc />
+    public bool Equals(BatchCheckSingleResponse? other) {
+        if (other == null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        return Allowed == other.Allowed &&
+               EqualityComparer<ClientCheckRequest>.Default.Equals(Request, other.Request) &&
+               EqualityComparer<Exception>.Default.Equals(Error, other.Error);
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object obj) {
+        if (obj is BatchCheckSingleResponse other) {
+            return Equals(other);
+        }
+        return false;
+    }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
         throw new NotImplementedException();
+
+    public override int GetHashCode() {
+        throw new NotImplementedException();
+    }
 }
 
 /// <summary>
 ///     CheckResponse
 /// </summary>
-[DataContract(Name = "BatchCheckResponse")]
-public class BatchCheckResponse : IEquatable<BatchCheckResponse>, IValidatableObject {
+[DataContract(Name = "ClientBatchCheckClientResponse")]
+public class ClientBatchCheckClientResponse : IEquatable<ClientBatchCheckClientResponse>, IValidatableObject {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="BatchCheckResponse" /> class.
+    ///     Initializes a new instance of the <see cref="ClientBatchCheckClientResponse" /> class.
     /// </summary>
-    public BatchCheckResponse() {
+    public ClientBatchCheckClientResponse() {
         Responses = new List<BatchCheckSingleResponse>();
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="BatchCheckResponse" /> class.
+    ///     Initializes a new instance of the <see cref="ClientBatchCheckClientResponse" /> class.
     /// </summary>
-    public BatchCheckResponse(List<BatchCheckSingleResponse> responses) {
+    public ClientBatchCheckClientResponse(List<BatchCheckSingleResponse> responses) {
         Responses = responses;
     }
 
@@ -83,7 +103,21 @@ public class BatchCheckResponse : IEquatable<BatchCheckResponse>, IValidatableOb
     [JsonPropertyName("responses")]
     public List<BatchCheckSingleResponse> Responses { get; set; }
 
-    public bool Equals(BatchCheckResponse? other) => throw new NotImplementedException();
+    /// <inheritdoc />
+    public bool Equals(ClientBatchCheckClientResponse? other) {
+        if (other == null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        return Responses.SequenceEqual(other.Responses);
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object obj) {
+        if (obj is ClientBatchCheckClientResponse other) {
+            return Equals(other);
+        }
+        return false;
+    }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
         throw new NotImplementedException();
@@ -93,4 +127,8 @@ public class BatchCheckResponse : IEquatable<BatchCheckResponse>, IValidatableOb
     /// </summary>
     /// <param name="response"></param>
     public void AppendResponse(BatchCheckSingleResponse response) => Responses.Add(response);
+
+    public override int GetHashCode() {
+        throw new NotImplementedException();
+    }
 }

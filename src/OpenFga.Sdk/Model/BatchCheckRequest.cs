@@ -18,10 +18,10 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// ReadRequest
+    /// BatchCheckRequest
     /// </summary>
-    [DataContract(Name = "Read_request")]
-    public partial class ReadRequest : IEquatable<ReadRequest>, IValidatableObject {
+    [DataContract(Name = "BatchCheck_request")]
+    public partial class BatchCheckRequest : IEquatable<BatchCheckRequest>, IValidatableObject {
 
         /// <summary>
         /// Gets or Sets Consistency
@@ -30,51 +30,45 @@ namespace OpenFga.Sdk.Model {
         [JsonPropertyName("consistency")]
         public ConsistencyPreference? Consistency { get; set; }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReadRequest" /> class.
+        /// Initializes a new instance of the <see cref="BatchCheckRequest" /> class.
         /// </summary>
         [JsonConstructor]
-        public ReadRequest() {
+        public BatchCheckRequest() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReadRequest" /> class.
+        /// Initializes a new instance of the <see cref="BatchCheckRequest" /> class.
         /// </summary>
-        /// <param name="tupleKey">tupleKey.</param>
-        /// <param name="pageSize">pageSize.</param>
-        /// <param name="continuationToken">continuationToken.</param>
+        /// <param name="checks">checks (required).</param>
+        /// <param name="authorizationModelId">authorizationModelId.</param>
         /// <param name="consistency">consistency.</param>
-        public ReadRequest(ReadRequestTupleKey tupleKey = default(ReadRequestTupleKey), int pageSize = default(int), string continuationToken = default(string), ConsistencyPreference? consistency = default(ConsistencyPreference?)) {
-            this.TupleKey = tupleKey;
-            this.PageSize = pageSize;
-            this.ContinuationToken = continuationToken;
+        public BatchCheckRequest(List<BatchCheckItem> checks = default(List<BatchCheckItem>), string authorizationModelId = default(string), ConsistencyPreference? consistency = default(ConsistencyPreference?)) {
+            // to ensure "checks" is required (not null)
+            if (checks == null) {
+                throw new ArgumentNullException("checks is a required property for BatchCheckRequest and cannot be null");
+            }
+            this.Checks = checks;
+            this.AuthorizationModelId = authorizationModelId;
             this.Consistency = consistency;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Gets or Sets TupleKey
+        /// Gets or Sets Checks
         /// </summary>
-        [DataMember(Name = "tuple_key", EmitDefaultValue = false)]
-        [JsonPropertyName("tuple_key")]
+        [DataMember(Name = "checks", IsRequired = true, EmitDefaultValue = false)]
+        [JsonPropertyName("checks")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ReadRequestTupleKey? TupleKey { get; set; }
+        public List<BatchCheckItem> Checks { get; set; }
 
         /// <summary>
-        /// Gets or Sets PageSize
+        /// Gets or Sets AuthorizationModelId
         /// </summary>
-        [DataMember(Name = "page_size", EmitDefaultValue = false)]
-        [JsonPropertyName("page_size")]
+        [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
+        [JsonPropertyName("authorization_model_id")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public int? PageSize { get; set; }
-
-        /// <summary>
-        /// Gets or Sets ContinuationToken
-        /// </summary>
-        [DataMember(Name = "continuation_token", EmitDefaultValue = false)]
-        [JsonPropertyName("continuation_token")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? ContinuationToken { get; set; }
+        public string? AuthorizationModelId { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -92,11 +86,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a ReadRequest from the JSON string presentation of the object
+        /// Builds a BatchCheckRequest from the JSON string presentation of the object
         /// </summary>
-        /// <returns>ReadRequest</returns>
-        public static ReadRequest FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<ReadRequest>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>BatchCheckRequest</returns>
+        public static BatchCheckRequest FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<BatchCheckRequest>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -105,32 +99,29 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as ReadRequest);
+            return this.Equals(input as BatchCheckRequest);
         }
 
         /// <summary>
-        /// Returns true if ReadRequest instances are equal
+        /// Returns true if BatchCheckRequest instances are equal
         /// </summary>
-        /// <param name="input">Instance of ReadRequest to be compared</param>
+        /// <param name="input">Instance of BatchCheckRequest to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ReadRequest input) {
+        public bool Equals(BatchCheckRequest input) {
             if (input == null) {
                 return false;
             }
             return
                 (
-                    this.TupleKey == input.TupleKey ||
-                    (this.TupleKey != null &&
-                    this.TupleKey.Equals(input.TupleKey))
+                    this.Checks == input.Checks ||
+                    this.Checks != null &&
+                    input.Checks != null &&
+                    this.Checks.SequenceEqual(input.Checks)
                 ) &&
                 (
-                    this.PageSize == input.PageSize ||
-                    this.PageSize.Equals(input.PageSize)
-                ) &&
-                (
-                    this.ContinuationToken == input.ContinuationToken ||
-                    (this.ContinuationToken != null &&
-                    this.ContinuationToken.Equals(input.ContinuationToken))
+                    this.AuthorizationModelId == input.AuthorizationModelId ||
+                    (this.AuthorizationModelId != null &&
+                    this.AuthorizationModelId.Equals(input.AuthorizationModelId))
                 ) &&
                 (
                     this.Consistency == input.Consistency ||
@@ -147,12 +138,11 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 9661;
-                if (this.TupleKey != null) {
-                    hashCode = (hashCode * 9923) + this.TupleKey.GetHashCode();
+                if (this.Checks != null) {
+                    hashCode = (hashCode * 9923) + this.Checks.GetHashCode();
                 }
-                hashCode = (hashCode * 9923) + this.PageSize.GetHashCode();
-                if (this.ContinuationToken != null) {
-                    hashCode = (hashCode * 9923) + this.ContinuationToken.GetHashCode();
+                if (this.AuthorizationModelId != null) {
+                    hashCode = (hashCode * 9923) + this.AuthorizationModelId.GetHashCode();
                 }
                 hashCode = (hashCode * 9923) + this.Consistency.GetHashCode();
                 if (this.AdditionalProperties != null) {
@@ -168,16 +158,6 @@ namespace OpenFga.Sdk.Model {
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
-            // PageSize (int) maximum
-            if (this.PageSize > 100) {
-                yield return new ValidationResult("Invalid value for PageSize, must be a value less than or equal to 100.", new[] { "PageSize" });
-            }
-
-            // PageSize (int) minimum
-            if (this.PageSize < 1) {
-                yield return new ValidationResult("Invalid value for PageSize, must be a value greater than or equal to 1.", new[] { "PageSize" });
-            }
-
             yield break;
         }
 

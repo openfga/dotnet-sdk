@@ -1,5 +1,21 @@
 # Changelog
 
+## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.5.1...HEAD)
+
+- feat: add support for `start_time` parameter in `ReadChanges` endpoint
+- feat: update API definitions
+- feat: support assertions context and contextual tuples
+- feat: support contextual tuples in `Expand`
+- feat!: support passing in name to filter in `ListStores`
+- fix: remove dependency on OpenTelemetry.Api (#100) - thanks @m4tchl0ck
+- fix: limit default retries to `3` from `15` (https://github.com/openfga/sdk-generator/pull/420) - thanks @ovindu-a
+- fix: `ListRelations` should not swallow errors
+- chore(docs): replace readable names with uuid to discourage storing PII in OpenFGA (https://github.com/openfga/sdk-generator/pull/433) - thanks @sccalabr
+
+[!WARNING]
+BREAKING CHANGES:
+- The `ListStores` method now accepts a body parameter with an optional `Name` to filter the stores. This is a breaking change as it changes the method contract to allow passing in a body with the name.
+
 ## v0.5.1
 
 ### [0.5.1](https://github.com/openfga/dotnet-sdk/compare/v0.5.0...v0.5.1) (2024-09-09)
@@ -136,7 +152,7 @@ Updated to include support for [OpenFGA 0.3.0](https://github.com/openfga/openfg
 
 Changes:
 - [BREAKING] feat(list-objects)!: response has been changed to include the object type
-    e.g. response that was `{"object_ids":["roadmap"]}`, will now be `{"objects":["document:roadmap"]}`
+    e.g. response that was `{"object_ids":["roadmap"]}`, will now be `{"objects":["document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"]}`
 
 Fixes:
 - fix(models): update interfaces that had incorrectly optional fields to make them required

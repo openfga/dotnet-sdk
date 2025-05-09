@@ -18,41 +18,38 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// ExpandRequest
+    /// BatchCheckItem
     /// </summary>
-    [DataContract(Name = "Expand_request")]
-    public partial class ExpandRequest : IEquatable<ExpandRequest>, IValidatableObject {
-
+    [DataContract(Name = "BatchCheckItem")]
+    public partial class BatchCheckItem : IEquatable<BatchCheckItem>, IValidatableObject {
         /// <summary>
-        /// Gets or Sets Consistency
-        /// </summary>
-        [DataMember(Name = "consistency", EmitDefaultValue = false)]
-        [JsonPropertyName("consistency")]
-        public ConsistencyPreference? Consistency { get; set; }
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExpandRequest" /> class.
+        /// Initializes a new instance of the <see cref="BatchCheckItem" /> class.
         /// </summary>
         [JsonConstructor]
-        public ExpandRequest() {
+        public BatchCheckItem() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExpandRequest" /> class.
+        /// Initializes a new instance of the <see cref="BatchCheckItem" /> class.
         /// </summary>
         /// <param name="tupleKey">tupleKey (required).</param>
-        /// <param name="authorizationModelId">authorizationModelId.</param>
-        /// <param name="consistency">consistency.</param>
         /// <param name="contextualTuples">contextualTuples.</param>
-        public ExpandRequest(ExpandRequestTupleKey tupleKey = default(ExpandRequestTupleKey), string authorizationModelId = default(string), ConsistencyPreference? consistency = default(ConsistencyPreference?), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys)) {
+        /// <param name="context">context.</param>
+        /// <param name="correlationId">correlation_id must be a string containing only letters, numbers, or hyphens, with length ≤ 36 characters. (required).</param>
+        public BatchCheckItem(CheckRequestTupleKey tupleKey = default(CheckRequestTupleKey), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys), Object context = default(Object), string correlationId = default(string)) {
             // to ensure "tupleKey" is required (not null)
             if (tupleKey == null) {
-                throw new ArgumentNullException("tupleKey is a required property for ExpandRequest and cannot be null");
+                throw new ArgumentNullException("tupleKey is a required property for BatchCheckItem and cannot be null");
             }
             this.TupleKey = tupleKey;
-            this.AuthorizationModelId = authorizationModelId;
-            this.Consistency = consistency;
+            // to ensure "correlationId" is required (not null)
+            if (correlationId == null) {
+                throw new ArgumentNullException("correlationId is a required property for BatchCheckItem and cannot be null");
+            }
+            this.CorrelationId = correlationId;
             this.ContextualTuples = contextualTuples;
+            this.Context = context;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -62,15 +59,7 @@ namespace OpenFga.Sdk.Model {
         [DataMember(Name = "tuple_key", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("tuple_key")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public ExpandRequestTupleKey TupleKey { get; set; }
-
-        /// <summary>
-        /// Gets or Sets AuthorizationModelId
-        /// </summary>
-        [DataMember(Name = "authorization_model_id", EmitDefaultValue = false)]
-        [JsonPropertyName("authorization_model_id")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? AuthorizationModelId { get; set; }
+        public CheckRequestTupleKey TupleKey { get; set; }
 
         /// <summary>
         /// Gets or Sets ContextualTuples
@@ -79,6 +68,23 @@ namespace OpenFga.Sdk.Model {
         [JsonPropertyName("contextual_tuples")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public ContextualTupleKeys? ContextualTuples { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Context
+        /// </summary>
+        [DataMember(Name = "context", EmitDefaultValue = false)]
+        [JsonPropertyName("context")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public Object? Context { get; set; }
+
+        /// <summary>
+        /// correlation_id must be a string containing only letters, numbers, or hyphens, with length ≤ 36 characters.
+        /// </summary>
+        /// <value>correlation_id must be a string containing only letters, numbers, or hyphens, with length ≤ 36 characters.</value>
+        [DataMember(Name = "correlation_id", IsRequired = true, EmitDefaultValue = false)]
+        [JsonPropertyName("correlation_id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public string CorrelationId { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -96,11 +102,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a ExpandRequest from the JSON string presentation of the object
+        /// Builds a BatchCheckItem from the JSON string presentation of the object
         /// </summary>
-        /// <returns>ExpandRequest</returns>
-        public static ExpandRequest FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<ExpandRequest>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>BatchCheckItem</returns>
+        public static BatchCheckItem FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<BatchCheckItem>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -109,15 +115,15 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as ExpandRequest);
+            return this.Equals(input as BatchCheckItem);
         }
 
         /// <summary>
-        /// Returns true if ExpandRequest instances are equal
+        /// Returns true if BatchCheckItem instances are equal
         /// </summary>
-        /// <param name="input">Instance of ExpandRequest to be compared</param>
+        /// <param name="input">Instance of BatchCheckItem to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ExpandRequest input) {
+        public bool Equals(BatchCheckItem input) {
             if (input == null) {
                 return false;
             }
@@ -128,18 +134,19 @@ namespace OpenFga.Sdk.Model {
                     this.TupleKey.Equals(input.TupleKey))
                 ) &&
                 (
-                    this.AuthorizationModelId == input.AuthorizationModelId ||
-                    (this.AuthorizationModelId != null &&
-                    this.AuthorizationModelId.Equals(input.AuthorizationModelId))
-                ) &&
-                (
-                    this.Consistency == input.Consistency ||
-                    this.Consistency.Equals(input.Consistency)
-                ) &&
-                (
                     this.ContextualTuples == input.ContextualTuples ||
                     (this.ContextualTuples != null &&
                     this.ContextualTuples.Equals(input.ContextualTuples))
+                ) &&
+                (
+                    this.Context == input.Context ||
+                    (this.Context != null &&
+                    this.Context.Equals(input.Context))
+                ) &&
+                (
+                    this.CorrelationId == input.CorrelationId ||
+                    (this.CorrelationId != null &&
+                    this.CorrelationId.Equals(input.CorrelationId))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -155,12 +162,14 @@ namespace OpenFga.Sdk.Model {
                 if (this.TupleKey != null) {
                     hashCode = (hashCode * 9923) + this.TupleKey.GetHashCode();
                 }
-                if (this.AuthorizationModelId != null) {
-                    hashCode = (hashCode * 9923) + this.AuthorizationModelId.GetHashCode();
-                }
-                hashCode = (hashCode * 9923) + this.Consistency.GetHashCode();
                 if (this.ContextualTuples != null) {
                     hashCode = (hashCode * 9923) + this.ContextualTuples.GetHashCode();
+                }
+                if (this.Context != null) {
+                    hashCode = (hashCode * 9923) + this.Context.GetHashCode();
+                }
+                if (this.CorrelationId != null) {
+                    hashCode = (hashCode * 9923) + this.CorrelationId.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
