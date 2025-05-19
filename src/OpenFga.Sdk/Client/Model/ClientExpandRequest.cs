@@ -25,6 +25,8 @@ public interface IClientExpandRequest {
     ///     Object
     /// </summary>
     public string Object { get; set; }
+
+    public List<ClientTupleKey>? ContextualTuples { get; set; }
 }
 
 /// <inheritdoc />
@@ -39,6 +41,13 @@ public class ClientExpandRequest : IClientExpandRequest, IEquatable<ClientExpand
     [JsonPropertyName("object")]
 
     public string Object { get; set; }
+
+    /// <summary>
+    ///     Gets or Sets Contextual Tuples
+    /// </summary>
+    [DataMember(Name = "contextual_tuples", EmitDefaultValue = false)]
+    [JsonPropertyName("contextual_tuples")]
+    public List<ClientTupleKey>? ContextualTuples { get; set; }
 
     public bool Equals(ClientExpandRequest input) {
         if (input == null) {
@@ -55,6 +64,11 @@ public class ClientExpandRequest : IClientExpandRequest, IEquatable<ClientExpand
                 Object == input.Object ||
                 (Object != null &&
                  Object.Equals(input.Object))
+            ) &&
+            (
+                ContextualTuples == input.ContextualTuples ||
+                (ContextualTuples != null &&
+                 ContextualTuples.Equals(input.ContextualTuples))
             );
     }
 
@@ -79,6 +93,10 @@ public class ClientExpandRequest : IClientExpandRequest, IEquatable<ClientExpand
 
             if (Object != null) {
                 hashCode = (hashCode * 9923) + Object.GetHashCode();
+            }
+
+            if (ContextualTuples != null) {
+                hashCode = (hashCode * 9923) + ContextualTuples.GetHashCode();
             }
 
             return hashCode;

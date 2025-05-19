@@ -480,7 +480,8 @@ public class OpenFgaApi : IDisposable {
             queryParams.Add("continuation_token", continuationToken.ToString());
         }
         if (startTime != null) {
-            queryParams.Add("start_time", startTime.ToString());
+            // call the specific date time stringify
+            queryParams.Add("start_time", startTime?.ToString("O"));
         }
 
         var requestBuilder = new RequestBuilder<Any> {

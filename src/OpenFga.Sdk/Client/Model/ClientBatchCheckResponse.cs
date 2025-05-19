@@ -49,6 +49,7 @@ public class BatchCheckSingleResponse : IEquatable<BatchCheckSingleResponse>, IV
     [JsonPropertyName("error")]
     public Exception? Error { get; set; }
 
+
     /// <summary>
     /// Returns true if objects are equal
     /// </summary>
@@ -93,6 +94,7 @@ public class BatchCheckSingleResponse : IEquatable<BatchCheckSingleResponse>, IV
 
             return hashCode;
         }
+
     }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
@@ -122,6 +124,7 @@ public class ClientBatchCheckClientResponse : IEquatable<ClientBatchCheckClientR
     [DataMember(Name = "responses", EmitDefaultValue = true)]
     [JsonPropertyName("responses")]
     public List<BatchCheckSingleResponse> Responses { get; set; }
+
 
     /// <summary>
     /// Returns true if objects are equal
@@ -171,6 +174,7 @@ public class ClientBatchCheckClientResponse : IEquatable<ClientBatchCheckClientR
 
             return hashCode;
         }
+
     }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {

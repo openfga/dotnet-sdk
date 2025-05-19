@@ -9,6 +9,9 @@ namespace Example1;
 
 public class Example1 {
     public static async Task Main() {
+        var shouldSkipListingStores = false;
+        var shouldSkipStoreMethods = false;
+
         try {
             var credentials = new Credentials();
             if (Environment.GetEnvironmentVariable("FGA_CLIENT_ID") != null) {
@@ -29,28 +32,44 @@ public class Example1 {
             };
             var fgaClient = new OpenFgaClient(configuration);
 
-            // ListStores
-            Console.WriteLine("Listing Stores");
-            var stores1 = await fgaClient.ListStores();
-            Console.WriteLine("Stores Count: " + stores1.Stores?.Count());
+            GetStoreResponse? currentStore = null;
+            if (shouldSkipStoreMethods) {
+                Console.WriteLine("Skipping initial store creation");
+            }
+            else {
+                if (shouldSkipListingStores) {
+                    Console.WriteLine("Skipping Listing Stores");
+                }
+                else {
+                    // ListStores
+                    Console.WriteLine("Listing Stores");
+                    var stores1 = await fgaClient.ListStores();
+                    Console.WriteLine("Stores Count: " + stores1.Stores?.Count());
+                }
 
-            // CreateStore
-            Console.WriteLine("Creating Test Store");
-            var store = await fgaClient.CreateStore(new ClientCreateStoreRequest {Name = "Test Store"});
-            Console.WriteLine("Test Store ID: " + store.Id);
+                // CreateStore
+                Console.WriteLine("Creating Test Store");
+                var store = await fgaClient.CreateStore(new ClientCreateStoreRequest {Name = "Test Store"});
+                Console.WriteLine("Created Test Store ID: " + store.Id);
 
-            // Set the store id
-            fgaClient.StoreId = store.Id;
+                // Set the store id
+                fgaClient.StoreId = store.Id;
 
-            // ListStores after Create
-            Console.WriteLine("Listing Stores");
-            var stores = await fgaClient.ListStores();
-            Console.WriteLine("Stores Count: " + stores.Stores?.Count());
+                if (shouldSkipListingStores) {
+                    Console.WriteLine("Skipping Listing Stores");
+                }
+                else {
+                    // ListStores after Create
+                    Console.WriteLine("Listing Stores");
+                    var stores = await fgaClient.ListStores();
+                    Console.WriteLine("Stores Count: " + stores.Stores?.Count());
+                }
 
-            // GetStore
-            Console.WriteLine("Getting Current Store");
-            var currentStore = await fgaClient.GetStore();
-            Console.WriteLine("Current Store Name: " + currentStore.Name);
+                // GetStore
+                Console.WriteLine("Getting Current Store");
+                currentStore = await fgaClient.GetStore();
+                Console.WriteLine("Current Store Name: " + currentStore.Name);
+            }
 
             // ReadAuthorizationModels
             Console.WriteLine("Reading Authorization Models");
@@ -142,16 +161,23 @@ public class Example1 {
             Console.WriteLine("Authorization Model ID " + authorizationModel.AuthorizationModelId);
 
             // ReadAuthorizationModels - after Write
+            Thread.Sleep(10_000);
             Console.WriteLine("Reading Authorization Models");
             models = await fgaClient.ReadAuthorizationModels();
             Console.WriteLine("Models Count: " + models.AuthorizationModels?.Count());
 
             // ReadLatestAuthorizationModel - after Write
             latestAauthorizationModel = await fgaClient.ReadLatestAuthorizationModel();
-            Console.WriteLine("Latest Authorization Model ID " + latestAauthorizationModel.AuthorizationModel.Id);
+            if (latestAauthorizationModel == null) {
+                throw new Exception("Cannot find module that was written");
+            }
+            else {
+                var latestModelId = latestAauthorizationModel.AuthorizationModel?.Id;
+                Console.WriteLine("Latest Authorization Model ID " + latestModelId);
 
-            // Set the model ID
-            fgaClient.AuthorizationModelId = latestAauthorizationModel.AuthorizationModel.Id;
+                // Set the model ID
+                fgaClient.AuthorizationModelId = latestModelId;
+            }
 
             // Write
             Console.WriteLine("Writing Tuples");
@@ -160,7 +186,7 @@ public class Example1 {
                     new() {
                         User = "user:anne",
                         Relation = "writer",
-                        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                        Object = "document:roadmap",
                         Condition = new RelationshipCondition() {
                             Name = "ViewCountLessThan200",
                             Context = new { Name = "Roadmap", Type = "document" }
@@ -188,7 +214,7 @@ public class Example1 {
                 var failingCheckResponse = await fgaClient.Check(new ClientCheckRequest {
                     User = "user:anne",
                     Relation = "viewer",
-                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                    Object = "document:roadmap"
                 });
                 Console.WriteLine("Allowed: " + failingCheckResponse.Allowed);
             }
@@ -201,10 +227,69 @@ public class Example1 {
             var checkResponse = await fgaClient.Check(new ClientCheckRequest {
                 User = "user:anne",
                 Relation = "viewer",
-                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                Object = "document:roadmap",
                 Context = new { ViewCount = 100 }
             });
             Console.WriteLine("Allowed: " + checkResponse.Allowed);
+
+            // Batch checking for access with context
+            Console.WriteLine("Batch checking for access with context");
+            var batchCheckResponse = await fgaClient.BatchCheck(new List<ClientCheckRequest>() {
+                new () {
+                    User = "user:anne",
+                    Relation = "viewer",
+                    Object = "document:roadmap",
+                    Context = new { ViewCount = 100 }
+                }
+            });
+            Console.WriteLine("Responses[0].Allowed: " + batchCheckResponse.Responses[0].Allowed);
+
+            // Listing relations with context
+            Console.WriteLine("Listing relations with context");
+            var listRelationsResponse = await fgaClient.ListRelations(new ClientListRelationsRequest() {
+                User = "user:anne",
+                Relations = new List<string>() {"viewer", "writer"},
+                Object = "document:roadmap",
+                Context = new { ViewCount = 100 }
+            });
+            // var allowedRelations = new List<string>();
+            // listRelationsResponse.Relations?.ForEach(r => {
+            //     allowedRelations.Add(r);
+            // });
+            Console.WriteLine("Relations: " + string.Join(" | ", listRelationsResponse.Relations!));
+
+            // Listing objects with context
+            Console.WriteLine("Listing objects with context");
+            var listObjectsResponse = await fgaClient.ListObjects(new ClientListObjectsRequest() {
+                User = "user:anne",
+                Relation = "viewer",
+                Type = "document",
+                Context = new { ViewCount = 100 }
+            });
+            // var allowedObjects = new List<string>();
+            // listObjectsResponse.Objects?.ForEach(o => {
+            //     allowedObjects.Add(o);
+            // });
+            Console.WriteLine("Objects: " + string.Join(" | ", listObjectsResponse.Objects!));
+
+            // Listing users with context
+            Console.WriteLine("Listing users with context");
+            var listUsersResponse = await fgaClient.ListUsers(new ClientListUsersRequest() {
+                UserFilters = new List<UserTypeFilter>() {
+                    new () { Type = "user" },
+                },
+                Relation = "viewer",
+                Object = new FgaObject() {
+                    Type = "document",
+                    Id = "roadmap"
+                },
+                Context = new { ViewCount = 100 }
+            });
+            var allowedUsers = new List<string>();
+            listUsersResponse.Users?.ForEach(u => {
+                allowedUsers.Add(u.ToJson());
+            });
+            Console.WriteLine("Users: " + string.Join(" | ", allowedUsers));
 
             // WriteAssertions
             await fgaClient.WriteAssertions(new List<ClientAssertion>() {
@@ -217,7 +302,7 @@ public class Example1 {
                 new ClientAssertion() {
                     User = "user:anne",
                     Relation = "viewer",
-                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                    Object = "document:roadmap",
                     Expectation = false,
                 }
             });
@@ -228,10 +313,15 @@ public class Example1 {
             var assertions = await fgaClient.ReadAssertions();
             Console.WriteLine("Assertions " + assertions.ToJson());
 
-            // DeleteStore
-            Console.WriteLine("Deleting Current Store");
-            await fgaClient.DeleteStore();
-            Console.WriteLine("Deleted Store: " + currentStore.Name);
+            if (shouldSkipStoreMethods || currentStore == null) {
+                Console.WriteLine("Skipping store deletion");
+            }
+            else {
+                // DeleteStore
+                Console.WriteLine("Deleting Test Store");
+                await fgaClient.DeleteStore();
+                Console.WriteLine("Deleted Store: " + currentStore.Name);
+            }
         }
         catch (ApiException e) {
             Console.WriteLine("Error: " + e);
