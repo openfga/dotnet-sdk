@@ -10,12 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Model {
     /// <summary>
     /// User.  Represents any possible value for a user (subject or principal). Can be a: - Specific user object e.g.: &#39;user:will&#39;, &#39;folder:marketing&#39;, &#39;org:contoso&#39;, ...) - Specific userset (e.g. &#39;group:engineering#member&#39;) - Public-typed wildcard (e.g. &#39;user:*&#39;)  See https://openfga.dev/docs/concepts#what-is-a-user
@@ -96,7 +90,17 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as User);
+            // Proper type checking in the Equals method - don't use 'as' operator
+            if (input == null)
+                return false;
+
+            if (ReferenceEquals(this, input))
+                return true;
+
+            if (this.GetType() != input.GetType())
+                return false;
+
+            return Equals((User)input);
         }
 
         /// <summary>
@@ -108,23 +112,64 @@ namespace OpenFga.Sdk.Model {
             if (input == null) {
                 return false;
             }
-            return
-                (
-                    this.Object == input.Object ||
-                    (this.Object != null &&
-                    this.Object.Equals(input.Object))
-                ) &&
-                (
-                    this.Userset == input.Userset ||
-                    (this.Userset != null &&
-                    this.Userset.Equals(input.Userset))
-                ) &&
-                (
-                    this.Wildcard == input.Wildcard ||
-                    (this.Wildcard != null &&
-                    this.Wildcard.Equals(input.Wildcard))
-                )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+
+            return ArePropertiesEqual(input);
+        }
+
+        // Helper methods for property equality
+        private bool ArePropertiesEqual(User input) {
+
+            if (!IsPropertyEqual(this.Object, input.Object)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.Userset, input.Userset)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.Wildcard, input.Wildcard)) {
+                return false;
+            }
+
+
+            // Check if additional properties are equal
+            if (!AreAdditionalPropertiesEqual(input)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool AreAdditionalPropertiesEqual(User input) {
+            if (this.AdditionalProperties.Count != input.AdditionalProperties.Count) {
+                return false;
+            }
+
+            return !this.AdditionalProperties.Except(input.AdditionalProperties).Any();
+        }
+
+        private bool IsPropertyEqual<T>(T thisValue, T otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.Equals(otherValue);
+        }
+
+        private bool IsCollectionPropertyEqual<T>(IEnumerable<T> thisValue, IEnumerable<T> otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.SequenceEqual(otherValue);
         }
 
         /// <summary>

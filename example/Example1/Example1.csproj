@@ -20,4 +20,11 @@
   <!--    </Reference>-->
   <!--  </ItemGroup>-->
 
+  <!-- To target the local build with .NET Standard 2.0, uncomment this section -->
+  <!--  <ItemGroup>-->
+  <!--    <Reference Include="OpenFga.Sdk">-->
+  <!--      <HintPath>..\..\src\OpenFga.Sdk\bin\Debug\netstandard2.0\OpenFga.Sdk.dll</HintPath>-->
+  <!--    </Reference>-->
+  <!--  </ItemGroup>-->
+
 </Project>

@@ -12,9 +12,6 @@
 
 
 using OpenFga.Sdk.Exceptions;
-using System.Text;
-using System.Text.Json;
-using System.Web;
 
 namespace OpenFga.Sdk.ApiClient;
 

@@ -10,10 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Exceptions.Parsers;
 
 public class ApiErrorParser {
