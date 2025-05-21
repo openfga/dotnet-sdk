@@ -37,7 +37,7 @@ public static class TelemetryMeter {
     public static readonly string TokenExchangeCount = "fga-client.credentials.request";
 
     /// <summary>
-    ///     The total number of times a new token was requested when using ClientCredentials.
+    ///     The total number of requests made to the FGA server.
     /// </summary>
     public static readonly string RequestCount = "fga-client.request.count";
 

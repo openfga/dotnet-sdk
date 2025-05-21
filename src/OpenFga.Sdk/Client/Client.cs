@@ -82,9 +82,9 @@ public class OpenFgaClient : IDisposable {
     /**
    * ListStores - Get a paginated list of stores.
    */
-    public async Task<ListStoresResponse> ListStores(IClientListStoresOptions? options = default,
+    public async Task<ListStoresResponse> ListStores(IClientListStoresRequest? body, IClientListStoresOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ListStores(options?.PageSize, options?.ContinuationToken, cancellationToken);
+        await api.ListStores(options?.PageSize, options?.ContinuationToken, body?.Name, cancellationToken);
 
     /**
    * CreateStore - Initialize a store
@@ -491,7 +491,7 @@ public class OpenFgaClient : IDisposable {
      * ListRelations - List all the relations a user has with an object (evaluates)
      */
     public async Task<ListRelationsResponse> ListRelations(IClientListRelationsRequest body,
-        IClientBatchCheckOptions? options = default,
+        IClientListRelationsOptions? options = default,
         CancellationToken cancellationToken = default) {
         if (body.Relations.Count == 0) {
             throw new FgaValidationError("At least 1 relation to check has to be provided when calling ListRelations");

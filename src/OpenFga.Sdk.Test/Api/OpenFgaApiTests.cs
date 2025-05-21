@@ -76,7 +76,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// Test that a storeId is required when calling methods that need it
         /// </summary>
         [Fact]
-        public async void StoreIdRequiredWhenNeeded() {
+        public async Task StoreIdRequiredWhenNeeded() {
             var config = new Configuration.Configuration() { ApiHost = _host };
             var openFgaApi = new OpenFgaApi(config);
 
