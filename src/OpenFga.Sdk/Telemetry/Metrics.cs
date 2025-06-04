@@ -14,7 +14,6 @@
 using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Configuration;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 
 namespace OpenFga.Sdk.Telemetry;
 
@@ -25,19 +24,20 @@ public class Metrics {
     public const string Name = "OpenFga.Sdk";
 
     // This is to store all the enabled attributes across all metrics so that they can be computed only once
-    private readonly HashSet<string> _allEnabledAttributes = new();
+    private readonly HashSet<string> _allEnabledAttributes = new HashSet<string>();
     private readonly Credentials? _credentialsConfig;
 
     private readonly TelemetryConfig _telemetryConfig;
 
     private TelemetryCounters Counters { get; }
     private TelemetryHistograms Histograms { get; }
-    public Meter Meter { get; } = new(Name, Configuration.Configuration.Version);
+    public Meter Meter { get; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Metrics" /> class.
     /// </summary>
     public Metrics(Configuration.Configuration config) {
+        Meter = new Meter(Name, Configuration.Configuration.Version);
         Histograms = new TelemetryHistograms(Meter);
         Counters = new TelemetryCounters(Meter);
         _telemetryConfig = config.Telemetry ?? new TelemetryConfig().UseDefaultConfig();

@@ -62,32 +62,24 @@ public class TelemetryConfig {
     /// </summary>
     /// <returns></returns>
     private static IDictionary<string, MetricConfig> GetDefaultMetricsConfiguration() {
-        var defaultAttributes = new HashSet<string> {
-            TelemetryAttribute.HttpHost,
-            TelemetryAttribute.HttpStatus,
-            TelemetryAttribute.HttpUserAgent,
-            TelemetryAttribute.RequestMethod,
-            TelemetryAttribute.RequestClientId,
-            TelemetryAttribute.RequestStoreId,
-            TelemetryAttribute.RequestModelId,
-            TelemetryAttribute.RequestRetryCount,
-            TelemetryAttribute.ResponseModelId
+        var defaultAttributes = new HashSet<string>();
+        defaultAttributes.Add(TelemetryAttribute.HttpHost);
+        defaultAttributes.Add(TelemetryAttribute.HttpStatus);
+        defaultAttributes.Add(TelemetryAttribute.HttpUserAgent);
+        defaultAttributes.Add(TelemetryAttribute.RequestMethod);
+        defaultAttributes.Add(TelemetryAttribute.RequestClientId);
+        defaultAttributes.Add(TelemetryAttribute.RequestStoreId);
+        defaultAttributes.Add(TelemetryAttribute.RequestModelId);
+        defaultAttributes.Add(TelemetryAttribute.RequestRetryCount);
+        defaultAttributes.Add(TelemetryAttribute.ResponseModelId);
 
-            // These metrics are not included by default because they are usually less useful
-            // TelemetryAttribute.HttpScheme,
-            // TelemetryAttribute.HttpMethod,
-            // TelemetryAttribute.HttpUrl,
+        var metricsConfig = new Dictionary<string, MetricConfig>();
+        metricsConfig.Add(TelemetryMeter.TokenExchangeCount, new MetricConfig { Attributes = defaultAttributes });
+        metricsConfig.Add(TelemetryMeter.RequestDuration, new MetricConfig { Attributes = defaultAttributes });
+        metricsConfig.Add(TelemetryMeter.QueryDuration, new MetricConfig { Attributes = defaultAttributes });
+        // metricsConfig.Add(TelemetryMeter.RequestCount, new MetricConfig { Attributes = defaultAttributes });
 
-            // This not included by default as it has a very high cardinality which could increase costs for users
-            // TelemetryAttribute.FgaRequestUser
-        };
-
-        return new Dictionary<string, MetricConfig> {
-            { TelemetryMeter.TokenExchangeCount, new MetricConfig { Attributes = defaultAttributes } },
-            { TelemetryMeter.RequestDuration, new MetricConfig { Attributes = defaultAttributes } },
-            { TelemetryMeter.QueryDuration, new MetricConfig { Attributes = defaultAttributes } },
-            // { TelemetryMeters.RequestCount, new MetricConfig { Attributes = defaultAttributes } }
-        };
+        return metricsConfig;
     }
 
     /// <summary>

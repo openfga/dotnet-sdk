@@ -15,7 +15,10 @@ using OpenFga.Sdk.Model;
 
 namespace OpenFga.Sdk.Client.Model;
 
-public class ClientListRelationsOptions : IClientBatchCheckOptions {
+public interface IClientListRelationsOptions : IClientBatchCheckOptions {
+}
+
+public class ClientListRelationsOptions : IClientListRelationsOptions {
     /// <inheritdoc />
     public string? StoreId { get; set; }
 

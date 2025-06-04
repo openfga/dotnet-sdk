@@ -10,10 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.Diagnostics;
-using System.Diagnostics.Metrics;
-
 namespace OpenFga.Sdk.Telemetry;
 
 /// <summary>
@@ -45,5 +41,5 @@ public class TelemetryCounters {
     ///     Increments the counter for an API request.
     /// </summary>
     /// <param name="attributes">The attributes associated with the telemetry data.</param>
-    public void IncrementRequestCounter(TagList attributes) => TokenExchangeCounter.Add(1, attributes);
+    public void IncrementRequestCounter(TagList attributes) => RequestCounter.Add(1, attributes);
 }

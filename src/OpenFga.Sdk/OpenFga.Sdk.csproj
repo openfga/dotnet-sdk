@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>OpenFga.Sdk</AssemblyName>
     <PackageId>OpenFga.Sdk</PackageId>
     <OutputType>Library</OutputType>
@@ -23,14 +23,24 @@
     <PackageIcon>FGAIcon.png</PackageIcon>
     <Nullable>annotations</Nullable>
     <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <!-- Disable implicit usings for .NET Standard 2.0 -->
+    <ImplicitUsings>disable</ImplicitUsings>
+    <DefineConstants>NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Models"/>
     <None Include="../../assets/FGAIcon.png" Pack="true" Visible="false" PackagePath=""/>
     <None Include="../../README.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="7.0.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
+    <PackageReference Include="System.Text.Json" Version="7.0.3" />
   </ItemGroup>
 
 </Project>

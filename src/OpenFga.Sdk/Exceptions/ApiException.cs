@@ -10,10 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.Net;
-using System.Runtime.Serialization;
-
 namespace OpenFga.Sdk.Exceptions;
 
 public class ApiException : Exception {
@@ -58,22 +54,34 @@ public class ApiException : Exception {
     public static async Task<ApiException> CreateSpecificExceptionAsync(HttpResponseMessage? response, HttpRequestMessage request,
         string? apiName = null) {
         var statusCode = response?.StatusCode;
-        switch (statusCode) {
-            case HttpStatusCode.Unauthorized:
-            case HttpStatusCode.Forbidden:
-                return await FgaApiAuthenticationError.CreateAsync(response, request, apiName).ConfigureAwait(false);
-            case HttpStatusCode.BadRequest:
-            case HttpStatusCode.UnprocessableEntity:
-                return await FgaApiValidationError.CreateAsync(response, request, apiName).ConfigureAwait(false);
-            case HttpStatusCode.NotFound:
-                return await FgaApiNotFoundError.CreateAsync(response, request, apiName).ConfigureAwait(false);
-            case HttpStatusCode.TooManyRequests:
-                return await FgaApiRateLimitExceededError.CreateAsync(response, request, apiName).ConfigureAwait(false);
-            default:
-                if (statusCode >= HttpStatusCode.InternalServerError && statusCode != HttpStatusCode.NotImplemented) {
-                    return await FgaApiInternalError.CreateAsync(response, request, apiName).ConfigureAwait(false);
-                }
-                return await FgaApiError.CreateAsync(response, request, apiName).ConfigureAwait(false);
+
+        // Handle authentication errors
+        if (statusCode == HttpStatusCode.Unauthorized || statusCode == HttpStatusCode.Forbidden) {
+            return await FgaApiAuthenticationError.CreateAsync(response, request, apiName).ConfigureAwait(false);
         }
+
+        // Handle validation errors
+        if (statusCode == HttpStatusCode.BadRequest ||
+            statusCode == HttpStatusCodeExtensions.UnprocessableEntity) {
+            return await FgaApiValidationError.CreateAsync(response, request, apiName).ConfigureAwait(false);
+        }
+
+        // Handle not found errors
+        if (statusCode == HttpStatusCode.NotFound) {
+            return await FgaApiNotFoundError.CreateAsync(response, request, apiName).ConfigureAwait(false);
+        }
+
+        // Handle rate limit errors
+        if (statusCode == HttpStatusCodeExtensions.TooManyRequests) {
+            return await FgaApiRateLimitExceededError.CreateAsync(response, request, apiName).ConfigureAwait(false);
+        }
+
+        // Handle other errors
+        if (statusCode >= HttpStatusCode.InternalServerError && statusCode != HttpStatusCode.NotImplemented) {
+            return await FgaApiInternalError.CreateAsync(response, request, apiName).ConfigureAwait(false);
+        }
+
+        // Default case
+        return await FgaApiError.CreateAsync(response, request, apiName).ConfigureAwait(false);
     }
 }
