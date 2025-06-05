@@ -2,6 +2,24 @@
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.5.1...HEAD)
 
+- feat: refactor to support .NET Standard 2.0
+- feat: add support for `start_time` parameter in `ReadChanges` endpoint
+- feat: update API definitions
+- feat: support assertions context and contextual tuples
+- feat: support contextual tuples in `Expand`
+- feat!: support passing in name to filter in `ListStores`
+- fix: remove dependency on OpenTelemetry.Api (#100) - thanks @m4tchl0ck
+- fix: limit default retries to `3` from `15` (https://github.com/openfga/sdk-generator/pull/420) - thanks @ovindu-a
+- fix: `ListRelations` should not swallow errors
+- chore(docs): replace readable names with uuid to discourage storing PII in OpenFGA (https://github.com/openfga/sdk-generator/pull/433) - thanks @sccalabr
+
+[!WARNING]
+BREAKING CHANGES:
+- The `ListStores` method now accepts a body parameter with an optional `Name` to filter the stores. This is a breaking change as it changes the method contract to allow passing in a body with the name.
+
+## [0.7.0-alpha.1](https://github.com/openfga/dotnet-sdk/compare/v0.5.1...v0.7.0-alpha1)
+
+- feat: refactor to support .NET Standard 2.0
 - feat: add support for `start_time` parameter in `ReadChanges` endpoint
 - feat: update API definitions
 - feat: support assertions context and contextual tuples
