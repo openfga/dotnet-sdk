@@ -147,7 +147,7 @@ public class OpenFgaClientTests {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         var expectedResponse = new ListStoresResponse() {
             Stores = new List<Store>() {
-                new() {Id = "45678", Name = "TestStore", CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now}
+                new Store() {Id = "45678", Name = "TestStore", CreatedAt = DateTime.Now, UpdatedAt = DateTime.Now}
             }
         };
         mockHandler.Protected()
@@ -1593,20 +1593,20 @@ public class OpenFgaClientTests {
         var expectedResponse = new ListUsersResponse {
             // A real API would not return all these for the filter provided, these are just for test purposes
             Users = new List<User> {
-                new () {
+                new User() {
                     Object = new FgaObject {
                         Type = "user",
                         Id = "81684243-9356-4421-8fbf-a4f8d36aa31b"
                     }
                 },
-                new () {
+                new User() {
                     Userset = new UsersetUser() {
                         Type = "team",
                         Id = "fga",
                         Relation = "member"
                     }
                 },
-                new () {
+                new User() {
                     Wildcard = new TypedWildcard() {
                         Type = "user"
                     }

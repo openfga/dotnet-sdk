@@ -10,11 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Client.Model;
 
 [DataContract(Name = "BatchCheckSingleResponse")]
@@ -54,29 +49,56 @@ public class BatchCheckSingleResponse : IEquatable<BatchCheckSingleResponse>, IV
     [JsonPropertyName("error")]
     public Exception? Error { get; set; }
 
-    /// <inheritdoc />
+
+    /// <summary>
+    /// Returns true if objects are equal
+    /// </summary>
+    /// <param name="obj">Object to be compared</param>
+    /// <returns>Boolean</returns>
+    public override bool Equals(object? obj) {
+        if (obj is not BatchCheckSingleResponse other)
+            return false;
+
+        return Equals(other);
+    }
+
+    /// <summary>
+    /// Returns true if BatchCheckSingleResponse instances are equal
+    /// </summary>
+    /// <param name="other">Instance of BatchCheckSingleResponse to be compared</param>
+    /// <returns>Boolean</returns>
     public bool Equals(BatchCheckSingleResponse? other) {
-        if (other == null) return false;
-        if (ReferenceEquals(this, other)) return true;
+        if (other == null)
+            return false;
 
         return Allowed == other.Allowed &&
-               EqualityComparer<ClientCheckRequest>.Default.Equals(Request, other.Request) &&
-               EqualityComparer<Exception>.Default.Equals(Error, other.Error);
+               (Request?.Equals(other.Request) ?? other.Request == null) &&
+               ((Error == null && other.Error == null) ||
+                (Error != null && other.Error != null && Error.Message == other.Error.Message));
     }
 
-    /// <inheritdoc />
-    public override bool Equals(object obj) {
-        if (obj is BatchCheckSingleResponse other) {
-            return Equals(other);
-        }
-        return false;
-    }
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
-        throw new NotImplementedException();
-
+    /// <summary>
+    /// Gets the hash code
+    /// </summary>
+    /// <returns>Hash code</returns>
     public override int GetHashCode() {
-        throw new NotImplementedException();
+        unchecked {
+            int hashCode = 41;
+            hashCode = (hashCode * 59) + Allowed.GetHashCode();
+
+            if (Request != null)
+                hashCode = (hashCode * 59) + Request.GetHashCode();
+
+            if (Error != null)
+                hashCode = (hashCode * 59) + Error.GetHashCode();
+
+            return hashCode;
+        }
+
+    }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        yield break;
     }
 }
 
@@ -103,32 +125,65 @@ public class ClientBatchCheckClientResponse : IEquatable<ClientBatchCheckClientR
     [JsonPropertyName("responses")]
     public List<BatchCheckSingleResponse> Responses { get; set; }
 
-    /// <inheritdoc />
+
+    /// <summary>
+    /// Returns true if objects are equal
+    /// </summary>
+    /// <param name="obj">Object to be compared</param>
+    /// <returns>Boolean</returns>
+    public override bool Equals(object? obj) {
+        if (obj is not ClientBatchCheckClientResponse other)
+            return false;
+
+        return Equals(other);
+    }
+
+    /// <summary>
+    /// Returns true if ClientBatchCheckClientResponse instances are equal
+    /// </summary>
+    /// <param name="other">Instance of ClientBatchCheckClientResponse to be compared</param>
+    /// <returns>Boolean</returns>
     public bool Equals(ClientBatchCheckClientResponse? other) {
-        if (other == null) return false;
-        if (ReferenceEquals(this, other)) return true;
+        if (other == null)
+            return false;
 
-        return Responses.SequenceEqual(other.Responses);
-    }
+        if (Responses.Count != other.Responses.Count)
+            return false;
 
-    /// <inheritdoc />
-    public override bool Equals(object obj) {
-        if (obj is ClientBatchCheckClientResponse other) {
-            return Equals(other);
+        for (int i = 0; i < Responses.Count; i++) {
+            if (!Responses[i].Equals(other.Responses[i]))
+                return false;
         }
-        return false;
+
+        return true;
     }
 
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
-        throw new NotImplementedException();
+    /// <summary>
+    /// Gets the hash code
+    /// </summary>
+    /// <returns>Hash code</returns>
+    public override int GetHashCode() {
+        unchecked {
+            int hashCode = 41;
+
+            if (Responses != null) {
+                foreach (var response in Responses) {
+                    hashCode = (hashCode * 59) + response.GetHashCode();
+                }
+            }
+
+            return hashCode;
+        }
+
+    }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        yield break;
+    }
 
     /// <summary>
     ///     Appends a response to the list of responses
     /// </summary>
     /// <param name="response"></param>
     public void AppendResponse(BatchCheckSingleResponse response) => Responses.Add(response);
-
-    public override int GetHashCode() {
-        throw new NotImplementedException();
-    }
 }

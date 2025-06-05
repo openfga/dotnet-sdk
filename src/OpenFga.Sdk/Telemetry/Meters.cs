@@ -10,7 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
 namespace OpenFga.Sdk.Telemetry;
 
 /// <summary>
@@ -38,7 +37,7 @@ public static class TelemetryMeter {
     public static readonly string TokenExchangeCount = "fga-client.credentials.request";
 
     /// <summary>
-    ///     The total number of times a new token was requested when using ClientCredentials.
+    ///     The total number of requests made to the FGA server.
     /// </summary>
     public static readonly string RequestCount = "fga-client.request.count";
 
@@ -46,11 +45,11 @@ public static class TelemetryMeter {
     /// Return all supported meter names
     /// </summary>
     public static HashSet<string> GetAllMeters() {
-        return new() {
-            RequestDuration,
-            QueryDuration,
-            TokenExchangeCount,
-            RequestCount
-        };
+        var meters = new HashSet<string>();
+        meters.Add(RequestDuration);
+        meters.Add(QueryDuration);
+        meters.Add(TokenExchangeCount);
+        meters.Add(RequestCount);
+        return meters;
     }
 }

@@ -6,6 +6,8 @@
     <RootNamespace>OpenFga.Sdk.Test</RootNamespace>
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

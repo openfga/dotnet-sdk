@@ -10,12 +10,6 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
-
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Assertion
@@ -111,7 +105,17 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as Assertion);
+            // Proper type checking in the Equals method - don't use 'as' operator
+            if (input == null)
+                return false;
+
+            if (ReferenceEquals(this, input))
+                return true;
+
+            if (this.GetType() != input.GetType())
+                return false;
+
+            return Equals((Assertion)input);
         }
 
         /// <summary>
@@ -123,28 +127,68 @@ namespace OpenFga.Sdk.Model {
             if (input == null) {
                 return false;
             }
-            return
-                (
-                    this.TupleKey == input.TupleKey ||
-                    (this.TupleKey != null &&
-                    this.TupleKey.Equals(input.TupleKey))
-                ) &&
-                (
-                    this.Expectation == input.Expectation ||
-                    this.Expectation.Equals(input.Expectation)
-                ) &&
-                (
-                    this.ContextualTuples == input.ContextualTuples ||
-                    this.ContextualTuples != null &&
-                    input.ContextualTuples != null &&
-                    this.ContextualTuples.SequenceEqual(input.ContextualTuples)
-                ) &&
-                (
-                    this.Context == input.Context ||
-                    (this.Context != null &&
-                    this.Context.Equals(input.Context))
-                )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+
+            return ArePropertiesEqual(input);
+        }
+
+        // Helper methods for property equality
+        private bool ArePropertiesEqual(Assertion input) {
+
+            if (!IsPropertyEqual(this.TupleKey, input.TupleKey)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.Expectation, input.Expectation)) {
+                return false;
+            }
+
+            if (!IsCollectionPropertyEqual(this.ContextualTuples, input.ContextualTuples)) {
+                return false;
+            }
+
+            if (!IsPropertyEqual(this.Context, input.Context)) {
+                return false;
+            }
+
+
+            // Check if additional properties are equal
+            if (!AreAdditionalPropertiesEqual(input)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool AreAdditionalPropertiesEqual(Assertion input) {
+            if (this.AdditionalProperties.Count != input.AdditionalProperties.Count) {
+                return false;
+            }
+
+            return !this.AdditionalProperties.Except(input.AdditionalProperties).Any();
+        }
+
+        private bool IsPropertyEqual<T>(T thisValue, T otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.Equals(otherValue);
+        }
+
+        private bool IsCollectionPropertyEqual<T>(IEnumerable<T> thisValue, IEnumerable<T> otherValue) {
+            if (thisValue == null && otherValue == null) {
+                return true;
+            }
+
+            if (thisValue == null || otherValue == null) {
+                return false;
+            }
+
+            return thisValue.SequenceEqual(otherValue);
         }
 
         /// <summary>
