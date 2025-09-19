@@ -1,9 +1,11 @@
 # .NET SDK for OpenFGA
 
 [![Nuget](https://img.shields.io/nuget/v/OpenFga.Sdk?label=OpenFga.Sdk&style=flat-square)](https://www.nuget.org/packages/OpenFga.Sdk)
+[![Socket Badge](https://badge.socket.dev/nuget/package/openfga.sdk)](https://socket.dev/nuget/package/openfga.sdk)
+[![DeepWiki](https://img.shields.io/badge/DeepWiki-openfga%2Fdotnet--sdk-blue.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAyCAYAAAAnWDnqAAAAAXNSR0IArs4c6QAAA05JREFUaEPtmUtyEzEQhtWTQyQLHNak2AB7ZnyXZMEjXMGeK/AIi+QuHrMnbChYY7MIh8g01fJoopFb0uhhEqqcbWTp06/uv1saEDv4O3n3dV60RfP947Mm9/SQc0ICFQgzfc4CYZoTPAswgSJCCUJUnAAoRHOAUOcATwbmVLWdGoH//PB8mnKqScAhsD0kYP3j/Yt5LPQe2KvcXmGvRHcDnpxfL2zOYJ1mFwrryWTz0advv1Ut4CJgf5uhDuDj5eUcAUoahrdY/56ebRWeraTjMt/00Sh3UDtjgHtQNHwcRGOC98BJEAEymycmYcWwOprTgcB6VZ5JK5TAJ+fXGLBm3FDAmn6oPPjR4rKCAoJCal2eAiQp2x0vxTPB3ALO2CRkwmDy5WohzBDwSEFKRwPbknEggCPB/imwrycgxX2NzoMCHhPkDwqYMr9tRcP5qNrMZHkVnOjRMWwLCcr8ohBVb1OMjxLwGCvjTikrsBOiA6fNyCrm8V1rP93iVPpwaE+gO0SsWmPiXB+jikdf6SizrT5qKasx5j8ABbHpFTx+vFXp9EnYQmLx02h1QTTrl6eDqxLnGjporxl3NL3agEvXdT0WmEost648sQOYAeJS9Q7bfUVoMGnjo4AZdUMQku50McDcMWcBPvr0SzbTAFDfvJqwLzgxwATnCgnp4wDl6Aa+Ax283gghmj+vj7feE2KBBRMW3FzOpLOADl0Isb5587h/U4gGvkt5v60Z1VLG8BhYjbzRwyQZemwAd6cCR5/XFWLYZRIMpX39AR0tjaGGiGzLVyhse5C9RKC6ai42ppWPKiBagOvaYk8lO7DajerabOZP46Lby5wKjw1HCRx7p9sVMOWGzb/vA1hwiWc6jm3MvQDTogQkiqIhJV0nBQBTU+3okKCFDy9WwferkHjtxib7t3xIUQtHxnIwtx4mpg26/HfwVNVDb4oI9RHmx5WGelRVlrtiw43zboCLaxv46AZeB3IlTkwouebTr1y2NjSpHz68WNFjHvupy3q8TFn3Hos2IAk4Ju5dCo8B3wP7VPr/FGaKiG+T+v+TQqIrOqMTL1VdWV1DdmcbO8KXBz6esmYWYKPwDL5b5FA1a0hwapHiom0r/cKaoqr+27/XcrS5UwSMbQAAAABJRU5ErkJggg==)](https://deepwiki.com/openfga/dotnet-sdk)
 [![Release](https://img.shields.io/github/v/release/openfga/dotnet-sdk?sort=semver&color=green)](https://github.com/openfga/dotnet-sdk/releases)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fopenfga%2Fdotnet-sdk.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fopenfga%2Fdotnet-sdk?ref=badge_shield)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/openfga/dotnet-sdk/badge)](https://securityscorecards.dev/viewer/?uri=github.com/openfga/dotnet-sdk)
 [![Join our community](https://img.shields.io/badge/slack-cncf_%23openfga-40abb8.svg?logo=slack)](https://openfga.dev/community)
 [![Twitter](https://img.shields.io/twitter/follow/openfga?color=%23179CF0&logo=twitter&style=flat-square "@openfga on Twitter")](https://twitter.com/openfga)
 
@@ -548,6 +550,8 @@ var response = await fgaClient.Check(body, options);
 Run a set of [checks](#check). Batch Check will return `allowed: false` if it encounters an error, and will return the error in the body.
 If 429s or 5xxs are encountered, the underlying check will retry up to 3 times before giving up.
 
+> **Note**: The order of `BatchCheck` results is not guaranteed to match the order of the checks provided. Use `correlationId` to pair responses with requests.
+
 ```csharp
 var options = new ClientBatchCheckOptions {
     // You can rely on the model id set in the configuration or override it for this specific request
@@ -690,8 +694,8 @@ var response = await fgaClient.ListObjects(body, options);
 List the relations a user has on an object.
 
 ```csharp
-ListRelationsRequest body =
-    new ListRelationsRequest() {
+ClientListRelationsRequest body =
+    new ClientListRelationsRequest() {
         User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
         Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
         Relations = new List<string> {"can_view", "can_edit", "can_delete", "can_rename"},
@@ -715,39 +719,30 @@ List the users who have a certain relation to a particular type.
 [API Documentation](https://openfga.dev/api/service#/Relationship%20Queries/ListUsers)
 
 ```csharp
-const options = {};
-
-// To override the authorization model id for this request
-options.authorization_model_id = "1uHxCSuTP0VKPYSnkq1pbb1jeZw";
-
-// Only a single filter is allowed for the time being
-const userFilters = [{type: "user"}];
-// user filters can also be of the form
-// const userFilters = [{type: "team", relation: "member"}];
-
-const response = await fgaClient.listUsers({
-  object: {
-    type: "document",
-    id: "roadmap"
-  },
-  relation: "can_read",
-  user_filters: userFilters,
-  context: {
-    "view_count": 100
-  },
-  contextualTuples:
-    [{
-      user: "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-      relation: "editor",
-      object: "folder:product"
-    }, {
-      user: "folder:product",
-      relation: "parent",
-      object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
-    }]
-}, options);
-
-// response.users = [{object: {type: "user", id: "81684243-9356-4421-8fbf-a4f8d36aa31b"}}, {userset: { type: "user" }}, ...]
+var body = new ClientListUsersRequest()
+{
+    Object = new FgaObject()
+    {
+        Type = "document",
+        Id = "roadmap"
+    },
+    Relation = "can_read",
+    UserFilters = new List<UserTypeFilter>
+    {
+        new UserTypeFilter()
+        {
+            Type = "user"
+        }
+    },
+    ContextualTuples = new List<ClientTupleKey>() {
+        new ClientTupleKey {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "editor",
+            Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+        }
+    }
+};
+var response = await fgaClient.ListUsers(body);
 ```
 
 #### Assertions
