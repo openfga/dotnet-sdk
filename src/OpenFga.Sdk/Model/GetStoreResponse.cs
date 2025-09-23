@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -38,7 +42,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="createdAt">createdAt (required).</param>
         /// <param name="updatedAt">updatedAt (required).</param>
         /// <param name="deletedAt">deletedAt.</param>
-        public GetStoreResponse(string id = default(string), string name = default(string), DateTime createdAt = default(DateTime), DateTime updatedAt = default(DateTime), DateTime deletedAt = default(DateTime)) {
+        public GetStoreResponse(string id = default, string name = default, DateTime createdAt = default, DateTime updatedAt = default, DateTime deletedAt = default) {
             // to ensure "id" is required (not null)
             if (id == null) {
                 throw new ArgumentNullException("id is a required property for GetStoreResponse and cannot be null");
@@ -162,7 +166,7 @@ namespace OpenFga.Sdk.Model {
                     (this.DeletedAt != null &&
                     this.DeletedAt.Equals(input.DeletedAt))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -37,7 +41,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="expression">A Google CEL expression, expressed as a string. (required).</param>
         /// <param name="parameters">A map of parameter names to the parameter&#39;s defined type reference..</param>
         /// <param name="metadata">metadata.</param>
-        public Condition(string name = default(string), string expression = default(string), Dictionary<string, ConditionParamTypeRef> parameters = default(Dictionary<string, ConditionParamTypeRef>), ConditionMetadata metadata = default(ConditionMetadata)) {
+        public Condition(string name = default, string expression = default, Dictionary<string, ConditionParamTypeRef> parameters = default, ConditionMetadata metadata = default) {
             // to ensure "name" is required (not null)
             if (name == null) {
                 throw new ArgumentNullException("name is a required property for Condition and cannot be null");
@@ -150,7 +154,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Metadata != null &&
                     this.Metadata.Equals(input.Metadata))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

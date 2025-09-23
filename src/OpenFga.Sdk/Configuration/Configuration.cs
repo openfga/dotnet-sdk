@@ -12,6 +12,8 @@
 
 
 using OpenFga.Sdk.Exceptions;
+using System;
+using System.Collections.Generic;
 
 namespace OpenFga.Sdk.Configuration;
 

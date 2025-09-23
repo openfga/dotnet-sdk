@@ -13,8 +13,10 @@
 
 using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Configuration;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Net.Http;
 
 namespace OpenFga.Sdk.Telemetry;
 

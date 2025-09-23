@@ -14,6 +14,11 @@
 using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OpenFga.Sdk.Api;
 

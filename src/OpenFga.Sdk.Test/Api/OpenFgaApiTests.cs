@@ -45,7 +45,7 @@ namespace OpenFga.Sdk.Test.Api {
 
         private HttpResponseMessage GetCheckResponse(CheckResponse content, bool shouldRetry = false) {
             var response = new HttpResponseMessage() {
-                StatusCode = shouldRetry ? HttpStatusCode.TooManyRequests : HttpStatusCode.OK,
+                StatusCode = shouldRetry ? (HttpStatusCode)429 : HttpStatusCode.OK,
                 Content = Utils.CreateJsonStringContent(content),
                 Headers = { }
             };
@@ -507,7 +507,7 @@ namespace OpenFga.Sdk.Test.Api {
                     ItExpr.IsAny<CancellationToken>()
                 )
                 .ReturnsAsync(new HttpResponseMessage() {
-                    StatusCode = HttpStatusCode.TooManyRequests
+                    StatusCode = (HttpStatusCode)429
                 })
                     .ReturnsAsync(new HttpResponseMessage() {
                         StatusCode = HttpStatusCode.InternalServerError
@@ -1356,7 +1356,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new ExpandRequest { TupleKey = new ExpandRequestTupleKey(_object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a", relation: "viewer"), AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1" };
+            var body = new ExpandRequest { TupleKey = new ExpandRequestTupleKey(varObject: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a", relation: "viewer"), AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1" };
             var response = await openFgaApi.Expand(_storeId, body);
 
             mockHandler.Protected().Verify(
@@ -1383,19 +1383,19 @@ namespace OpenFga.Sdk.Test.Api {
                 tree: new UsersetTree(
                 root: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a1#owner",
                 union: new Nodes(
-                    nodes: new List<Node>() {
-                        new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a2#owner", leaf: new Leaf(users: new Users(users: new List<string>(){"team:product#member"}))),
+                    varNodes: new List<Node>() {
+                        new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a2#owner", leaf: new Leaf(users: new Users(varUsers: new List<string>(){"team:product#member"}))),
                         new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a3#owner", leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(tupleset: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner", computed: new List<Computed>(){
                         new Computed(userset: "org:contoso#admin")
                     }))),
                 }),
                 difference: new UsersetTreeDifference(
-                    _base: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a3#owner", leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" }))),
-                    subtract: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a4#owner", leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" })))
+                    varBase: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a3#owner", leaf: new Leaf(users: new Users(varUsers: new List<string>() { "team:product#member" }))),
+                    subtract: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a4#owner", leaf: new Leaf(users: new Users(varUsers: new List<string>() { "team:product#member" })))
                 ),
                 intersection: new Nodes(
-                    nodes: new List<Node>() {
-                        new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a5#owner", leaf: new Leaf(users: new Users(users: new List<string>(){"team:product#commentor"}))),
+                    varNodes: new List<Node>() {
+                        new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a5#owner", leaf: new Leaf(users: new Users(varUsers: new List<string>(){"team:product#commentor"}))),
                         new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a6#owner", leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(tupleset: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#viewer", computed: new List<Computed>(){
                         new Computed(userset: "org:contoso#owner")
                     }))),
@@ -1418,7 +1418,7 @@ namespace OpenFga.Sdk.Test.Api {
             var httpClient = new HttpClient(mockHandler.Object);
             var openFgaApi = new OpenFgaApi(_config, httpClient);
 
-            var body = new ExpandRequest(new ExpandRequestTupleKey(_object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a", relation: "viewer"));
+            var body = new ExpandRequest(new ExpandRequestTupleKey(varObject: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a", relation: "viewer"));
             var response = await openFgaApi.Expand(_storeId, body);
 
             mockHandler.Protected().Verify(
@@ -1679,7 +1679,7 @@ namespace OpenFga.Sdk.Test.Api {
                                 User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
                                 Relation = "viewer",
                                 Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
-                            }, TupleOperation.WRITE, DateTime.Now),
+                            }, TupleOperation.TUPLEOPERATIONWRITE, DateTime.Now),
                         },
                 ContinuationToken = "eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ=="
             };

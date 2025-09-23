@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -36,7 +40,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="type">type (required).</param>
         /// <param name="relations">relations.</param>
         /// <param name="metadata">metadata.</param>
-        public TypeDefinition(string type = default(string), Dictionary<string, Userset> relations = default(Dictionary<string, Userset>), Metadata metadata = default(Metadata)) {
+        public TypeDefinition(string type = default, Dictionary<string, Userset> relations = default, Metadata metadata = default) {
             // to ensure "type" is required (not null)
             if (type == null) {
                 throw new ArgumentNullException("type is a required property for TypeDefinition and cannot be null");
@@ -129,7 +133,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Metadata != null &&
                     this.Metadata.Equals(input.Metadata))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -35,7 +39,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="changes">changes (required).</param>
         /// <param name="continuationToken">The continuation token will be identical if there are no new changes..</param>
-        public ReadChangesResponse(List<TupleChange> changes = default(List<TupleChange>), string continuationToken = default(string)) {
+        public ReadChangesResponse(List<TupleChange> changes = default, string continuationToken = default) {
             // to ensure "changes" is required (not null)
             if (changes == null) {
                 throw new ArgumentNullException("changes is a required property for ReadChangesResponse and cannot be null");
@@ -115,7 +119,7 @@ namespace OpenFga.Sdk.Model {
                     (this.ContinuationToken != null &&
                     this.ContinuationToken.Equals(input.ContinuationToken))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

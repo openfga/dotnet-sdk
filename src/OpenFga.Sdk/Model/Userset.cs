@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -33,14 +37,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Userset" /> class.
         /// </summary>
-        /// <param name="_this">A DirectUserset is a sentinel message for referencing the direct members specified by an object/relation mapping..</param>
+        /// <param name="varThis">A DirectUserset is a sentinel message for referencing the direct members specified by an object/relation mapping..</param>
         /// <param name="computedUserset">computedUserset.</param>
         /// <param name="tupleToUserset">tupleToUserset.</param>
         /// <param name="union">union.</param>
         /// <param name="intersection">intersection.</param>
         /// <param name="difference">difference.</param>
-        public Userset(Object _this = default(Object), ObjectRelation computedUserset = default(ObjectRelation), TupleToUserset tupleToUserset = default(TupleToUserset), Usersets union = default(Usersets), Usersets intersection = default(Usersets), Difference difference = default(Difference)) {
-            this.This = _this;
+        public Userset(Object varThis = default, ObjectRelation computedUserset = default, TupleToUserset tupleToUserset = default, Usersets union = default, Usersets intersection = default, Difference difference = default) {
+            this.This = varThis;
             this.ComputedUserset = computedUserset;
             this.TupleToUserset = tupleToUserset;
             this.Union = union;
@@ -170,7 +174,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Difference != null &&
                     this.Difference.Equals(input.Difference))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

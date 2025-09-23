@@ -15,8 +15,14 @@ using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Telemetry;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Net.Http;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OpenFga.Sdk.ApiClient;
 

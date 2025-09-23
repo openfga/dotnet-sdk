@@ -1,5 +1,6 @@
 appveyor.yml
 git_push.sh
+api/openapi.yaml
 src/OpenFga.Sdk.Test/Model/*
 src/OpenFga.Sdk/Client/ApiException.cs
 src/OpenFga.Sdk/Client/ApiResponse.cs

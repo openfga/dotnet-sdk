@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -42,7 +46,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="typeName">typeName (required).</param>
         /// <param name="genericTypes">genericTypes.</param>
-        public ConditionParamTypeRef(TypeName typeName = default(TypeName), List<ConditionParamTypeRef> genericTypes = default(List<ConditionParamTypeRef>)) {
+        public ConditionParamTypeRef(TypeName typeName = default, List<ConditionParamTypeRef> genericTypes = default) {
             this.TypeName = typeName;
             this.GenericTypes = genericTypes;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -108,7 +112,7 @@ namespace OpenFga.Sdk.Model {
                     input.GenericTypes != null &&
                     this.GenericTypes.SequenceEqual(input.GenericTypes)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

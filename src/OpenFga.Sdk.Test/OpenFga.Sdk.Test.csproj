@@ -4,9 +4,34 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyName>OpenFga.Sdk.Test</AssemblyName>
     <RootNamespace>OpenFga.Sdk.Test</RootNamespace>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net48;net8.0;net9.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+
+  <!-- .NET 8.0 and .NET 9.0 specific settings -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0' OR '$(TargetFramework)' == 'net9.0'">
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <!-- .NET Core 3.1 specific settings -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- .NET Framework 4.8 specific settings -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Package references for .NET Framework 4.8 -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="System.Text.Json" Version="6.0.10" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0"><PrivateAssets>all</PrivateAssets></PackageReference>

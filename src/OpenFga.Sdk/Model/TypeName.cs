@@ -11,8 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -21,76 +27,76 @@ namespace OpenFga.Sdk.Model {
     [JsonConverter(typeof(JsonStringEnumMemberConverter<TypeName>))]
     public enum TypeName {
         /// <summary>
-        /// Enum UNSPECIFIED for value: TYPE_NAME_UNSPECIFIED
+        /// Enum TYPENAMEUNSPECIFIED for value: TYPE_NAME_UNSPECIFIED
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_UNSPECIFIED")]
-        UNSPECIFIED = 1,
+        TYPENAMEUNSPECIFIED = 1,
 
         /// <summary>
-        /// Enum ANY for value: TYPE_NAME_ANY
+        /// Enum TYPENAMEANY for value: TYPE_NAME_ANY
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_ANY")]
-        ANY = 2,
+        TYPENAMEANY = 2,
 
         /// <summary>
-        /// Enum BOOL for value: TYPE_NAME_BOOL
+        /// Enum TYPENAMEBOOL for value: TYPE_NAME_BOOL
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_BOOL")]
-        BOOL = 3,
+        TYPENAMEBOOL = 3,
 
         /// <summary>
-        /// Enum STRING for value: TYPE_NAME_STRING
+        /// Enum TYPENAMESTRING for value: TYPE_NAME_STRING
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_STRING")]
-        STRING = 4,
+        TYPENAMESTRING = 4,
 
         /// <summary>
-        /// Enum INT for value: TYPE_NAME_INT
+        /// Enum TYPENAMEINT for value: TYPE_NAME_INT
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_INT")]
-        INT = 5,
+        TYPENAMEINT = 5,
 
         /// <summary>
-        /// Enum UINT for value: TYPE_NAME_UINT
+        /// Enum TYPENAMEUINT for value: TYPE_NAME_UINT
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_UINT")]
-        UINT = 6,
+        TYPENAMEUINT = 6,
 
         /// <summary>
-        /// Enum DOUBLE for value: TYPE_NAME_DOUBLE
+        /// Enum TYPENAMEDOUBLE for value: TYPE_NAME_DOUBLE
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_DOUBLE")]
-        DOUBLE = 7,
+        TYPENAMEDOUBLE = 7,
 
         /// <summary>
-        /// Enum DURATION for value: TYPE_NAME_DURATION
+        /// Enum TYPENAMEDURATION for value: TYPE_NAME_DURATION
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_DURATION")]
-        DURATION = 8,
+        TYPENAMEDURATION = 8,
 
         /// <summary>
-        /// Enum TIMESTAMP for value: TYPE_NAME_TIMESTAMP
+        /// Enum TYPENAMETIMESTAMP for value: TYPE_NAME_TIMESTAMP
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_TIMESTAMP")]
-        TIMESTAMP = 9,
+        TYPENAMETIMESTAMP = 9,
 
         /// <summary>
-        /// Enum MAP for value: TYPE_NAME_MAP
+        /// Enum TYPENAMEMAP for value: TYPE_NAME_MAP
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_MAP")]
-        MAP = 10,
+        TYPENAMEMAP = 10,
 
         /// <summary>
-        /// Enum LIST for value: TYPE_NAME_LIST
+        /// Enum TYPENAMELIST for value: TYPE_NAME_LIST
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_LIST")]
-        LIST = 11,
+        TYPENAMELIST = 11,
 
         /// <summary>
-        /// Enum IPADDRESS for value: TYPE_NAME_IPADDRESS
+        /// Enum TYPENAMEIPADDRESS for value: TYPE_NAME_IPADDRESS
         /// </summary>
         [EnumMember(Value = "TYPE_NAME_IPADDRESS")]
-        IPADDRESS = 12
+        TYPENAMEIPADDRESS = 12
 
     }
 

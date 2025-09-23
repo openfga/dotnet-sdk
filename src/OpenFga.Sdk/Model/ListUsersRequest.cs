@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -41,18 +45,18 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ListUsersRequest" /> class.
         /// </summary>
         /// <param name="authorizationModelId">authorizationModelId.</param>
-        /// <param name="_object">_object (required).</param>
+        /// <param name="varObject">varObject (required).</param>
         /// <param name="relation">relation (required).</param>
         /// <param name="userFilters">The type of results returned. Only accepts exactly one value. (required).</param>
         /// <param name="contextualTuples">contextualTuples.</param>
         /// <param name="context">Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation..</param>
         /// <param name="consistency">consistency.</param>
-        public ListUsersRequest(string authorizationModelId = default(string), FgaObject _object = default(FgaObject), string relation = default(string), List<UserTypeFilter> userFilters = default(List<UserTypeFilter>), List<TupleKey> contextualTuples = default(List<TupleKey>), Object context = default(Object), ConsistencyPreference? consistency = default(ConsistencyPreference?)) {
-            // to ensure "_object" is required (not null)
-            if (_object == null) {
-                throw new ArgumentNullException("_object is a required property for ListUsersRequest and cannot be null");
+        public ListUsersRequest(string authorizationModelId = default, FgaObject varObject = default, string relation = default, List<UserTypeFilter> userFilters = default, List<TupleKey> contextualTuples = default, Object context = default, ConsistencyPreference? consistency = default) {
+            // to ensure "varObject" is required (not null)
+            if (varObject == null) {
+                throw new ArgumentNullException("varObject is a required property for ListUsersRequest and cannot be null");
             }
-            this.Object = _object;
+            this.Object = varObject;
             // to ensure "relation" is required (not null)
             if (relation == null) {
                 throw new ArgumentNullException("relation is a required property for ListUsersRequest and cannot be null");
@@ -198,7 +202,7 @@ namespace OpenFga.Sdk.Model {
                     this.Consistency == input.Consistency ||
                     this.Consistency.Equals(input.Consistency)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

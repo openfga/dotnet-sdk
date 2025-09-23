@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -43,7 +47,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="checks">checks (required).</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
         /// <param name="consistency">consistency.</param>
-        public BatchCheckRequest(List<BatchCheckItem> checks = default(List<BatchCheckItem>), string authorizationModelId = default(string), ConsistencyPreference? consistency = default(ConsistencyPreference?)) {
+        public BatchCheckRequest(List<BatchCheckItem> checks = default, string authorizationModelId = default, ConsistencyPreference? consistency = default) {
             // to ensure "checks" is required (not null)
             if (checks == null) {
                 throw new ArgumentNullException("checks is a required property for BatchCheckRequest and cannot be null");
@@ -127,7 +131,7 @@ namespace OpenFga.Sdk.Model {
                     this.Consistency == input.Consistency ||
                     this.Consistency.Equals(input.Consistency)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

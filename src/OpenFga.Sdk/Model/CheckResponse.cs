@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -35,7 +39,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="allowed">allowed.</param>
         /// <param name="resolution">For internal use only..</param>
-        public CheckResponse(bool allowed = default(bool), string resolution = default(string)) {
+        public CheckResponse(bool allowed = default, string resolution = default) {
             this.Allowed = allowed;
             this.Resolution = resolution;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -109,7 +113,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Resolution != null &&
                     this.Resolution.Equals(input.Resolution))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

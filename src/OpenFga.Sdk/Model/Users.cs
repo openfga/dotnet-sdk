@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -33,23 +37,23 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Users" /> class.
         /// </summary>
-        /// <param name="users">users (required).</param>
-        public Users(List<string> users = default(List<string>)) {
-            // to ensure "users" is required (not null)
-            if (users == null) {
-                throw new ArgumentNullException("users is a required property for Users and cannot be null");
+        /// <param name="varUsers">varUsers (required).</param>
+        public Users(List<string> varUsers = default) {
+            // to ensure "varUsers" is required (not null)
+            if (varUsers == null) {
+                throw new ArgumentNullException("varUsers is a required property for Users and cannot be null");
             }
-            this._Users = users;
+            this.VarUsers = varUsers;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Gets or Sets _Users
+        /// Gets or Sets VarUsers
         /// </summary>
         [DataMember(Name = "users", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("users")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<string> _Users { get; set; }
+        public List<string> VarUsers { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -94,12 +98,12 @@ namespace OpenFga.Sdk.Model {
             }
             return
                 (
-                    this._Users == input._Users ||
-                    this._Users != null &&
-                    input._Users != null &&
-                    this._Users.SequenceEqual(input._Users)
+                    this.VarUsers == input.VarUsers ||
+                    this.VarUsers != null &&
+                    input.VarUsers != null &&
+                    this.VarUsers.SequenceEqual(input.VarUsers)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>
@@ -110,8 +114,8 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 9661;
-                if (this._Users != null) {
-                    hashCode = (hashCode * 9923) + this._Users.GetHashCode();
+                if (this.VarUsers != null) {
+                    hashCode = (hashCode * 9923) + this.VarUsers.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

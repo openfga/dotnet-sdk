@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -33,10 +37,10 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectRelation" /> class.
         /// </summary>
-        /// <param name="_object">_object.</param>
+        /// <param name="varObject">varObject.</param>
         /// <param name="relation">relation.</param>
-        public ObjectRelation(string _object = default(string), string relation = default(string)) {
-            this.Object = _object;
+        public ObjectRelation(string varObject = default, string relation = default) {
+            this.Object = varObject;
             this.Relation = relation;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -109,7 +113,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Relation != null &&
                     this.Relation.Equals(input.Relation))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

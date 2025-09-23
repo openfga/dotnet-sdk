@@ -12,9 +12,12 @@
 
 
 using OpenFga.Sdk.Exceptions.Parsers;
+using System;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace OpenFga.Sdk.Exceptions;
 
@@ -143,7 +146,7 @@ public class FgaApiError : ApiException {
     /// <param name="shouldRetry"></param>
     public FgaApiError(HttpResponseMessage? response, HttpRequestMessage request, string? apiName, ApiErrorParser? apiError = null, bool shouldRetry = false)
         : this((apiError == null ? (response?.StatusCode.ToString()) : apiError.Message) ?? string.Empty) {
-        var requestPaths = request.RequestUri?.LocalPath.Split("/") ?? Array.Empty<string>();
+        var requestPaths = request.RequestUri?.LocalPath.Split('/') ?? Array.Empty<string>();
         var storeId = requestPaths.Length > 2 ? requestPaths[2] : null;
 
         StatusCode = response?.StatusCode ?? HttpStatusCode.InternalServerError;

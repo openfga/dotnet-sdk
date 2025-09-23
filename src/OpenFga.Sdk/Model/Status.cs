@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -36,7 +40,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="code">code.</param>
         /// <param name="message">message.</param>
         /// <param name="details">details.</param>
-        public Status(int code = default(int), string message = default(string), List<Any> details = default(List<Any>)) {
+        public Status(int code = default, string message = default, List<Any> details = default) {
             this.Code = code;
             this.Message = message;
             this.Details = details;
@@ -124,7 +128,7 @@ namespace OpenFga.Sdk.Model {
                     input.Details != null &&
                     this.Details.SequenceEqual(input.Details)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

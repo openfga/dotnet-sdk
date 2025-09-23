@@ -10,9 +10,13 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
+
 using OpenFga.Sdk.Model;
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace OpenFga.Sdk.Test.Models {

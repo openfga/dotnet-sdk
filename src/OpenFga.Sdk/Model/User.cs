@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -33,11 +37,11 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="User" /> class.
         /// </summary>
-        /// <param name="_object">_object.</param>
+        /// <param name="varObject">varObject.</param>
         /// <param name="userset">userset.</param>
         /// <param name="wildcard">wildcard.</param>
-        public User(FgaObject _object = default(FgaObject), UsersetUser userset = default(UsersetUser), TypedWildcard wildcard = default(TypedWildcard)) {
-            this.Object = _object;
+        public User(FgaObject varObject = default, UsersetUser userset = default, TypedWildcard wildcard = default) {
+            this.Object = varObject;
             this.Userset = userset;
             this.Wildcard = wildcard;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -124,7 +128,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Wildcard != null &&
                     this.Wildcard.Equals(input.Wildcard))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

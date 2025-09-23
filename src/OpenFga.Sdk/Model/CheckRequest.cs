@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -45,7 +49,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="authorizationModelId">authorizationModelId.</param>
         /// <param name="context">Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation..</param>
         /// <param name="consistency">consistency.</param>
-        public CheckRequest(CheckRequestTupleKey tupleKey = default(CheckRequestTupleKey), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys), string authorizationModelId = default(string), Object context = default(Object), ConsistencyPreference? consistency = default(ConsistencyPreference?)) {
+        public CheckRequest(CheckRequestTupleKey tupleKey = default, ContextualTupleKeys contextualTuples = default, string authorizationModelId = default, Object context = default, ConsistencyPreference? consistency = default) {
             // to ensure "tupleKey" is required (not null)
             if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for CheckRequest and cannot be null");
@@ -177,7 +181,7 @@ namespace OpenFga.Sdk.Model {
                     this.Consistency == input.Consistency ||
                     this.Consistency.Equals(input.Consistency)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

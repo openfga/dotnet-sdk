@@ -10,6 +10,9 @@
 // NOTE: This file was auto generated. DO NOT EDIT.
 //
 
+
+using System;
+
 namespace OpenFga.Sdk.Exceptions;
 
 /// <summary>

@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -35,7 +39,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="stores">stores (required).</param>
         /// <param name="continuationToken">The continuation token will be empty if there are no more stores. (required).</param>
-        public ListStoresResponse(List<Store> stores = default(List<Store>), string continuationToken = default(string)) {
+        public ListStoresResponse(List<Store> stores = default, string continuationToken = default) {
             // to ensure "stores" is required (not null)
             if (stores == null) {
                 throw new ArgumentNullException("stores is a required property for ListStoresResponse and cannot be null");
@@ -119,7 +123,7 @@ namespace OpenFga.Sdk.Model {
                     (this.ContinuationToken != null &&
                     this.ContinuationToken.Equals(input.ContinuationToken))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

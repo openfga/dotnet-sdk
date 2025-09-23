@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -44,7 +48,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="pageSize">pageSize.</param>
         /// <param name="continuationToken">continuationToken.</param>
         /// <param name="consistency">consistency.</param>
-        public ReadRequest(ReadRequestTupleKey tupleKey = default(ReadRequestTupleKey), int pageSize = default(int), string continuationToken = default(string), ConsistencyPreference? consistency = default(ConsistencyPreference?)) {
+        public ReadRequest(ReadRequestTupleKey tupleKey = default, int pageSize = default, string continuationToken = default, ConsistencyPreference? consistency = default) {
             this.TupleKey = tupleKey;
             this.PageSize = pageSize;
             this.ContinuationToken = continuationToken;
@@ -136,7 +140,7 @@ namespace OpenFga.Sdk.Model {
                     this.Consistency == input.Consistency ||
                     this.Consistency.Equals(input.Consistency)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

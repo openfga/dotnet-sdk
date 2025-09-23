@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -34,7 +38,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="Computed" /> class.
         /// </summary>
         /// <param name="userset">userset (required).</param>
-        public Computed(string userset = default(string)) {
+        public Computed(string userset = default) {
             // to ensure "userset" is required (not null)
             if (userset == null) {
                 throw new ArgumentNullException("userset is a required property for Computed and cannot be null");
@@ -98,7 +102,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Userset != null &&
                     this.Userset.Equals(input.Userset))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

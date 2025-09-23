@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -36,7 +40,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="users">users.</param>
         /// <param name="computed">computed.</param>
         /// <param name="tupleToUserset">tupleToUserset.</param>
-        public Leaf(Users users = default(Users), Computed computed = default(Computed), UsersetTreeTupleToUserset tupleToUserset = default(UsersetTreeTupleToUserset)) {
+        public Leaf(Users users = default, Computed computed = default, UsersetTreeTupleToUserset tupleToUserset = default) {
             this.Users = users;
             this.Computed = computed;
             this.TupleToUserset = tupleToUserset;
@@ -124,7 +128,7 @@ namespace OpenFga.Sdk.Model {
                     (this.TupleToUserset != null &&
                     this.TupleToUserset.Equals(input.TupleToUserset))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

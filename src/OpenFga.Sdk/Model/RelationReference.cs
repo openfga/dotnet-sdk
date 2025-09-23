@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -37,7 +41,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="relation">relation.</param>
         /// <param name="wildcard">wildcard.</param>
         /// <param name="condition">The name of a condition that is enforced over the allowed relation..</param>
-        public RelationReference(string type = default(string), string relation = default(string), Object wildcard = default(Object), string condition = default(string)) {
+        public RelationReference(string type = default, string relation = default, Object wildcard = default, string condition = default) {
             // to ensure "type" is required (not null)
             if (type == null) {
                 throw new ArgumentNullException("type is a required property for RelationReference and cannot be null");
@@ -144,7 +148,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Condition != null &&
                     this.Condition.Equals(input.Condition))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

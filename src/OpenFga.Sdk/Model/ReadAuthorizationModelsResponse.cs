@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -35,7 +39,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="authorizationModels">authorizationModels (required).</param>
         /// <param name="continuationToken">The continuation token will be empty if there are no more models..</param>
-        public ReadAuthorizationModelsResponse(List<AuthorizationModel> authorizationModels = default(List<AuthorizationModel>), string continuationToken = default(string)) {
+        public ReadAuthorizationModelsResponse(List<AuthorizationModel> authorizationModels = default, string continuationToken = default) {
             // to ensure "authorizationModels" is required (not null)
             if (authorizationModels == null) {
                 throw new ArgumentNullException("authorizationModels is a required property for ReadAuthorizationModelsResponse and cannot be null");
@@ -115,7 +119,7 @@ namespace OpenFga.Sdk.Model {
                     (this.ContinuationToken != null &&
                     this.ContinuationToken.Equals(input.ContinuationToken))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

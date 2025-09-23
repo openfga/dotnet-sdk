@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -34,7 +38,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="CreateStoreRequest" /> class.
         /// </summary>
         /// <param name="name">name (required).</param>
-        public CreateStoreRequest(string name = default(string)) {
+        public CreateStoreRequest(string name = default) {
             // to ensure "name" is required (not null)
             if (name == null) {
                 throw new ArgumentNullException("name is a required property for CreateStoreRequest and cannot be null");
@@ -98,7 +102,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Name != null &&
                     this.Name.Equals(input.Name))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

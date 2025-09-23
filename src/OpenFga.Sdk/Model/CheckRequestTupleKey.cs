@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -35,8 +39,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="user">user (required).</param>
         /// <param name="relation">relation (required).</param>
-        /// <param name="_object">_object (required).</param>
-        public CheckRequestTupleKey(string user = default(string), string relation = default(string), string _object = default(string)) {
+        /// <param name="varObject">varObject (required).</param>
+        public CheckRequestTupleKey(string user = default, string relation = default, string varObject = default) {
             // to ensure "user" is required (not null)
             if (user == null) {
                 throw new ArgumentNullException("user is a required property for CheckRequestTupleKey and cannot be null");
@@ -47,11 +51,11 @@ namespace OpenFga.Sdk.Model {
                 throw new ArgumentNullException("relation is a required property for CheckRequestTupleKey and cannot be null");
             }
             this.Relation = relation;
-            // to ensure "_object" is required (not null)
-            if (_object == null) {
-                throw new ArgumentNullException("_object is a required property for CheckRequestTupleKey and cannot be null");
+            // to ensure "varObject" is required (not null)
+            if (varObject == null) {
+                throw new ArgumentNullException("varObject is a required property for CheckRequestTupleKey and cannot be null");
             }
-            this.Object = _object;
+            this.Object = varObject;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -136,7 +140,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Object != null &&
                     this.Object.Equals(input.Object))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -43,7 +47,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="tupleKey">tupleKey (required).</param>
         /// <param name="operation">operation (required).</param>
         /// <param name="timestamp">timestamp (required).</param>
-        public TupleChange(TupleKey tupleKey = default(TupleKey), TupleOperation operation = default(TupleOperation), DateTime timestamp = default(DateTime)) {
+        public TupleChange(TupleKey tupleKey = default, TupleOperation operation = default, DateTime timestamp = default) {
             // to ensure "tupleKey" is required (not null)
             if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for TupleChange and cannot be null");
@@ -126,7 +130,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Timestamp != null &&
                     this.Timestamp.Equals(input.Timestamp))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

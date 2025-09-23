@@ -13,6 +13,8 @@
 
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Linq;
+using System.Net.Http;
 
 namespace OpenFga.Sdk.Telemetry;
 

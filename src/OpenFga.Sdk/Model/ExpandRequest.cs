@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -44,7 +48,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="authorizationModelId">authorizationModelId.</param>
         /// <param name="consistency">consistency.</param>
         /// <param name="contextualTuples">contextualTuples.</param>
-        public ExpandRequest(ExpandRequestTupleKey tupleKey = default(ExpandRequestTupleKey), string authorizationModelId = default(string), ConsistencyPreference? consistency = default(ConsistencyPreference?), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys)) {
+        public ExpandRequest(ExpandRequestTupleKey tupleKey = default, string authorizationModelId = default, ConsistencyPreference? consistency = default, ContextualTupleKeys contextualTuples = default) {
             // to ensure "tupleKey" is required (not null)
             if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for ExpandRequest and cannot be null");
@@ -141,7 +145,7 @@ namespace OpenFga.Sdk.Model {
                     (this.ContextualTuples != null &&
                     this.ContextualTuples.Equals(input.ContextualTuples))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

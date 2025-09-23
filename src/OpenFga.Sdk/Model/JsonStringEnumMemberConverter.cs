@@ -11,6 +11,10 @@
 //
 
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -30,7 +34,7 @@ public class JsonStringEnumMemberConverter<EnumTemplate> : JsonConverter<EnumTem
 	/// </summary>
     public JsonStringEnumMemberConverter() {
         var type = typeof(EnumTemplate);
-        var values = Enum.GetValues<EnumTemplate>();
+        var values = Enum.GetValues(type).Cast<EnumTemplate>();
 
         foreach (var value in values) {
             var enumMember = type.GetMember(value.ToString())[0];

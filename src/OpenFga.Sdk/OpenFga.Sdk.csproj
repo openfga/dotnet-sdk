@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net48;net8.0;net9.0</TargetFrameworks>
     <AssemblyName>OpenFga.Sdk</AssemblyName>
     <PackageId>OpenFga.Sdk</PackageId>
     <OutputType>Library</OutputType>
+    <LangVersion>10.0</LangVersion>
     <Authors>OpenFGA</Authors>
     <Company>OpenFGA</Company>
     <AssemblyTitle>OpenFGA SDK for .NET</AssemblyTitle>
@@ -21,11 +22,48 @@
     <PackageReleaseNotes>https://github.com/openfga/dotnet-sdk/blob/main/CHANGELOG.md</PackageReleaseNotes>
     <PackageTags>openfga;authorization;fga;fine-grained-authorization;rebac;zanzibar</PackageTags>
     <PackageIcon>FGAIcon.png</PackageIcon>
-    <Nullable>annotations</Nullable>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <!-- Expose internals to test project -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>OpenFga.Sdk.Test</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <!-- Common package references for all frameworks -->
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.1" />
+  </ItemGroup>
+
+  <!-- .NET 8.0+ specific settings -->
+  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <!-- Pre-.NET 8.0 settings (requires explicit LangVersion) -->
+  <PropertyGroup Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Package references for frameworks that need backport packages -->
+  <ItemGroup Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+    <PackageReference Include="System.Text.Json" Version="6.0.10" />
+    <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
+  </ItemGroup>
+
+  <!-- .NET Framework 4.8 specific packages -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Models"/>

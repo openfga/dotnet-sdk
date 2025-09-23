@@ -11,29 +11,36 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Any
     /// </summary>
     [DataContract(Name = "Any")]
-    public partial class Any : Dictionary<String, Object>, IEquatable<Any>, IValidatableObject {
+    public partial class Any : IEquatable<Any>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="Any" /> class.
         /// </summary>
         [JsonConstructor]
-        public Any() { }
+        public Any() {
+            this.AdditionalProperties = new Dictionary<string, object>();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Any" /> class.
         /// </summary>
         /// <param name="type">type.</param>
-        public Any(string type = default(string)) : base() {
+        public Any(string type = default) {
             this.Type = type;
+            this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -44,12 +51,18 @@ namespace OpenFga.Sdk.Model {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string? Type { get; set; }
 
+        /// <summary>
+        /// Gets or Sets additional properties
+        /// </summary>
+        [JsonExtensionData]
+        public IDictionary<string, object> AdditionalProperties { get; set; }
+
 
         /// <summary>
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public string ToJson() {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -79,12 +92,13 @@ namespace OpenFga.Sdk.Model {
             if (input == null) {
                 return false;
             }
-            return base.Equals(input) &&
+            return
                 (
                     this.Type == input.Type ||
                     (this.Type != null &&
                     this.Type.Equals(input.Type))
-                );
+                )
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>
@@ -94,9 +108,12 @@ namespace OpenFga.Sdk.Model {
         public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
-                int hashCode = base.GetHashCode();
+                int hashCode = 9661;
                 if (this.Type != null) {
                     hashCode = (hashCode * 9923) + this.Type.GetHashCode();
+                }
+                if (this.AdditionalProperties != null) {
+                    hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
             }

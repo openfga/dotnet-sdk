@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -37,7 +41,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="contextualTuples">contextualTuples.</param>
         /// <param name="context">context.</param>
         /// <param name="correlationId">correlation_id must be a string containing only letters, numbers, or hyphens, with length ≤ 36 characters. (required).</param>
-        public BatchCheckItem(CheckRequestTupleKey tupleKey = default(CheckRequestTupleKey), ContextualTupleKeys contextualTuples = default(ContextualTupleKeys), Object context = default(Object), string correlationId = default(string)) {
+        public BatchCheckItem(CheckRequestTupleKey tupleKey = default, ContextualTupleKeys contextualTuples = default, Object context = default, string correlationId = default) {
             // to ensure "tupleKey" is required (not null)
             if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for BatchCheckItem and cannot be null");
@@ -148,7 +152,7 @@ namespace OpenFga.Sdk.Model {
                     (this.CorrelationId != null &&
                     this.CorrelationId.Equals(input.CorrelationId))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

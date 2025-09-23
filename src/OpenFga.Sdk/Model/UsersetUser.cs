@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -36,7 +40,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="type">type (required).</param>
         /// <param name="id">id (required).</param>
         /// <param name="relation">relation (required).</param>
-        public UsersetUser(string type = default(string), string id = default(string), string relation = default(string)) {
+        public UsersetUser(string type = default, string id = default, string relation = default) {
             // to ensure "type" is required (not null)
             if (type == null) {
                 throw new ArgumentNullException("type is a required property for UsersetUser and cannot be null");
@@ -136,7 +140,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Relation != null &&
                     this.Relation.Equals(input.Relation))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

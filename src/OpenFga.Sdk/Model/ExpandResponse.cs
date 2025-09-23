@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -34,7 +38,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ExpandResponse" /> class.
         /// </summary>
         /// <param name="tree">tree.</param>
-        public ExpandResponse(UsersetTree tree = default(UsersetTree)) {
+        public ExpandResponse(UsersetTree tree = default) {
             this.Tree = tree;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -94,7 +98,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Tree != null &&
                     this.Tree.Equals(input.Tree))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>
