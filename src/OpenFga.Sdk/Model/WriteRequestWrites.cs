@@ -23,6 +23,34 @@ namespace OpenFga.Sdk.Model {
     [DataContract(Name = "WriteRequestWrites")]
     public partial class WriteRequestWrites : IEquatable<WriteRequestWrites>, IValidatableObject {
         /// <summary>
+        /// On &#39;error&#39; ( or unspecified ), the API returns an error if an identical tuple already exists. On &#39;ignore&#39;, identical writes are treated as no-ops (matching on user, relation, object, and RelationshipCondition).
+        /// </summary>
+        /// <value>On &#39;error&#39; ( or unspecified ), the API returns an error if an identical tuple already exists. On &#39;ignore&#39;, identical writes are treated as no-ops (matching on user, relation, object, and RelationshipCondition).</value>
+        [JsonConverter(typeof(JsonStringEnumMemberConverter<OnDuplicateEnum>))]
+        public enum OnDuplicateEnum {
+            /// <summary>
+            /// Enum Error for value: error
+            /// </summary>
+            [EnumMember(Value = "error")]
+            Error = 1,
+
+            /// <summary>
+            /// Enum Ignore for value: ignore
+            /// </summary>
+            [EnumMember(Value = "ignore")]
+            Ignore = 2
+
+        }
+
+
+        /// <summary>
+        /// On &#39;error&#39; ( or unspecified ), the API returns an error if an identical tuple already exists. On &#39;ignore&#39;, identical writes are treated as no-ops (matching on user, relation, object, and RelationshipCondition).
+        /// </summary>
+        /// <value>On &#39;error&#39; ( or unspecified ), the API returns an error if an identical tuple already exists. On &#39;ignore&#39;, identical writes are treated as no-ops (matching on user, relation, object, and RelationshipCondition).</value>
+        [DataMember(Name = "on_duplicate", EmitDefaultValue = false)]
+        [JsonPropertyName("on_duplicate")]
+        public OnDuplicateEnum? OnDuplicate { get; set; }
+        /// <summary>
         /// Initializes a new instance of the <see cref="WriteRequestWrites" /> class.
         /// </summary>
         [JsonConstructor]
@@ -34,12 +62,14 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="WriteRequestWrites" /> class.
         /// </summary>
         /// <param name="tupleKeys">tupleKeys (required).</param>
-        public WriteRequestWrites(List<TupleKey> tupleKeys = default(List<TupleKey>)) {
+        /// <param name="onDuplicate">On &#39;error&#39; ( or unspecified ), the API returns an error if an identical tuple already exists. On &#39;ignore&#39;, identical writes are treated as no-ops (matching on user, relation, object, and RelationshipCondition). (default to OnDuplicateEnum.Error).</param>
+        public WriteRequestWrites(List<TupleKey> tupleKeys = default(List<TupleKey>), OnDuplicateEnum? onDuplicate = OnDuplicateEnum.Error) {
             // to ensure "tupleKeys" is required (not null)
             if (tupleKeys == null) {
                 throw new ArgumentNullException("tupleKeys is a required property for WriteRequestWrites and cannot be null");
             }
             this.TupleKeys = tupleKeys;
+            this.OnDuplicate = onDuplicate;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -98,6 +128,10 @@ namespace OpenFga.Sdk.Model {
                     this.TupleKeys != null &&
                     input.TupleKeys != null &&
                     this.TupleKeys.SequenceEqual(input.TupleKeys)
+                ) &&
+                (
+                    this.OnDuplicate == input.OnDuplicate ||
+                    this.OnDuplicate.Equals(input.OnDuplicate)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
         }
@@ -113,6 +147,7 @@ namespace OpenFga.Sdk.Model {
                 if (this.TupleKeys != null) {
                     hashCode = (hashCode * 9923) + this.TupleKeys.GetHashCode();
                 }
+                hashCode = (hashCode * 9923) + this.OnDuplicate.GetHashCode();
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
                 }
