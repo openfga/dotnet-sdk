@@ -5,12 +5,10 @@
 .github/ISSUE_TEMPLATE/bug_report.yaml
 .github/ISSUE_TEMPLATE/config.yaml
 .github/ISSUE_TEMPLATE/feature_request.yaml
-.github/dependabot.yaml
 .gitignore
 CHANGELOG.md
 CONTRIBUTING.md
 LICENSE
-NOTICE.txt
 OpenFga.Sdk.sln
 OpenTelemetry.md
 README.md
