@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -130,9 +129,11 @@ public class BaseClient : IDisposable {
 
             T responseContent = default;
             if (response.Content != null && response.StatusCode != HttpStatusCode.NoContent) {
-                responseContent = await response.Content.ReadFromJsonAsync<T>(cancellationToken: cancellationToken)
-                                      .ConfigureAwait(false) ??
-                                  throw new FgaError();
+                var contentString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                if (!string.IsNullOrEmpty(contentString)) {
+                    responseContent = JsonSerializer.Deserialize<T>(contentString) ??
+                                      throw new FgaError();
+                }
             }
 
             return new ResponseWrapper<T> { rawResponse = response, responseContent = responseContent };

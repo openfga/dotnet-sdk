@@ -496,7 +496,7 @@ public class OpenFgaClient : IDisposable {
      * ListRelations - List all the relations a user has with an object (evaluates)
      */
     public async Task<ListRelationsResponse> ListRelations(IClientListRelationsRequest body,
-        IClientBatchCheckOptions? options = default,
+        IClientListRelationsOptions? options = default,
         CancellationToken cancellationToken = default) {
         if (body.Relations.Count == 0) {
             throw new FgaValidationError("At least 1 relation to check has to be provided when calling ListRelations");

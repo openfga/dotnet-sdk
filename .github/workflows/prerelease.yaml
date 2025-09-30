@@ -1,0 +1,102 @@
+name: Prerelease
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  test-prerelease:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '-test-')
+    name: Test Prerelease Package
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET versions
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+        with:
+          dotnet-version: |
+            3.1.x
+            6.0.x
+            8.0.x
+            9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore --verbosity minimal
+
+      - name: Build SDK
+        run: dotnet build src/OpenFga.Sdk/OpenFga.Sdk.csproj --no-restore --configuration Release --verbosity normal
+
+      - name: Create NuGet package
+        run: dotnet pack src/OpenFga.Sdk/OpenFga.Sdk.csproj --no-build --configuration Release --verbosity normal
+
+      - name: Verify package was created
+        run: |
+          echo "Verifying package creation..."
+          if [ ! -f src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg ]; then
+            echo "❌ NuGet package was not created"
+            exit 1
+          fi
+          echo "✅ NuGet package created successfully"
+          ls -la src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg
+
+      - name: Upload test package artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: nuget-test-package
+          path: src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg
+
+  publish-prerelease:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '-') && !contains(github.ref, '-test-')
+    name: Publish Prerelease Package
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET versions
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+        with:
+          dotnet-version: |
+            3.1.x
+            6.0.x
+            8.0.x
+            9.0.x
+          source-url: https://api.nuget.org/v3/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
+
+      - name: Restore dependencies
+        run: dotnet restore --verbosity minimal
+
+      - name: Build SDK
+        run: dotnet build src/OpenFga.Sdk/OpenFga.Sdk.csproj --no-restore --configuration Release --verbosity normal
+
+      - name: Create NuGet package
+        run: dotnet pack src/OpenFga.Sdk/OpenFga.Sdk.csproj --no-build --configuration Release --verbosity normal
+
+      - name: Upload prerelease package artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: nuget-prerelease-package
+          path: src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg
+
+      - name: Publish to NuGet
+        run: dotnet nuget push src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg --api-key ${NUGET_AUTH_TOKEN}
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
