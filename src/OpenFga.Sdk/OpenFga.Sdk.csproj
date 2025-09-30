@@ -23,6 +23,7 @@
     <PackageTags>openfga;authorization;fga;fine-grained-authorization;rebac;zanzibar</PackageTags>
     <PackageIcon>FGAIcon.png</PackageIcon>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IsNet8OrGreater>$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))</IsNet8OrGreater>
   </PropertyGroup>
 
   <!-- Expose internals to test project -->
@@ -40,19 +41,19 @@
   </ItemGroup>
 
   <!-- .NET 8.0+ specific settings -->
-  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+  <PropertyGroup Condition="'$(IsNet8OrGreater)' == 'true'">
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <!-- Pre-.NET 8.0 settings (requires explicit LangVersion) -->
-  <PropertyGroup Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+  <PropertyGroup  Condition="'$(IsNet8OrGreater)' != 'true'">
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <!-- Package references for frameworks that need backport packages -->
-  <ItemGroup Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+  <ItemGroup Condition="'$(IsNet8OrGreater)' != 'true'">
     <PackageReference Include="System.Text.Json" Version="6.0.10" />
     <PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
