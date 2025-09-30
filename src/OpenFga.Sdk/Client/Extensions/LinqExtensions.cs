@@ -31,20 +31,23 @@ namespace OpenFga.Sdk.Client.Extensions {
         public static IEnumerable<T[]> Chunk<T>(this IEnumerable<T> source, int size) {
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
+            var collection = source as ICollection<T>;
 
+            if (collection?.Count == 0) {
+                return Enumerable.Empty<T[]>();
+            }
             return ChunkIterator(source, size);
         }
 
         private static IEnumerable<T[]> ChunkIterator<T>(IEnumerable<T> source, int size) {
-            using (var enumerator = source.GetEnumerator()) {
-                while (enumerator.MoveNext()) {
-                    var chunk = new List<T>(size);
-                    do {
-                        chunk.Add(enumerator.Current);
-                    } while (chunk.Count < size && enumerator.MoveNext());
+            using var enumerator = source.GetEnumerator();
+            while (enumerator.MoveNext()) {
+                var chunk = new List<T>(size);
+                do {
+                    chunk.Add(enumerator.Current);
+                } while (chunk.Count < size && enumerator.MoveNext());
                     
-                    yield return chunk.ToArray();
-                }
+                yield return chunk.ToArray();
             }
         }
 #endif
