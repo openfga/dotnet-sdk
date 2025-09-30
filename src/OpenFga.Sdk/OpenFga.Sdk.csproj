@@ -12,7 +12,7 @@
     <Description>.NET SDK for OpenFGA</Description>
     <Copyright>OpenFGA</Copyright>
     <RootNamespace>OpenFga.Sdk</RootNamespace>
-    <Version>0.5.1</Version>
+    <Version>0.6.0</Version>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\OpenFga.Sdk.xml</DocumentationFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
