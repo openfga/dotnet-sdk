@@ -2,6 +2,27 @@
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.6.0...HEAD)
 
+- feat!: add support for .NET Standard 2.0, .NET 8.0 and .NET 9.0
+
+[!WARNING]
+BREAKING CHANGES:
+- While we have dropped .NET 6.0 as a target framework, the SDK now supports .NET Standard 2.0 - which means it can still be used in .NET 6.0 projects.
+- We have updated the underlying OpenAPI generator to a newer version, which has caused some changes in the generated code. Below is a summary of the changes:
+
+| Old Name | New Name  | Affected Models |
+| -- | -- | -- |
+| _Nodes | VarNodes | Nodes (and related constructors/references) |
+| _Users | VarUsers | Users (and related constructors/references) |
+| _base | VarBase | Difference, UsersetTreeDifference |
+| _object | VarObject | CheckRequestTupleKey, ExpandRequestTupleKey, TupleKey, TupleKeyWithoutCondition, FgaObject, ObjectRelation, ReadRequestTupleKey, User |
+| _this | VarThis | Userset |
+| UNSPECIFIED | TYPENAMEUNSPECIFIED | TypeName (and other members in this enum) |
+
+| Old Enum Value | New Enum Value | Affected Enum |
+| -- | -- | -- |
+| WRITE | TUPLEOPERATIONWRITE | TupleOperation |
+| DELETE | TUPLEOPERATIONDELETE | TupleOperation |
+
 ## v0.6.0
 
 ### [0.6.0](https://github.com/openfga/dotnet-sdk/compare/v0.5.1...v0.6.0) (2025-09-30)
