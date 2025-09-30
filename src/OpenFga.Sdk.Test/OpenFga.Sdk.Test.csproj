@@ -25,12 +25,18 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <!-- Package references for .NET Framework 4.8 -->
+  <!-- Packages needed for .NET versions < .NET 8 -->
+  <ItemGroup Condition="'$(IsNet8OrGreater)' != 'true'">
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.9" />
+    <PackageReference Include="System.Net.Http.Json" Version="9.0.9" />
+    <PackageReference Include="System.Text.Json" Version="9.0.9" />
+  </ItemGroup>
+
+  <!-- .NET Framework 4.8 specific packages -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-    <PackageReference Include="System.Text.Json" Version="6.0.10" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
+    <PackageReference Include="System.Memory" Version="4.6.3" />
+    <Reference Include="System.Web" />
   </ItemGroup>
 
   <ItemGroup>
