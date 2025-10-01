@@ -61,7 +61,10 @@ public class BatchCheckSingleResponse : IEquatable<BatchCheckSingleResponse>, IV
 
         return Allowed == other.Allowed &&
                EqualityComparer<ClientCheckRequest>.Default.Equals(Request, other.Request) &&
-               EqualityComparer<Exception>.Default.Equals(Error, other.Error);
+               (ReferenceEquals(Error, other.Error) ||
+                (Error != null && other.Error != null &&
+                   Error.GetType() == other.Error.GetType() &&
+                   Error.Message == other.Error.Message));
     }
 
     /// <inheritdoc />
@@ -72,11 +75,23 @@ public class BatchCheckSingleResponse : IEquatable<BatchCheckSingleResponse>, IV
         return false;
     }
 
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
-        throw new NotImplementedException();
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        yield break;
+    }
 
     public override int GetHashCode() {
-        throw new NotImplementedException();
+        unchecked {
+            int hashCode = 9661;
+            hashCode = (hashCode * 9923) + Allowed.GetHashCode();
+            if (Request != null) {
+                hashCode = (hashCode * 9923) + Request.GetHashCode();
+            }
+            if (Error != null) {
+                hashCode = (hashCode * 9923) + Error.Message.GetHashCode();
+                hashCode = (hashCode * 9923) + Error.Message.GetHashCode();
+            }
+            return hashCode;
+        }
     }
 }
 
@@ -119,8 +134,9 @@ public class ClientBatchCheckClientResponse : IEquatable<ClientBatchCheckClientR
         return false;
     }
 
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
-        throw new NotImplementedException();
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        yield break;
+    }
 
     /// <summary>
     ///     Appends a response to the list of responses
@@ -129,6 +145,14 @@ public class ClientBatchCheckClientResponse : IEquatable<ClientBatchCheckClientR
     public void AppendResponse(BatchCheckSingleResponse response) => Responses.Add(response);
 
     public override int GetHashCode() {
-        throw new NotImplementedException();
+        unchecked {
+            int hashCode = 9661;
+            if (Responses != null) {
+                foreach (var response in Responses) {
+                    hashCode = (hashCode * 9923) + (response?.GetHashCode() ?? 0);
+                }
+            }
+            return hashCode;
+        }
     }
 }
