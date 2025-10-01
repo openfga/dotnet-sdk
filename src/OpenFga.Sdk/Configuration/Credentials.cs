@@ -1,4 +1,5 @@
 using OpenFga.Sdk.Exceptions;
+using System;
 using System.Runtime.Serialization;
 
 namespace OpenFga.Sdk.Configuration;

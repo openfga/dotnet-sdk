@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -35,7 +39,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="authorizationModelId">authorizationModelId (required).</param>
         /// <param name="assertions">assertions.</param>
-        public ReadAssertionsResponse(string authorizationModelId = default(string), List<Assertion> assertions = default(List<Assertion>)) {
+        public ReadAssertionsResponse(string authorizationModelId = default, List<Assertion> assertions = default) {
             // to ensure "authorizationModelId" is required (not null)
             if (authorizationModelId == null) {
                 throw new ArgumentNullException("authorizationModelId is a required property for ReadAssertionsResponse and cannot be null");
@@ -114,7 +118,7 @@ namespace OpenFga.Sdk.Model {
                     input.Assertions != null &&
                     this.Assertions.SequenceEqual(input.Assertions)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

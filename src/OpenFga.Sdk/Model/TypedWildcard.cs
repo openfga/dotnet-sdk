@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -34,7 +38,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="TypedWildcard" /> class.
         /// </summary>
         /// <param name="type">type (required).</param>
-        public TypedWildcard(string type = default(string)) {
+        public TypedWildcard(string type = default) {
             // to ensure "type" is required (not null)
             if (type == null) {
                 throw new ArgumentNullException("type is a required property for TypedWildcard and cannot be null");
@@ -98,7 +102,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Type != null &&
                     this.Type.Equals(input.Type))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

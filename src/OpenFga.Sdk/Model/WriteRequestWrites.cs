@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -63,7 +67,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tupleKeys">tupleKeys (required).</param>
         /// <param name="onDuplicate">On &#39;error&#39; ( or unspecified ), the API returns an error if an identical tuple already exists. On &#39;ignore&#39;, identical writes are treated as no-ops (matching on user, relation, object, and RelationshipCondition). (default to OnDuplicateEnum.Error).</param>
-        public WriteRequestWrites(List<TupleKey> tupleKeys = default(List<TupleKey>), OnDuplicateEnum? onDuplicate = OnDuplicateEnum.Error) {
+        public WriteRequestWrites(List<TupleKey> tupleKeys = default, OnDuplicateEnum? onDuplicate = OnDuplicateEnum.Error) {
             // to ensure "tupleKeys" is required (not null)
             if (tupleKeys == null) {
                 throw new ArgumentNullException("tupleKeys is a required property for WriteRequestWrites and cannot be null");
@@ -133,7 +137,7 @@ namespace OpenFga.Sdk.Model {
                     this.OnDuplicate == input.OnDuplicate ||
                     this.OnDuplicate.Equals(input.OnDuplicate)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -33,15 +37,15 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="AssertionTupleKey" /> class.
         /// </summary>
-        /// <param name="_object">_object (required).</param>
+        /// <param name="varObject">varObject (required).</param>
         /// <param name="relation">relation (required).</param>
         /// <param name="user">user (required).</param>
-        public AssertionTupleKey(string _object = default(string), string relation = default(string), string user = default(string)) {
-            // to ensure "_object" is required (not null)
-            if (_object == null) {
-                throw new ArgumentNullException("_object is a required property for AssertionTupleKey and cannot be null");
+        public AssertionTupleKey(string varObject = default, string relation = default, string user = default) {
+            // to ensure "varObject" is required (not null)
+            if (varObject == null) {
+                throw new ArgumentNullException("varObject is a required property for AssertionTupleKey and cannot be null");
             }
-            this.Object = _object;
+            this.Object = varObject;
             // to ensure "relation" is required (not null)
             if (relation == null) {
                 throw new ArgumentNullException("relation is a required property for AssertionTupleKey and cannot be null");
@@ -136,7 +140,7 @@ namespace OpenFga.Sdk.Model {
                     (this.User != null &&
                     this.User.Equals(input.User))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

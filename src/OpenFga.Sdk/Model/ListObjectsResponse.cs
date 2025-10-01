@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -34,7 +38,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ListObjectsResponse" /> class.
         /// </summary>
         /// <param name="objects">objects (required).</param>
-        public ListObjectsResponse(List<string> objects = default(List<string>)) {
+        public ListObjectsResponse(List<string> objects = default) {
             // to ensure "objects" is required (not null)
             if (objects == null) {
                 throw new ArgumentNullException("objects is a required property for ListObjectsResponse and cannot be null");
@@ -99,7 +103,7 @@ namespace OpenFga.Sdk.Model {
                     input.Objects != null &&
                     this.Objects.SequenceEqual(input.Objects)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

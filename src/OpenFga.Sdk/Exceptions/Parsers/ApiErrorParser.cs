@@ -11,8 +11,11 @@
 //
 
 
+using System;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace OpenFga.Sdk.Exceptions.Parsers;
 
@@ -45,11 +48,20 @@ public class ApiErrorParser {
         if (response == null || response?.Content == null)
             return null;
 
-        var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-        if (string.IsNullOrEmpty(content))
-            return null;
+        try {
+            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            if (string.IsNullOrEmpty(content))
+                return null;
 
-        return Parse(content);
+            return Parse(content);
+        }
+        catch (ObjectDisposedException) {
+            // .NET Framework 4.8 is having an error while testing where the content is disposed before it can be parsed.
+            return new ApiErrorParser {
+                Error = "Error Parsing Response Content",
+                Message = "HTTP response content was disposed before it could be read"
+            };
+        }
     }
 
     internal static ApiErrorParser Parse(string content) {

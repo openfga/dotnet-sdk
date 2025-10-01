@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -34,7 +38,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="BatchCheckResponse" /> class.
         /// </summary>
         /// <param name="result">map keys are the correlation_id values from the BatchCheckItems in the request.</param>
-        public BatchCheckResponse(Dictionary<string, BatchCheckSingleResult> result = default(Dictionary<string, BatchCheckSingleResult>)) {
+        public BatchCheckResponse(Dictionary<string, BatchCheckSingleResult> result = default) {
             this.Result = result;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -96,7 +100,7 @@ namespace OpenFga.Sdk.Model {
                     input.Result != null &&
                     this.Result.SequenceEqual(input.Result)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

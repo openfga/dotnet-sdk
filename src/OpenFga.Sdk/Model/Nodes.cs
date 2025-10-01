@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -33,23 +37,23 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="Nodes" /> class.
         /// </summary>
-        /// <param name="nodes">nodes (required).</param>
-        public Nodes(List<Node> nodes = default(List<Node>)) {
-            // to ensure "nodes" is required (not null)
-            if (nodes == null) {
-                throw new ArgumentNullException("nodes is a required property for Nodes and cannot be null");
+        /// <param name="varNodes">varNodes (required).</param>
+        public Nodes(List<Node> varNodes = default) {
+            // to ensure "varNodes" is required (not null)
+            if (varNodes == null) {
+                throw new ArgumentNullException("varNodes is a required property for Nodes and cannot be null");
             }
-            this._Nodes = nodes;
+            this.VarNodes = varNodes;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Gets or Sets _Nodes
+        /// Gets or Sets VarNodes
         /// </summary>
         [DataMember(Name = "nodes", IsRequired = true, EmitDefaultValue = false)]
         [JsonPropertyName("nodes")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public List<Node> _Nodes { get; set; }
+        public List<Node> VarNodes { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -94,12 +98,12 @@ namespace OpenFga.Sdk.Model {
             }
             return
                 (
-                    this._Nodes == input._Nodes ||
-                    this._Nodes != null &&
-                    input._Nodes != null &&
-                    this._Nodes.SequenceEqual(input._Nodes)
+                    this.VarNodes == input.VarNodes ||
+                    this.VarNodes != null &&
+                    input.VarNodes != null &&
+                    this.VarNodes.SequenceEqual(input.VarNodes)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>
@@ -110,8 +114,8 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = 9661;
-                if (this._Nodes != null) {
-                    hashCode = (hashCode * 9923) + this._Nodes.GetHashCode();
+                if (this.VarNodes != null) {
+                    hashCode = (hashCode * 9923) + this.VarNodes.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();

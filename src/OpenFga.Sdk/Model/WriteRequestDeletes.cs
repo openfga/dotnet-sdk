@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -63,7 +67,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tupleKeys">tupleKeys (required).</param>
         /// <param name="onMissing">On &#39;error&#39;, the API returns an error when deleting a tuple that does not exist. On &#39;ignore&#39;, deletes of non-existent tuples are treated as no-ops. (default to OnMissingEnum.Error).</param>
-        public WriteRequestDeletes(List<TupleKeyWithoutCondition> tupleKeys = default(List<TupleKeyWithoutCondition>), OnMissingEnum? onMissing = OnMissingEnum.Error) {
+        public WriteRequestDeletes(List<TupleKeyWithoutCondition> tupleKeys = default, OnMissingEnum? onMissing = OnMissingEnum.Error) {
             // to ensure "tupleKeys" is required (not null)
             if (tupleKeys == null) {
                 throw new ArgumentNullException("tupleKeys is a required property for WriteRequestDeletes and cannot be null");
@@ -133,7 +137,7 @@ namespace OpenFga.Sdk.Model {
                     this.OnMissing == input.OnMissing ||
                     this.OnMissing.Equals(input.OnMissing)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

@@ -2,82 +2,242 @@ name: Build, Test and Release
 
 on:
   merge_group:
-  push:
   pull_request:
-  workflow_dispatch:
+    branches:
+      - main
+  push:
+    branches:
+      - feat/dotnet-standard2.0
+    tags:
+      - 'v*'
+
+concurrency:
+  # Prevent duplicate publishes for the same ref (tag/branch) running concurrently
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
 
+env:
+  # Suppress .NET first-time experience and telemetry
+  # Source: https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-environment-variables
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+        framework: [ net6.0, net8.0, net9.0 ]
+        include:
+          # .NET4.8 requires Windows
+          - os: windows-latest
+            framework: net48
+          # .NET Core 3.1 is EOL, and is having libssl issues on Linux
+          # But we still want to test it - no support is promised
+          # It should still use .NET Standard 2.0
+          - os: windows-latest
+            framework: netcoreapp3.1
+          # Test current LTS against Mac and Windows too
+          - os: windows-latest
+            framework: net8.0
+          - os: macos-latest
+            framework: net8.0
 
+    name: Test ${{ matrix.framework }} on ${{ matrix.os }}
+    
     steps:
-      - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.2.2
+      - name: Checkout code
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.2.2
         with:
           fetch-depth: 0
 
-      - name: Setup .NET
+      - name: Setup .NET versions
         uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: |
+            3.1.x
+            6.0.x
+            8.0.x
+            9.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore OpenFga.Sdk.sln --verbosity minimal
 
-      - name: Build
-        run: dotnet build --no-restore
+      - name: Build SDK and test project
+        run: dotnet build --no-restore --configuration Release --verbosity minimal
 
-      - name: Test
-        run: dotnet test --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+      - name: Run tests for specific framework
+        run: dotnet test src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj --no-build --configuration Release --framework ${{ matrix.framework }} --verbosity normal --logger trx --results-directory TestResults/ --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - name: Upload test results
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
         with:
-          name: nuget-package
-          path: src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg
+          name: test-results-${{ matrix.os }}-${{ matrix.framework }}
+          path: TestResults/
+          retention-days: 7
 
       - name: Upload coverage to Codecov
+        # Only upload coverage from one matrix job to avoid conflicts
+        if: matrix.os == 'ubuntu-latest' && matrix.framework == 'net8.0'
         uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: openfga/dotnet-sdk
 
-  publish:
+  build-verification:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-test')
-    needs: [test]
+    name: Build Verification
+
+    permissions:
+      contents: read
 
     steps:
-      - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.2.2
+      - name: Checkout code
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET versions
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+        with:
+          dotnet-version: |
+            3.1.x
+            6.0.x
+            8.0.x
+            9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore OpenFga.Sdk.sln --verbosity minimal
+
+      - name: Build SDK for all target frameworks
+        run: dotnet build src/OpenFga.Sdk/OpenFga.Sdk.csproj --no-restore --configuration Release --verbosity normal
+
+      - name: Verify all framework outputs exist
+        run: |
+          echo "Checking build outputs..."
+          ls -la src/OpenFga.Sdk/bin/Release/
+
+          # Verify each framework was built successfully
+          frameworks=("netstandard2.0" "net48" "net8.0" "net9.0")
+          for framework in "${frameworks[@]}"; do
+            if [ -d "src/OpenFga.Sdk/bin/Release/${framework}" ]; then
+              echo "✅ ${framework} build output found"
+              ls -la "src/OpenFga.Sdk/bin/Release/${framework}/"
+            else
+              echo "❌ ${framework} build output missing"
+              exit 1
+            fi
+          done
+
+      - name: Upload SDK artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sdk-build-outputs
+          path: src/OpenFga.Sdk/bin/Release/
+          retention-days: 7
+
+  pack:
+    runs-on: ubuntu-latest
+    name: Pack NuGet
+    needs: [test, build-verification]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.2.2
         with:
           fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: |
+            3.1.x
+            6.0.x
+            8.0.x
+            9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore OpenFga.Sdk.sln --verbosity minimal
+
+      - name: Build
+        run: dotnet build src/OpenFga.Sdk/OpenFga.Sdk.csproj --no-restore --configuration Release -p:ContinuousIntegrationBuild=true --verbosity minimal
+
+      - name: Pack
+        # Produce both the primary NuGet package (.nupkg) and the symbol package (.snupkg)
+        run: |
+          dotnet pack src/OpenFga.Sdk/OpenFga.Sdk.csproj \
+            --no-build \
+            --configuration Release \
+            -p:ContinuousIntegrationBuild=true \
+            -p:IncludeSymbols=true \
+            -p:SymbolPackageFormat=snupkg \
+            -p:DebugType=portable \
+            -o artifact-pack
+
+      - name: List produced packages
+        run: ls -la artifact-pack
+
+      - name: Upload NuGet package artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: nuget-package
+          path: |
+            artifact-pack/*.nupkg
+            artifact-pack/*.snupkg
+          retention-days: 7
+
+  publish:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-test')
+    needs: [pack]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+        with:
+          dotnet-version: |
+            3.1.x
+            6.0.x
+            8.0.x
+            9.0.x
           source-url: https://api.nuget.org/v3/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
 
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
-
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - name: Download package artifact
+        uses: actions/download-artifact@9c19ed7fe5d278cd354c7dfd5d3b88589c7e2395 # v4.1.8
         with:
           name: nuget-package
-          path: src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg
+          path: ./dist
 
       - name: Publish
-        run: dotnet nuget push src/OpenFga.Sdk/bin/Release/OpenFga.Sdk.*.nupkg --api-key ${NUGET_AUTH_TOKEN}
+        run: |
+          echo "Publishing primary package (.nupkg)...";
+          dotnet nuget push dist/OpenFga.Sdk.*.nupkg --api-key ${NUGET_AUTH_TOKEN} --skip-duplicate --source https://api.nuget.org/v3/index.json
+          echo "Publishing symbol package (.snupkg)...";
+          dotnet nuget push dist/OpenFga.Sdk.*.snupkg --api-key ${NUGET_AUTH_TOKEN} --skip-duplicate --source https://api.nuget.org/v3/index.json || echo "No symbol package found or already published."
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
-
   create-release:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-test')

@@ -13,6 +13,7 @@
 
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Telemetry;
+using System.Collections.Generic;
 
 namespace OpenFga.Sdk.Configuration;
 

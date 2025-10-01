@@ -11,6 +11,8 @@
 //
 
 
+using System.Collections.Generic;
+
 namespace OpenFga.Sdk.Telemetry;
 
 /// <summary>

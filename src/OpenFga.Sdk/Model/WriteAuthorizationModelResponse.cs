@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -34,7 +38,7 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="WriteAuthorizationModelResponse" /> class.
         /// </summary>
         /// <param name="authorizationModelId">authorizationModelId (required).</param>
-        public WriteAuthorizationModelResponse(string authorizationModelId = default(string)) {
+        public WriteAuthorizationModelResponse(string authorizationModelId = default) {
             // to ensure "authorizationModelId" is required (not null)
             if (authorizationModelId == null) {
                 throw new ArgumentNullException("authorizationModelId is a required property for WriteAuthorizationModelResponse and cannot be null");
@@ -98,7 +102,7 @@ namespace OpenFga.Sdk.Model {
                     (this.AuthorizationModelId != null &&
                     this.AuthorizationModelId.Equals(input.AuthorizationModelId))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

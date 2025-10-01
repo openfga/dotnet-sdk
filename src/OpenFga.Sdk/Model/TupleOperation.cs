@@ -11,8 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -21,16 +27,16 @@ namespace OpenFga.Sdk.Model {
     [JsonConverter(typeof(JsonStringEnumMemberConverter<TupleOperation>))]
     public enum TupleOperation {
         /// <summary>
-        /// Enum WRITE for value: TUPLE_OPERATION_WRITE
+        /// Enum TUPLEOPERATIONWRITE for value: TUPLE_OPERATION_WRITE
         /// </summary>
         [EnumMember(Value = "TUPLE_OPERATION_WRITE")]
-        WRITE = 1,
+        TUPLEOPERATIONWRITE = 1,
 
         /// <summary>
-        /// Enum DELETE for value: TUPLE_OPERATION_DELETE
+        /// Enum TUPLEOPERATIONDELETE for value: TUPLE_OPERATION_DELETE
         /// </summary>
         [EnumMember(Value = "TUPLE_OPERATION_DELETE")]
-        DELETE = 2
+        TUPLEOPERATIONDELETE = 2
 
     }
 

@@ -13,7 +13,10 @@
 
 using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Configuration;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -185,17 +188,13 @@ public class Attributes {
 
     private static TagList AddRequestAttributes<T>(
         HashSet<string> enabledAttributes, string apiName, RequestBuilder<T> requestBuilder, TagList attributes) {
-        // var attributes = new TagList();
         if (enabledAttributes.Contains(TelemetryAttribute.RequestMethod)) {
             attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestMethod, apiName));
         }
 
         if (enabledAttributes.Contains(TelemetryAttribute.RequestStoreId) &&
-            requestBuilder.PathParameters.ContainsKey("store_id")) {
-            var storeId = requestBuilder.PathParameters.GetValueOrDefault("store_id");
-            if (!string.IsNullOrEmpty(storeId)) {
-                attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestStoreId, storeId));
-            }
+            requestBuilder.PathParameters.TryGetValue("store_id", out var storeId) && !string.IsNullOrEmpty(storeId)) {
+            attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestStoreId, storeId));
         }
 
         if (enabledAttributes.Contains(TelemetryAttribute.RequestModelId)) {
@@ -209,12 +208,12 @@ public class Attributes {
         RequestBuilder<T> requestBuilder, string apiName, TagList attributes) {
         string? modelId = null;
 
-        if (requestBuilder.PathParameters.ContainsKey("authorization_model_id")) {
-            modelId = requestBuilder.PathParameters.GetValueOrDefault("authorization_model_id");
+        if (requestBuilder.PathParameters.TryGetValue("authorization_model_id", out var authModelIdValue)) {
+            modelId = authModelIdValue;
         }
         else if (requestBuilder.PathTemplate == "/stores/{store_id}/authorization-models/{id}" &&
-                 requestBuilder.PathParameters.ContainsKey("id")) {
-            modelId = requestBuilder.PathParameters.GetValueOrDefault("id");
+            requestBuilder.PathParameters.TryGetValue("id", out var idValue)) {
+            modelId = idValue;
         }
 
         if (!string.IsNullOrEmpty(modelId)) {

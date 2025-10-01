@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -33,14 +37,14 @@ namespace OpenFga.Sdk.Model {
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersetTreeDifference" /> class.
         /// </summary>
-        /// <param name="_base">_base (required).</param>
+        /// <param name="varBase">varBase (required).</param>
         /// <param name="subtract">subtract (required).</param>
-        public UsersetTreeDifference(Node _base = default(Node), Node subtract = default(Node)) {
-            // to ensure "_base" is required (not null)
-            if (_base == null) {
-                throw new ArgumentNullException("_base is a required property for UsersetTreeDifference and cannot be null");
+        public UsersetTreeDifference(Node varBase = default, Node subtract = default) {
+            // to ensure "varBase" is required (not null)
+            if (varBase == null) {
+                throw new ArgumentNullException("varBase is a required property for UsersetTreeDifference and cannot be null");
             }
-            this.Base = _base;
+            this.Base = varBase;
             // to ensure "subtract" is required (not null)
             if (subtract == null) {
                 throw new ArgumentNullException("subtract is a required property for UsersetTreeDifference and cannot be null");
@@ -117,7 +121,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Subtract != null &&
                     this.Subtract.Equals(input.Subtract))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

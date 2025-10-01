@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -36,7 +40,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="typeDefinitions">typeDefinitions (required).</param>
         /// <param name="schemaVersion">schemaVersion (required).</param>
         /// <param name="conditions">conditions.</param>
-        public WriteAuthorizationModelRequest(List<TypeDefinition> typeDefinitions = default(List<TypeDefinition>), string schemaVersion = default(string), Dictionary<string, Condition> conditions = default(Dictionary<string, Condition>)) {
+        public WriteAuthorizationModelRequest(List<TypeDefinition> typeDefinitions = default, string schemaVersion = default, Dictionary<string, Condition> conditions = default) {
             // to ensure "typeDefinitions" is required (not null)
             if (typeDefinitions == null) {
                 throw new ArgumentNullException("typeDefinitions is a required property for WriteAuthorizationModelRequest and cannot be null");
@@ -134,7 +138,7 @@ namespace OpenFga.Sdk.Model {
                     input.Conditions != null &&
                     this.Conditions.SequenceEqual(input.Conditions)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

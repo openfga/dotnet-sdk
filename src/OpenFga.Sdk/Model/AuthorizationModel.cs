@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -37,7 +41,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="schemaVersion">schemaVersion (required).</param>
         /// <param name="typeDefinitions">typeDefinitions (required).</param>
         /// <param name="conditions">conditions.</param>
-        public AuthorizationModel(string id = default(string), string schemaVersion = default(string), List<TypeDefinition> typeDefinitions = default(List<TypeDefinition>), Dictionary<string, Condition> conditions = default(Dictionary<string, Condition>)) {
+        public AuthorizationModel(string id = default, string schemaVersion = default, List<TypeDefinition> typeDefinitions = default, Dictionary<string, Condition> conditions = default) {
             // to ensure "id" is required (not null)
             if (id == null) {
                 throw new ArgumentNullException("id is a required property for AuthorizationModel and cannot be null");
@@ -153,7 +157,7 @@ namespace OpenFga.Sdk.Model {
                     input.Conditions != null &&
                     this.Conditions.SequenceEqual(input.Conditions)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

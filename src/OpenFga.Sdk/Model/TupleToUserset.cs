@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -35,7 +39,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tupleset">tupleset (required).</param>
         /// <param name="computedUserset">computedUserset (required).</param>
-        public TupleToUserset(ObjectRelation tupleset = default(ObjectRelation), ObjectRelation computedUserset = default(ObjectRelation)) {
+        public TupleToUserset(ObjectRelation tupleset = default, ObjectRelation computedUserset = default) {
             // to ensure "tupleset" is required (not null)
             if (tupleset == null) {
                 throw new ArgumentNullException("tupleset is a required property for TupleToUserset and cannot be null");
@@ -117,7 +121,7 @@ namespace OpenFga.Sdk.Model {
                     (this.ComputedUserset != null &&
                     this.ComputedUserset.Equals(input.ComputedUserset))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

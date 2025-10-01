@@ -122,6 +122,7 @@ src/OpenFga.Sdk/ApiClient/Utils.cs
 src/OpenFga.Sdk/Client/ApiClient.cs
 src/OpenFga.Sdk/Client/Client.cs
 src/OpenFga.Sdk/Client/ClientConfiguration.cs
+src/OpenFga.Sdk/Client/Extensions/LinqExtensions.cs
 src/OpenFga.Sdk/Client/Model/AuthorizationModelIdOptions.cs
 src/OpenFga.Sdk/Client/Model/ClientBatchCheckOptions.cs
 src/OpenFga.Sdk/Client/Model/ClientBatchCheckResponse.cs

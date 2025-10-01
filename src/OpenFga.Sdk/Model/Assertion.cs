@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -37,7 +41,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="expectation">expectation (required).</param>
         /// <param name="contextualTuples">contextualTuples.</param>
         /// <param name="context">Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation..</param>
-        public Assertion(AssertionTupleKey tupleKey = default(AssertionTupleKey), bool expectation = default(bool), List<TupleKey> contextualTuples = default(List<TupleKey>), Object context = default(Object)) {
+        public Assertion(AssertionTupleKey tupleKey = default, bool expectation = default, List<TupleKey> contextualTuples = default, Object context = default) {
             // to ensure "tupleKey" is required (not null)
             if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for Assertion and cannot be null");
@@ -144,7 +148,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Context != null &&
                     this.Context.Equals(input.Context))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

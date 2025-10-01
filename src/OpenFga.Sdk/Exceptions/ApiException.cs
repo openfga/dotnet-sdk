@@ -11,8 +11,11 @@
 //
 
 
+using System;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 
 namespace OpenFga.Sdk.Exceptions;
 
@@ -63,11 +66,13 @@ public class ApiException : Exception {
             case HttpStatusCode.Forbidden:
                 return await FgaApiAuthenticationError.CreateAsync(response, request, apiName).ConfigureAwait(false);
             case HttpStatusCode.BadRequest:
-            case HttpStatusCode.UnprocessableEntity:
+            // For some reason .NET Framework 4.8 does not have an enum for 422 and 429
+            // See https://learn.microsoft.com/en-us/dotnet/api/system.net.httpstatuscode?view=netframework-4.8
+            case (HttpStatusCode)422:
                 return await FgaApiValidationError.CreateAsync(response, request, apiName).ConfigureAwait(false);
             case HttpStatusCode.NotFound:
                 return await FgaApiNotFoundError.CreateAsync(response, request, apiName).ConfigureAwait(false);
-            case HttpStatusCode.TooManyRequests:
+            case (HttpStatusCode)429:
                 return await FgaApiRateLimitExceededError.CreateAsync(response, request, apiName).ConfigureAwait(false);
             default:
                 if (statusCode >= HttpStatusCode.InternalServerError && statusCode != HttpStatusCode.NotImplemented) {

@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -35,7 +39,7 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="allowed">allowed.</param>
         /// <param name="error">error.</param>
-        public BatchCheckSingleResult(bool allowed = default(bool), CheckError error = default(CheckError)) {
+        public BatchCheckSingleResult(bool allowed = default, CheckError error = default) {
             this.Allowed = allowed;
             this.Error = error;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -108,7 +112,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Error != null &&
                     this.Error.Equals(input.Error))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

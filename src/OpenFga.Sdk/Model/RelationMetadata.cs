@@ -11,10 +11,14 @@
 //
 
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -36,7 +40,7 @@ namespace OpenFga.Sdk.Model {
         /// <param name="directlyRelatedUserTypes">directlyRelatedUserTypes.</param>
         /// <param name="module">module.</param>
         /// <param name="sourceInfo">sourceInfo.</param>
-        public RelationMetadata(List<RelationReference> directlyRelatedUserTypes = default(List<RelationReference>), string module = default(string), SourceInfo sourceInfo = default(SourceInfo)) {
+        public RelationMetadata(List<RelationReference> directlyRelatedUserTypes = default, string module = default, SourceInfo sourceInfo = default) {
             this.DirectlyRelatedUserTypes = directlyRelatedUserTypes;
             this.Module = module;
             this.SourceInfo = sourceInfo;
@@ -125,7 +129,7 @@ namespace OpenFga.Sdk.Model {
                     (this.SourceInfo != null &&
                     this.SourceInfo.Equals(input.SourceInfo))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && !this.AdditionalProperties.Except(input.AdditionalProperties).Any());
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
 
         /// <summary>

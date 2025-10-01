@@ -31,7 +31,7 @@ using Xunit;
 
 namespace OpenFga.Sdk.Test.Client;
 
-public class OpenFgaClientTests {
+public class OpenFgaClientTests : IDisposable {
     private readonly string _storeId;
     private readonly string _apiUrl = "https://api.fga.example";
     private readonly ClientConfiguration _config;
@@ -43,7 +43,7 @@ public class OpenFgaClientTests {
 
     private HttpResponseMessage GetCheckResponse(CheckResponse content, bool shouldRetry = false) {
         var response = new HttpResponseMessage() {
-            StatusCode = shouldRetry ? HttpStatusCode.TooManyRequests : HttpStatusCode.OK,
+            StatusCode = shouldRetry ? (HttpStatusCode)429 : HttpStatusCode.OK,
             Content = Utils.CreateJsonStringContent(content),
             Headers = { }
         };
@@ -57,7 +57,6 @@ public class OpenFgaClientTests {
         return response;
     }
 
-    [Fact]
     public void Dispose() {
         // Cleanup when everything is done.
     }
@@ -626,7 +625,7 @@ public class OpenFgaClientTests {
                         Relation = "viewer",
                         Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
                     },
-                    TupleOperation.WRITE, DateTime.Now),
+                    TupleOperation.TUPLEOPERATIONWRITE, DateTime.Now),
             },
             ContinuationToken =
                 "eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ=="
@@ -679,6 +678,7 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task ReadTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        string capturedContent = "";
         var expectedResponse = new ReadResponse() {
             Tuples = new List<Model.Tuple>() {
                 new(new TupleKey {
@@ -694,10 +694,12 @@ public class OpenFgaClientTests {
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
-                    req.Method == HttpMethod.Post &&
-                    req.Content.ReadAsStringAsync().Result.Contains("tuple")),
+                    req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             )
+            .Callback<HttpRequestMessage, CancellationToken>((req, token) => {
+                capturedContent = req.Content.ReadAsStringAsync().Result;
+            })
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.OK,
                 Content = Utils.CreateJsonStringContent(expectedResponse),
@@ -719,10 +721,11 @@ public class OpenFgaClientTests {
             Times.Exactly(1),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
-                req.Method == HttpMethod.Post &&
-                req.Content.ReadAsStringAsync().Result.Contains("tuple")),
+                req.Method == HttpMethod.Post),
             ItExpr.IsAny<CancellationToken>()
         );
+
+        Assert.Contains("tuple", capturedContent);
 
         Assert.IsType<ReadResponse>(response);
         Assert.Single(response.Tuples);
@@ -735,6 +738,7 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task ReadEmptyTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        string capturedContent = "";
         var expectedResponse = new ReadResponse() {
             Tuples = new List<Model.Tuple>() {
                 new(new TupleKey {
@@ -750,10 +754,12 @@ public class OpenFgaClientTests {
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
-                    req.Method == HttpMethod.Post &&
-                    !req.Content.ReadAsStringAsync().Result.Contains("tuple")),
+                    req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             )
+            .Callback<HttpRequestMessage, CancellationToken>((req, token) => {
+                capturedContent = req.Content.ReadAsStringAsync().Result;
+            })
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.OK,
                 Content = Utils.CreateJsonStringContent(expectedResponse),
@@ -771,10 +777,11 @@ public class OpenFgaClientTests {
             Times.Exactly(1),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/read") &&
-                req.Method == HttpMethod.Post &&
-                !req.Content.ReadAsStringAsync().Result.Contains("tuple")),
+                req.Method == HttpMethod.Post),
             ItExpr.IsAny<CancellationToken>()
         );
+
+        Assert.DoesNotContain("tuple", capturedContent);
 
         Assert.IsType<ReadResponse>(response);
         Assert.Single(response.Tuples);
@@ -1060,15 +1067,22 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task CheckWithConsistencyTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        string capturedContent = null;
+
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                    req.Method == HttpMethod.Post &&
-                    req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
+                    req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             )
+            .Callback<HttpRequestMessage, CancellationToken>((request, token) => {
+                // Eagerly read the content before disposal
+                if (request.Content != null) {
+                    capturedContent = request.Content.ReadAsStringAsync().Result;
+                }
+            })
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.OK,
                 Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
@@ -1104,10 +1118,12 @@ public class OpenFgaClientTests {
             Times.Exactly(1),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                req.Method == HttpMethod.Post &&
-                req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
+                req.Method == HttpMethod.Post),
             ItExpr.IsAny<CancellationToken>()
         );
+
+        // Verify the captured content contains the expected consistency setting
+        Assert.Contains("MINIMIZE_LATENCY", capturedContent);
 
         Assert.IsType<CheckResponse>(response);
         Assert.True(response.Allowed);
@@ -1118,43 +1134,49 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task BatchCheckTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        string capturedContent = null;
+        int callCounter = 0;
+
         mockHandler.Protected()
-            .SetupSequence<Task<HttpResponseMessage>>(
+            .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                    req.Method == HttpMethod.Post &&
-                    req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
+                    req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             )
-            .Returns(Task.Run(async () => {
-                await Task.Delay(500);
-                return new HttpResponseMessage() {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+            .Callback<HttpRequestMessage, CancellationToken>((request, token) => {
+                // Eagerly read the content before disposal
+                if (request.Content != null) {
+                    capturedContent = request.Content.ReadAsStringAsync().Result;
+                }
+            })
+            .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
+                callCounter++;
+                return callCounter switch {
+                    1 or 3 => Task.Run(async () => {
+                        await Task.Delay(500);
+                        return new HttpResponseMessage() {
+                            StatusCode = HttpStatusCode.OK,
+                            Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                        };
+                    }),
+                    2 => Task.Run(async () => {
+                        await Task.Delay(500);
+                        return new HttpResponseMessage() {
+                            StatusCode = HttpStatusCode.OK,
+                            Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
+                        };
+                    }),
+                    _ => Task.Run(async () => {
+                        await Task.Delay(500);
+                        return new HttpResponseMessage() {
+                            StatusCode = HttpStatusCode.NotFound,
+                            Content = Utils.CreateJsonStringContent(new Object { }),
+                        };
+                    })
                 };
-            }))
-            .Returns(Task.Run(async () => {
-                await Task.Delay(500);
-                return new HttpResponseMessage() {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
-                };
-            }))
-            .Returns(Task.Run(async () => {
-                await Task.Delay(500);
-                return new HttpResponseMessage() {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
-                };
-            }))
-            .Returns(Task.Run(async () => {
-                await Task.Delay(500);
-                return new HttpResponseMessage() {
-                    StatusCode = HttpStatusCode.NotFound,
-                    Content = Utils.CreateJsonStringContent(new Object { }),
-                };
-            }));
+            });
 
         var httpClient = new HttpClient(mockHandler.Object);
         var fgaClient = new OpenFgaClient(_config, httpClient);
@@ -1205,16 +1227,18 @@ public class OpenFgaClientTests {
             Times.Exactly(4),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                req.Method == HttpMethod.Post &&
-                req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
+                req.Method == HttpMethod.Post),
             ItExpr.IsAny<CancellationToken>()
         );
+
+        // Verify the captured content contains the expected consistency setting
+        Assert.Contains("HIGHER_CONSISTENCY", capturedContent);
 
         Assert.IsType<ClientBatchCheckClientResponse>(response);
 
         var allowedResponses = response.Responses.FindAll(res => res.Allowed);
         Assert.Equal(2, allowedResponses.Count);
-        var notAllowedResponses = response.Responses.FindAll(res => res.Allowed == false);
+        var notAllowedResponses = response.Responses.FindAll(res => !res.Allowed);
         Assert.Equal(2, notAllowedResponses.Count);
         var failedResponses = response.Responses.FindAll(res => res.Error != null);
         Assert.Single(failedResponses);
@@ -1226,6 +1250,7 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task ExpandTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        string capturedContent = "";
 
         var jsonResponse =
             "{\"tree\":{\"root\":{\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"union\":{\"nodes\":[{\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"leaf\":{\"users\":{\"users\":[\"team:product#member\"]}}}, {\"name\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"leaf\":{\"tupleToUserset\":{\"tupleset\":\"document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner\", \"computed\":[{\"userset\":\"org:contoso#admin\"}]}}}]}}}}";
@@ -1234,10 +1259,12 @@ public class OpenFgaClientTests {
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/expand") &&
-                    req.Method == HttpMethod.Post &&
-                    req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
+                    req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             )
+            .Callback<HttpRequestMessage, CancellationToken>((req, token) => {
+                capturedContent = req.Content.ReadAsStringAsync().Result;
+            })
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(jsonResponse, Encoding.UTF8, "application/json"),
@@ -1267,11 +1294,12 @@ public class OpenFgaClientTests {
             Times.Exactly(1),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/expand") &&
-                req.Method == HttpMethod.Post &&
-                req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY") &&
-                req.Content.ReadAsStringAsync().Result.Contains("user:81684243-9356-4421-8fbf-a4f8d36aa31b")),
+                req.Method == HttpMethod.Post),
             ItExpr.IsAny<CancellationToken>()
         );
+
+        Assert.Contains("HIGHER_CONSISTENCY", capturedContent);
+        Assert.Contains("user:81684243-9356-4421-8fbf-a4f8d36aa31b", capturedContent);
 
         Assert.IsType<ExpandResponse>(response);
         ExpandResponse expectedResponse = JsonSerializer.Deserialize<ExpandResponse>(jsonResponse);
@@ -1288,24 +1316,24 @@ public class OpenFgaClientTests {
             tree: new UsersetTree(
                 root: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a1#owner",
                     union: new Nodes(
-                        nodes: new List<Node>() {
+                        varNodes: new List<Node>() {
                             new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a2#owner",
-                                leaf: new Leaf(users: new Users(users: new List<string>() {"team:product#member"}))),
+                                leaf: new Leaf(users: new Users(varUsers: new List<string>() {"team:product#member"}))),
                             new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a3#owner",
                                 leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(
                                     tupleset: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#owner",
                                     computed: new List<Computed>() {new Computed(userset: "org:contoso#admin")}))),
                         }),
                     difference: new UsersetTreeDifference(
-                        _base: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a3#owner",
-                            leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" }))),
+                        varBase: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a3#owner",
+                            leaf: new Leaf(users: new Users(varUsers: new List<string>() { "team:product#member" }))),
                         subtract: new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a4#owner",
-                            leaf: new Leaf(users: new Users(users: new List<string>() { "team:product#member" })))
+                            leaf: new Leaf(users: new Users(varUsers: new List<string>() { "team:product#member" })))
                     ),
                     intersection: new Nodes(
-                        nodes: new List<Node>() {
+                        varNodes: new List<Node>() {
                             new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a5#owner",
-                                leaf: new Leaf(users: new Users(users: new List<string>() {"team:product#commentor"}))),
+                                leaf: new Leaf(users: new Users(varUsers: new List<string>() {"team:product#commentor"}))),
                             new Node(name: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a6#owner",
                                 leaf: new Leaf(tupleToUserset: new UsersetTreeTupleToUserset(
                                     tupleset: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a#viewer",
@@ -1357,15 +1385,22 @@ public class OpenFgaClientTests {
     public async Task ListObjectsTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         var expectedResponse = new ListObjectsResponse { Objects = new List<string> { "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a" } };
+        string capturedContent = null;
+
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/list-objects") &&
-                    req.Method == HttpMethod.Post &&
-                    req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
+                    req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             )
+            .Callback<HttpRequestMessage, CancellationToken>((request, token) => {
+                // Eagerly read the content before disposal
+                if (request.Content != null) {
+                    capturedContent = request.Content.ReadAsStringAsync().Result;
+                }
+            })
             .ReturnsAsync(new HttpResponseMessage() {
                 StatusCode = HttpStatusCode.OK,
                 Content = Utils.CreateJsonStringContent(expectedResponse),
@@ -1401,10 +1436,12 @@ public class OpenFgaClientTests {
             Times.Exactly(1),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/list-objects") &&
-                req.Method == HttpMethod.Post &&
-                req.Content.ReadAsStringAsync().Result.Contains("HIGHER_CONSISTENCY")),
+                req.Method == HttpMethod.Post),
             ItExpr.IsAny<CancellationToken>()
         );
+
+        // Verify the captured content contains the expected consistency setting
+        Assert.Contains("HIGHER_CONSISTENCY", capturedContent);
 
         Assert.IsType<ListObjectsResponse>(response);
         Assert.Single(response.Objects);
@@ -1417,30 +1454,39 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task ListRelationsTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        string capturedContent = null;
+        int callCounter = 0;
+
         mockHandler.Protected()
-            .SetupSequence<Task<HttpResponseMessage>>(
+            .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                    req.Method == HttpMethod.Post &&
-                    req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
+                    req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             )
-            .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+            .Callback<HttpRequestMessage, CancellationToken>((request, token) => {
+                // Eagerly read the content before disposal
+                if (request.Content != null) {
+                    capturedContent = request.Content.ReadAsStringAsync().Result;
+                }
             })
-            .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
-            })
-            .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
-            })
-            .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
+            .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
+                callCounter++;
+                return callCounter switch {
+                    1 or 3 => Task.FromResult(new HttpResponseMessage() {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                    }),
+                    2 or 4 => Task.FromResult(new HttpResponseMessage() {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
+                    }),
+                    _ => Task.FromResult(new HttpResponseMessage() {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Content = Utils.CreateJsonStringContent(new Object { }),
+                    })
+                };
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -1467,10 +1513,12 @@ public class OpenFgaClientTests {
             Times.Exactly(4),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                req.Method == HttpMethod.Post &&
-                req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
+                req.Method == HttpMethod.Post),
             ItExpr.IsAny<CancellationToken>()
         );
+
+        // Verify the captured content contains the expected consistency setting
+        Assert.Contains("MINIMIZE_LATENCY", capturedContent);
 
         Assert.IsType<ListRelationsResponse>(response);
         Assert.Equal(2, response.Relations.Count);
@@ -1484,30 +1532,39 @@ public class OpenFgaClientTests {
     [Fact]
     public async Task ListRelationsRelationNotFoundTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        string capturedContent = null;
+        int callCounter = 0;
+
         mockHandler.Protected()
-            .SetupSequence<Task<HttpResponseMessage>>(
+            .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                    req.Method == HttpMethod.Post &&
-                    req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
+                    req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             )
-            .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+            .Callback<HttpRequestMessage, CancellationToken>((request, token) => {
+                // Eagerly read the content before disposal
+                if (request.Content != null) {
+                    capturedContent = request.Content.ReadAsStringAsync().Result;
+                }
             })
-            .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
-            })
-            .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
-            })
-            .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.NotFound,
-                Content = Utils.CreateJsonStringContent(new Object { }),
+            .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
+                callCounter++;
+                return callCounter switch {
+                    1 or 3 => Task.FromResult(new HttpResponseMessage() {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                    }),
+                    2 => Task.FromResult(new HttpResponseMessage() {
+                        StatusCode = HttpStatusCode.OK,
+                        Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
+                    }),
+                    _ => Task.FromResult(new HttpResponseMessage() {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Content = Utils.CreateJsonStringContent(new Object { }),
+                    })
+                };
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
@@ -1535,10 +1592,12 @@ public class OpenFgaClientTests {
             Times.Exactly(4),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/check") &&
-                req.Method == HttpMethod.Post &&
-                req.Content.ReadAsStringAsync().Result.Contains("MINIMIZE_LATENCY")),
+                req.Method == HttpMethod.Post),
             ItExpr.IsAny<CancellationToken>()
         );
+
+        // Verify the captured content contains the expected consistency setting
+        Assert.Contains("MINIMIZE_LATENCY", capturedContent);
     }
 
     /// <summary>
