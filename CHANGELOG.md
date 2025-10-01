@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.6.0...HEAD)
 
+## v0.7.0
+
+### [0.7.0](https://github.com/openfga/dotnet-sdk/compare/v0.6.0...v0.7.0) (2025-10-01)
 - feat!: add support for .NET Standard 2.0, .NET 8.0 and .NET 9.0
 
 [!WARNING]
