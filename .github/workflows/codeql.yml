@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '34 10 * * 0'
 
+permissions:
+  contents: read
+
 jobs:
   analyze:
     name: Analyze (csharp)
@@ -21,11 +24,11 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@64d10c13136e1c5bce3e5fbde8d4906eeaafc885 # v3.30.6
       with:
         languages: csharp
         build-mode: manual
@@ -37,6 +40,6 @@ jobs:
         dotnet build
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@64d10c13136e1c5bce3e5fbde8d4906eeaafc885 # v3.30.6
       with:
         category: "/language:csharp"
