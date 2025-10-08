@@ -11,6 +11,8 @@
 //
 
 
+using System.Collections.Generic;
+
 namespace OpenFga.Sdk.Client.Model;
 
 /// <summary>
@@ -65,4 +67,7 @@ public class ClientWriteOptions : IClientWriteOptions {
 
     /// <inheritdoc />
     public ITransactionOpts Transaction { get; set; }
+
+    /// <inheritdoc />
+    public IDictionary<string, string>? Headers { get; set; }
 }

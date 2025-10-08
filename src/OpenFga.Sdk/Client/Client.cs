@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using OpenFga.Sdk.Api;
+using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Client.Model;
 #if NETSTANDARD2_0 || NET48
 using OpenFga.Sdk.Client.Extensions;
@@ -64,6 +65,17 @@ public class OpenFgaClient : IDisposable {
 
     public void Dispose() => api.Dispose();
 
+    /// <summary>
+    ///     Extracts and validates headers from options object implementing ClientRequestOptions interface
+    /// </summary>
+    /// <param name="options">Options object that may implement ClientRequestOptions</param>
+    /// <returns>Headers dictionary if present, otherwise null</returns>
+    /// <exception cref="ArgumentException">Thrown when headers contain invalid data</exception>
+    private static IDictionary<string, string>? ExtractHeaders(object? options) {
+        var headers = (options as ClientRequestOptions)?.Headers;
+        ClientConfiguration.ValidateHeaders(headers, "options.Headers");
+        return headers;
+    }
 
 #if NET6_0_OR_GREATER
     private async Task ProcessWriteChunksAsync<T>(
@@ -134,7 +146,7 @@ public class OpenFgaClient : IDisposable {
         ClientWriteOptions clientWriteOpts,
         int maxParallelReqs,
         CancellationToken cancellationToken) {
-        
+
         using (var throttler = new SemaphoreSlim(maxParallelReqs)) {
             var tasks = chunks.Select(async chunk => {
                 await throttler.WaitAsync(cancellationToken);
@@ -175,7 +187,7 @@ public class OpenFgaClient : IDisposable {
         IClientBatchCheckOptions? options,
         int maxParallelReqs,
         CancellationToken cancellationToken) {
-        
+
         using (var throttler = new SemaphoreSlim(maxParallelReqs)) {
             var tasks = requests.Select(async request => {
                 await throttler.WaitAsync(cancellationToken);
@@ -233,7 +245,7 @@ public class OpenFgaClient : IDisposable {
    */
     public async Task<ListStoresResponse> ListStores(IClientListStoresRequest? body, IClientListStoresOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ListStores(options?.PageSize, options?.ContinuationToken, body?.Name, cancellationToken);
+        await api.ListStores(options?.PageSize, options?.ContinuationToken, body?.Name, ExtractHeaders(options), cancellationToken);
 
     /**
    * CreateStore - Initialize a store
@@ -241,19 +253,19 @@ public class OpenFgaClient : IDisposable {
     public async Task<CreateStoreResponse> CreateStore(ClientCreateStoreRequest body,
         ClientRequestOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.CreateStore(body, cancellationToken);
+        await api.CreateStore(body, options?.Headers, cancellationToken);
 
     /**
    * GetStore - Get information about the current store
    */
     public async Task<GetStoreResponse> GetStore(IClientRequestOptionsWithStoreId? options = default, CancellationToken cancellationToken = default) =>
-        await api.GetStore(GetStoreId(options), cancellationToken);
+        await api.GetStore(GetStoreId(options), ExtractHeaders(options), cancellationToken);
 
     /**
    * DeleteStore - Delete a store
    */
     public async Task DeleteStore(IClientRequestOptionsWithStoreId? options = default, CancellationToken cancellationToken = default) =>
-        await api.DeleteStore(GetStoreId(options), cancellationToken);
+        await api.DeleteStore(GetStoreId(options), ExtractHeaders(options), cancellationToken);
 
     /************************
      * Authorization Models *
@@ -265,7 +277,7 @@ public class OpenFgaClient : IDisposable {
     public async Task<ReadAuthorizationModelsResponse> ReadAuthorizationModels(
         IClientReadAuthorizationModelsOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ReadAuthorizationModels(GetStoreId(options), options?.PageSize, options?.ContinuationToken, cancellationToken);
+        await api.ReadAuthorizationModels(GetStoreId(options), options?.PageSize, options?.ContinuationToken, ExtractHeaders(options), cancellationToken);
 
     /**
      * WriteAuthorizationModel - Create a new version of the authorization model
@@ -273,7 +285,7 @@ public class OpenFgaClient : IDisposable {
     public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(ClientWriteAuthorizationModelRequest body,
         IClientRequestOptionsWithStoreId? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.WriteAuthorizationModel(GetStoreId(options), body, cancellationToken);
+        await api.WriteAuthorizationModel(GetStoreId(options), body, ExtractHeaders(options), cancellationToken);
 
     /**
      * ReadAuthorizationModel - Read the current authorization model
@@ -286,7 +298,7 @@ public class OpenFgaClient : IDisposable {
             throw new FgaRequiredParamError("ClientConfiguration", "AuthorizationModelId");
         }
 
-        return await api.ReadAuthorizationModel(GetStoreId(options), authorizationModelId, cancellationToken);
+        return await api.ReadAuthorizationModel(GetStoreId(options), authorizationModelId, ExtractHeaders(options), cancellationToken);
     }
 
     /**
@@ -296,7 +308,7 @@ public class OpenFgaClient : IDisposable {
         IClientRequestOptionsWithAuthZModelId? options = default,
         CancellationToken cancellationToken = default) {
         var response =
-            await ReadAuthorizationModels(new ClientReadAuthorizationModelsOptions { StoreId = options?.StoreId, PageSize = 1 }, cancellationToken);
+            await ReadAuthorizationModels(new ClientReadAuthorizationModelsOptions { StoreId = options?.StoreId, PageSize = 1, Headers = ExtractHeaders(options) }, cancellationToken);
 
         if (response.AuthorizationModels.Count > 0) {
             return new ReadAuthorizationModelResponse { AuthorizationModel = response.AuthorizationModels?[0] };
@@ -315,7 +327,7 @@ public class OpenFgaClient : IDisposable {
     public async Task<ReadChangesResponse> ReadChanges(ClientReadChangesRequest? body = default,
         ClientReadChangesOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ReadChanges(GetStoreId(options), body?.Type, options?.PageSize, options?.ContinuationToken, body?.StartTime, cancellationToken);
+        await api.ReadChanges(GetStoreId(options), body?.Type, options?.PageSize, options?.ContinuationToken, body?.StartTime, ExtractHeaders(options), cancellationToken);
 
     /**
      * Read - Read tuples previously written to the store (does not evaluate)
@@ -333,7 +345,7 @@ public class OpenFgaClient : IDisposable {
                 PageSize = options?.PageSize,
                 ContinuationToken = options?.ContinuationToken,
                 Consistency = options?.Consistency,
-            }, cancellationToken);
+            }, ExtractHeaders(options), cancellationToken);
     }
 
     /**
@@ -359,7 +371,7 @@ public class OpenFgaClient : IDisposable {
                 requestBody.Deletes = new WriteRequestDeletes(body.Deletes.ConvertAll(key => key.ToTupleKeyWithoutCondition()));
             }
 
-            await api.Write(GetStoreId(options), requestBody, cancellationToken);
+            await api.Write(GetStoreId(options), requestBody, ExtractHeaders(options), cancellationToken);
             return new ClientWriteResponse {
                 Writes =
                     body.Writes?.ConvertAll(tupleKey =>
@@ -372,7 +384,7 @@ public class OpenFgaClient : IDisposable {
             };
         }
 
-        var clientWriteOpts = new ClientWriteOptions() { StoreId = StoreId, AuthorizationModelId = authorizationModelId };
+        var clientWriteOpts = new ClientWriteOptions() { StoreId = StoreId, AuthorizationModelId = authorizationModelId, Headers = ExtractHeaders(options) };
 
         var writeChunks = body.Writes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKey[]>();
         var writeResponses = new ConcurrentBag<ClientWriteSingleResponse>();
@@ -435,7 +447,7 @@ public class OpenFgaClient : IDisposable {
                 Context = body.Context,
                 AuthorizationModelId = GetAuthorizationModelId(options),
                 Consistency = options?.Consistency,
-            }, cancellationToken);
+            }, ExtractHeaders(options), cancellationToken);
 
     /**
    * BatchCheck - Run a set of checks (evaluates)
@@ -469,7 +481,7 @@ public class OpenFgaClient : IDisposable {
                     },
                 AuthorizationModelId = GetAuthorizationModelId(options),
                 Consistency = options?.Consistency
-            }, cancellationToken);
+            }, ExtractHeaders(options), cancellationToken);
 
     /**
      * ListObjects - List the objects of a particular type that the user has a certain relation to (evaluates)
@@ -489,7 +501,7 @@ public class OpenFgaClient : IDisposable {
             Context = body.Context,
             AuthorizationModelId = GetAuthorizationModelId(options),
             Consistency = options?.Consistency,
-        }, cancellationToken);
+        }, ExtractHeaders(options), cancellationToken);
 
 
     /**
@@ -546,7 +558,7 @@ public class OpenFgaClient : IDisposable {
             Context = body.Context,
             AuthorizationModelId = GetAuthorizationModelId(options),
             Consistency = options?.Consistency
-        });
+        }, ExtractHeaders(options), cancellationToken);
 
     /**************
      * Assertions *
@@ -562,7 +574,7 @@ public class OpenFgaClient : IDisposable {
             throw new FgaRequiredParamError("ClientConfiguration", "AuthorizationModelId");
         }
 
-        return await api.ReadAssertions(GetStoreId(options), authorizationModelId, cancellationToken);
+        return await api.ReadAssertions(GetStoreId(options), authorizationModelId, ExtractHeaders(options), cancellationToken);
     }
 
     /**
@@ -591,6 +603,6 @@ public class OpenFgaClient : IDisposable {
         }
 
         await api.WriteAssertions(GetStoreId(options), authorizationModelId,
-            new WriteAssertionsRequest { Assertions = assertions }, cancellationToken);
+            new WriteAssertionsRequest { Assertions = assertions }, ExtractHeaders(options), cancellationToken);
     }
 }

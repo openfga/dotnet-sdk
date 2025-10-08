@@ -73,27 +73,27 @@ public class ApiClient : IDisposable {
     /// </summary>
     /// <param name="requestBuilder"></param>
     /// <param name="apiName"></param>
+    /// <param name="perRequestHeaders"></param>
     /// <param name="cancellationToken"></param>
     /// <typeparam name="T">Response Type</typeparam>
     /// <returns></returns>
     /// <exception cref="FgaApiAuthenticationError"></exception>
     public async Task<TRes> SendRequestAsync<TReq, TRes>(RequestBuilder<TReq> requestBuilder, string apiName,
+        IDictionary<string, string>? perRequestHeaders = null,
         CancellationToken cancellationToken = default) {
-        IDictionary<string, string> additionalHeaders = new Dictionary<string, string>();
-
         var sw = Stopwatch.StartNew();
+
+        string? oauthToken = null;
         if (_oauth2Client != null) {
             try {
-                var token = await _oauth2Client.GetAccessTokenAsync();
-
-                if (!string.IsNullOrEmpty(token)) {
-                    additionalHeaders["Authorization"] = $"Bearer {token}";
-                }
+                oauthToken = await _oauth2Client.GetAccessTokenAsync();
             }
             catch (ApiException e) {
                 throw new FgaApiAuthenticationError("Invalid Client Credentials", apiName, e);
             }
         }
+
+        var additionalHeaders = BuildHeaders(oauthToken, perRequestHeaders);
 
         var response = await Retry(async () =>
             await _baseClient.SendRequestAsync<TReq, TRes>(requestBuilder, additionalHeaders, apiName,
@@ -112,25 +112,25 @@ public class ApiClient : IDisposable {
     /// </summary>
     /// <param name="requestBuilder"></param>
     /// <param name="apiName"></param>
+    /// <param name="perRequestHeaders"></param>
     /// <param name="cancellationToken"></param>
     /// <exception cref="FgaApiAuthenticationError"></exception>
     public async Task SendRequestAsync<TReq>(RequestBuilder<TReq> requestBuilder, string apiName,
+        IDictionary<string, string>? perRequestHeaders = null,
         CancellationToken cancellationToken = default) {
-        IDictionary<string, string> additionalHeaders = new Dictionary<string, string>();
-
         var sw = Stopwatch.StartNew();
+
+        string? oauthToken = null;
         if (_oauth2Client != null) {
             try {
-                var token = await _oauth2Client.GetAccessTokenAsync();
-
-                if (!string.IsNullOrEmpty(token)) {
-                    additionalHeaders["Authorization"] = $"Bearer {token}";
-                }
+                oauthToken = await _oauth2Client.GetAccessTokenAsync();
             }
             catch (ApiException e) {
                 throw new FgaApiAuthenticationError("Invalid Client Credentials", apiName, e);
             }
         }
+
+        var additionalHeaders = BuildHeaders(oauthToken, perRequestHeaders);
 
         var response = await Retry(async () =>
             await _baseClient.SendRequestAsync<TReq, object>(requestBuilder, additionalHeaders, apiName,
@@ -175,6 +175,34 @@ public class ApiClient : IDisposable {
                 await Task.Delay(waitInMs);
             }
         }
+    }
+
+    /// <summary>
+    ///     Builds the complete headers dictionary by merging OAuth token and per-request headers
+    /// </summary>
+    /// <param name="oauthToken">OAuth access token if available</param>
+    /// <param name="perRequestHeaders">Per-request custom headers</param>
+    /// <returns>Merged headers dictionary or null if no headers to add</returns>
+    private static IDictionary<string, string>? BuildHeaders(string? oauthToken, IDictionary<string, string>? perRequestHeaders) {
+        if (string.IsNullOrEmpty(oauthToken) && perRequestHeaders == null) {
+            return null;
+        }
+
+        var headers = new Dictionary<string, string>();
+
+        // Add OAuth token header if present
+        if (!string.IsNullOrEmpty(oauthToken)) {
+            headers["Authorization"] = $"Bearer {oauthToken}";
+        }
+
+        // Merge per-request headers (these take precedence)
+        if (perRequestHeaders != null) {
+            foreach (var header in perRequestHeaders) {
+                headers[header.Key] = header.Value;
+            }
+        }
+
+        return headers;
     }
 
     public void Dispose() => _baseClient.Dispose();

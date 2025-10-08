@@ -46,9 +46,10 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of BatchCheckResponse</returns>
-    public async Task<BatchCheckResponse> BatchCheck(string storeId, BatchCheckRequest body, CancellationToken cancellationToken = default) {
+    public async Task<BatchCheckResponse> BatchCheck(string storeId, BatchCheckRequest body, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("BatchCheck", "StoreId");
@@ -69,7 +70,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<BatchCheckRequest, BatchCheckResponse>(requestBuilder,
-            "BatchCheck", cancellationToken);
+            "BatchCheck", headers, cancellationToken);
     }
 
     /// <summary>
@@ -78,9 +79,10 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of CheckResponse</returns>
-    public async Task<CheckResponse> Check(string storeId, CheckRequest body, CancellationToken cancellationToken = default) {
+    public async Task<CheckResponse> Check(string storeId, CheckRequest body, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("Check", "StoreId");
@@ -101,7 +103,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<CheckRequest, CheckResponse>(requestBuilder,
-            "Check", cancellationToken);
+            "Check", headers, cancellationToken);
     }
 
     /// <summary>
@@ -109,9 +111,10 @@ public class OpenFgaApi : IDisposable {
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="body"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of CreateStoreResponse</returns>
-    public async Task<CreateStoreResponse> CreateStore(CreateStoreRequest body, CancellationToken cancellationToken = default) {
+    public async Task<CreateStoreResponse> CreateStore(CreateStoreRequest body, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
 
         var queryParams = new Dictionary<string, string>();
@@ -126,7 +129,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<CreateStoreRequest, CreateStoreResponse>(requestBuilder,
-            "CreateStore", cancellationToken);
+            "CreateStore", headers, cancellationToken);
     }
 
     /// <summary>
@@ -134,9 +137,10 @@ public class OpenFgaApi : IDisposable {
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of void</returns>
-    public async Task DeleteStore(string storeId, CancellationToken cancellationToken = default) {
+    public async Task DeleteStore(string storeId, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("DeleteStore", "StoreId");
@@ -156,7 +160,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         await _apiClient.SendRequestAsync(requestBuilder,
-            "DeleteStore", cancellationToken);
+            "DeleteStore", headers, cancellationToken);
     }
 
     /// <summary>
@@ -165,9 +169,10 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ExpandResponse</returns>
-    public async Task<ExpandResponse> Expand(string storeId, ExpandRequest body, CancellationToken cancellationToken = default) {
+    public async Task<ExpandResponse> Expand(string storeId, ExpandRequest body, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("Expand", "StoreId");
@@ -188,7 +193,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<ExpandRequest, ExpandResponse>(requestBuilder,
-            "Expand", cancellationToken);
+            "Expand", headers, cancellationToken);
     }
 
     /// <summary>
@@ -196,9 +201,10 @@ public class OpenFgaApi : IDisposable {
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of GetStoreResponse</returns>
-    public async Task<GetStoreResponse> GetStore(string storeId, CancellationToken cancellationToken = default) {
+    public async Task<GetStoreResponse> GetStore(string storeId, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("GetStore", "StoreId");
@@ -218,7 +224,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, GetStoreResponse>(requestBuilder,
-            "GetStore", cancellationToken);
+            "GetStore", headers, cancellationToken);
     }
 
     /// <summary>
@@ -227,9 +233,10 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ListObjectsResponse</returns>
-    public async Task<ListObjectsResponse> ListObjects(string storeId, ListObjectsRequest body, CancellationToken cancellationToken = default) {
+    public async Task<ListObjectsResponse> ListObjects(string storeId, ListObjectsRequest body, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("ListObjects", "StoreId");
@@ -250,7 +257,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<ListObjectsRequest, ListObjectsResponse>(requestBuilder,
-            "ListObjects", cancellationToken);
+            "ListObjects", headers, cancellationToken);
     }
 
     /// <summary>
@@ -260,9 +267,10 @@ public class OpenFgaApi : IDisposable {
     /// <param name="pageSize"> (optional)</param>
     /// <param name="continuationToken"> (optional)</param>
     /// <param name="name">The name parameter instructs the API to only include results that match that name.Multiple results may be returned. Only exact matches will be returned; substring matches and regexes will not be evaluated (optional)</param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ListStoresResponse</returns>
-    public async Task<ListStoresResponse> ListStores(int? pageSize = default(int?), string? continuationToken = default(string?), string? name = default(string?), CancellationToken cancellationToken = default) {
+    public async Task<ListStoresResponse> ListStores(int? pageSize = default(int?), string? continuationToken = default(string?), string? name = default(string?), IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
 
         var queryParams = new Dictionary<string, string>();
@@ -285,7 +293,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, ListStoresResponse>(requestBuilder,
-            "ListStores", cancellationToken);
+            "ListStores", headers, cancellationToken);
     }
 
     /// <summary>
@@ -294,9 +302,10 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ListUsersResponse</returns>
-    public async Task<ListUsersResponse> ListUsers(string storeId, ListUsersRequest body, CancellationToken cancellationToken = default) {
+    public async Task<ListUsersResponse> ListUsers(string storeId, ListUsersRequest body, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("ListUsers", "StoreId");
@@ -317,7 +326,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<ListUsersRequest, ListUsersResponse>(requestBuilder,
-            "ListUsers", cancellationToken);
+            "ListUsers", headers, cancellationToken);
     }
 
     /// <summary>
@@ -326,9 +335,10 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ReadResponse</returns>
-    public async Task<ReadResponse> Read(string storeId, ReadRequest body, CancellationToken cancellationToken = default) {
+    public async Task<ReadResponse> Read(string storeId, ReadRequest body, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("Read", "StoreId");
@@ -349,7 +359,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<ReadRequest, ReadResponse>(requestBuilder,
-            "Read", cancellationToken);
+            "Read", headers, cancellationToken);
     }
 
     /// <summary>
@@ -358,9 +368,10 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="authorizationModelId"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ReadAssertionsResponse</returns>
-    public async Task<ReadAssertionsResponse> ReadAssertions(string storeId, string authorizationModelId, CancellationToken cancellationToken = default) {
+    public async Task<ReadAssertionsResponse> ReadAssertions(string storeId, string authorizationModelId, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("ReadAssertions", "StoreId");
@@ -383,7 +394,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, ReadAssertionsResponse>(requestBuilder,
-            "ReadAssertions", cancellationToken);
+            "ReadAssertions", headers, cancellationToken);
     }
 
     /// <summary>
@@ -392,9 +403,10 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="id"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ReadAuthorizationModelResponse</returns>
-    public async Task<ReadAuthorizationModelResponse> ReadAuthorizationModel(string storeId, string id, CancellationToken cancellationToken = default) {
+    public async Task<ReadAuthorizationModelResponse> ReadAuthorizationModel(string storeId, string id, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("ReadAuthorizationModel", "StoreId");
@@ -417,7 +429,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, ReadAuthorizationModelResponse>(requestBuilder,
-            "ReadAuthorizationModel", cancellationToken);
+            "ReadAuthorizationModel", headers, cancellationToken);
     }
 
     /// <summary>
@@ -427,9 +439,10 @@ public class OpenFgaApi : IDisposable {
     /// <param name="storeId"></param>
     /// <param name="pageSize"> (optional)</param>
     /// <param name="continuationToken"> (optional)</param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ReadAuthorizationModelsResponse</returns>
-    public async Task<ReadAuthorizationModelsResponse> ReadAuthorizationModels(string storeId, int? pageSize = default(int?), string? continuationToken = default(string?), CancellationToken cancellationToken = default) {
+    public async Task<ReadAuthorizationModelsResponse> ReadAuthorizationModels(string storeId, int? pageSize = default(int?), string? continuationToken = default(string?), IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("ReadAuthorizationModels", "StoreId");
@@ -455,7 +468,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, ReadAuthorizationModelsResponse>(requestBuilder,
-            "ReadAuthorizationModels", cancellationToken);
+            "ReadAuthorizationModels", headers, cancellationToken);
     }
 
     /// <summary>
@@ -467,9 +480,10 @@ public class OpenFgaApi : IDisposable {
     /// <param name="pageSize"> (optional)</param>
     /// <param name="continuationToken"> (optional)</param>
     /// <param name="startTime">Start date and time of changes to read. Format: ISO 8601 timestamp (e.g., 2022-01-01T00:00:00Z) If a continuation_token is provided along side start_time, the continuation_token will take precedence over start_time. (optional)</param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ReadChangesResponse</returns>
-    public async Task<ReadChangesResponse> ReadChanges(string storeId, string? type = default(string?), int? pageSize = default(int?), string? continuationToken = default(string?), DateTime? startTime = default(DateTime?), CancellationToken cancellationToken = default) {
+    public async Task<ReadChangesResponse> ReadChanges(string storeId, string? type = default(string?), int? pageSize = default(int?), string? continuationToken = default(string?), DateTime? startTime = default(DateTime?), IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("ReadChanges", "StoreId");
@@ -502,7 +516,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, ReadChangesResponse>(requestBuilder,
-            "ReadChanges", cancellationToken);
+            "ReadChanges", headers, cancellationToken);
     }
 
     /// <summary>
@@ -511,9 +525,10 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of Object</returns>
-    public async Task<Object> Write(string storeId, WriteRequest body, CancellationToken cancellationToken = default) {
+    public async Task<Object> Write(string storeId, WriteRequest body, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("Write", "StoreId");
@@ -534,7 +549,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<WriteRequest, Object>(requestBuilder,
-            "Write", cancellationToken);
+            "Write", headers, cancellationToken);
     }
 
     /// <summary>
@@ -544,9 +559,10 @@ public class OpenFgaApi : IDisposable {
     /// <param name="storeId"></param>
     /// <param name="authorizationModelId"></param>
     /// <param name="body"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of void</returns>
-    public async Task WriteAssertions(string storeId, string authorizationModelId, WriteAssertionsRequest body, CancellationToken cancellationToken = default) {
+    public async Task WriteAssertions(string storeId, string authorizationModelId, WriteAssertionsRequest body, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("WriteAssertions", "StoreId");
@@ -570,7 +586,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         await _apiClient.SendRequestAsync(requestBuilder,
-            "WriteAssertions", cancellationToken);
+            "WriteAssertions", headers, cancellationToken);
     }
 
     /// <summary>
@@ -579,9 +595,10 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
+    /// <param name="headers"></param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of WriteAuthorizationModelResponse</returns>
-    public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(string storeId, WriteAuthorizationModelRequest body, CancellationToken cancellationToken = default) {
+    public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(string storeId, WriteAuthorizationModelRequest body, IDictionary<string, string>? headers = null, CancellationToken cancellationToken = default) {
         var pathParams = new Dictionary<string, string> { };
         if (string.IsNullOrWhiteSpace(storeId)) {
             throw new FgaRequiredParamError("WriteAuthorizationModel", "StoreId");
@@ -602,7 +619,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<WriteAuthorizationModelRequest, WriteAuthorizationModelResponse>(requestBuilder,
-            "WriteAuthorizationModel", cancellationToken);
+            "WriteAuthorizationModel", headers, cancellationToken);
     }
 
 
