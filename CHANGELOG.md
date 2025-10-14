@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.6.0...HEAD)
+## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.7.0...HEAD)
 
 ## v0.7.0
 

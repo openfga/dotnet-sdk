@@ -46,7 +46,7 @@ namespace OpenFga.Sdk.Client.Extensions {
                 do {
                     chunk.Add(enumerator.Current);
                 } while (chunk.Count < size && enumerator.MoveNext());
-                    
+
                 yield return chunk.ToArray();
             }
         }

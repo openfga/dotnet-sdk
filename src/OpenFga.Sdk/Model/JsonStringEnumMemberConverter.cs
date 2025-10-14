@@ -34,7 +34,7 @@ public class JsonStringEnumMemberConverter<EnumTemplate> : JsonConverter<EnumTem
 	/// </summary>
     public JsonStringEnumMemberConverter() {
         var type = typeof(EnumTemplate);
-        var values = (EnumTemplate[])Enum.GetValues(type);;
+        var values = (EnumTemplate[])Enum.GetValues(type);
 
         foreach (var value in values) {
             var enumMember = type.GetMember(value.ToString())[0];
