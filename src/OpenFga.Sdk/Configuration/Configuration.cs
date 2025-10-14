@@ -1,16 +1,4 @@
-//
-// OpenFGA/.NET SDK for OpenFGA
-//
-// API version: 1.x
-// Website: https://openfga.dev
-// Documentation: https://openfga.dev/docs
-// Support: https://openfga.dev/community
-// License: [Apache-2.0](https://github.com/openfga/dotnet-sdk/blob/main/LICENSE)
-//
-// NOTE: This file was auto generated. DO NOT EDIT.
-//
-
-
+using OpenFga.Sdk.Constants;
 using OpenFga.Sdk.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -31,7 +19,7 @@ public class Configuration {
         DefaultHeaders ??= new Dictionary<string, string>();
 
         if (!DefaultHeaders.ContainsKey("User-Agent")) {
-            DefaultHeaders.Add("User-Agent", DefaultUserAgent);
+            DefaultHeaders.Add("User-Agent", FgaConstants.UserAgent);
         }
     }
 
@@ -117,8 +105,8 @@ public class Configuration {
                 $"Configuration.ApiUrl ({ApiUrl ?? BasePath}) does not form a valid URI ({BasePath})");
         }
 
-        if (MaxRetry > 15) {
-            throw new FgaValidationError("Configuration.MaxRetry exceeds maximum allowed limit of 15");
+        if (MaxRetry > FgaConstants.RetryMaxAllowedNumber) {
+            throw new FgaValidationError($"Configuration.MaxRetry exceeds maximum allowed limit of {FgaConstants.RetryMaxAllowedNumber}");
         }
 
         // Validate that DefaultHeaders don't contain reserved headers
@@ -136,9 +124,9 @@ public class Configuration {
     ///     Version of the package.
     /// </summary>
     /// <value>Version of the package.</value>
-    public const string Version = "0.8.0";
+    public const string Version = FgaConstants.SdkVersion;
 
-    private const string DefaultUserAgent = "openfga-sdk dotnet/0.8.0";
+    private const string DefaultUserAgent = FgaConstants.UserAgent;
 
     #endregion Constants
 
@@ -211,13 +199,13 @@ public class Configuration {
     ///     Max number of times to retry after a request is rate limited
     /// </summary>
     /// <value>MaxRetry</value>
-    public int MaxRetry { get; set; } = 3;
+    public int MaxRetry { get; set; } = FgaConstants.DefaultMaxRetry;
 
     /// <summary>
     ///     Minimum time in ms to wait before retrying
     /// </summary>
     /// <value>MinWaitInMs</value>
-    public int MinWaitInMs { get; set; } = 100;
+    public int MinWaitInMs { get; set; } = FgaConstants.DefaultMinWaitInMs;
 
     /// <summary>
     ///     Gets or sets the telemetry configuration.

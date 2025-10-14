@@ -1,18 +1,6 @@
-//
-// OpenFGA/.NET SDK for OpenFGA
-//
-// API version: 1.x
-// Website: https://openfga.dev
-// Documentation: https://openfga.dev/docs
-// Support: https://openfga.dev/community
-// License: [Apache-2.0](https://github.com/openfga/dotnet-sdk/blob/main/LICENSE)
-//
-// NOTE: This file was auto generated. DO NOT EDIT.
-//
-
-
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
+using OpenFga.Sdk.Constants;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Telemetry;
 using System;
@@ -30,10 +18,10 @@ namespace OpenFga.Sdk.ApiClient;
 ///     OAuth2 Client to exchange the credentials for an access token using the client credentials flow
 /// </summary>
 public class OAuth2Client {
-    private const int TOKEN_EXPIRY_BUFFER_THRESHOLD_IN_SEC = 300;
+    private const int TOKEN_EXPIRY_BUFFER_THRESHOLD_IN_SEC = FgaConstants.TokenExpiryThresholdBufferInSec;
 
     private const int
-        TOKEN_EXPIRY_JITTER_IN_SEC = 300; // We add some jitter so that token refreshes are less likely to collide
+        TOKEN_EXPIRY_JITTER_IN_SEC = FgaConstants.TokenExpiryJitterInSec; // We add some jitter so that token refreshes are less likely to collide
 
     private static readonly Random _random = new();
     private readonly Metrics metrics;

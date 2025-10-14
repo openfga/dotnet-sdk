@@ -11,6 +11,7 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -18,7 +19,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -164,21 +164,21 @@ namespace OpenFga.Sdk.Model {
         public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
-                int hashCode = 9661;
+                int hashCode = FgaConstants.HashCodeBasePrimeNumber;
                 if (this.Name != null) {
-                    hashCode = (hashCode * 9923) + this.Name.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Name.GetHashCode();
                 }
                 if (this.Expression != null) {
-                    hashCode = (hashCode * 9923) + this.Expression.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Expression.GetHashCode();
                 }
                 if (this.Parameters != null) {
-                    hashCode = (hashCode * 9923) + this.Parameters.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Parameters.GetHashCode();
                 }
                 if (this.Metadata != null) {
-                    hashCode = (hashCode * 9923) + this.Metadata.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Metadata.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
-                    hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
             }

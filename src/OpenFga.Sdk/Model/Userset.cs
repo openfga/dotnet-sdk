@@ -11,6 +11,7 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -18,7 +19,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
@@ -184,27 +184,27 @@ namespace OpenFga.Sdk.Model {
         public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
-                int hashCode = 9661;
+                int hashCode = FgaConstants.HashCodeBasePrimeNumber;
                 if (this.This != null) {
-                    hashCode = (hashCode * 9923) + this.This.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.This.GetHashCode();
                 }
                 if (this.ComputedUserset != null) {
-                    hashCode = (hashCode * 9923) + this.ComputedUserset.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.ComputedUserset.GetHashCode();
                 }
                 if (this.TupleToUserset != null) {
-                    hashCode = (hashCode * 9923) + this.TupleToUserset.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.TupleToUserset.GetHashCode();
                 }
                 if (this.Union != null) {
-                    hashCode = (hashCode * 9923) + this.Union.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Union.GetHashCode();
                 }
                 if (this.Intersection != null) {
-                    hashCode = (hashCode * 9923) + this.Intersection.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Intersection.GetHashCode();
                 }
                 if (this.Difference != null) {
-                    hashCode = (hashCode * 9923) + this.Difference.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Difference.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
-                    hashCode = (hashCode * 9923) + this.AdditionalProperties.GetHashCode();
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
             }
