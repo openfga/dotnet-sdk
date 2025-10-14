@@ -178,24 +178,46 @@ public class ApiClient : IDisposable {
     }
 
     /// <summary>
-    ///     Builds the complete headers dictionary by merging OAuth token and per-request headers
+    ///     Builds the complete headers dictionary by merging OAuth token and per-request headers.
+    ///     Validates per-request headers and performs case-insensitive merging.
     /// </summary>
     /// <param name="oauthToken">OAuth access token if available</param>
     /// <param name="perRequestHeaders">Per-request custom headers</param>
     /// <returns>Merged headers dictionary or null if no headers to add</returns>
+    /// <exception cref="ArgumentException">Thrown when header key is null, empty, or whitespace</exception>
+    /// <exception cref="ArgumentNullException">Thrown when header value is null</exception>
     private static IDictionary<string, string>? BuildHeaders(string? oauthToken, IDictionary<string, string>? perRequestHeaders) {
-        if (string.IsNullOrEmpty(oauthToken) && perRequestHeaders == null) {
+        // Validate per-request headers at the client boundary
+        if (perRequestHeaders != null) {
+            foreach (var header in perRequestHeaders) {
+                if (string.IsNullOrWhiteSpace(header.Key)) {
+                    throw new ArgumentException(
+                        "Header name cannot be null, empty, or whitespace.",
+                        nameof(perRequestHeaders));
+                }
+
+                if (header.Value == null) {
+                    throw new ArgumentNullException(
+                        nameof(perRequestHeaders),
+                        $"Header '{header.Key}' has a null value. Header values cannot be null.");
+                }
+            }
+        }
+
+        // Return null if no headers to add
+        if (string.IsNullOrEmpty(oauthToken) && (perRequestHeaders == null || perRequestHeaders.Count == 0)) {
             return null;
         }
 
-        var headers = new Dictionary<string, string>();
+        // Use case-insensitive dictionary for proper header merging
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        // Add OAuth token header if present
+        // Add OAuth token header first
         if (!string.IsNullOrEmpty(oauthToken)) {
             headers["Authorization"] = $"Bearer {oauthToken}";
         }
 
-        // Merge per-request headers (these take precedence)
+        // Overlay per-request headers (these take precedence regardless of casing)
         if (perRequestHeaders != null) {
             foreach (var header in perRequestHeaders) {
                 headers[header.Key] = header.Value;
