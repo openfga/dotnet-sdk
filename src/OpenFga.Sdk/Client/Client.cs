@@ -553,8 +553,7 @@ public class OpenFgaClient : IDisposable {
             Object = body.Object,
             Relation = body.Relation,
             UserFilters = body.UserFilters,
-            ContextualTuples = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ??
-                                new List<TupleKey>(),
+            ContextualTuples = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ?? new List<TupleKey>(),
             Context = body.Context,
             AuthorizationModelId = GetAuthorizationModelId(options),
             Consistency = options?.Consistency
