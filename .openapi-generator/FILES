@@ -12,6 +12,7 @@ LICENSE
 OpenFga.Sdk.sln
 OpenTelemetry.md
 README.md
+SUPPORTED_FRAMEWORKS.md
 VERSION.txt
 assets/FGAIcon.png
 docs/AbortedMessageResponse.md
