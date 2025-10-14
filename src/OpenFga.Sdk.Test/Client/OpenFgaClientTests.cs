@@ -2659,16 +2659,16 @@ public class OpenFgaClientTests : IDisposable {
 
         // Verify per-request header overrides default
         Assert.NotNull(sentHeaders);
-        Assert.True(sentHeaders.ContainsKey("X-Override-Test"));
-        Assert.Equal("per-request-value", sentHeaders["X-Override-Test"].First());
+        Assert.True(sentHeaders.TryGetValue("X-Override-Test", out var headerOverride));
+        Assert.Equal("per-request-value", headerOverride.First());
 
         // Verify per-request-only header is present
-        Assert.True(sentHeaders.ContainsKey("X-Per-Request-Only"));
-        Assert.Equal("per-request-only-value", sentHeaders["X-Per-Request-Only"].First());
+        Assert.True(sentHeaders.TryGetValue("X-Per-Request-Only", out var headerPerRequestOnly));
+        Assert.Equal("per-request-only-value", headerPerRequestOnly.First());
 
         // Verify default header is still present when not overridden
-        Assert.True(sentHeaders.ContainsKey("X-Default-Header"));
-        Assert.Equal("default-value", sentHeaders["X-Default-Header"].First());
+        Assert.True(sentHeaders.TryGetValue("X-Default-Header", out var headerDefault));
+        Assert.Equal("default-value", headerDefault.First());
     }
 
     /// <summary>
