@@ -11,6 +11,8 @@
 //
 
 
+using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
