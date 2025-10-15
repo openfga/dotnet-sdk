@@ -1,3 +1,4 @@
+using OpenFga.Sdk.Constants;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Linq;
@@ -36,9 +37,9 @@ public class TelemetryHistograms {
     /// <param name="response">The HTTP response message.</param>
     /// <param name="attributes">The attributes associated with the telemetry data.</param>
     public void RecordQueryDuration(HttpResponseMessage response, TagList attributes) {
-        if (response.Headers.Contains("fga-query-duration-ms") &&
-            response.Headers.GetValues("fga-query-duration-ms").Any()) {
-            var durationHeader = response.Headers.GetValues("fga-query-duration-ms").First();
+        if (response.Headers.Contains(FgaConstants.QueryDurationHeaderName) &&
+            response.Headers.GetValues(FgaConstants.QueryDurationHeaderName).Any()) {
+            var durationHeader = response.Headers.GetValues(FgaConstants.QueryDurationHeaderName).First();
             if (!string.IsNullOrEmpty(durationHeader) && float.TryParse(durationHeader, out var durationFloat)) {
                 QueryDurationHistogram?.Record(durationFloat, attributes);
             }

@@ -13,64 +13,144 @@
 
 namespace OpenFga.Sdk.Constants;
 
+/// <summary>
+/// Centralized constants for the OpenFGA .NET SDK.
+/// </summary>
 public static class FgaConstants {
-    // SdkVersion is the version of this service
+    /// <summary>
+    /// Version of the OpenFGA .NET SDK.
+    /// </summary>
     public const string SdkVersion = "0.8.0";
 
-    // UserAgent is the user agent used in HTTP requests
+    /// <summary>
+    /// User agent used in HTTP requests.
+    /// </summary>
     public const string UserAgent = "openfga-sdk dotnet/0.8.0";
 
-    // SampleBaseDomain is the sample API Domain
-    public const string SampleBaseDomain = "fga.example";
+    /// <summary>
+    /// Example API domain for documentation/tests.
+    /// </summary>
+    public static readonly string SampleBaseDomain = "fga.example";
 
-    // RetryMaxAllowedNumber is the maximum allowed number of retries for HTTP requests
+    /// <summary>
+    /// API URL used for tests.
+    /// </summary>
+    public static readonly string TestApiUrl = "https://api." + SampleBaseDomain;
+
+    /// <summary>
+    /// API Token Issuer URL used for tests.
+    /// </summary>
+    public static readonly string TestIssuerUrl = "https://issuer." + SampleBaseDomain;
+
+    /// <summary>
+    /// Default API URL.
+    /// </summary>
+    public static readonly string DefaultApiUrl = "http://localhost:8080";
+
+    // Retry configuration
+
+    /// <summary>
+    /// Maximum allowed number of retries for HTTP requests.
+    /// </summary>
     public const int RetryMaxAllowedNumber = 15;
 
-    // DefaultMaxRetry is the default maximum number of retries for HTTP requests
+    /// <summary>
+    /// Default maximum number of retries for HTTP requests.
+    /// </summary>
     public const int DefaultMaxRetry = 3;
 
-    // DefaultMinWaitInMs is the default minimum wait time between retries in milliseconds
+    /// <summary>
+    /// Default minimum wait time between retries in milliseconds.
+    /// </summary>
     public const int DefaultMinWaitInMs = 100;
 
-    // MaxBackoffTimeInSec is the maximum backoff time in seconds
+    /// <summary>
+    /// Maximum backoff time in seconds.
+    /// </summary>
     public const int MaxBackoffTimeInSec = 120;
 
-    // RetryHeaderMaxAllowableDurationInSec is the maximum allowable duration for retry headers in seconds
+    /// <summary>
+    /// Maximum allowable duration for retry headers in seconds.
+    /// </summary>
     public const int RetryHeaderMaxAllowableDurationInSec = 1800;
 
-    // ClientMaxMethodParallelRequests is the maximum number of parallel requests for a single method
+    /// <summary>
+    /// Standard HTTP header for retry-after.
+    /// </summary>
+    public static readonly string RetryAfterHeaderName = "Retry-After";
+
+    /// <summary>
+    /// Rate limit reset header name.
+    /// </summary>
+    public static readonly string RateLimitResetHeaderName = "X-RateLimit-Reset";
+
+    /// <summary>
+    /// Alternative rate limit reset header name.
+    /// </summary>
+    public static readonly string RateLimitResetAltHeaderName = "X-Rate-Limit-Reset";
+
+    // Client methods
+
+    /// <summary>
+    /// Maximum number of parallel requests for a single method.
+    /// </summary>
     public const int ClientMaxMethodParallelRequests = 10;
 
-    // ClientMaxBatchSize is the maximum batch size for batch requests
+    /// <summary>
+    /// Maximum batch size for batch requests.
+    /// </summary>
     public const int ClientMaxBatchSize = 50;
 
-    // DefaultConnectionTimeoutInMs is the default connection timeout in milliseconds
+    /// <summary>
+    /// Header used to identify the client method.
+    /// </summary>
+    public static readonly string ClientMethodHeader = "X-OpenFGA-Client-Method";
+
+    /// <summary>
+    /// Header used to identify bulk requests.
+    /// </summary>
+    public static readonly string ClientBulkRequestIdHeader = "X-OpenFGA-Client-Bulk-Request-Id";
+
+    // Connection options
+
+    /// <summary>
+    /// Default timeout for HTTP requests in milliseconds.
+    /// </summary>
+    public const int DefaultRequestTimeoutInMs = 10000;
+
+    /// <summary>
+    /// Default connection timeout in milliseconds.
+    /// </summary>
     public const int DefaultConnectionTimeoutInMs = 10000;
 
-    // TokenExpiryThresholdBufferInSec is the buffer time in seconds before token expiry to consider it expired
+    // Token management
+
+    /// <summary>
+    /// Buffer time in seconds before token expiry to consider it expired.
+    /// </summary>
     public const int TokenExpiryThresholdBufferInSec = 300;
 
-    // TokenExpiryJitterInSec is the jitter time in seconds to add randomness to token expiry checks
+    /// <summary>
+    /// Jitter time in seconds to add randomness to token expiry checks.
+    /// </summary>
     public const int TokenExpiryJitterInSec = 300;
 
-    // ClientMethodHeader is the header used to identify the client method
-    public const string ClientMethodHeader = "X-OpenFGA-Client-Method";
+    // FGA Response Headers
 
-    // ClientBulkRequestIdHeader is the header used to identify bulk request IDs
-    public const string ClientBulkRequestIdHeader = "X-OpenFGA-Client-Bulk-Request-Id";
+    /// <summary>
+    /// Response header name for query duration in milliseconds.
+    /// </summary>
+    public static readonly string QueryDurationHeaderName = "fga-query-duration-ms";
 
-    // RetryAfterHeaderName is the standard HTTP header for retry after
-    public const string RetryAfterHeaderName = "Retry-After";
+    // .NET Specific constants
 
-    // RateLimitResetHeaderName is a common header for rate limit reset time
-    public const string RateLimitResetHeaderName = "X-RateLimit-Reset";
-
-    // RateLimitResetAltHeaderName is an alternative header for rate limit reset time
-    public const string RateLimitResetAltHeaderName = "X-Rate-Limit-Reset";
-
-    // HashCodeBasePrimeNumber is a prime number used as a base in hash code calculations
+    /// <summary>
+    /// Prime number used as a base in hash code calculations.
+    /// </summary>
     public const int HashCodeBasePrimeNumber = 9661;
 
-    // HashCodeMultiplierPrimeNumber is a prime number used as a multiplier in hash code calculations
+    /// <summary>
+    /// Prime number used as a multiplier in hash code calculations.
+    /// </summary>
     public const int HashCodeMultiplierPrimeNumber = 9923;
 }
