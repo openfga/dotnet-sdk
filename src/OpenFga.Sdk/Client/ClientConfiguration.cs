@@ -114,7 +114,12 @@ public class ClientConfiguration : Configuration.Configuration {
         "Content-Length",
         "Host",
         "Accept",
-        "Accept-Encoding"
+        "Accept-Encoding",
+        "Transfer-Encoding",
+        "Connection",
+        "Cookie",
+        "Set-Cookie",
+        "Date"
     };
 
     /// <summary>
