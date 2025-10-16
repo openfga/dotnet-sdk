@@ -167,6 +167,16 @@ public class OpenFgaClientTests : IDisposable {
     [InlineData("accept", "application/xml")]
     [InlineData("Accept-Encoding", "gzip")]
     [InlineData("accept-encoding", "gzip")]
+    [InlineData("Transfer-Encoding", "chunked")]
+    [InlineData("transfer-encoding", "chunked")]
+    [InlineData("Connection", "close")]
+    [InlineData("connection", "close")]
+    [InlineData("Cookie", "sessionid=abc123")]
+    [InlineData("cookie", "sessionid=abc123")]
+    [InlineData("Set-Cookie", "sessionid=abc123")]
+    [InlineData("set-cookie", "sessionid=abc123")]
+    [InlineData("Date", "Mon, 01 Jan 2024 00:00:00 GMT")]
+    [InlineData("date", "Mon, 01 Jan 2024 00:00:00 GMT")]
     public void EnsureValid_WithReservedDefaultHeader_ShouldThrowArgumentException(string headerName, string headerValue) {
         var config = new ClientConfiguration {
             ApiUrl = _apiUrl,
