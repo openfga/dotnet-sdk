@@ -21,10 +21,6 @@ namespace OpenFga.Sdk.Client;
 public class OpenFgaClient : IDisposable {
     private readonly ClientConfiguration _configuration;
     protected OpenFgaApi api;
-    private string CLIENT_BULK_REQUEST_ID_HEADER = FgaConstants.ClientBulkRequestIdHeader;
-    private string CLIENT_METHOD_HEADER = FgaConstants.ClientMethodHeader;
-
-    private readonly int DEFAULT_MAX_METHOD_PARALLEL_REQS = FgaConstants.ClientMaxMethodParallelRequests;
 
     public OpenFgaClient(
         ClientConfiguration configuration,
@@ -347,7 +343,7 @@ public class OpenFgaClient : IDisposable {
             options?.Transaction?.MaxPerChunk ??
             1; // 1 has to be the default otherwise the chunks will be sent in transactions
         var maxParallelReqs =
-            options?.Transaction?.MaxParallelRequests ?? DEFAULT_MAX_METHOD_PARALLEL_REQS;
+            options?.Transaction?.MaxParallelRequests ?? FgaConstants.ClientMaxMethodParallelRequests;
         var authorizationModelId = GetAuthorizationModelId(options);
 
         if (options?.Transaction?.Disable != true) {
@@ -458,7 +454,7 @@ public class OpenFgaClient : IDisposable {
         CancellationToken cancellationToken = default) {
         var responses = new ConcurrentBag<BatchCheckSingleResponse>();
 
-        var maxParallelReqs = options?.MaxParallelRequests ?? DEFAULT_MAX_METHOD_PARALLEL_REQS;
+        var maxParallelReqs = options?.MaxParallelRequests ?? FgaConstants.ClientMaxMethodParallelRequests;
 
         await ProcessCheckRequestsAsync(body, responses, options, maxParallelReqs, cancellationToken);
 
