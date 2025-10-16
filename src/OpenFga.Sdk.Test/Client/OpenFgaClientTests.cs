@@ -2182,6 +2182,490 @@ public class OpenFgaClientTests : IDisposable {
     }
 
     /// <summary>
+    /// Test Write with OnDuplicateWrites = Ignore
+    /// </summary>
+    [Fact]
+    public async Task Write_WithConflictOnDuplicateWritesIgnore_ShouldPassOptionToApi() {
+        WriteRequest? capturedRequest = null;
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .Callback<HttpRequestMessage, CancellationToken>((req, _) => {
+                var content = req.Content!.ReadAsStringAsync().Result;
+                capturedRequest = JsonSerializer.Deserialize<WriteRequest>(content);
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientWriteRequest() {
+            Writes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                }
+            },
+        };
+
+        var response = await fgaClient.Write(body, new ClientWriteOptions {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+            Conflict = new ConflictOptions {
+                OnDuplicateWrites = OnDuplicateWrites.Ignore
+            }
+        });
+
+        Assert.NotNull(capturedRequest);
+        Assert.NotNull(capturedRequest.Writes);
+        Assert.Equal(WriteRequestWrites.OnDuplicateEnum.Ignore, capturedRequest.Writes.OnDuplicate);
+    }
+
+    /// <summary>
+    /// Test Write with OnDuplicateWrites = Error
+    /// </summary>
+    [Fact]
+    public async Task Write_WithConflictOnDuplicateWritesError_ShouldPassOptionToApi() {
+        WriteRequest? capturedRequest = null;
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .Callback<HttpRequestMessage, CancellationToken>((req, _) => {
+                var content = req.Content!.ReadAsStringAsync().Result;
+                capturedRequest = JsonSerializer.Deserialize<WriteRequest>(content);
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientWriteRequest() {
+            Writes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                }
+            },
+        };
+
+        var response = await fgaClient.Write(body, new ClientWriteOptions {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+            Conflict = new ConflictOptions {
+                OnDuplicateWrites = OnDuplicateWrites.Error
+            }
+        });
+
+        Assert.NotNull(capturedRequest);
+        Assert.NotNull(capturedRequest.Writes);
+        Assert.Equal(WriteRequestWrites.OnDuplicateEnum.Error, capturedRequest.Writes.OnDuplicate);
+    }
+
+    /// <summary>
+    /// Test Write with OnMissingDeletes = Ignore
+    /// </summary>
+    [Fact]
+    public async Task Write_WithConflictOnMissingDeletesIgnore_ShouldPassOptionToApi() {
+        WriteRequest? capturedRequest = null;
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .Callback<HttpRequestMessage, CancellationToken>((req, _) => {
+                var content = req.Content!.ReadAsStringAsync().Result;
+                capturedRequest = JsonSerializer.Deserialize<WriteRequest>(content);
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientWriteRequest() {
+            Deletes = new List<ClientTupleKeyWithoutCondition> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                }
+            },
+        };
+
+        var response = await fgaClient.Write(body, new ClientWriteOptions {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+            Conflict = new ConflictOptions {
+                OnMissingDeletes = OnMissingDeletes.Ignore
+            }
+        });
+
+        Assert.NotNull(capturedRequest);
+        Assert.NotNull(capturedRequest.Deletes);
+        Assert.Equal(WriteRequestDeletes.OnMissingEnum.Ignore, capturedRequest.Deletes.OnMissing);
+    }
+
+    /// <summary>
+    /// Test Write with OnMissingDeletes = Error
+    /// </summary>
+    [Fact]
+    public async Task Write_WithConflictOnMissingDeletesError_ShouldPassOptionToApi() {
+        WriteRequest? capturedRequest = null;
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .Callback<HttpRequestMessage, CancellationToken>((req, _) => {
+                var content = req.Content!.ReadAsStringAsync().Result;
+                capturedRequest = JsonSerializer.Deserialize<WriteRequest>(content);
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientWriteRequest() {
+            Deletes = new List<ClientTupleKeyWithoutCondition> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                }
+            },
+        };
+
+        var response = await fgaClient.Write(body, new ClientWriteOptions {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+            Conflict = new ConflictOptions {
+                OnMissingDeletes = OnMissingDeletes.Error
+            }
+        });
+
+        Assert.NotNull(capturedRequest);
+        Assert.NotNull(capturedRequest.Deletes);
+        Assert.Equal(WriteRequestDeletes.OnMissingEnum.Error, capturedRequest.Deletes.OnMissing);
+    }
+
+    /// <summary>
+    /// Test Write with both OnDuplicateWrites and OnMissingDeletes
+    /// </summary>
+    [Fact]
+    public async Task Write_WithBothConflictOptions_ShouldPassBothOptionsToApi() {
+        WriteRequest? capturedRequest = null;
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .Callback<HttpRequestMessage, CancellationToken>((req, _) => {
+                var content = req.Content!.ReadAsStringAsync().Result;
+                capturedRequest = JsonSerializer.Deserialize<WriteRequest>(content);
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientWriteRequest() {
+            Writes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                }
+            },
+            Deletes = new List<ClientTupleKeyWithoutCondition> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "writer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                }
+            },
+        };
+
+        var response = await fgaClient.Write(body, new ClientWriteOptions {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+            Conflict = new ConflictOptions {
+                OnDuplicateWrites = OnDuplicateWrites.Ignore,
+                OnMissingDeletes = OnMissingDeletes.Ignore
+            }
+        });
+
+        Assert.NotNull(capturedRequest);
+        Assert.NotNull(capturedRequest.Writes);
+        Assert.NotNull(capturedRequest.Deletes);
+        Assert.Equal(WriteRequestWrites.OnDuplicateEnum.Ignore, capturedRequest.Writes.OnDuplicate);
+        Assert.Equal(WriteRequestDeletes.OnMissingEnum.Ignore, capturedRequest.Deletes.OnMissing);
+    }
+
+    /// <summary>
+    /// Test Write in non-transaction mode with conflict options
+    /// </summary>
+    [Fact]
+    public async Task Write_NonTransactionWithConflictOptions_ShouldPassOptionsToAllRequests() {
+        var capturedRequests = new List<WriteRequest>();
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .Callback<HttpRequestMessage, CancellationToken>((req, _) => {
+                var content = req.Content!.ReadAsStringAsync().Result;
+                var writeRequest = JsonSerializer.Deserialize<WriteRequest>(content);
+                if (writeRequest != null) {
+                    capturedRequests.Add(writeRequest);
+                }
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientWriteRequest() {
+            Writes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                },
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:budget",
+                }
+            },
+            Deletes = new List<ClientTupleKeyWithoutCondition> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "writer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                }
+            },
+        };
+
+        var response = await fgaClient.Write(body, new ClientWriteOptions {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+            Transaction = new TransactionOptions {
+                Disable = true,
+                MaxPerChunk = 1
+            },
+            Conflict = new ConflictOptions {
+                OnDuplicateWrites = OnDuplicateWrites.Ignore,
+                OnMissingDeletes = OnMissingDeletes.Ignore
+            }
+        });
+
+        // Should have made 3 requests (2 writes + 1 delete in non-transaction mode)
+        Assert.Equal(3, capturedRequests.Count);
+
+        // Verify each request has the conflict options
+        foreach (var request in capturedRequests) {
+            if (request.Writes != null) {
+                Assert.Equal(WriteRequestWrites.OnDuplicateEnum.Ignore, request.Writes.OnDuplicate);
+            }
+            if (request.Deletes != null) {
+                Assert.Equal(WriteRequestDeletes.OnMissingEnum.Ignore, request.Deletes.OnMissing);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Test Write with null conflict options (default behavior)
+    /// </summary>
+    [Fact]
+    public async Task Write_WithNullConflictOptions_ShouldUseApiDefaults() {
+        WriteRequest? capturedRequest = null;
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .Callback<HttpRequestMessage, CancellationToken>((req, _) => {
+                var content = req.Content!.ReadAsStringAsync().Result;
+                capturedRequest = JsonSerializer.Deserialize<WriteRequest>(content);
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var body = new ClientWriteRequest() {
+            Writes = new List<ClientTupleKey> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                }
+            },
+            Deletes = new List<ClientTupleKeyWithoutCondition> {
+                new() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "writer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+                }
+            },
+        };
+
+        // Don't specify Conflict options - should use API defaults
+        var response = await fgaClient.Write(body, new ClientWriteOptions {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
+        });
+
+        Assert.NotNull(capturedRequest);
+        // When no options are specified, the SDK explicitly sends Error as the default
+        Assert.NotNull(capturedRequest.Writes);
+        Assert.Equal(WriteRequestWrites.OnDuplicateEnum.Error, capturedRequest.Writes.OnDuplicate);
+        Assert.NotNull(capturedRequest.Deletes);
+        Assert.Equal(WriteRequestDeletes.OnMissingEnum.Error, capturedRequest.Deletes.OnMissing);
+    }
+
+    /// <summary>
+    /// Test WriteTuples convenience method with conflict options
+    /// </summary>
+    [Fact]
+    public async Task WriteTuples_WithConflictOptions_ShouldPassOptionToApi() {
+        WriteRequest? capturedRequest = null;
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .Callback<HttpRequestMessage, CancellationToken>((req, _) => {
+                var content = req.Content!.ReadAsStringAsync().Result;
+                capturedRequest = JsonSerializer.Deserialize<WriteRequest>(content);
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var tuples = new List<ClientTupleKey> {
+            new() {
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                Relation = "viewer",
+                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+            }
+        };
+
+        var response = await fgaClient.WriteTuples(tuples, new ClientWriteOptions {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+            Conflict = new ConflictOptions {
+                OnDuplicateWrites = OnDuplicateWrites.Ignore
+            }
+        });
+
+        Assert.NotNull(capturedRequest);
+        Assert.NotNull(capturedRequest.Writes);
+        Assert.Equal(WriteRequestWrites.OnDuplicateEnum.Ignore, capturedRequest.Writes.OnDuplicate);
+    }
+
+    /// <summary>
+    /// Test DeleteTuples convenience method with conflict options
+    /// </summary>
+    [Fact]
+    public async Task DeleteTuples_WithConflictOptions_ShouldPassOptionToApi() {
+        WriteRequest? capturedRequest = null;
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/write") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(new Object()),
+            })
+            .Callback<HttpRequestMessage, CancellationToken>((req, _) => {
+                var content = req.Content!.ReadAsStringAsync().Result;
+                capturedRequest = JsonSerializer.Deserialize<WriteRequest>(content);
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        var tuples = new List<ClientTupleKeyWithoutCondition> {
+            new() {
+                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                Relation = "viewer",
+                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+            }
+        };
+
+        var response = await fgaClient.DeleteTuples(tuples, new ClientWriteOptions {
+            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+            Conflict = new ConflictOptions {
+                OnMissingDeletes = OnMissingDeletes.Ignore
+            }
+        });
+
+        Assert.NotNull(capturedRequest);
+        Assert.NotNull(capturedRequest.Deletes);
+        Assert.Equal(WriteRequestDeletes.OnMissingEnum.Ignore, capturedRequest.Deletes.OnMissing);
+    }
+
+    /// <summary>
     /// Test Read with custom headers
     /// </summary>
     [Fact]

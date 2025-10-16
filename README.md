@@ -574,6 +574,45 @@ var options = new ClientWriteOptions {
 var response = await fgaClient.Write(body, options);
 ```
 
+###### Conflict Options for Write Operations
+
+The SDK allows you to control how write conflicts are handled using the `Conflict` option:
+
+- **OnDuplicateWrites**: Controls behavior when writing a tuple that already exists
+  - `OnDuplicateWrites.Error` - Return error on duplicates (default)
+  - `OnDuplicateWrites.Ignore` - Silently skip duplicate writes
+
+- **OnMissingDeletes**: Controls behavior when deleting a tuple that doesn't exist
+  - `OnMissingDeletes.Error` - Return error on missing deletes (default)
+  - `OnMissingDeletes.Ignore` - Silently skip missing deletes
+
+```csharp
+var body = new ClientWriteRequest() {
+    Writes = new List<ClientTupleKey> {
+        new() {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "viewer",
+            Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+        }
+    },
+    Deletes = new List<ClientTupleKeyWithoutCondition> {
+        new() {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "writer",
+            Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+        }
+    },
+};
+var options = new ClientWriteOptions {
+    AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+    Conflict = new ConflictOptions {
+        OnDuplicateWrites = OnDuplicateWrites.Ignore,
+        OnMissingDeletes = OnMissingDeletes.Ignore
+    }
+};
+var response = await fgaClient.Write(body, options);
+```
+
 #### Relationship Queries
 
 ##### Check
