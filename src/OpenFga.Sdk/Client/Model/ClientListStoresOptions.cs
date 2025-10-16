@@ -18,7 +18,7 @@ namespace OpenFga.Sdk.Client.Model;
 /// <summary>
 ///     ClientListStoresOptions - Client Options for ListStores
 /// </summary>
-public interface IClientListStoresOptions : ClientRequestOptions, AuthorizationModelIdOptions, ClientPaginationOptions {
+public interface IClientListStoresOptions : IClientRequestOptions, AuthorizationModelIdOptions, ClientPaginationOptions {
 }
 
 /// <inheritdoc />

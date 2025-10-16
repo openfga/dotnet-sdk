@@ -66,15 +66,15 @@ public class OpenFgaClient : IDisposable {
     public void Dispose() => api.Dispose();
 
     /// <summary>
-    ///     Extracts and validates headers from options object implementing ClientRequestOptions interface
+    ///     Extracts and validates headers from options object implementing IClientRequestOptions interface
     /// </summary>
-    /// <param name="options">Options object that may implement ClientRequestOptions</param>
-    /// <returns>Headers dictionary if present, otherwise null</returns>
+    /// <param name="options">Options object that may implement IClientRequestOptions</param>
+    /// <returns>IRequestOptions with headers if present, otherwise null</returns>
     /// <exception cref="ArgumentException">Thrown when headers contain invalid data</exception>
-    private static IDictionary<string, string>? ExtractHeaders(object? options) {
-        var headers = (options as ClientRequestOptions)?.Headers;
+    private static IRequestOptions? ExtractHeaders(object? options) {
+        var headers = (options as IClientRequestOptions)?.Headers;
         ClientConfiguration.ValidateHeaders(headers, "options.Headers");
-        return headers;
+        return headers != null ? new RequestOptions { Headers = headers } : null;
     }
 
 #if NET6_0_OR_GREATER
@@ -251,7 +251,7 @@ public class OpenFgaClient : IDisposable {
    * CreateStore - Initialize a store
    */
     public async Task<CreateStoreResponse> CreateStore(ClientCreateStoreRequest body,
-        ClientRequestOptions? options = default,
+        IClientRequestOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.CreateStore(body, ExtractHeaders(options), cancellationToken);
 
@@ -308,7 +308,7 @@ public class OpenFgaClient : IDisposable {
         IClientRequestOptionsWithAuthZModelId? options = default,
         CancellationToken cancellationToken = default) {
         var response =
-            await ReadAuthorizationModels(new ClientReadAuthorizationModelsOptions { StoreId = options?.StoreId, PageSize = 1, Headers = ExtractHeaders(options) }, cancellationToken);
+            await ReadAuthorizationModels(new ClientReadAuthorizationModelsOptions { StoreId = options?.StoreId, PageSize = 1, Headers = ExtractHeaders(options)?.Headers }, cancellationToken);
 
         if (response.AuthorizationModels.Count > 0) {
             return new ReadAuthorizationModelResponse { AuthorizationModel = response.AuthorizationModels?[0] };
@@ -384,7 +384,7 @@ public class OpenFgaClient : IDisposable {
             };
         }
 
-        var clientWriteOpts = new ClientWriteOptions() { StoreId = StoreId, AuthorizationModelId = authorizationModelId, Headers = ExtractHeaders(options) };
+        var clientWriteOpts = new ClientWriteOptions() { StoreId = StoreId, AuthorizationModelId = authorizationModelId, Headers = ExtractHeaders(options)?.Headers };
 
         var writeChunks = body.Writes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKey[]>();
         var writeResponses = new ConcurrentBag<ClientWriteSingleResponse>();

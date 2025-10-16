@@ -15,7 +15,7 @@ using System.Collections.Generic;
 
 namespace OpenFga.Sdk.Client.Model;
 
-public interface IClientCreateStoreOptions : ClientRequestOptions { }
+public interface IClientCreateStoreOptions : IClientRequestOptions { }
 
 public class ClientCreateStoreOptions : IClientCreateStoreOptions {
     /// <inheritdoc />

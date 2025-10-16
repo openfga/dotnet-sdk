@@ -14,5 +14,5 @@
 namespace OpenFga.Sdk.Client.Model;
 
 /// <inheritdoc />
-public interface IClientRequestOptionsWithStoreId : ClientRequestOptions, StoreIdOptions {
+public interface IClientRequestOptionsWithStoreId : IClientRequestOptions, StoreIdOptions {
 }

@@ -2042,7 +2042,7 @@ public class OpenFgaClientTests : IDisposable {
     [InlineData(typeof(ClientListObjectsOptions))]
     [InlineData(typeof(ClientReadOptions))]
     public void ClientOptions_ShouldImplementHeadersProperty(Type optionsType) {
-        var options = Activator.CreateInstance(optionsType) as ClientRequestOptions;
+        var options = Activator.CreateInstance(optionsType) as IClientRequestOptions;
         Assert.NotNull(options);
 
         var headers = new Dictionary<string, string> {
