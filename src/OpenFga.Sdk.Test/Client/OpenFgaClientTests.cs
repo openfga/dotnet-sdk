@@ -1021,7 +1021,8 @@ public class OpenFgaClientTests : IDisposable {
             },
             Deletes = new List<ClientTupleKeyWithoutCondition>(), // should not get passed
         };
-        var response = await fgaClient.Write(body, new ClientWriteOptions {
+
+        await fgaClient.Write(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
         });
 
@@ -1066,7 +1067,8 @@ public class OpenFgaClientTests : IDisposable {
                 }
             },
         };
-        var response = await fgaClient.Write(body, new ClientWriteOptions {
+
+        await fgaClient.Write(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
         });
 
@@ -1118,7 +1120,8 @@ public class OpenFgaClientTests : IDisposable {
                 }
             },
         };
-        var response = await fgaClient.Write(body, new ClientWriteOptions {
+
+        await fgaClient.Write(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
         });
 
@@ -2218,7 +2221,7 @@ public class OpenFgaClientTests : IDisposable {
             },
         };
 
-        var response = await fgaClient.Write(body, new ClientWriteOptions {
+        await fgaClient.Write(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
             Conflict = new ConflictOptions {
                 OnDuplicateWrites = OnDuplicateWrites.Ignore
@@ -2267,7 +2270,7 @@ public class OpenFgaClientTests : IDisposable {
             },
         };
 
-        var response = await fgaClient.Write(body, new ClientWriteOptions {
+        await fgaClient.Write(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
             Conflict = new ConflictOptions {
                 OnDuplicateWrites = OnDuplicateWrites.Error
@@ -2316,7 +2319,7 @@ public class OpenFgaClientTests : IDisposable {
             },
         };
 
-        var response = await fgaClient.Write(body, new ClientWriteOptions {
+        await fgaClient.Write(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
             Conflict = new ConflictOptions {
                 OnMissingDeletes = OnMissingDeletes.Ignore
@@ -2365,7 +2368,7 @@ public class OpenFgaClientTests : IDisposable {
             },
         };
 
-        var response = await fgaClient.Write(body, new ClientWriteOptions {
+        await fgaClient.Write(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
             Conflict = new ConflictOptions {
                 OnMissingDeletes = OnMissingDeletes.Error
@@ -2421,7 +2424,7 @@ public class OpenFgaClientTests : IDisposable {
             },
         };
 
-        var response = await fgaClient.Write(body, new ClientWriteOptions {
+        await fgaClient.Write(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
             Conflict = new ConflictOptions {
                 OnDuplicateWrites = OnDuplicateWrites.Ignore,
@@ -2488,7 +2491,7 @@ public class OpenFgaClientTests : IDisposable {
             },
         };
 
-        var response = await fgaClient.Write(body, new ClientWriteOptions {
+        await fgaClient.Write(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
             Transaction = new TransactionOptions {
                 Disable = true,
@@ -2559,7 +2562,7 @@ public class OpenFgaClientTests : IDisposable {
         };
 
         // Don't specify Conflict options - should use API defaults
-        var response = await fgaClient.Write(body, new ClientWriteOptions {
+        await fgaClient.Write(body, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
         });
 
@@ -2606,7 +2609,7 @@ public class OpenFgaClientTests : IDisposable {
             }
         };
 
-        var response = await fgaClient.WriteTuples(tuples, new ClientWriteOptions {
+        await fgaClient.WriteTuples(tuples, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
             Conflict = new ConflictOptions {
                 OnDuplicateWrites = OnDuplicateWrites.Ignore
@@ -2653,7 +2656,7 @@ public class OpenFgaClientTests : IDisposable {
             }
         };
 
-        var response = await fgaClient.DeleteTuples(tuples, new ClientWriteOptions {
+        await fgaClient.DeleteTuples(tuples, new ClientWriteOptions {
             AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
             Conflict = new ConflictOptions {
                 OnMissingDeletes = OnMissingDeletes.Ignore
@@ -2889,8 +2892,7 @@ public class OpenFgaClientTests : IDisposable {
         var options = new ClientWriteOptions {
             Headers = new Dictionary<string, string> {
                 { "X-Latest-Model", "latest-xyz" }
-            },
-            Transaction = new TransactionOptions()
+            }
         };
 
         var response = await client.ReadLatestAuthorizationModel(options);
