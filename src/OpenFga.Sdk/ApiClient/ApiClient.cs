@@ -197,11 +197,11 @@ public class ApiClient : IDisposable {
         // Validate per-request headers
         Configuration.Configuration.ValidateHeaders(perRequestHeaders, "options.Headers");
 
-        // Return null if no headers to add
+        // Return empty dictionary if no headers to add
         if (string.IsNullOrEmpty(oauthToken) &&
             (defaultHeaders == null || defaultHeaders.Count == 0) &&
             (perRequestHeaders == null || perRequestHeaders.Count == 0)) {
-            return null;
+            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         }
 
         // Use case-insensitive dictionary for proper header merging
