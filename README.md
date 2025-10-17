@@ -574,7 +574,7 @@ var options = new ClientWriteOptions {
 var response = await fgaClient.Write(body, options);
 ```
 
-###### Conflict Options for Write Operations
+##### Conflict Options for Write Operations
 
 The SDK allows you to control how write conflicts are handled using the `Conflict` option:
 
