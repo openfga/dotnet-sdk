@@ -7,7 +7,7 @@
   - per-request headers support via `Headers` property on all client options classes
   - `IRequestOptions` interface and `RequestOptions` class for API-level header support
   - `IClientRequestOptions` interface and `ClientRequestOptions` class for client-level header support
-  - add header validation to prevent overiding of reserved headers
+  - add header validation to prevent overriding of reserved headers
 - feat: add write conflict resolution options
   - `ConflictOptions` to control behavior for duplicate writes and missing deletes
   - `OnDuplicateWrites` option: `Error` (default) or `Ignore` for handling duplicate tuple writes

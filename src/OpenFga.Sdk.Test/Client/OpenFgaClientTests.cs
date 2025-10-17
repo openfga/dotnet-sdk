@@ -2580,6 +2580,7 @@ public class OpenFgaClientTests : IDisposable {
     [Fact]
     public async Task WriteTuples_WithConflictOptions_ShouldPassOptionToApi() {
         WriteRequest? capturedRequest = null;
+        HttpResponseMessage? responseMsg = null;
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -2589,9 +2590,12 @@ public class OpenFgaClientTests : IDisposable {
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             )
-            .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new Object()),
+            .ReturnsAsync(() => {
+                responseMsg = new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new Object()),
+                };
+                return responseMsg;
             })
             .Callback<HttpRequestMessage, CancellationToken>((req, _) => {
                 var content = req.Content!.ReadAsStringAsync().Result;
@@ -2609,16 +2613,22 @@ public class OpenFgaClientTests : IDisposable {
             }
         };
 
-        await fgaClient.WriteTuples(tuples, new ClientWriteOptions {
-            AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
-            Conflict = new ConflictOptions {
-                OnDuplicateWrites = OnDuplicateWrites.Ignore
-            }
-        });
+        try {
+            await fgaClient.WriteTuples(tuples, new ClientWriteOptions {
+                AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+                Conflict = new ConflictOptions {
+                    OnDuplicateWrites = OnDuplicateWrites.Ignore
+                }
+            });
 
-        Assert.NotNull(capturedRequest);
-        Assert.NotNull(capturedRequest.Writes);
-        Assert.Equal(WriteRequestWrites.OnDuplicateEnum.Ignore, capturedRequest.Writes.OnDuplicate);
+            Assert.NotNull(capturedRequest);
+            Assert.NotNull(capturedRequest.Writes);
+            Assert.Equal(WriteRequestWrites.OnDuplicateEnum.Ignore, capturedRequest.Writes.OnDuplicate);
+        }
+        finally {
+            if (responseMsg != null)
+                responseMsg.Dispose();
+        }
     }
 
     /// <summary>
@@ -2627,6 +2637,7 @@ public class OpenFgaClientTests : IDisposable {
     [Fact]
     public async Task DeleteTuples_WithConflictOptions_ShouldPassOptionToApi() {
         WriteRequest? capturedRequest = null;
+        HttpResponseMessage? httpResponse = null;
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -2636,9 +2647,12 @@ public class OpenFgaClientTests : IDisposable {
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>()
             )
-            .ReturnsAsync(new HttpResponseMessage() {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(new Object()),
+            .ReturnsAsync(() => {
+                httpResponse = new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new Object()),
+                };
+                return httpResponse;
             })
             .Callback<HttpRequestMessage, CancellationToken>((req, _) => {
                 var content = req.Content!.ReadAsStringAsync().Result;
@@ -2666,6 +2680,8 @@ public class OpenFgaClientTests : IDisposable {
         Assert.NotNull(capturedRequest);
         Assert.NotNull(capturedRequest.Deletes);
         Assert.Equal(WriteRequestDeletes.OnMissingEnum.Ignore, capturedRequest.Deletes.OnMissing);
+
+        httpResponse?.Dispose();
     }
 
     /// <summary>
