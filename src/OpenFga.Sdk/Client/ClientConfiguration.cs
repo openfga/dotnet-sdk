@@ -76,7 +76,6 @@ public class ClientConfiguration : Configuration.Configuration {
     /// Ensures the configuration is valid, otherwise throws an error.
     /// </summary>
     /// <exception cref="FgaValidationError">Thrown when the Store ID or Authorization Model ID is not in a valid ULID format.</exception>
-    /// <exception cref="ArgumentException">Thrown when DefaultHeaders contain reserved or invalid headers.</exception>
     public new void EnsureValid() {
         base.EnsureValid();
 
@@ -88,9 +87,6 @@ public class ClientConfiguration : Configuration.Configuration {
             !IsWellFormedUlidString(AuthorizationModelId)) {
             throw new FgaValidationError("AuthorizationModelId is not in a valid ulid format");
         }
-
-        // Validate that DefaultHeaders don't contain reserved headers
-        ValidateHeaders(DefaultHeaders, nameof(DefaultHeaders));
     }
 
     /// <summary>
