@@ -70,7 +70,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<BatchCheckRequest, BatchCheckResponse>(requestBuilder,
-            "BatchCheck", options?.Headers, cancellationToken);
+            "BatchCheck", options, cancellationToken);
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<CheckRequest, CheckResponse>(requestBuilder,
-            "Check", options?.Headers, cancellationToken);
+            "Check", options, cancellationToken);
     }
 
     /// <summary>
@@ -129,7 +129,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<CreateStoreRequest, CreateStoreResponse>(requestBuilder,
-            "CreateStore", options?.Headers, cancellationToken);
+            "CreateStore", options, cancellationToken);
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         await _apiClient.SendRequestAsync(requestBuilder,
-            "DeleteStore", options?.Headers, cancellationToken);
+            "DeleteStore", options, cancellationToken);
     }
 
     /// <summary>
@@ -193,7 +193,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<ExpandRequest, ExpandResponse>(requestBuilder,
-            "Expand", options?.Headers, cancellationToken);
+            "Expand", options, cancellationToken);
     }
 
     /// <summary>
@@ -224,7 +224,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, GetStoreResponse>(requestBuilder,
-            "GetStore", options?.Headers, cancellationToken);
+            "GetStore", options, cancellationToken);
     }
 
     /// <summary>
@@ -257,7 +257,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<ListObjectsRequest, ListObjectsResponse>(requestBuilder,
-            "ListObjects", options?.Headers, cancellationToken);
+            "ListObjects", options, cancellationToken);
     }
 
     /// <summary>
@@ -293,7 +293,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, ListStoresResponse>(requestBuilder,
-            "ListStores", options?.Headers, cancellationToken);
+            "ListStores", options, cancellationToken);
     }
 
     /// <summary>
@@ -326,7 +326,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<ListUsersRequest, ListUsersResponse>(requestBuilder,
-            "ListUsers", options?.Headers, cancellationToken);
+            "ListUsers", options, cancellationToken);
     }
 
     /// <summary>
@@ -359,7 +359,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<ReadRequest, ReadResponse>(requestBuilder,
-            "Read", options?.Headers, cancellationToken);
+            "Read", options, cancellationToken);
     }
 
     /// <summary>
@@ -394,7 +394,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, ReadAssertionsResponse>(requestBuilder,
-            "ReadAssertions", options?.Headers, cancellationToken);
+            "ReadAssertions", options, cancellationToken);
     }
 
     /// <summary>
@@ -429,7 +429,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, ReadAuthorizationModelResponse>(requestBuilder,
-            "ReadAuthorizationModel", options?.Headers, cancellationToken);
+            "ReadAuthorizationModel", options, cancellationToken);
     }
 
     /// <summary>
@@ -468,7 +468,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, ReadAuthorizationModelsResponse>(requestBuilder,
-            "ReadAuthorizationModels", options?.Headers, cancellationToken);
+            "ReadAuthorizationModels", options, cancellationToken);
     }
 
     /// <summary>
@@ -516,7 +516,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<Any, ReadChangesResponse>(requestBuilder,
-            "ReadChanges", options?.Headers, cancellationToken);
+            "ReadChanges", options, cancellationToken);
     }
 
     /// <summary>
@@ -549,7 +549,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<WriteRequest, Object>(requestBuilder,
-            "Write", options?.Headers, cancellationToken);
+            "Write", options, cancellationToken);
     }
 
     /// <summary>
@@ -586,7 +586,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         await _apiClient.SendRequestAsync(requestBuilder,
-            "WriteAssertions", options?.Headers, cancellationToken);
+            "WriteAssertions", options, cancellationToken);
     }
 
     /// <summary>
@@ -619,7 +619,7 @@ public class OpenFgaApi : IDisposable {
         };
 
         return await _apiClient.SendRequestAsync<WriteAuthorizationModelRequest, WriteAuthorizationModelResponse>(requestBuilder,
-            "WriteAuthorizationModel", options?.Headers, cancellationToken);
+            "WriteAuthorizationModel", options, cancellationToken);
     }
 
 

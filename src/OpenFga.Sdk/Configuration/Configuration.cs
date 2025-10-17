@@ -45,10 +45,68 @@ public class Configuration {
         (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
 
     /// <summary>
+    ///     Reserved HTTP headers that should not be overridden via custom headers.
+    ///     Note: User-Agent is intentionally excluded as the SDK sets a default value
+    ///     but allows users to customize it via DefaultHeaders.
+    /// </summary>
+    private static readonly HashSet<string> ReservedHeaders = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
+        "Authorization",
+        "Content-Type",
+        "Content-Length",
+        "Host",
+        "Accept",
+        "Accept-Encoding",
+        "Transfer-Encoding",
+        "Connection",
+        "Cookie",
+        "Set-Cookie",
+        "Date"
+    };
+
+    /// <summary>
+    ///     Validates that HTTP headers are safe to use with HTTP requests
+    /// </summary>
+    /// <param name="headers">The headers dictionary to validate</param>
+    /// <param name="paramName">The parameter name for exception messages</param>
+    /// <exception cref="ArgumentException">Thrown when headers contain invalid data</exception>
+    internal static void ValidateHeaders(IDictionary<string, string>? headers, string paramName = "headers") {
+        if (headers == null) {
+            return;
+        }
+
+        foreach (var header in headers) {
+            if (string.IsNullOrWhiteSpace(header.Key)) {
+                throw new ArgumentException("Header name cannot be null, empty, or whitespace.", paramName);
+            }
+
+            if (header.Value == null) {
+                throw new ArgumentException($"Header '{header.Key}' has a null value. Header values cannot be null.", paramName);
+            }
+
+            // Prevent HTTP header injection attacks by checking for newline characters
+            if (header.Value.Contains("\r") || header.Value.Contains("\n")) {
+                throw new ArgumentException(
+                    $"Header '{header.Key}' contains invalid characters (CR/LF). Header values cannot contain newline characters as this may lead to header injection vulnerabilities.",
+                    paramName);
+            }
+
+            // Warn about reserved headers that may cause unexpected behavior
+            if (ReservedHeaders.Contains(header.Key)) {
+                throw new ArgumentException(
+                    $"Header '{header.Key}' is a reserved HTTP header and should not be set via custom headers. " +
+                    $"Setting this header may cause authentication failures, request corruption, or other unexpected behavior. " +
+                    $"Reserved headers include: {string.Join(", ", ReservedHeaders)}.",
+                    paramName);
+            }
+        }
+    }
+
+    /// <summary>
     ///     Ensures that the configuration is valid otherwise throws an error
     /// </summary>
     /// <exception cref="FgaRequiredParamError"></exception>
     /// <exception cref="FgaValidationError"></exception>
+    /// <exception cref="ArgumentException">Thrown when DefaultHeaders contain reserved or invalid headers</exception>
     public void EnsureValid() {
         if (BasePath == null || BasePath == "") {
             throw new FgaRequiredParamError("Configuration", "ApiUrl");
@@ -62,6 +120,9 @@ public class Configuration {
         if (MaxRetry > 15) {
             throw new FgaValidationError("Configuration.MaxRetry exceeds maximum allowed limit of 15");
         }
+
+        // Validate that DefaultHeaders don't contain reserved headers
+        ValidateHeaders(DefaultHeaders, nameof(DefaultHeaders));
 
         Credentials?.EnsureValid();
         Telemetry?.EnsureValid();
