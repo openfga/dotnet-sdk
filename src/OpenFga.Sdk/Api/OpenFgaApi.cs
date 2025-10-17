@@ -46,7 +46,7 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of BatchCheckResponse</returns>
     public async Task<BatchCheckResponse> BatchCheck(string storeId, BatchCheckRequest body, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -79,7 +79,7 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of CheckResponse</returns>
     public async Task<CheckResponse> Check(string storeId, CheckRequest body, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -111,7 +111,7 @@ public class OpenFgaApi : IDisposable {
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="body"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of CreateStoreResponse</returns>
     public async Task<CreateStoreResponse> CreateStore(CreateStoreRequest body, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -137,7 +137,7 @@ public class OpenFgaApi : IDisposable {
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of void</returns>
     public async Task DeleteStore(string storeId, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -169,7 +169,7 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ExpandResponse</returns>
     public async Task<ExpandResponse> Expand(string storeId, ExpandRequest body, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -201,7 +201,7 @@ public class OpenFgaApi : IDisposable {
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of GetStoreResponse</returns>
     public async Task<GetStoreResponse> GetStore(string storeId, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -233,7 +233,7 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ListObjectsResponse</returns>
     public async Task<ListObjectsResponse> ListObjects(string storeId, ListObjectsRequest body, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -267,7 +267,7 @@ public class OpenFgaApi : IDisposable {
     /// <param name="pageSize"> (optional)</param>
     /// <param name="continuationToken"> (optional)</param>
     /// <param name="name">The name parameter instructs the API to only include results that match that name.Multiple results may be returned. Only exact matches will be returned; substring matches and regexes will not be evaluated (optional)</param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ListStoresResponse</returns>
     public async Task<ListStoresResponse> ListStores(int? pageSize = default(int?), string? continuationToken = default(string?), string? name = default(string?), IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -302,7 +302,7 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ListUsersResponse</returns>
     public async Task<ListUsersResponse> ListUsers(string storeId, ListUsersRequest body, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -335,7 +335,7 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ReadResponse</returns>
     public async Task<ReadResponse> Read(string storeId, ReadRequest body, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -368,7 +368,7 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="authorizationModelId"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ReadAssertionsResponse</returns>
     public async Task<ReadAssertionsResponse> ReadAssertions(string storeId, string authorizationModelId, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -403,7 +403,7 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="id"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ReadAuthorizationModelResponse</returns>
     public async Task<ReadAuthorizationModelResponse> ReadAuthorizationModel(string storeId, string id, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -439,7 +439,7 @@ public class OpenFgaApi : IDisposable {
     /// <param name="storeId"></param>
     /// <param name="pageSize"> (optional)</param>
     /// <param name="continuationToken"> (optional)</param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ReadAuthorizationModelsResponse</returns>
     public async Task<ReadAuthorizationModelsResponse> ReadAuthorizationModels(string storeId, int? pageSize = default(int?), string? continuationToken = default(string?), IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -480,7 +480,7 @@ public class OpenFgaApi : IDisposable {
     /// <param name="pageSize"> (optional)</param>
     /// <param name="continuationToken"> (optional)</param>
     /// <param name="startTime">Start date and time of changes to read. Format: ISO 8601 timestamp (e.g., 2022-01-01T00:00:00Z) If a continuation_token is provided along side start_time, the continuation_token will take precedence over start_time. (optional)</param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of ReadChangesResponse</returns>
     public async Task<ReadChangesResponse> ReadChanges(string storeId, string? type = default(string?), int? pageSize = default(int?), string? continuationToken = default(string?), DateTime? startTime = default(DateTime?), IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -525,7 +525,7 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of Object</returns>
     public async Task<Object> Write(string storeId, WriteRequest body, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -559,7 +559,7 @@ public class OpenFgaApi : IDisposable {
     /// <param name="storeId"></param>
     /// <param name="authorizationModelId"></param>
     /// <param name="body"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of void</returns>
     public async Task WriteAssertions(string storeId, string authorizationModelId, WriteAssertionsRequest body, IRequestOptions? options = null, CancellationToken cancellationToken = default) {
@@ -595,7 +595,7 @@ public class OpenFgaApi : IDisposable {
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
     /// <param name="storeId"></param>
     /// <param name="body"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
     /// <returns>Task of WriteAuthorizationModelResponse</returns>
     public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(string storeId, WriteAuthorizationModelRequest body, IRequestOptions? options = null, CancellationToken cancellationToken = default) {

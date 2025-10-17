@@ -90,7 +90,7 @@ public class Configuration {
                     paramName);
             }
 
-            // Warn about reserved headers that may cause unexpected behavior
+            // Reject reserved headers that may cause unexpected behavior
             if (ReservedHeaders.Contains(header.Key)) {
                 throw new ArgumentException(
                     $"Header '{header.Key}' is a reserved HTTP header and should not be set via custom headers. " +

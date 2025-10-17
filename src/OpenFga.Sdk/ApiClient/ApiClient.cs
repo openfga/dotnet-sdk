@@ -75,7 +75,7 @@ public class ApiClient : IDisposable {
     /// </summary>
     /// <param name="requestBuilder"></param>
     /// <param name="apiName"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken"></param>
     /// <typeparam name="T">Response Type</typeparam>
     /// <returns></returns>
@@ -114,7 +114,7 @@ public class ApiClient : IDisposable {
     /// </summary>
     /// <param name="requestBuilder"></param>
     /// <param name="apiName"></param>
-    /// <param name="options"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken"></param>
     /// <exception cref="FgaApiAuthenticationError"></exception>
     public async Task SendRequestAsync<TReq>(RequestBuilder<TReq> requestBuilder, string apiName,

@@ -69,7 +69,8 @@ public class OpenFgaClientTests : IDisposable {
 
     private (OpenFgaClient client, Mock<HttpMessageHandler> handler) CreateTestClientForHeaders<TResponse>(
         TResponse response,
-        Func<HttpRequestMessage, bool>? requestValidator = null) {
+        Func<HttpRequestMessage, bool>? requestValidator = null,
+        ClientConfiguration? config = null) {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -85,7 +86,7 @@ public class OpenFgaClientTests : IDisposable {
             });
 
         var httpClient = new HttpClient(mockHandler.Object);
-        return (new OpenFgaClient(_config, httpClient), mockHandler);
+        return (new OpenFgaClient(config ?? _config, httpClient), mockHandler);
     }
 
     private void AssertHeaderPresent(Mock<HttpMessageHandler> mockHandler, string headerName, string expectedValue) {
@@ -2593,7 +2594,8 @@ public class OpenFgaClientTests : IDisposable {
         var expectedResponse = new CheckResponse() { Allowed = true };
         var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
             req.Headers.Contains(TestHeaders.RequestId) &&
-            req.Headers.GetValues(TestHeaders.RequestId).First() == "override-request-id"
+            req.Headers.GetValues(TestHeaders.RequestId).First() == "override-request-id",
+            configWithDefaults
         );
 
         var options = new ClientCheckOptions {
@@ -2682,19 +2684,19 @@ public class OpenFgaClientTests : IDisposable {
     }
 
     /// <summary>
-    /// Test header precedence across all layers: per-request > OAuth > default
+    /// Test that per-request headers properly override default headers while non-conflicting headers are preserved
     /// </summary>
     [Fact]
     public async Task Check_HeaderPrecedence_AllLayersIntegration() {
-        // This test verifies the complete header precedence chain:
-        // Per-request headers > Runtime headers (OAuth) > Default headers
+        // This test verifies that per-request headers properly override default headers
+        // while non-conflicting headers from both layers are preserved.
 
         var configWithDefaults = new ClientConfiguration() {
             StoreId = _storeId,
             ApiUrl = _apiUrl
         };
 
-        // Layer 1: Default headers (lowest priority)
+        // Default headers (lowest priority)
         configWithDefaults.DefaultHeaders["X-Layer"] = "default";
         configWithDefaults.DefaultHeaders["X-Default-Only"] = "default-only";
 
@@ -2719,7 +2721,7 @@ public class OpenFgaClientTests : IDisposable {
         var httpClient = new HttpClient(mockHandler.Object);
         var client = new OpenFgaClient(configWithDefaults, httpClient);
 
-        // Layer 3: Per-request headers (highest priority)
+        // Per-request headers (highest priority)
         var options = new ClientCheckOptions {
             Headers = new Dictionary<string, string> {
                 { "X-Layer", "per-request" },
