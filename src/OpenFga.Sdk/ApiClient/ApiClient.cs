@@ -11,9 +11,11 @@
 //
 
 
+using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
+using OpenFga.Sdk.Model;
 using OpenFga.Sdk.Telemetry;
 using System;
 using System.Collections.Generic;
@@ -73,27 +75,27 @@ public class ApiClient : IDisposable {
     /// </summary>
     /// <param name="requestBuilder"></param>
     /// <param name="apiName"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken"></param>
     /// <typeparam name="T">Response Type</typeparam>
     /// <returns></returns>
     /// <exception cref="FgaApiAuthenticationError"></exception>
     public async Task<TRes> SendRequestAsync<TReq, TRes>(RequestBuilder<TReq> requestBuilder, string apiName,
+        IRequestOptions? options = null,
         CancellationToken cancellationToken = default) {
-        IDictionary<string, string> additionalHeaders = new Dictionary<string, string>();
-
         var sw = Stopwatch.StartNew();
+
+        string? oauthToken = null;
         if (_oauth2Client != null) {
             try {
-                var token = await _oauth2Client.GetAccessTokenAsync();
-
-                if (!string.IsNullOrEmpty(token)) {
-                    additionalHeaders["Authorization"] = $"Bearer {token}";
-                }
+                oauthToken = await _oauth2Client.GetAccessTokenAsync();
             }
             catch (ApiException e) {
                 throw new FgaApiAuthenticationError("Invalid Client Credentials", apiName, e);
             }
         }
+
+        var additionalHeaders = BuildHeaders(_configuration, oauthToken, options);
 
         var response = await Retry(async () =>
             await _baseClient.SendRequestAsync<TReq, TRes>(requestBuilder, additionalHeaders, apiName,
@@ -112,25 +114,25 @@ public class ApiClient : IDisposable {
     /// </summary>
     /// <param name="requestBuilder"></param>
     /// <param name="apiName"></param>
+    /// <param name="options">Request options.</param>
     /// <param name="cancellationToken"></param>
     /// <exception cref="FgaApiAuthenticationError"></exception>
     public async Task SendRequestAsync<TReq>(RequestBuilder<TReq> requestBuilder, string apiName,
+        IRequestOptions? options = null,
         CancellationToken cancellationToken = default) {
-        IDictionary<string, string> additionalHeaders = new Dictionary<string, string>();
-
         var sw = Stopwatch.StartNew();
+
+        string? oauthToken = null;
         if (_oauth2Client != null) {
             try {
-                var token = await _oauth2Client.GetAccessTokenAsync();
-
-                if (!string.IsNullOrEmpty(token)) {
-                    additionalHeaders["Authorization"] = $"Bearer {token}";
-                }
+                oauthToken = await _oauth2Client.GetAccessTokenAsync();
             }
             catch (ApiException e) {
                 throw new FgaApiAuthenticationError("Invalid Client Credentials", apiName, e);
             }
         }
+
+        var additionalHeaders = BuildHeaders(_configuration, oauthToken, options);
 
         var response = await Retry(async () =>
             await _baseClient.SendRequestAsync<TReq, object>(requestBuilder, additionalHeaders, apiName,
@@ -175,6 +177,56 @@ public class ApiClient : IDisposable {
                 await Task.Delay(waitInMs);
             }
         }
+    }
+
+    /// <summary>
+    ///     Builds the complete headers dictionary by merging default headers, OAuth token, and per-request headers.
+    ///     Validates per-request headers and performs case-insensitive merging.
+    ///     Header precedence (lowest to highest): DefaultHeaders → OAuth token → Per-request headers
+    /// </summary>
+    /// <param name="configuration">Configuration containing default headers</param>
+    /// <param name="oauthToken">OAuth access token if available</param>
+    /// <param name="options">Request options containing custom headers</param>
+    /// <returns>Merged headers dictionary or null if no headers to add</returns>
+    /// <exception cref="ArgumentException">Thrown when header key is null, empty, or whitespace</exception>
+    /// <exception cref="ArgumentNullException">Thrown when header value is null</exception>
+    private static IDictionary<string, string>? BuildHeaders(Configuration.Configuration configuration, string? oauthToken, IRequestOptions? options) {
+        var defaultHeaders = configuration.DefaultHeaders;
+        var perRequestHeaders = options?.Headers;
+
+        // Validate per-request headers
+        Configuration.Configuration.ValidateHeaders(perRequestHeaders, "options.Headers");
+
+        // Return empty dictionary if no headers to add
+        if (string.IsNullOrEmpty(oauthToken) &&
+            (defaultHeaders == null || defaultHeaders.Count == 0) &&
+            (perRequestHeaders == null || perRequestHeaders.Count == 0)) {
+            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        // Use case-insensitive dictionary for proper header merging
+        var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        // Default headers from configuration, if set
+        if (defaultHeaders != null) {
+            foreach (var header in defaultHeaders) {
+                headers[header.Key] = header.Value;
+            }
+        }
+
+        // Authorization token header, if set
+        if (!string.IsNullOrEmpty(oauthToken)) {
+            headers["Authorization"] = $"Bearer {oauthToken}";
+        }
+
+        // Per-request headers, if set
+        if (perRequestHeaders != null) {
+            foreach (var header in perRequestHeaders) {
+                headers[header.Key] = header.Value;
+            }
+        }
+
+        return headers;
     }
 
     public void Dispose() => _baseClient.Dispose();

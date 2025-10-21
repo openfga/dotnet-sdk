@@ -21,6 +21,7 @@ using OpenFga.Sdk.Exceptions.Parsers;
 using OpenFga.Sdk.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -35,6 +36,15 @@ public class OpenFgaClientTests : IDisposable {
     private readonly string _storeId;
     private readonly string _apiUrl = "https://api.fga.example";
     private readonly ClientConfiguration _config;
+
+    private static class TestHeaders {
+        public const string RequestId = "X-Request-ID";
+        public const string TraceId = "X-Trace-ID";
+        public const string SessionId = "X-Session-ID";
+        public const string UserId = "X-User-ID";
+        public const string CorrelationId = "X-Correlation-ID";
+        public const string CustomHeader = "X-Custom-Header";
+    }
 
     public OpenFgaClientTests() {
         _storeId = "01H0H015178Y2V4CX10C2KGHF4";
@@ -55,6 +65,39 @@ public class OpenFgaClientTests : IDisposable {
         }
 
         return response;
+    }
+
+    private (OpenFgaClient client, Mock<HttpMessageHandler> handler) CreateTestClientForHeaders<TResponse>(
+        TResponse response,
+        Func<HttpRequestMessage, bool>? requestValidator = null,
+        ClientConfiguration? config = null) {
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                requestValidator != null
+                    ? ItExpr.Is<HttpRequestMessage>(req => requestValidator(req))
+                    : ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync(() => new HttpResponseMessage() {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(response),
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        return (new OpenFgaClient(config ?? _config, httpClient), mockHandler);
+    }
+
+    private void AssertHeaderPresent(Mock<HttpMessageHandler> mockHandler, string headerName, string expectedValue) {
+        mockHandler.Protected().Verify(
+            "SendAsync",
+            Times.AtLeastOnce(),
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.Headers.Contains(headerName) &&
+                req.Headers.GetValues(headerName).First() == expectedValue),
+            ItExpr.IsAny<CancellationToken>()
+        );
     }
 
     public void Dispose() {
@@ -106,6 +149,164 @@ public class OpenFgaClientTests : IDisposable {
         });
         var exception = await Assert.ThrowsAsync<FgaValidationError>(ActionMissingStoreId);
         Assert.Equal("AuthorizationModelId is not in a valid ulid format", exception.Message);
+    }
+
+    /// <summary>
+    /// Test DefaultHeaders with reserved headers should throw
+    /// </summary>
+    [Theory]
+    [InlineData("Content-Type", "application/xml")]
+    [InlineData("content-type", "text/plain")]
+    [InlineData("CONTENT-TYPE", "application/json")]
+    [InlineData("Authorization", "Bearer fake-token")]
+    [InlineData("authorization", "Bearer fake-token")]
+    [InlineData("Content-Length", "1234")]
+    [InlineData("content-length", "1234")]
+    [InlineData("Host", "evil.com")]
+    [InlineData("host", "evil.com")]
+    [InlineData("Accept", "application/xml")]
+    [InlineData("accept", "application/xml")]
+    [InlineData("Accept-Encoding", "gzip")]
+    [InlineData("accept-encoding", "gzip")]
+    [InlineData("Transfer-Encoding", "chunked")]
+    [InlineData("transfer-encoding", "chunked")]
+    [InlineData("Connection", "close")]
+    [InlineData("connection", "close")]
+    [InlineData("Cookie", "sessionid=abc123")]
+    [InlineData("cookie", "sessionid=abc123")]
+    [InlineData("Set-Cookie", "sessionid=abc123")]
+    [InlineData("set-cookie", "sessionid=abc123")]
+    [InlineData("Date", "Mon, 01 Jan 2024 00:00:00 GMT")]
+    [InlineData("date", "Mon, 01 Jan 2024 00:00:00 GMT")]
+    public void EnsureValid_WithReservedDefaultHeader_ShouldThrowArgumentException(string headerName, string headerValue) {
+        var config = new ClientConfiguration {
+            ApiUrl = _apiUrl,
+            StoreId = _storeId
+        };
+        config.DefaultHeaders[headerName] = headerValue;
+
+        var exception = Assert.Throws<ArgumentException>(() => config.EnsureValid());
+
+        Assert.Contains("is a reserved HTTP header", exception.Message);
+        Assert.Contains("should not be set via custom headers", exception.Message);
+        Assert.Contains(headerName, exception.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Test DefaultHeaders with valid custom headers should not throw
+    /// </summary>
+    [Fact]
+    public void EnsureValid_WithValidCustomDefaultHeaders_ShouldNotThrow() {
+        var config = new ClientConfiguration {
+            ApiUrl = _apiUrl,
+            StoreId = _storeId
+        };
+        config.DefaultHeaders["X-Custom-Header"] = "custom-value";
+        config.DefaultHeaders["X-Request-ID"] = "req-123";
+        config.DefaultHeaders["X-Correlation-ID"] = "corr-456";
+
+        config.EnsureValid();
+    }
+
+    /// <summary>
+    /// Test DefaultHeaders with empty header name should throw
+    /// </summary>
+    [Fact]
+    public void EnsureValid_WithEmptyDefaultHeaderName_ShouldThrowArgumentException() {
+        var config = new ClientConfiguration {
+            ApiUrl = _apiUrl,
+            StoreId = _storeId
+        };
+        config.DefaultHeaders[""] = "value";
+
+        var exception = Assert.Throws<ArgumentException>(() => config.EnsureValid());
+        Assert.Contains("Header name cannot be null, empty, or whitespace", exception.Message);
+    }
+
+    /// <summary>
+    /// Test DefaultHeaders with null header value should throw
+    /// </summary>
+    [Fact]
+    public void EnsureValid_WithNullDefaultHeaderValue_ShouldThrowArgumentException() {
+        var config = new ClientConfiguration {
+            ApiUrl = _apiUrl,
+            StoreId = _storeId
+        };
+        config.DefaultHeaders["X-Custom"] = null!;
+
+        var exception = Assert.Throws<ArgumentException>(() => config.EnsureValid());
+        Assert.Contains("has a null value", exception.Message);
+    }
+
+    /// <summary>
+    /// Test DefaultHeaders with header injection should throw
+    /// </summary>
+    [Fact]
+    public void EnsureValid_WithHeaderInjectionInDefaultHeaders_ShouldThrowArgumentException() {
+        var config = new ClientConfiguration {
+            ApiUrl = _apiUrl,
+            StoreId = _storeId
+        };
+        config.DefaultHeaders["X-Custom"] = "value\r\nX-Injected: malicious";
+
+        var exception = Assert.Throws<ArgumentException>(() => config.EnsureValid());
+        Assert.Contains("CR/LF", exception.Message);
+        Assert.Contains("header injection", exception.Message);
+    }
+
+    /// <summary>
+    /// Test Content-Type in DefaultHeaders should throw with specific error
+    /// </summary>
+    [Fact]
+    public void EnsureValid_ContentTypeInDefaultHeaders_ShouldThrowWithSpecificError() {
+        var config = new ClientConfiguration {
+            ApiUrl = _apiUrl,
+            StoreId = _storeId
+        };
+        config.DefaultHeaders["Content-Type"] = "application/xml";
+
+        var exception = Assert.Throws<ArgumentException>(() => config.EnsureValid());
+
+        Assert.Contains("Content-Type", exception.Message);
+        Assert.Contains("reserved", exception.Message);
+        Assert.Contains("DefaultHeaders", exception.ParamName);
+    }
+
+    /// <summary>
+    /// Test Content-Type in DefaultHeaders is case-insensitive
+    /// </summary>
+    [Fact]
+    public void EnsureValid_ContentTypeInDefaultHeaders_CaseInsensitive_ShouldThrow() {
+        var casings = new[] { "content-type", "CONTENT-TYPE", "Content-type", "CoNtEnT-tYpE" };
+
+        foreach (var casing in casings) {
+            var config = new ClientConfiguration {
+                ApiUrl = _apiUrl,
+                StoreId = _storeId
+            };
+            config.DefaultHeaders[casing] = "application/xml";
+
+            var exception = Assert.Throws<ArgumentException>(() => config.EnsureValid());
+            Assert.Contains("reserved", exception.Message);
+        }
+    }
+
+    /// <summary>
+    /// Test Authorization in DefaultHeaders should throw with specific error
+    /// </summary>
+    [Fact]
+    public void EnsureValid_AuthorizationInDefaultHeaders_ShouldThrowWithSpecificError() {
+        var config = new ClientConfiguration {
+            ApiUrl = _apiUrl,
+            StoreId = _storeId
+        };
+        config.DefaultHeaders["Authorization"] = "Bearer custom-token";
+
+        var exception = Assert.Throws<ArgumentException>(() => config.EnsureValid());
+
+        Assert.Contains("Authorization", exception.Message);
+        Assert.Contains("reserved", exception.Message);
+        Assert.Contains("authentication failures", exception.Message);
     }
 
     /// <summary>
@@ -1829,4 +2030,853 @@ public class OpenFgaClientTests : IDisposable {
             ItExpr.IsAny<CancellationToken>()
         );
     }
+
+    #region Custom Headers Tests
+
+    /// <summary>
+    /// Test that Client*Options classes implement Headers property
+    /// </summary>
+    [Theory]
+    [InlineData(typeof(ClientCheckOptions))]
+    [InlineData(typeof(ClientWriteOptions))]
+    [InlineData(typeof(ClientExpandOptions))]
+    [InlineData(typeof(ClientListObjectsOptions))]
+    [InlineData(typeof(ClientReadOptions))]
+    public void ClientOptions_ShouldImplementHeadersProperty(Type optionsType) {
+        var options = Activator.CreateInstance(optionsType) as IClientRequestOptions;
+        Assert.NotNull(options);
+
+        var headers = new Dictionary<string, string> {
+            { TestHeaders.RequestId, "test-123" }
+        };
+
+        options!.Headers = headers;
+        Assert.NotNull(options.Headers);
+        Assert.Equal("test-123", options.Headers[TestHeaders.RequestId]);
+    }
+
+    /// <summary>
+    /// Test that Client*Options classes allow null headers
+    /// </summary>
+    [Fact]
+    public void ClientOptions_ShouldAllowNullHeaders() {
+        var options = new ClientCheckOptions { Headers = null };
+        Assert.Null(options.Headers);
+    }
+
+    /// <summary>
+    /// Test Check with custom headers includes headers in request
+    /// </summary>
+    [Fact]
+    public async Task Check_WithCustomHeaders_ShouldIncludeHeadersInRequest() {
+        var expectedResponse = new CheckResponse() { Allowed = true };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
+            req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+            req.Method == HttpMethod.Post &&
+            req.Headers.Contains(TestHeaders.RequestId) &&
+            req.Headers.GetValues(TestHeaders.RequestId).First() == "test-123" &&
+            req.Headers.Contains(TestHeaders.CustomHeader) &&
+            req.Headers.GetValues(TestHeaders.CustomHeader).First() == "custom-value"
+        );
+
+        var options = new ClientCheckOptions {
+            Headers = new Dictionary<string, string> {
+                { TestHeaders.RequestId, "test-123" },
+                { TestHeaders.CustomHeader, "custom-value" }
+            }
+        };
+
+        var response = await client.Check(
+            new ClientCheckRequest {
+                User = "user:anne",
+                Relation = "reader",
+                Object = "document:budget"
+            },
+            options
+        );
+
+        Assert.True(response.Allowed);
+        AssertHeaderPresent(mockHandler, TestHeaders.RequestId, "test-123");
+        AssertHeaderPresent(mockHandler, TestHeaders.CustomHeader, "custom-value");
+    }
+
+    /// <summary>
+    /// Test Check with null headers should not fail
+    /// </summary>
+    [Fact]
+    public async Task Check_WithNullHeaders_ShouldNotFail() {
+        var expectedResponse = new CheckResponse() { Allowed = false };
+        var (client, _) = CreateTestClientForHeaders(expectedResponse);
+
+        var options = new ClientCheckOptions { Headers = null };
+
+        var response = await client.Check(
+            new ClientCheckRequest {
+                User = "user:anne",
+                Relation = "reader",
+                Object = "document:budget"
+            },
+            options
+        );
+
+        Assert.False(response.Allowed);
+    }
+
+    /// <summary>
+    /// Test Check with invalid header value (CRLF injection) should throw
+    /// </summary>
+    [Fact]
+    public async Task Check_WithInvalidHeaderValue_ShouldThrowArgumentException() {
+        var (client, _) = CreateTestClientForHeaders(new CheckResponse());
+
+        var options = new ClientCheckOptions {
+            Headers = new Dictionary<string, string> {
+                { TestHeaders.RequestId, "value\r\nX-Injected: malicious" }
+            }
+        };
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await client.Check(
+                new ClientCheckRequest {
+                    User = "user:anne",
+                    Relation = "reader",
+                    Object = "document:budget"
+                },
+                options
+            )
+        );
+
+        Assert.Contains("CR/LF", exception.Message);
+        Assert.Contains("header injection", exception.Message);
+    }
+
+    /// <summary>
+    /// Test Write with custom headers
+    /// </summary>
+    [Fact]
+    public async Task Write_WithCustomHeaders_ShouldIncludeHeadersInRequest() {
+        var (client, mockHandler) = CreateTestClientForHeaders(new { }, req =>
+            req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/write") &&
+            req.Method == HttpMethod.Post &&
+            req.Headers.Contains(TestHeaders.TraceId) &&
+            req.Headers.GetValues(TestHeaders.TraceId).First() == "trace-456"
+        );
+
+        var options = new ClientWriteOptions {
+            Headers = new Dictionary<string, string> {
+                { TestHeaders.TraceId, "trace-456" }
+            },
+            Transaction = new TransactionOptions()
+        };
+
+        await client.Write(
+            new ClientWriteRequest {
+                Writes = new List<ClientTupleKey> {
+                    new() { User = "user:anne", Relation = "writer", Object = "document:budget" }
+                }
+            },
+            options
+        );
+
+        AssertHeaderPresent(mockHandler, TestHeaders.TraceId, "trace-456");
+    }
+
+    /// <summary>
+    /// Test Read with custom headers
+    /// </summary>
+    [Fact]
+    public async Task Read_WithCustomHeaders_ShouldIncludeHeadersInRequest() {
+        var expectedResponse = new ReadResponse() { Tuples = new List<Model.Tuple>() };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
+            req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/read") &&
+            req.Method == HttpMethod.Post &&
+            req.Headers.Contains(TestHeaders.SessionId)
+        );
+
+        var options = new ClientReadOptions {
+            Headers = new Dictionary<string, string> {
+                { TestHeaders.SessionId, "session-xyz" }
+            }
+        };
+
+        var response = await client.Read(
+            new ClientReadRequest { User = "user:anne" },
+            options
+        );
+
+        Assert.NotNull(response.Tuples);
+        AssertHeaderPresent(mockHandler, TestHeaders.SessionId, "session-xyz");
+    }
+
+    /// <summary>
+    /// Test Expand with custom headers
+    /// </summary>
+    [Fact]
+    public async Task Expand_WithCustomHeaders_ShouldIncludeHeadersInRequest() {
+        var expectedResponse = new ExpandResponse() {
+            Tree = new UsersetTree() { Root = new Node() }
+        };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
+            req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/expand") &&
+            req.Method == HttpMethod.Post &&
+            req.Headers.Contains(TestHeaders.UserId)
+        );
+
+        var options = new ClientExpandOptions {
+            Headers = new Dictionary<string, string> {
+                { TestHeaders.UserId, "user-789" }
+            }
+        };
+
+        var response = await client.Expand(
+            new ClientExpandRequest {
+                Relation = "reader",
+                Object = "document:budget"
+            },
+            options
+        );
+
+        Assert.NotNull(response.Tree);
+        AssertHeaderPresent(mockHandler, TestHeaders.UserId, "user-789");
+    }
+
+    /// <summary>
+    /// Test ListObjects with custom headers
+    /// </summary>
+    [Fact]
+    public async Task ListObjects_WithCustomHeaders_ShouldIncludeHeadersInRequest() {
+        var expectedResponse = new ListObjectsResponse() { Objects = new List<string>() };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
+            req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/list-objects") &&
+            req.Method == HttpMethod.Post &&
+            req.Headers.Contains(TestHeaders.CorrelationId)
+        );
+
+        var options = new ClientListObjectsOptions {
+            Headers = new Dictionary<string, string> {
+                { TestHeaders.CorrelationId, "corr-abc" }
+            }
+        };
+
+        var response = await client.ListObjects(
+            new ClientListObjectsRequest {
+                User = "user:anne",
+                Relation = "reader",
+                Type = "document"
+            },
+            options
+        );
+
+        Assert.NotNull(response.Objects);
+        AssertHeaderPresent(mockHandler, TestHeaders.CorrelationId, "corr-abc");
+    }
+
+    /// <summary>
+    /// Test ListUsers with custom headers
+    /// </summary>
+    [Fact]
+    public async Task ListUsers_WithCustomHeaders_ShouldIncludeHeadersInRequest() {
+        var expectedResponse = new ListUsersResponse() { Users = new List<User>() };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
+            req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/list-users") &&
+            req.Method == HttpMethod.Post &&
+            req.Headers.Contains("X-List-Users")
+        );
+
+        var options = new ClientListUsersOptions {
+            Headers = new Dictionary<string, string> {
+                { "X-List-Users", "users-123" }
+            }
+        };
+
+        var response = await client.ListUsers(
+            new ClientListUsersRequest {
+                Object = new FgaObject { Type = "document", Id = "budget" },
+                Relation = "reader",
+                UserFilters = new List<UserTypeFilter>()
+            },
+            options
+        );
+
+        Assert.NotNull(response.Users);
+        AssertHeaderPresent(mockHandler, "X-List-Users", "users-123");
+    }
+
+    /// <summary>
+    /// Test CreateStore with custom headers
+    /// </summary>
+    [Fact]
+    public async Task CreateStore_WithCustomHeaders_ShouldIncludeHeadersInRequest() {
+        var expectedResponse = new CreateStoreResponse() {
+            Id = "01H0H015178Y2V4CX10C2KGHF6",
+            Name = "Test Store"
+        };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
+            req.RequestUri == new Uri($"{_config.BasePath}/stores") &&
+            req.Method == HttpMethod.Post &&
+            req.Headers.Contains("X-Store-Create")
+        );
+
+        var options = new ClientCreateStoreOptions {
+            Headers = new Dictionary<string, string> {
+                { "X-Store-Create", "create-456" }
+            }
+        };
+
+        var response = await client.CreateStore(
+            new ClientCreateStoreRequest { Name = "Test Store" },
+            options
+        );
+
+        Assert.Equal("Test Store", response.Name);
+        AssertHeaderPresent(mockHandler, "X-Store-Create", "create-456");
+    }
+
+    /// <summary>
+    /// Test ListStores with custom headers
+    /// </summary>
+    [Fact]
+    public async Task ListStores_WithCustomHeaders_ShouldIncludeHeadersInRequest() {
+        var expectedResponse = new ListStoresResponse() { Stores = new List<Store>() };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
+            req.RequestUri.ToString().StartsWith($"{_config.BasePath}/stores") &&
+            req.Method == HttpMethod.Get &&
+            req.Headers.Contains("X-List-Stores")
+        );
+
+        var options = new ClientListStoresOptions {
+            Headers = new Dictionary<string, string> {
+                { "X-List-Stores", "list-789" }
+            }
+        };
+
+        var response = await client.ListStores(
+            new ClientListStoresRequest { },
+            options
+        );
+
+        Assert.NotNull(response.Stores);
+        AssertHeaderPresent(mockHandler, "X-List-Stores", "list-789");
+    }
+
+    /// <summary>
+    /// Test ReadAuthorizationModels with custom headers
+    /// </summary>
+    [Fact]
+    public async Task ReadAuthorizationModels_WithCustomHeaders_ShouldIncludeHeadersInRequest() {
+        var expectedResponse = new ReadAuthorizationModelsResponse() {
+            AuthorizationModels = new List<AuthorizationModel>()
+        };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
+            req.RequestUri.ToString().StartsWith($"{_config.BasePath}/stores/{_storeId}/authorization-models") &&
+            req.Method == HttpMethod.Get &&
+            req.Headers.Contains("X-Model-Request")
+        );
+
+        var options = new ClientReadAuthorizationModelsOptions {
+            Headers = new Dictionary<string, string> {
+                { "X-Model-Request", "model-123" }
+            }
+        };
+
+        var response = await client.ReadAuthorizationModels(options);
+
+        Assert.NotNull(response.AuthorizationModels);
+        AssertHeaderPresent(mockHandler, "X-Model-Request", "model-123");
+    }
+
+    /// <summary>
+    /// Test ReadLatestAuthorizationModel with custom headers
+    /// </summary>
+    [Fact]
+    public async Task ReadLatestAuthorizationModel_WithCustomHeaders_ShouldPropagateHeaders() {
+        var authModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
+        var expectedResponse = new ReadAuthorizationModelsResponse() {
+            AuthorizationModels = new List<AuthorizationModel> {
+                new AuthorizationModel { Id = authModelId }
+            }
+        };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
+            req.RequestUri.ToString().Contains("page_size=1") &&
+            req.Method == HttpMethod.Get &&
+            req.Headers.Contains("X-Latest-Model")
+        );
+
+        var options = new ClientWriteOptions {
+            Headers = new Dictionary<string, string> {
+                { "X-Latest-Model", "latest-xyz" }
+            },
+            Transaction = new TransactionOptions()
+        };
+
+        var response = await client.ReadLatestAuthorizationModel(options);
+
+        Assert.NotNull(response);
+        AssertHeaderPresent(mockHandler, "X-Latest-Model", "latest-xyz");
+    }
+
+    /// <summary>
+    /// Test ReadChanges with custom headers
+    /// </summary>
+    [Fact]
+    public async Task ReadChanges_WithCustomHeaders_ShouldIncludeHeadersInRequest() {
+        var expectedResponse = new ReadChangesResponse() {
+            Changes = new List<TupleChange>()
+        };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
+            req.RequestUri.ToString().StartsWith($"{_config.BasePath}/stores/{_storeId}/changes") &&
+            req.Method == HttpMethod.Get &&
+            req.Headers.Contains("X-Changes-Request")
+        );
+
+        var options = new ClientReadChangesOptions {
+            Headers = new Dictionary<string, string> {
+                { "X-Changes-Request", "changes-abc" }
+            }
+        };
+
+        var response = await client.ReadChanges(
+            new ClientReadChangesRequest { },
+            options
+        );
+
+        Assert.NotNull(response.Changes);
+        AssertHeaderPresent(mockHandler, "X-Changes-Request", "changes-abc");
+    }
+
+    /// <summary>
+    /// Test Check with empty header name should throw
+    /// </summary>
+    [Fact]
+    public async Task Check_WithEmptyHeaderName_ShouldThrowArgumentException() {
+        var (client, _) = CreateTestClientForHeaders(new CheckResponse());
+
+        var options = new ClientCheckOptions {
+            Headers = new Dictionary<string, string> {
+                { "", "value" }
+            }
+        };
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await client.Check(
+                new ClientCheckRequest {
+                    User = "user:anne",
+                    Relation = "reader",
+                    Object = "document:budget"
+                },
+                options
+            )
+        );
+
+        Assert.Contains("Header name cannot be null, empty, or whitespace", exception.Message);
+    }
+
+    /// <summary>
+    /// Test Check with null header value should throw
+    /// </summary>
+    [Fact]
+    public async Task Check_WithNullHeaderValue_ShouldThrowArgumentException() {
+        var (client, _) = CreateTestClientForHeaders(new CheckResponse());
+
+        var options = new ClientCheckOptions {
+            Headers = new Dictionary<string, string> {
+                { TestHeaders.RequestId, null! }
+            }
+        };
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await client.Check(
+                new ClientCheckRequest {
+                    User = "user:anne",
+                    Relation = "reader",
+                    Object = "document:budget"
+                },
+                options
+            )
+        );
+
+        Assert.Contains("has a null value", exception.Message);
+    }
+
+    /// <summary>
+    /// Test Check with reserved headers should throw
+    /// </summary>
+    [Theory]
+    [InlineData("Authorization")]
+    [InlineData("authorization")]
+    [InlineData("Content-Type")]
+    [InlineData("content-type")]
+    [InlineData("Content-Length")]
+    [InlineData("Host")]
+    [InlineData("Accept")]
+    [InlineData("Accept-Encoding")]
+    public async Task Check_WithReservedHeader_ShouldThrowArgumentException(string headerName) {
+        var (client, _) = CreateTestClientForHeaders(new CheckResponse());
+
+        var options = new ClientCheckOptions {
+            Headers = new Dictionary<string, string> {
+                { headerName, "some-value" }
+            }
+        };
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await client.Check(
+                new ClientCheckRequest {
+                    User = "user:anne",
+                    Relation = "reader",
+                    Object = "document:budget"
+                },
+                options
+            )
+        );
+
+        Assert.Contains("is a reserved HTTP header", exception.Message);
+        Assert.Contains("should not be set via custom headers", exception.Message);
+    }
+
+    /// <summary>
+    /// Test concurrent requests with different headers should not interfere
+    /// </summary>
+    [Fact]
+    public async Task ConcurrentRequests_WithDifferentHeaders_ShouldNotInterfere() {
+        var expectedResponse = new CheckResponse() { Allowed = true };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse);
+
+        var task1 = client.Check(
+            new ClientCheckRequest {
+                User = "user:anne",
+                Relation = "reader",
+                Object = "document:budget"
+            },
+            new ClientCheckOptions {
+                Headers = new Dictionary<string, string> {
+                    { TestHeaders.RequestId, "request-1" }
+                }
+            }
+        );
+
+        var task2 = client.Check(
+            new ClientCheckRequest {
+                User = "user:bob",
+                Relation = "writer",
+                Object = "document:report"
+            },
+            new ClientCheckOptions {
+                Headers = new Dictionary<string, string> {
+                    { TestHeaders.RequestId, "request-2" }
+                }
+            }
+        );
+
+        var results = await Task.WhenAll(task1, task2);
+
+        Assert.All(results, r => Assert.True(r.Allowed));
+        mockHandler.Protected().Verify(
+            "SendAsync",
+            Times.Exactly(2),
+            ItExpr.IsAny<HttpRequestMessage>(),
+            ItExpr.IsAny<CancellationToken>()
+        );
+    }
+
+    /// <summary>
+    /// Test per-request header overriding default header
+    /// </summary>
+    [Fact]
+    public async Task Check_WithHeaderOverridingDefaultHeader_ShouldUsePerRequestValue() {
+        // Setup client with default headers
+        var configWithDefaults = new ClientConfiguration() {
+            StoreId = _storeId,
+            ApiUrl = _apiUrl
+        };
+        configWithDefaults.DefaultHeaders[TestHeaders.RequestId] = "default-request-id";
+
+        var expectedResponse = new CheckResponse() { Allowed = true };
+        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req =>
+            req.Headers.Contains(TestHeaders.RequestId) &&
+            req.Headers.GetValues(TestHeaders.RequestId).First() == "override-request-id",
+            configWithDefaults
+        );
+
+        var options = new ClientCheckOptions {
+            Headers = new Dictionary<string, string> {
+                { TestHeaders.RequestId, "override-request-id" }
+            }
+        };
+
+        var response = await client.Check(
+            new ClientCheckRequest {
+                User = "user:anne",
+                Relation = "reader",
+                Object = "document:budget"
+            },
+            options
+        );
+
+        Assert.True(response.Allowed);
+        AssertHeaderPresent(mockHandler, TestHeaders.RequestId, "override-request-id");
+    }
+
+    /// <summary>
+    /// Test header precedence: per-request headers override default headers
+    /// </summary>
+    [Fact]
+    public async Task Check_HeaderPrecedence_PerRequestOverridesDefault() {
+        // Setup: Configure client with default headers
+        var configWithDefaults = new ClientConfiguration() {
+            StoreId = _storeId,
+            ApiUrl = _apiUrl
+        };
+        configWithDefaults.DefaultHeaders["X-Default-Header"] = "default-value";
+        configWithDefaults.DefaultHeaders["X-Override-Test"] = "default-value";
+
+        var expectedResponse = new CheckResponse() { Allowed = true };
+
+        // Track all headers that were actually sent
+        IDictionary<string, IEnumerable<string>>? sentHeaders = null;
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync((HttpRequestMessage req, CancellationToken ct) => {
+                sentHeaders = req.Headers.ToDictionary(h => h.Key, h => h.Value);
+                return new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(expectedResponse),
+                };
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var client = new OpenFgaClient(configWithDefaults, httpClient);
+
+        // Per-request headers should override the default header with same name
+        var options = new ClientCheckOptions {
+            Headers = new Dictionary<string, string> {
+                { "X-Override-Test", "per-request-value" },
+                { "X-Per-Request-Only", "per-request-only-value" }
+            }
+        };
+
+        await client.Check(
+            new ClientCheckRequest {
+                User = "user:anne",
+                Relation = "reader",
+                Object = "document:budget"
+            },
+            options
+        );
+
+        // Verify per-request header overrides default
+        Assert.NotNull(sentHeaders);
+        Assert.True(sentHeaders.TryGetValue("X-Override-Test", out var headerOverride));
+        Assert.Equal("per-request-value", headerOverride.First());
+
+        // Verify per-request-only header is present
+        Assert.True(sentHeaders.TryGetValue("X-Per-Request-Only", out var headerPerRequestOnly));
+        Assert.Equal("per-request-only-value", headerPerRequestOnly.First());
+
+        // Verify default header is still present when not overridden
+        Assert.True(sentHeaders.TryGetValue("X-Default-Header", out var headerDefault));
+        Assert.Equal("default-value", headerDefault.First());
+    }
+
+    /// <summary>
+    /// Test that per-request headers properly override default headers while non-conflicting headers are preserved
+    /// </summary>
+    [Fact]
+    public async Task Check_HeaderPrecedence_AllLayersIntegration() {
+        // This test verifies that per-request headers properly override default headers
+        // while non-conflicting headers from both layers are preserved.
+
+        var configWithDefaults = new ClientConfiguration() {
+            StoreId = _storeId,
+            ApiUrl = _apiUrl
+        };
+
+        // Default headers (lowest priority)
+        configWithDefaults.DefaultHeaders["X-Layer"] = "default";
+        configWithDefaults.DefaultHeaders["X-Default-Only"] = "default-only";
+
+        var expectedResponse = new CheckResponse() { Allowed = true };
+        IDictionary<string, IEnumerable<string>>? sentHeaders = null;
+
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync((HttpRequestMessage req, CancellationToken ct) => {
+                sentHeaders = req.Headers.ToDictionary(h => h.Key, h => h.Value);
+                return new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(expectedResponse),
+                };
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var client = new OpenFgaClient(configWithDefaults, httpClient);
+
+        // Per-request headers (highest priority)
+        var options = new ClientCheckOptions {
+            Headers = new Dictionary<string, string> {
+                { "X-Layer", "per-request" },
+                { "X-Per-Request-Only", "per-request-only" }
+            }
+        };
+
+        await client.Check(
+            new ClientCheckRequest {
+                User = "user:anne",
+                Relation = "reader",
+                Object = "document:budget"
+            },
+            options
+        );
+
+        Assert.NotNull(sentHeaders);
+
+        // Verify per-request header wins the precedence battle
+        Assert.Equal("per-request", sentHeaders["X-Layer"].First());
+
+        // Verify per-request-only header is present
+        Assert.Equal("per-request-only", sentHeaders["X-Per-Request-Only"].First());
+
+        // Verify default-only header is present (not overridden)
+        Assert.Equal("default-only", sentHeaders["X-Default-Only"].First());
+
+        // Verify exactly the right number of custom headers (not counting standard HTTP headers)
+        var customHeaders = sentHeaders.Where(h => h.Key.StartsWith("X-")).ToList();
+        Assert.Equal(3, customHeaders.Count);
+    }
+
+    /// <summary>
+    /// Test per-request Content-Type header should be blocked before HTTP request
+    /// </summary>
+    [Fact]
+    public async Task PerRequestHeaders_ContentType_ShouldFailBeforeHttpRequest() {
+        var (client, _) = CreateTestClientForHeaders(new CheckResponse());
+
+        var options = new ClientCheckOptions {
+            Headers = new Dictionary<string, string> {
+                { "Content-Type", "application/xml" }
+            }
+        };
+
+        var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await client.Check(
+                new ClientCheckRequest {
+                    User = "user:anne",
+                    Relation = "reader",
+                    Object = "document:budget"
+                },
+                options
+            )
+        );
+
+        Assert.Contains("Content-Type", exception.Message);
+        Assert.Contains("reserved HTTP header", exception.Message);
+    }
+
+    /// <summary>
+    /// Comprehensive test: Content-Type cannot be overridden through ANY path
+    /// </summary>
+    [Fact]
+    public async Task IntegrationTest_ContentTypeCannotBeOverriddenAnyPath() {
+        // This comprehensive test verifies Content-Type cannot be overridden through ANY path:
+        // 1. Via DefaultHeaders - validated at configuration time
+        // 2. Via per-request Headers - validated at request time
+
+        // Test Path 1: DefaultHeaders
+        var configWithContentType = new ClientConfiguration() {
+            StoreId = _storeId,
+            ApiUrl = _apiUrl
+        };
+        configWithContentType.DefaultHeaders["Content-Type"] = "text/plain";
+
+        var configException = Assert.Throws<ArgumentException>(() => configWithContentType.EnsureValid());
+        Assert.Contains("Content-Type", configException.Message);
+        Assert.Contains("reserved", configException.Message);
+
+        // Test Path 2: Per-request headers
+        var (client, _) = CreateTestClientForHeaders(new CheckResponse());
+
+        var optionsWithContentType = new ClientCheckOptions {
+            Headers = new Dictionary<string, string> {
+                { "Content-Type", "application/xml" }
+            }
+        };
+
+        var requestException = await Assert.ThrowsAsync<ArgumentException>(async () =>
+            await client.Check(
+                new ClientCheckRequest {
+                    User = "user:anne",
+                    Relation = "reader",
+                    Object = "document:budget"
+                },
+                optionsWithContentType
+            )
+        );
+
+        Assert.Contains("Content-Type", requestException.Message);
+        Assert.Contains("reserved", requestException.Message);
+    }
+
+    /// <summary>
+    /// Comprehensive test: all reserved headers are protected in both config and per-request paths
+    /// </summary>
+    [Fact]
+    public async Task IntegrationTest_AllReservedHeadersProtected() {
+        // Comprehensive test: ensure ALL reserved headers are protected in both paths
+        // Note: User-Agent is intentionally excluded as the SDK allows customization
+
+        var reservedHeaders = new[] {
+            "Authorization",
+            "Content-Type",
+            "Content-Length",
+            "Host",
+            "Accept",
+            "Accept-Encoding"
+        };
+
+        foreach (var reservedHeader in reservedHeaders) {
+            // Test DefaultHeaders path
+            var config = new ClientConfiguration() {
+                StoreId = _storeId,
+                ApiUrl = _apiUrl
+            };
+            config.DefaultHeaders[reservedHeader] = "test-value";
+
+            var configException = Assert.Throws<ArgumentException>(() => config.EnsureValid());
+            Assert.Contains(reservedHeader, configException.Message, StringComparison.OrdinalIgnoreCase);
+
+            // Test per-request headers path
+            var (client, _) = CreateTestClientForHeaders(new CheckResponse());
+
+            var options = new ClientCheckOptions {
+                Headers = new Dictionary<string, string> {
+                    { reservedHeader, "test-value" }
+                }
+            };
+
+            var requestException = await Assert.ThrowsAsync<ArgumentException>(async () =>
+                await client.Check(
+                    new ClientCheckRequest {
+                        User = "user:anne",
+                        Relation = "reader",
+                        Object = "document:budget"
+                    },
+                    options
+                )
+            );
+
+            Assert.Contains(reservedHeader, requestException.Message, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    #endregion
 }

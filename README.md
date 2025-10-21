@@ -205,6 +205,46 @@ namespace Example {
 }
 ```
 
+### Custom Headers
+
+#### Default Headers
+You can set default headers that will be sent with every request during client initialization:
+
+```csharp
+var configuration = new ClientConfiguration() {
+    ApiUrl = Environment.GetEnvironmentVariable("FGA_API_URL") ?? "http://localhost:8080",
+    StoreId = Environment.GetEnvironmentVariable("FGA_STORE_ID"),
+    AuthorizationModelId = Environment.GetEnvironmentVariable("FGA_MODEL_ID"),
+    DefaultHeaders = new Dictionary<string, string> {
+        { "X-Custom-Header", "default-value" },
+        { "X-Request-Source", "my-app" }
+    }
+};
+var fgaClient = new OpenFgaClient(configuration);
+```
+
+#### Per-Request Headers
+
+You can also send custom headers on a per-request basis by using the options parameter. Per-request headers will override any default headers set in the client configuration.
+
+```csharp
+// Add custom headers to a specific request
+var body = new ClientCheckRequest {
+    User = "user:anne",
+    Relation = "viewer",
+    Object = "document:roadmap"
+};
+
+var options = new ClientCheckOptions {
+    Headers = new Dictionary<string, string> {
+        { "X-Request-ID", "123e4567-e89b-12d3-a456-426614174000" },
+        { "X-Custom-Header", "custom-value" } // These override any default headers
+    }
+};
+
+var response = await fgaClient.Check(body, options);
+```
+
 
 ### Get your Store ID
 

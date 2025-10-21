@@ -11,12 +11,14 @@
 //
 
 
+using System.Collections.Generic;
+
 namespace OpenFga.Sdk.Client.Model;
 
 /// <summary>
 ///     ClientListStoresOptions - Client Options for ListStores
 /// </summary>
-public interface IClientListStoresOptions : ClientRequestOptions, AuthorizationModelIdOptions, ClientPaginationOptions {
+public interface IClientListStoresOptions : IClientRequestOptions, AuthorizationModelIdOptions, ClientPaginationOptions {
 }
 
 /// <inheritdoc />
@@ -30,4 +32,7 @@ public class ClientListStoresOptions : IClientListStoresOptions {
 
     /// <inheritdoc />
     public string? ContinuationToken { get; set; }
+
+    /// <inheritdoc />
+    public IDictionary<string, string>? Headers { get; set; }
 }

@@ -11,6 +11,8 @@
 //
 
 
+using System.Collections.Generic;
+
 namespace OpenFga.Sdk.Client.Model;
 
 /// <summary>
@@ -26,4 +28,7 @@ public class ClientReadAuthorizationModelOptions : IClientReadAuthorizationModel
 
     /// <inheritdoc />
     public string? AuthorizationModelId { get; set; }
+
+    /// <inheritdoc />
+    public IDictionary<string, string>? Headers { get; set; }
 }

@@ -12,6 +12,7 @@
 
 
 using OpenFga.Sdk.Model;
+using System.Collections.Generic;
 
 namespace OpenFga.Sdk.Client.Model;
 
@@ -27,4 +28,7 @@ public class ClientListObjectsOptions : IClientListObjectsOptions {
 
     /// <inheritdoc />
     public ConsistencyPreference? Consistency { get; set; }
+
+    /// <inheritdoc />
+    public IDictionary<string, string>? Headers { get; set; }
 }

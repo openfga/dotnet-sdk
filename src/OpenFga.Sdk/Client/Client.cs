@@ -20,6 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using OpenFga.Sdk.Api;
+using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Client.Model;
 #if NETSTANDARD2_0 || NET48
 using OpenFga.Sdk.Client.Extensions;
@@ -63,7 +64,6 @@ public class OpenFgaClient : IDisposable {
     }
 
     public void Dispose() => api.Dispose();
-
 
 #if NET6_0_OR_GREATER
     private async Task ProcessWriteChunksAsync<T>(
@@ -134,7 +134,7 @@ public class OpenFgaClient : IDisposable {
         ClientWriteOptions clientWriteOpts,
         int maxParallelReqs,
         CancellationToken cancellationToken) {
-        
+
         using (var throttler = new SemaphoreSlim(maxParallelReqs)) {
             var tasks = chunks.Select(async chunk => {
                 await throttler.WaitAsync(cancellationToken);
@@ -175,7 +175,7 @@ public class OpenFgaClient : IDisposable {
         IClientBatchCheckOptions? options,
         int maxParallelReqs,
         CancellationToken cancellationToken) {
-        
+
         using (var throttler = new SemaphoreSlim(maxParallelReqs)) {
             var tasks = requests.Select(async request => {
                 await throttler.WaitAsync(cancellationToken);
@@ -233,27 +233,27 @@ public class OpenFgaClient : IDisposable {
    */
     public async Task<ListStoresResponse> ListStores(IClientListStoresRequest? body, IClientListStoresOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ListStores(options?.PageSize, options?.ContinuationToken, body?.Name, cancellationToken);
+        await api.ListStores(options?.PageSize, options?.ContinuationToken, body?.Name, options, cancellationToken);
 
     /**
    * CreateStore - Initialize a store
    */
     public async Task<CreateStoreResponse> CreateStore(ClientCreateStoreRequest body,
-        ClientRequestOptions? options = default,
+        IClientRequestOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.CreateStore(body, cancellationToken);
+        await api.CreateStore(body, options, cancellationToken);
 
     /**
    * GetStore - Get information about the current store
    */
     public async Task<GetStoreResponse> GetStore(IClientRequestOptionsWithStoreId? options = default, CancellationToken cancellationToken = default) =>
-        await api.GetStore(GetStoreId(options), cancellationToken);
+        await api.GetStore(GetStoreId(options), options, cancellationToken);
 
     /**
    * DeleteStore - Delete a store
    */
     public async Task DeleteStore(IClientRequestOptionsWithStoreId? options = default, CancellationToken cancellationToken = default) =>
-        await api.DeleteStore(GetStoreId(options), cancellationToken);
+        await api.DeleteStore(GetStoreId(options), options, cancellationToken);
 
     /************************
      * Authorization Models *
@@ -265,7 +265,7 @@ public class OpenFgaClient : IDisposable {
     public async Task<ReadAuthorizationModelsResponse> ReadAuthorizationModels(
         IClientReadAuthorizationModelsOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ReadAuthorizationModels(GetStoreId(options), options?.PageSize, options?.ContinuationToken, cancellationToken);
+        await api.ReadAuthorizationModels(GetStoreId(options), options?.PageSize, options?.ContinuationToken, options, cancellationToken);
 
     /**
      * WriteAuthorizationModel - Create a new version of the authorization model
@@ -273,7 +273,7 @@ public class OpenFgaClient : IDisposable {
     public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(ClientWriteAuthorizationModelRequest body,
         IClientRequestOptionsWithStoreId? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.WriteAuthorizationModel(GetStoreId(options), body, cancellationToken);
+        await api.WriteAuthorizationModel(GetStoreId(options), body, options, cancellationToken);
 
     /**
      * ReadAuthorizationModel - Read the current authorization model
@@ -286,7 +286,7 @@ public class OpenFgaClient : IDisposable {
             throw new FgaRequiredParamError("ClientConfiguration", "AuthorizationModelId");
         }
 
-        return await api.ReadAuthorizationModel(GetStoreId(options), authorizationModelId, cancellationToken);
+        return await api.ReadAuthorizationModel(GetStoreId(options), authorizationModelId, options, cancellationToken);
     }
 
     /**
@@ -296,7 +296,7 @@ public class OpenFgaClient : IDisposable {
         IClientRequestOptionsWithAuthZModelId? options = default,
         CancellationToken cancellationToken = default) {
         var response =
-            await ReadAuthorizationModels(new ClientReadAuthorizationModelsOptions { StoreId = options?.StoreId, PageSize = 1 }, cancellationToken);
+            await ReadAuthorizationModels(new ClientReadAuthorizationModelsOptions { StoreId = options?.StoreId, PageSize = 1, Headers = options?.Headers }, cancellationToken);
 
         if (response.AuthorizationModels.Count > 0) {
             return new ReadAuthorizationModelResponse { AuthorizationModel = response.AuthorizationModels?[0] };
@@ -315,7 +315,7 @@ public class OpenFgaClient : IDisposable {
     public async Task<ReadChangesResponse> ReadChanges(ClientReadChangesRequest? body = default,
         ClientReadChangesOptions? options = default,
         CancellationToken cancellationToken = default) =>
-        await api.ReadChanges(GetStoreId(options), body?.Type, options?.PageSize, options?.ContinuationToken, body?.StartTime, cancellationToken);
+        await api.ReadChanges(GetStoreId(options), body?.Type, options?.PageSize, options?.ContinuationToken, body?.StartTime, options, cancellationToken);
 
     /**
      * Read - Read tuples previously written to the store (does not evaluate)
@@ -333,7 +333,7 @@ public class OpenFgaClient : IDisposable {
                 PageSize = options?.PageSize,
                 ContinuationToken = options?.ContinuationToken,
                 Consistency = options?.Consistency,
-            }, cancellationToken);
+            }, options, cancellationToken);
     }
 
     /**
@@ -359,7 +359,7 @@ public class OpenFgaClient : IDisposable {
                 requestBody.Deletes = new WriteRequestDeletes(body.Deletes.ConvertAll(key => key.ToTupleKeyWithoutCondition()));
             }
 
-            await api.Write(GetStoreId(options), requestBody, cancellationToken);
+            await api.Write(GetStoreId(options), requestBody, options, cancellationToken);
             return new ClientWriteResponse {
                 Writes =
                     body.Writes?.ConvertAll(tupleKey =>
@@ -372,7 +372,7 @@ public class OpenFgaClient : IDisposable {
             };
         }
 
-        var clientWriteOpts = new ClientWriteOptions() { StoreId = StoreId, AuthorizationModelId = authorizationModelId };
+        var clientWriteOpts = new ClientWriteOptions() { StoreId = StoreId, AuthorizationModelId = authorizationModelId, Headers = options?.Headers };
 
         var writeChunks = body.Writes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKey[]>();
         var writeResponses = new ConcurrentBag<ClientWriteSingleResponse>();
@@ -435,7 +435,7 @@ public class OpenFgaClient : IDisposable {
                 Context = body.Context,
                 AuthorizationModelId = GetAuthorizationModelId(options),
                 Consistency = options?.Consistency,
-            }, cancellationToken);
+            }, options, cancellationToken);
 
     /**
    * BatchCheck - Run a set of checks (evaluates)
@@ -469,7 +469,7 @@ public class OpenFgaClient : IDisposable {
                     },
                 AuthorizationModelId = GetAuthorizationModelId(options),
                 Consistency = options?.Consistency
-            }, cancellationToken);
+            }, options, cancellationToken);
 
     /**
      * ListObjects - List the objects of a particular type that the user has a certain relation to (evaluates)
@@ -489,7 +489,7 @@ public class OpenFgaClient : IDisposable {
             Context = body.Context,
             AuthorizationModelId = GetAuthorizationModelId(options),
             Consistency = options?.Consistency,
-        }, cancellationToken);
+        }, options, cancellationToken);
 
 
     /**
@@ -541,12 +541,11 @@ public class OpenFgaClient : IDisposable {
             Object = body.Object,
             Relation = body.Relation,
             UserFilters = body.UserFilters,
-            ContextualTuples = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ??
-                                new List<TupleKey>(),
+            ContextualTuples = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ?? new List<TupleKey>(),
             Context = body.Context,
             AuthorizationModelId = GetAuthorizationModelId(options),
             Consistency = options?.Consistency
-        });
+        }, options, cancellationToken);
 
     /**************
      * Assertions *
@@ -562,7 +561,7 @@ public class OpenFgaClient : IDisposable {
             throw new FgaRequiredParamError("ClientConfiguration", "AuthorizationModelId");
         }
 
-        return await api.ReadAssertions(GetStoreId(options), authorizationModelId, cancellationToken);
+        return await api.ReadAssertions(GetStoreId(options), authorizationModelId, options, cancellationToken);
     }
 
     /**
@@ -591,6 +590,6 @@ public class OpenFgaClient : IDisposable {
         }
 
         await api.WriteAssertions(GetStoreId(options), authorizationModelId,
-            new WriteAssertionsRequest { Assertions = assertions }, cancellationToken);
+            new WriteAssertionsRequest { Assertions = assertions }, options, cancellationToken);
     }
 }
