@@ -395,7 +395,7 @@ public class OpenFgaClient : IDisposable {
         var clientWriteOpts = new ClientWriteOptions() {
             StoreId = options?.StoreId ?? StoreId,
             AuthorizationModelId = authorizationModelId,
-            Headers = ExtractHeaders(options)?.Headers,
+            Headers = options?.Headers,
             Conflict = options?.Conflict
         };
 
