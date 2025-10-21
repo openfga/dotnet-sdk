@@ -1972,5 +1972,983 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.Empty(response.Stores);
             Assert.Equal(response, expectedResponse);
         }
+
+        /**
+         * Retry-After Header Tests
+         */
+
+        /// <summary>
+        /// Test that Retry-After header with integer format (delay-seconds) is parsed correctly in error
+        /// </summary>
+        [Fact]
+        public async Task RetryAfterIntegerFormatInErrorTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "5" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "10" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "15" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var config = new Configuration.Configuration() {
+                ApiHost = _host,
+                MaxRetry = 2,
+            };
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            Task<CheckResponse> RateLimitError() => openFgaApi.Check(_storeId, body);
+            var error = await Assert.ThrowsAsync<FgaApiRateLimitExceededError>(RateLimitError);
+
+            // Verify Retry-After header was parsed and stored
+            Assert.NotNull(error.RetryAfter);
+            Assert.Equal(15, error.RetryAfter);
+            Assert.Equal("15", error.RetryAfterRaw);
+
+            // Verify retry attempt tracking
+            Assert.Equal(2, error.RetryAttempt);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(3),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test that Retry-After header with HTTP-date format captures raw value for debugging
+        /// Note: HTTP-date parsing verification is limited in mock scenarios due to header handling.
+        /// The production implementation supports both integer and HTTP-date formats per RFC 7231.
+        /// </summary>
+        [Fact]
+        public async Task RetryAfterHttpDateFormatInErrorTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            // Use a well-formatted HTTP-date per RFC 7231
+            var httpDateFormat = "Wed, 21 Oct 2025 07:28:00 GMT";
+
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(() => {
+                    var response = new HttpResponseMessage {
+                        StatusCode = (HttpStatusCode)429,
+                        Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                    };
+                    response.Headers.TryAddWithoutValidation("Retry-After", httpDateFormat);
+                    return response;
+                })
+                .ReturnsAsync(() => {
+                    var response = new HttpResponseMessage {
+                        StatusCode = (HttpStatusCode)429,
+                        Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                    };
+                    response.Headers.TryAddWithoutValidation("Retry-After", httpDateFormat);
+                    return response;
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var config = new Configuration.Configuration() {
+                ApiHost = _host,
+                MaxRetry = 1,
+            };
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            Task<CheckResponse> RateLimitError() => openFgaApi.Check(_storeId, body);
+            var error = await Assert.ThrowsAsync<FgaApiRateLimitExceededError>(RateLimitError);
+
+            // Verify raw header value was captured for debugging purposes
+            // This is critical for troubleshooting retry issues
+            Assert.Equal(httpDateFormat, error.RetryAfterRaw);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test successful retry after respecting Retry-After header
+        /// </summary>
+        [Fact]
+        public async Task RetryAfterSuccessfulRetryTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "1" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            var response = await openFgaApi.Check(_storeId, body);
+
+            Assert.IsType<CheckResponse>(response);
+            Assert.True(response.Allowed);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test that out-of-bounds Retry-After values (too large) are handled correctly
+        /// </summary>
+        [Fact]
+        public async Task RetryAfterOutOfBoundsTooLargeTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            // Value > 1800 seconds (30 minutes) should be ignored
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "3600" } }, // 1 hour - too large
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "3600" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var config = new Configuration.Configuration() {
+                ApiHost = _host,
+                MaxRetry = 1,
+            };
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            Task<CheckResponse> RateLimitError() => openFgaApi.Check(_storeId, body);
+            var error = await Assert.ThrowsAsync<FgaApiRateLimitExceededError>(RateLimitError);
+
+            // Out of bounds value should result in null RetryAfter (falls back to exponential backoff)
+            Assert.Null(error.RetryAfter);
+            // But raw value should still be captured
+            Assert.Equal("3600", error.RetryAfterRaw);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test that out-of-bounds Retry-After values (too small) are handled correctly
+        /// </summary>
+        [Fact]
+        public async Task RetryAfterOutOfBoundsTooSmallTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            // Value < 1 second should be ignored
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "0" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "0" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var config = new Configuration.Configuration() {
+                ApiHost = _host,
+                MaxRetry = 1,
+            };
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            Task<CheckResponse> RateLimitError() => openFgaApi.Check(_storeId, body);
+            var error = await Assert.ThrowsAsync<FgaApiRateLimitExceededError>(RateLimitError);
+
+            // Out of bounds value should result in null RetryAfter
+            Assert.Null(error.RetryAfter);
+            Assert.Equal("0", error.RetryAfterRaw);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test that invalid Retry-After format is handled gracefully
+        /// </summary>
+        [Fact]
+        public async Task RetryAfterInvalidFormatTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(() => {
+                    var response = new HttpResponseMessage {
+                        StatusCode = (HttpStatusCode)429,
+                        Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                    };
+                    response.Headers.TryAddWithoutValidation("Retry-After", "invalid-value");
+                    return response;
+                })
+                .ReturnsAsync(() => {
+                    var response = new HttpResponseMessage {
+                        StatusCode = (HttpStatusCode)429,
+                        Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                    };
+                    response.Headers.TryAddWithoutValidation("Retry-After", "invalid-value");
+                    return response;
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var config = new Configuration.Configuration() {
+                ApiHost = _host,
+                MaxRetry = 1,
+            };
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            Task<CheckResponse> RateLimitError() => openFgaApi.Check(_storeId, body);
+            var error = await Assert.ThrowsAsync<FgaApiRateLimitExceededError>(RateLimitError);
+
+            // Invalid format should result in null RetryAfter (falls back to exponential backoff)
+            Assert.Null(error.RetryAfter);
+            // Raw value should still be captured for debugging
+            Assert.Equal("invalid-value", error.RetryAfterRaw);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test that RetryAttempt field is correctly tracked across retries
+        /// </summary>
+        [Fact]
+        public async Task RetryAttemptTrackingTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "1" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "1" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "1" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var config = new Configuration.Configuration() {
+                ApiHost = _host,
+                MaxRetry = 2,
+            };
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            Task<CheckResponse> RateLimitError() => openFgaApi.Check(_storeId, body);
+            var error = await Assert.ThrowsAsync<FgaApiRateLimitExceededError>(RateLimitError);
+
+            // Should show attempt 2 (0 = initial, 1 = first retry, 2 = second retry)
+            Assert.Equal(2, error.RetryAttempt);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(3),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test Retry-After with 500 Internal Server Error
+        /// </summary>
+        [Fact]
+        public async Task RetryAfterWith500ErrorTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Headers = { { "Retry-After", "3" } },
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Headers = { { "Retry-After", "5" } },
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var config = new Configuration.Configuration() {
+                ApiHost = _host,
+                MaxRetry = 1,
+            };
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            Task<CheckResponse> InternalError() => openFgaApi.Check(_storeId, body);
+            var error = await Assert.ThrowsAsync<FgaApiInternalError>(InternalError);
+
+            // Verify Retry-After header was captured for 500 errors
+            Assert.NotNull(error.RetryAfter);
+            Assert.Equal(5, error.RetryAfter);
+            Assert.Equal("5", error.RetryAfterRaw);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test Retry-After with 503 Service Unavailable
+        /// </summary>
+        [Fact]
+        public async Task RetryAfterWith503ErrorTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.ServiceUnavailable,
+                    Headers = { { "Retry-After", "2" } },
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            var response = await openFgaApi.Check(_storeId, body);
+
+            Assert.IsType<CheckResponse>(response);
+            Assert.True(response.Allowed);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test that missing Retry-After header doesn't break retry logic
+        /// </summary>
+        [Fact]
+        public async Task RetryWithoutRetryAfterHeaderTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    // No Retry-After header
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            var response = await openFgaApi.Check(_storeId, body);
+
+            Assert.IsType<CheckResponse>(response);
+            Assert.True(response.Allowed);
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test that x-ratelimit-reset legacy header is captured for logging/debugging only.
+        /// Verifies that Retry-After (not x-ratelimit-reset) is used for actual retry delay calculation.
+        /// The x-ratelimit-reset header is deprecated for retry logic but still exposed for logging.
+        /// </summary>
+        [Fact]
+        public async Task XRateLimitResetLegacyHeaderTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(() => {
+                    var response = new HttpResponseMessage {
+                        StatusCode = (HttpStatusCode)429,
+                        Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                    };
+                    // Add Retry-After for retry delay calculation
+                    response.Headers.TryAddWithoutValidation("Retry-After", "5");
+                    // Add legacy x-ratelimit-reset header (milliseconds) for logging only
+                    response.Headers.Add(RateLimitParser.RateLimitHeader.LimitResetIn, "3000");
+                    response.Headers.Add(RateLimitParser.RateLimitHeader.LimitRemaining, "0");
+                    response.Headers.Add(RateLimitParser.RateLimitHeader.LimitTotalInPeriod, "10");
+                    return response;
+                })
+                .ReturnsAsync(() => {
+                    var response = new HttpResponseMessage {
+                        StatusCode = (HttpStatusCode)429,
+                        Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                    };
+                    response.Headers.TryAddWithoutValidation("Retry-After", "5");
+                    response.Headers.Add(RateLimitParser.RateLimitHeader.LimitResetIn, "3000");
+                    response.Headers.Add(RateLimitParser.RateLimitHeader.LimitRemaining, "0");
+                    response.Headers.Add(RateLimitParser.RateLimitHeader.LimitTotalInPeriod, "10");
+                    return response;
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var config = new Configuration.Configuration() {
+                ApiHost = _host,
+                MaxRetry = 1,
+            };
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            Task<CheckResponse> RateLimitError() => openFgaApi.Check(_storeId, body);
+            var error = await Assert.ThrowsAsync<FgaApiRateLimitExceededError>(RateLimitError);
+
+            // Verify Retry-After is used for retry delay calculation (new standard)
+            Assert.NotNull(error.RetryAfter);
+            Assert.Equal(5, error.RetryAfter);
+            Assert.Equal("5", error.RetryAfterRaw);
+
+            // Verify x-ratelimit-reset legacy header is captured for logging/debugging
+            // (deprecated for retry logic, but still exposed)
+            Assert.NotNull(error.XRateLimitReset);
+            Assert.Equal(3000, error.XRateLimitReset); // Value in milliseconds
+            Assert.NotNull(error.ResetInMs);
+            Assert.Equal(3000, error.ResetInMs); // Same value from rate limit parser
+
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(2),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        /// <summary>
+        /// Test that different Retry-After values are respected across multiple retries
+        /// </summary>
+        [Fact]
+        public async Task RetryAfterMultipleRetriesWithDifferentValuesTest() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "1" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    Headers = { { "Retry-After", "2" } },
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.ServiceUnavailable,
+                    Headers = { { "Retry-After", "3" } },
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            var response = await openFgaApi.Check(_storeId, body);
+
+            Assert.IsType<CheckResponse>(response);
+            Assert.True(response.Allowed);
+
+            // Verify all attempts were made
+            mockHandler.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(4),
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>()
+            );
+        }
+
+        #region End-to-End Integration Improvements
+
+        [Fact]
+        public async Task RetryAfterWithTimingVerification() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Headers = { { "Retry-After", "1" } },
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var response = await openFgaApi.Check(_storeId, body);
+            sw.Stop();
+
+            Assert.IsType<CheckResponse>(response);
+            Assert.True(response.Allowed);
+            Assert.True(sw.ElapsedMilliseconds >= 1000, $"Expected delay >= 1000ms, but only took {sw.ElapsedMilliseconds}ms");
+            Assert.True(sw.ElapsedMilliseconds < 1500, $"Expected delay < 1500ms, but took {sw.ElapsedMilliseconds}ms");
+        }
+
+        [Fact]
+        public async Task RetryWithExponentialBackoffTimingVerification() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            mockHandler.Protected()
+                .SetupSequence<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = (HttpStatusCode)429,
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                })
+                .ReturnsAsync(new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var response = await openFgaApi.Check(_storeId, body);
+            sw.Stop();
+
+            Assert.IsType<CheckResponse>(response);
+            Assert.True(response.Allowed);
+            // With MinWaitInMs=100 (default), first retry delay should be [100ms, 200ms]
+            Assert.True(sw.ElapsedMilliseconds >= 100, $"Expected delay >= 100ms with exponential backoff, but only took {sw.ElapsedMilliseconds}ms");
+            Assert.True(sw.ElapsedMilliseconds < 300, $"Expected delay < 300ms with exponential backoff, but took {sw.ElapsedMilliseconds}ms");
+        }
+
+        [Fact]
+        public async Task RetryMultipleRetriesWithDifferentDelaysTimingVerification() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var attemptTimes = new List<long>();
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync((HttpRequestMessage req, CancellationToken ct) => {
+                    attemptTimes.Add(sw.ElapsedMilliseconds);
+                    if (attemptTimes.Count == 1) {
+                        return new HttpResponseMessage {
+                            StatusCode = (HttpStatusCode)429,
+                            Headers = { { "Retry-After", "1" } },
+                            Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                        };
+                    }
+                    else if (attemptTimes.Count == 2) {
+                        return new HttpResponseMessage {
+                            StatusCode = (HttpStatusCode)429,
+                            Headers = { { "Retry-After", "2" } },
+                            Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                        };
+                    }
+                    else {
+                        return new HttpResponseMessage {
+                            StatusCode = HttpStatusCode.OK,
+                            Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                        };
+                    }
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            var response = await openFgaApi.Check(_storeId, body);
+            sw.Stop();
+
+            Assert.IsType<CheckResponse>(response);
+            Assert.True(response.Allowed);
+            Assert.Equal(3, attemptTimes.Count);
+
+            var delay1 = attemptTimes[1] - attemptTimes[0];
+            var delay2 = attemptTimes[2] - attemptTimes[1];
+
+            Assert.True(delay1 >= 1000, $"First retry delay should be ~1000ms, got {delay1}ms");
+            Assert.True(delay1 < 1300, $"First retry delay should be ~1000ms, got {delay1}ms");
+            Assert.True(delay2 >= 2000, $"Second retry delay should be ~2000ms, got {delay2}ms");
+            Assert.True(delay2 < 2300, $"Second retry delay should be ~2000ms, got {delay2}ms");
+        }
+
+        [Fact]
+        public async Task RetryMetadataVerification() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var requestsReceived = 0;
+
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync((HttpRequestMessage req, CancellationToken ct) => {
+                    requestsReceived++;
+                    if (requestsReceived == 1) {
+                        return new HttpResponseMessage {
+                            StatusCode = (HttpStatusCode)429,
+                            Headers = { { "Retry-After", "1" } },
+                            Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                        };
+                    }
+                    else {
+                        return new HttpResponseMessage {
+                            StatusCode = HttpStatusCode.OK,
+                            Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                        };
+                    }
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            var response = await openFgaApi.Check(_storeId, body);
+
+            Assert.IsType<CheckResponse>(response);
+            Assert.True(response.Allowed);
+            Assert.Equal(2, requestsReceived);
+        }
+
+        [Fact]
+        public async Task ExponentialBackoffWithNetworkErrors() {
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var attemptTimes = new List<long>();
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/check") &&
+                        req.Method == HttpMethod.Post),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .Returns((HttpRequestMessage req, CancellationToken ct) => {
+                    attemptTimes.Add(sw.ElapsedMilliseconds);
+                    if (attemptTimes.Count == 1) {
+                        throw new HttpRequestException("Network error");
+                    }
+                    else {
+                        return Task.FromResult(new HttpResponseMessage {
+                            StatusCode = HttpStatusCode.OK,
+                            Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
+                        });
+                    }
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var openFgaApi = new OpenFgaApi(_config, httpClient);
+
+            var body = new CheckRequest {
+                TupleKey = new CheckRequestTupleKey() {
+                    User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+                    Relation = "viewer",
+                    Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+                }
+            };
+
+            var response = await openFgaApi.Check(_storeId, body);
+            sw.Stop();
+
+            Assert.IsType<CheckResponse>(response);
+            Assert.True(response.Allowed);
+            Assert.Equal(2, attemptTimes.Count);
+
+            var delay = attemptTimes[1] - attemptTimes[0];
+            // First retry delay with MinWaitInMs=100 (default) should be [100ms, 200ms]
+            Assert.True(delay >= 100, $"Expected exponential backoff delay >= 100ms after network error, got {delay}ms");
+            Assert.True(delay < 300, $"Expected exponential backoff delay < 300ms after network error, got {delay}ms");
+        }
+
+        #endregion
     }
 }
