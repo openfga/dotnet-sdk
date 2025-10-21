@@ -30,7 +30,7 @@ public class JsonStringEnumMemberConverter<EnumTemplate> : JsonConverter<EnumTem
     private readonly Dictionary<string, EnumTemplate> _stringToEnum = new Dictionary<string, EnumTemplate>();
 
     /// <summary>
-    /// Parsing and converting enum member	
+    /// Parsing and converting enum member
 	/// </summary>
     public JsonStringEnumMemberConverter() {
         var type = typeof(EnumTemplate);

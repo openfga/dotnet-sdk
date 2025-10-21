@@ -224,6 +224,20 @@ public class OpenFgaClient : IDisposable {
         return authorizationModelId;
     }
 
+    private static WriteRequestWrites.OnDuplicateEnum MapOnDuplicateWrites(OnDuplicateWrites? behavior) {
+        if (behavior == null) return WriteRequestWrites.OnDuplicateEnum.Error;
+        return behavior.Value == OnDuplicateWrites.Error
+            ? WriteRequestWrites.OnDuplicateEnum.Error
+            : WriteRequestWrites.OnDuplicateEnum.Ignore;
+    }
+
+    private static WriteRequestDeletes.OnMissingEnum MapOnMissingDeletes(OnMissingDeletes? behavior) {
+        if (behavior == null) return WriteRequestDeletes.OnMissingEnum.Error;
+        return behavior.Value == OnMissingDeletes.Error
+            ? WriteRequestDeletes.OnMissingEnum.Error
+            : WriteRequestDeletes.OnMissingEnum.Ignore;
+    }
+
     /**********
      * Stores *
      **********/
@@ -353,10 +367,16 @@ public class OpenFgaClient : IDisposable {
                 AuthorizationModelId = authorizationModelId
             };
             if (body.Writes?.Count > 0) {
-                requestBody.Writes = new WriteRequestWrites(body.Writes.ConvertAll(key => key.ToTupleKey()));
+                requestBody.Writes = new WriteRequestWrites(
+                    body.Writes.ConvertAll(key => key.ToTupleKey()),
+                    MapOnDuplicateWrites(options?.Conflict?.OnDuplicateWrites)
+                );
             }
             if (body.Deletes?.Count > 0) {
-                requestBody.Deletes = new WriteRequestDeletes(body.Deletes.ConvertAll(key => key.ToTupleKeyWithoutCondition()));
+                requestBody.Deletes = new WriteRequestDeletes(
+                    body.Deletes.ConvertAll(key => key.ToTupleKeyWithoutCondition()),
+                    MapOnMissingDeletes(options?.Conflict?.OnMissingDeletes)
+                );
             }
 
             await api.Write(GetStoreId(options), requestBody, options, cancellationToken);
@@ -372,7 +392,12 @@ public class OpenFgaClient : IDisposable {
             };
         }
 
-        var clientWriteOpts = new ClientWriteOptions() { StoreId = StoreId, AuthorizationModelId = authorizationModelId, Headers = options?.Headers };
+        var clientWriteOpts = new ClientWriteOptions() {
+            StoreId = GetStoreId(options),
+            AuthorizationModelId = authorizationModelId,
+            Headers = options?.Headers,
+            Conflict = options?.Conflict
+        };
 
         var writeChunks = body.Writes?.Chunk(maxPerChunk).ToList() ?? new List<ClientTupleKey[]>();
         var writeResponses = new ConcurrentBag<ClientWriteSingleResponse>();

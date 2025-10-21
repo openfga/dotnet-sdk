@@ -7,7 +7,12 @@
   - per-request headers support via `Headers` property on all client options classes
   - `IRequestOptions` interface and `RequestOptions` class for API-level header support
   - `IClientRequestOptions` interface and `ClientRequestOptions` class for client-level header support
-  - add header validation to prevent overiding of reserved headers
+  - add header validation to prevent overriding of reserved headers
+- feat: add write conflict resolution options
+  - `ConflictOptions` to control behavior for duplicate writes and missing deletes
+  - `OnDuplicateWrites` option: `Error` (default) or `Ignore` for handling duplicate tuple writes
+  - `OnMissingDeletes` option: `Error` (default) or `Ignore` for handling missing tuple deletes
+  - Available in `ClientWriteOptions.Conflict` property
 
 [!WARNING]
 BREAKING CHANGES:
@@ -15,11 +20,13 @@ BREAKING CHANGES:
 - **OpenFgaApi methods**: All API methods now accept an `IRequestOptions? options` parameter. If you are using the low-level `OpenFgaApi` directly, you may need to update your calls:
 
   Before:
+
   ```csharp
   await api.Check(storeId, body, cancellationToken);
   ```
 
   After:
+
   ```csharp
   var options = new RequestOptions {
       Headers = new Dictionary<string, string> { { "X-Custom-Header", "value" } }
@@ -30,11 +37,13 @@ BREAKING CHANGES:
 - **ClientRequestOptions renamed**: The base client request options interface has been renamed from `ClientRequestOptions` to `IClientRequestOptions` to better follow .NET naming conventions. A concrete `ClientRequestOptions` class is now also available. If you were casting to or implementing this interface, update your code:
 
   Before:
+
   ```csharp
   var options = obj as ClientRequestOptions;
   ```
 
   After:
+
   ```csharp
   var options = obj as IClientRequestOptions;
   ```
