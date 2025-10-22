@@ -145,7 +145,7 @@ public class ApiClient : IDisposable {
             response.retryCount);
     }
 
-    internal async Task<ResponseWrapper<TResult>> Retry<TResult>(Func<Task<ResponseWrapper<TResult>>> retryable) {
+    private async Task<ResponseWrapper<TResult>> Retry<TResult>(Func<Task<ResponseWrapper<TResult>>> retryable) {
         var requestCount = 0;
         var attemptCount = 0; // 0 = initial request, 1+ = retry attempts
 
@@ -236,7 +236,7 @@ public class ApiClient : IDisposable {
     /// <summary>
     /// Populates retry-related metadata in an exception before it's thrown.
     /// </summary>
-    internal void PopulateRetryMetadata(FgaApiError error, int attemptCount) {
+    private void PopulateRetryMetadata(FgaApiError error, int attemptCount) {
         error.RetryAttempt = attemptCount;
 
         if (error.ResponseHeaders != null) {
