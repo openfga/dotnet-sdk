@@ -88,6 +88,33 @@ public class FgaApiError : ApiException {
     public HttpStatusCode StatusCode { get; }
 
     /// <summary>
+    /// Parsed Retry-After header value in seconds, if present in the response.
+    /// This indicates how long the client should wait before retrying the request.
+    /// </summary>
+    [JsonPropertyName("retry_after")]
+    public int? RetryAfter { get; internal set; }
+
+    /// <summary>
+    /// Raw Retry-After header value from the response, if present.
+    /// May be in integer (seconds) or HTTP-date format.
+    /// </summary>
+    [JsonPropertyName("retry_after_raw")]
+    public string? RetryAfterRaw { get; internal set; }
+
+    /// <summary>
+    /// Legacy X-Rate-Limit-Reset header value (Unix timestamp), if present.
+    /// This is deprecated for retry logic but exposed for logging and debugging.
+    /// </summary>
+    [JsonPropertyName("x_rate_limit_reset")]
+    public long? XRateLimitReset { get; internal set; }
+
+    /// <summary>
+    /// The retry attempt number when this error occurred (0 = initial request, 1+ = retry attempts).
+    /// </summary>
+    [JsonPropertyName("retry_attempt")]
+    public int RetryAttempt { get; internal set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="FgaApiError"/> class.
     /// </summary>
     public FgaApiError() {
@@ -123,6 +150,7 @@ public class FgaApiError : ApiException {
     public FgaApiError(HttpStatusCode statusCode, string message, Exception innerException, bool shouldRetry = false)
         : base(message, innerException) {
         StatusCode = statusCode;
+        ShouldRetry = shouldRetry;
     }
 
     /// <summary>

@@ -81,7 +81,7 @@ public class OAuth2Client {
     private AuthToken _authToken = new();
     private IDictionary<string, string> _authRequest { get; }
     private string _apiTokenIssuer { get; }
-    private readonly RetryParams _retryParams;
+    private readonly RetryHandler _retryHandler;
 
     #endregion
 
@@ -92,6 +92,8 @@ public class OAuth2Client {
     /// </summary>
     /// <param name="credentialsConfig"></param>
     /// <param name="httpClient"></param>
+    /// <param name="retryParams"></param>
+    /// <param name="metrics"></param>
     /// <exception cref="NullReferenceException"></exception>
     public OAuth2Client(Credentials credentialsConfig, BaseClient httpClient, RetryParams retryParams,
         Metrics metrics) {
@@ -123,7 +125,7 @@ public class OAuth2Client {
             _authRequest["audience"] = credentialsConfig.Config.ApiAudience;
         }
 
-        _retryParams = retryParams;
+        _retryHandler = new RetryHandler(retryParams);
         this.metrics = metrics;
     }
 
@@ -147,7 +149,8 @@ public class OAuth2Client {
                 requestBuilder,
                 null,
                 "ExchangeTokenAsync",
-                cancellationToken));
+                cancellationToken),
+            cancellationToken);
 
         sw.Stop();
 
@@ -161,33 +164,38 @@ public class OAuth2Client {
         }
     }
 
-    private async Task<TResult> Retry<TResult>(Func<Task<TResult>> retryable) {
-        var numRetries = 0;
+    private async Task<TResult> Retry<TResult>(Func<Task<TResult>> retryable, CancellationToken cancellationToken = default) {
+        var attemptCount = 0; // 0 = initial request, 1+ = retry attempts
+
         while (true) {
             try {
-                numRetries++;
-
-                return await retryable();
+                return await retryable().ConfigureAwait(false);
             }
-            catch (FgaApiRateLimitExceededError err) {
-                if (numRetries > _retryParams.MaxRetry) {
+            catch (FgaApiError err) when (err is FgaApiRateLimitExceededError || err.ShouldRetry) {
+                // Check if we should retry based on status code and attempt count
+                if (!_retryHandler.ShouldRetry(err.StatusCode, attemptCount)) {
+                    err.RetryAttempt = attemptCount;
+
+                    if (err.ResponseHeaders != null) {
+                        var info = _retryHandler.ExtractRetryAfterInfoFromHeaders(err.ResponseHeaders);
+                        err.RetryAfter = info.retryAfterSeconds;
+                        err.RetryAfterRaw = info.retryAfterRaw;
+                    }
+
                     throw;
                 }
 
-                var waitInMs = (int)(err.ResetInMs == null || err.ResetInMs < _retryParams.MinWaitInMs
-                    ? _retryParams.MinWaitInMs
-                    : err.ResetInMs);
+                // Calculate delay using Retry-After header or exponential backoff
+                var delay = _retryHandler.CalculateDelayFromHeaders(err.ResponseHeaders, attemptCount);
 
-                await Task.Delay(waitInMs);
+                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                attemptCount++;
             }
-            catch (FgaApiError err) {
-                if (!err.ShouldRetry || numRetries > _retryParams.MaxRetry) {
-                    throw;
-                }
-
-                var waitInMs = _retryParams.MinWaitInMs;
-
-                await Task.Delay(waitInMs);
+            catch (Exception ex) when (_retryHandler.IsTransientError(ex, attemptCount)) {
+                // Network error - retry with exponential backoff (no headers available)
+                var delay = _retryHandler.CalculateDelayFromHeaders(null, attemptCount);
+                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                attemptCount++;
             }
         }
     }

@@ -34,6 +34,7 @@ public class ApiClient : IDisposable {
     private readonly Configuration.Configuration _configuration;
     private readonly OAuth2Client? _oauth2Client;
     private readonly Metrics metrics;
+    private readonly RetryHandler _retryHandler;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ApiClient" /> class.
@@ -44,6 +45,7 @@ public class ApiClient : IDisposable {
         configuration.EnsureValid();
         _configuration = configuration;
         _baseClient = new BaseClient(configuration, userHttpClient);
+        _retryHandler = new RetryHandler(new RetryParams { MaxRetry = _configuration.MaxRetry, MinWaitInMs = _configuration.MinWaitInMs });
 
         metrics = new Metrics(_configuration);
 
@@ -145,6 +147,8 @@ public class ApiClient : IDisposable {
 
     private async Task<ResponseWrapper<TResult>> Retry<TResult>(Func<Task<ResponseWrapper<TResult>>> retryable) {
         var requestCount = 0;
+        var attemptCount = 0; // 0 = initial request, 1+ = retry attempts
+
         while (true) {
             try {
                 requestCount++;
@@ -156,25 +160,25 @@ public class ApiClient : IDisposable {
 
                 return response;
             }
-            catch (FgaApiRateLimitExceededError err) {
-                if (requestCount > _configuration.MaxRetry) {
+            catch (FgaApiError err) when (err is FgaApiRateLimitExceededError || err.ShouldRetry) {
+                // Check if we should retry based on status code and attempt count
+                if (!_retryHandler.ShouldRetry(err.StatusCode, attemptCount)) {
+                    // Populate retry metadata before throwing
+                    PopulateRetryMetadata(err, attemptCount);
                     throw;
                 }
 
-                var waitInMs = (int)(err.ResetInMs == null || err.ResetInMs < _configuration.MinWaitInMs
-                    ? _configuration.MinWaitInMs
-                    : err.ResetInMs);
+                // Calculate delay using Retry-After header or exponential backoff
+                var delay = _retryHandler.CalculateDelayFromHeaders(err.ResponseHeaders, attemptCount);
 
-                await Task.Delay(waitInMs);
+                await Task.Delay(delay);
+                attemptCount++;
             }
-            catch (FgaApiError err) {
-                if (!err.ShouldRetry || requestCount > _configuration.MaxRetry) {
-                    throw;
-                }
-
-                var waitInMs = _configuration.MinWaitInMs;
-
-                await Task.Delay(waitInMs);
+            catch (Exception ex) when (_retryHandler.IsTransientError(ex, attemptCount)) {
+                // Network error - retry with exponential backoff (no headers available)
+                var delay = _retryHandler.CalculateDelayFromHeaders(null, attemptCount);
+                await Task.Delay(delay);
+                attemptCount++;
             }
         }
     }
@@ -227,6 +231,19 @@ public class ApiClient : IDisposable {
         }
 
         return headers;
+    }
+
+    /// <summary>
+    /// Populates retry-related metadata in an exception before it's thrown.
+    /// </summary>
+    private void PopulateRetryMetadata(FgaApiError error, int attemptCount) {
+        error.RetryAttempt = attemptCount;
+
+        if (error.ResponseHeaders != null) {
+            var retryInfo = _retryHandler.ExtractRetryAfterInfoFromHeaders(error.ResponseHeaders);
+            error.RetryAfter = retryInfo.retryAfterSeconds;
+            error.RetryAfterRaw = retryInfo.retryAfterRaw;
+        }
     }
 
     public void Dispose() => _baseClient.Dispose();

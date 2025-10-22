@@ -70,6 +70,9 @@ public class FgaApiRateLimitExceededError : FgaApiError {
         Reset = rateLimit.Reset;
         Message =
             $"Rate Limit Error for {rateLimit.Method} {rateLimit.ApiName} with API limit of {rateLimit.Limit} requests per {rateLimit.LimitUnit}.";
+
+        // Populate X-Rate-Limit-Reset for logging (legacy header, deprecated for retry logic)
+        XRateLimitReset = rateLimit.ResetInMs;
     }
 
     internal new static async Task<FgaApiError> CreateAsync(HttpResponseMessage response, HttpRequestMessage request, string? apiName) {

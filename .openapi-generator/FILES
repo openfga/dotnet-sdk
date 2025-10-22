@@ -110,6 +110,8 @@ example/OpenTelemetryExample/OpenTelemetryExample.cs
 example/OpenTelemetryExample/OpenTelemetryExample.csproj
 example/README.md
 src/OpenFga.Sdk.Test/Api/OpenFgaApiTests.cs
+src/OpenFga.Sdk.Test/ApiClient/OAuth2ClientTests.cs
+src/OpenFga.Sdk.Test/ApiClient/RetryHandlerTests.cs
 src/OpenFga.Sdk.Test/Client/OpenFgaClientTests.cs
 src/OpenFga.Sdk.Test/Models/Client/ClientBatchCheckResponseTest.cs
 src/OpenFga.Sdk.Test/Models/ModelTests.cs
@@ -119,6 +121,7 @@ src/OpenFga.Sdk/ApiClient/ApiClient.cs
 src/OpenFga.Sdk/ApiClient/BaseClient.cs
 src/OpenFga.Sdk/ApiClient/OAuth2Client.cs
 src/OpenFga.Sdk/ApiClient/RequestBuilder.cs
+src/OpenFga.Sdk/ApiClient/RetryHandler.cs
 src/OpenFga.Sdk/ApiClient/Utils.cs
 src/OpenFga.Sdk/Client/ApiClient.cs
 src/OpenFga.Sdk/Client/Client.cs
@@ -270,6 +273,7 @@ src/OpenFga.Sdk/Model/WriteRequest.cs
 src/OpenFga.Sdk/Model/WriteRequestDeletes.cs
 src/OpenFga.Sdk/Model/WriteRequestWrites.cs
 src/OpenFga.Sdk/OpenFga.Sdk.csproj
+src/OpenFga.Sdk/Properties/AssemblyInfo.cs
 src/OpenFga.Sdk/Telemetry/Attributes.cs
 src/OpenFga.Sdk/Telemetry/Counters.cs
 src/OpenFga.Sdk/Telemetry/Histograms.cs

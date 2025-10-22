@@ -13,6 +13,9 @@
   - `OnDuplicateWrites` option: `Error` (default) or `Ignore` for handling duplicate tuple writes
   - `OnMissingDeletes` option: `Error` (default) or `Ignore` for handling missing tuple deletes
   - Available in `ClientWriteOptions.Conflict` property
+- feat: add Retry-After header support for rate limiting
+  - Retry logic now respects `Retry-After` header from HTTP 429 responses
+  - Falls back to exponential backoff when Retry-After header is missing or invalid
 
 [!WARNING]
 BREAKING CHANGES:
