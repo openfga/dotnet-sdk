@@ -6,23 +6,33 @@
     <RootNamespace>OpenFga.Sdk.Test</RootNamespace>
     <TargetFrameworks>netcoreapp3.1;net48;net8.0;net9.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <LangVersion>10.0</LangVersion>
+    <IsNet8OrGreater>$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))</IsNet8OrGreater>
+    <!-- Suppress warnings that don't apply to test projects:
+         NU1701: Package compatibility warnings
+         CS1591: Missing XML documentation comments
+         CS1574,CS1712,CS1573: XML documentation reference warnings
+         CS0618: Obsolete API usage (intentional for backward compatibility testing)
+         CS8618: Non-nullable field must contain a non-null value when exiting constructor -->
+    <NoWarn>$(NoWarn);NU1701;CS1591;CS1574;CS1712;CS1573;CS0618;CS8618</NoWarn>
   </PropertyGroup>
 
-  <!-- .NET 8.0 and .NET 9.0 specific settings -->
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0' OR '$(TargetFramework)' == 'net9.0'">
+  <!-- .NET 8.0+ specific settings -->
+  <PropertyGroup Condition="'$(IsNet8OrGreater)' == 'true'">
+    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <!-- .NET Core 3.1 specific settings -->
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+  <!-- Pre-.NET 8.0 settings (requires explicit LangVersion) -->
+  <PropertyGroup Condition="'$(IsNet8OrGreater)' != 'true'">
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <!-- .NET Framework 4.8 specific settings -->
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
-    <LangVersion>10.0</LangVersion>
-    <Nullable>enable</Nullable>
+  <!-- Suppress TFM support warnings for netcoreapp3.1 -->
+  <!-- These packages work fine with netcoreapp3.1 despite not being officially tested -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <!-- Packages needed for .NET versions < .NET 8 -->
