@@ -19,6 +19,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenFga.Sdk.ApiClient;
@@ -54,7 +55,7 @@ public sealed class RetryHandler {
 
     private readonly IRetryParams _retryParams;
     private readonly int _maxRetries;
-    private static readonly Random _random = new();
+    private static readonly ThreadLocal<Random> _random = new(() => new Random());
 
     /// <summary>
     /// Initializes a new instance of the RetryHandler class.
@@ -239,7 +240,7 @@ public sealed class RetryHandler {
         var upperBoundMs = Math.Pow(2, attemptCount + 1) * _retryParams.MinWaitInMs;
 
         // Apply jitter: random value between base and upper bound
-        var jitterDelayMs = baseDelayMs + (_random.NextDouble() * (upperBoundMs - baseDelayMs));
+        var jitterDelayMs = baseDelayMs + (_random.Value!.NextDouble() * (upperBoundMs - baseDelayMs));
 
         // Cap at maximum delay
         var cappedDelayMs = Math.Min(jitterDelayMs, MAX_RETRY_DELAY_MS);
