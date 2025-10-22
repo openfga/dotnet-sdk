@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.7.0...HEAD)
+## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.8.0...HEAD)
+
+## v0.8.0
+
+### [0.8.0](https://github.com/openfga/dotnet-sdk/compare/v0.7.0...v0.8.0) (2025-10-22)
 
 - feat!: add per-request custom headers support
   - `DefaultHeaders` support to `ClientConfiguration` for headers sent with every request
