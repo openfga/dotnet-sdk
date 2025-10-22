@@ -876,7 +876,18 @@ await fgaClient.WriteAssertions(body, options);
 
 If a network request fails with a 429 or 5xx error from the server, the SDK will automatically retry the request up to 3 times with a minimum wait time of 100 milliseconds between each attempt.
 
-To customize this behavior, create a `RetryParams` instance and assign values to the `MaxRetry` and `MinWaitInMs` constructor parameters. `MaxRetry` determines the maximum number of retries (up to 15), while `MinWaitInMs` sets the minimum wait time between retries in milliseconds.
+#### Retry-After Header Support
+
+The SDK respects the `Retry-After` header from HTTP 429 (rate limit) responses per RFC 7231. When present, the SDK will use the delay specified in the header (supporting both delay-seconds and HTTP-date formats) instead of exponential backoff. If the `Retry-After` header is missing or invalid, the SDK automatically falls back to exponential backoff with jitter.
+
+When a rate limit error cannot be retried (e.g., retry limit exceeded), the `FgaApiRateLimitExceededError` exception will include:
+- `RetryAfter`: Parsed delay in seconds (if valid)
+- `RetryAfterRaw`: Raw header value for debugging
+- `RetryAttempt`: Number of retry attempts made
+
+#### Customizing Retry Behavior
+
+To customize retry behavior, create a `RetryParams` instance and assign values to the `MaxRetry` and `MinWaitInMs` constructor parameters. `MaxRetry` determines the maximum number of retries (up to 15), while `MinWaitInMs` sets the minimum wait time between retries in milliseconds (used for exponential backoff when `Retry-After` is not present).
 
 Apply your custom retry values by passing the object to the `ClientConfiguration` constructor's `RetryParams` parameter.
 
@@ -907,6 +918,7 @@ namespace Example {
     }
 }
 ```
+
 
 ### API Endpoints
 
