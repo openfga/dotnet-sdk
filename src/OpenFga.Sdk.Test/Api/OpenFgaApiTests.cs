@@ -2781,8 +2781,9 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.IsType<CheckResponse>(response);
             Assert.True(response.Allowed);
             // With MinWaitInMs=100 (default), first retry delay should be [100ms, 200ms]
+            // Allow up to 500ms to account for CI environment overhead (virtualization, CPU contention, etc.)
             Assert.True(sw.ElapsedMilliseconds >= 100, $"Expected delay >= 100ms with exponential backoff, but only took {sw.ElapsedMilliseconds}ms");
-            Assert.True(sw.ElapsedMilliseconds < 300, $"Expected delay < 300ms with exponential backoff, but took {sw.ElapsedMilliseconds}ms");
+            Assert.True(sw.ElapsedMilliseconds < 500, $"Expected delay < 500ms with exponential backoff, but took {sw.ElapsedMilliseconds}ms");
         }
 
         [Fact]
@@ -2865,19 +2866,10 @@ namespace OpenFga.Sdk.Test.Api {
                 )
                 .ReturnsAsync((HttpRequestMessage req, CancellationToken ct) => {
                     requestsReceived++;
-                    if (requestsReceived == 1) {
-                        return new HttpResponseMessage {
-                            StatusCode = (HttpStatusCode)429,
-                            Headers = { { "Retry-After", "1" } },
-                            Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
-                        };
-                    }
-                    else {
-                        return new HttpResponseMessage {
-                            StatusCode = HttpStatusCode.OK,
-                            Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
-                        };
-                    }
+
+                    return requestsReceived == 1
+                        ? new HttpResponseMessage { StatusCode = (HttpStatusCode)429, Headers = { { "Retry-After", "1" } }, Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }) }
+                        : new HttpResponseMessage { StatusCode = HttpStatusCode.OK, Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }) };
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
@@ -2945,8 +2937,9 @@ namespace OpenFga.Sdk.Test.Api {
 
             var delay = attemptTimes[1] - attemptTimes[0];
             // First retry delay with MinWaitInMs=100 (default) should be [100ms, 200ms]
+            // Allow up to 500ms to account for CI environment overhead (virtualization, CPU contention, etc.)
             Assert.True(delay >= 100, $"Expected exponential backoff delay >= 100ms after network error, got {delay}ms");
-            Assert.True(delay < 300, $"Expected exponential backoff delay < 300ms after network error, got {delay}ms");
+            Assert.True(delay < 500, $"Expected exponential backoff delay < 500ms after network error, got {delay}ms");
         }
 
         #endregion

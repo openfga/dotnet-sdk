@@ -81,7 +81,7 @@ public sealed class RetryHandler {
     /// Determines whether a request should be retried based on the HTTP status code and attempt count.
     /// </summary>
     /// <param name="statusCode">HTTP status code from the response</param>
-    /// <param name="attemptCount">Current retry attempt count (0 = initial request, 1+ = retries)</param>
+    /// <param name="attemptCount">Retry attempt index (0 = first retry, 1 = second, ...)</param>
     /// <returns>True if the request should be retried, false otherwise</returns>
     public bool ShouldRetry(HttpStatusCode statusCode, int attemptCount) {
         // Check if we've exhausted our retry attempts
@@ -147,7 +147,9 @@ public sealed class RetryHandler {
         if (headers != null) {
             var retryAfterSeconds = ParseRetryAfterFromHeaders(headers);
             if (retryAfterSeconds.HasValue) {
-                return TimeSpan.FromSeconds(retryAfterSeconds.Value);
+                var ms = retryAfterSeconds.Value * 1000.0;
+                var cappedMs = Math.Min(ms, MAX_RETRY_DELAY_MS);
+                return TimeSpan.FromMilliseconds(cappedMs);
             }
         }
 
