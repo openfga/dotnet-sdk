@@ -2051,8 +2051,8 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public async Task RetryAfterHttpDateFormatInErrorTest() {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-            // Use a well-formatted HTTP-date per RFC 7231
-            var httpDateFormat = "Wed, 21 Oct 2025 07:28:00 GMT";
+            // Use a valid RFC1123 date safely in the past to avoid long sleeps
+            var httpDateFormat = DateTimeOffset.UtcNow.AddMinutes(-60).ToString("r");
 
             mockHandler.Protected()
                 .SetupSequence<Task<HttpResponseMessage>>(

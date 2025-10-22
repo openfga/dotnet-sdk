@@ -149,7 +149,8 @@ public class OAuth2Client {
                 requestBuilder,
                 null,
                 "ExchangeTokenAsync",
-                cancellationToken));
+                cancellationToken),
+            cancellationToken);
 
         sw.Stop();
 
@@ -163,32 +164,37 @@ public class OAuth2Client {
         }
     }
 
-    private async Task<TResult> Retry<TResult>(Func<Task<TResult>> retryable) {
-        var requestCount = 0;
+    private async Task<TResult> Retry<TResult>(Func<Task<TResult>> retryable, CancellationToken cancellationToken = default) {
         var attemptCount = 0; // 0 = initial request, 1+ = retry attempts
 
         while (true) {
             try {
-                requestCount++;
-
-                return await retryable();
+                return await retryable().ConfigureAwait(false);
             }
             catch (FgaApiError err) when (err is FgaApiRateLimitExceededError || err.ShouldRetry) {
                 // Check if we should retry based on status code and attempt count
                 if (!_retryHandler.ShouldRetry(err.StatusCode, attemptCount)) {
+                    err.RetryAttempt = attemptCount;
+
+                    if (err.ResponseHeaders != null) {
+                        var info = _retryHandler.ExtractRetryAfterInfoFromHeaders(err.ResponseHeaders);
+                        err.RetryAfter = info.retryAfterSeconds;
+                        err.RetryAfterRaw = info.retryAfterRaw;
+                    }
+
                     throw;
                 }
 
                 // Calculate delay using Retry-After header or exponential backoff
                 var delay = _retryHandler.CalculateDelayFromHeaders(err.ResponseHeaders, attemptCount);
 
-                await Task.Delay(delay);
+                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 attemptCount++;
             }
             catch (Exception ex) when (_retryHandler.IsTransientError(ex, attemptCount)) {
                 // Network error - retry with exponential backoff (no headers available)
                 var delay = _retryHandler.CalculateDelayFromHeaders(null, attemptCount);
-                await Task.Delay(delay);
+                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 attemptCount++;
             }
         }

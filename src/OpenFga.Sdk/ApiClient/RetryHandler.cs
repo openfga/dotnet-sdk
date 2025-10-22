@@ -69,6 +69,10 @@ public sealed class RetryHandler {
             throw new ArgumentOutOfRangeException(nameof(retryParams.MaxRetry), "MaxRetry must be non-negative");
         }
 
+        if (_retryParams.MinWaitInMs <= 0) {
+            throw new ArgumentOutOfRangeException(nameof(retryParams.MinWaitInMs), "MinWaitInMs must be greater than 0");
+        }
+
         // Cap at 15 as per spec
         _maxRetries = Math.Min(_retryParams.MaxRetry, MAX_RETRIES_HARD_LIMIT);
     }
