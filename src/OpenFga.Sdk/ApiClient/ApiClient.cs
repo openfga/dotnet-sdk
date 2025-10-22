@@ -145,7 +145,7 @@ public class ApiClient : IDisposable {
             response.retryCount);
     }
 
-    private async Task<ResponseWrapper<TResult>> Retry<TResult>(Func<Task<ResponseWrapper<TResult>>> retryable) {
+    internal async Task<ResponseWrapper<TResult>> Retry<TResult>(Func<Task<ResponseWrapper<TResult>>> retryable) {
         var requestCount = 0;
         var attemptCount = 0; // 0 = initial request, 1+ = retry attempts
 
