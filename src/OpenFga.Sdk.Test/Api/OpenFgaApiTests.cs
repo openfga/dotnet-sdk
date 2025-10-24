@@ -1,15 +1,3 @@
-//
-// OpenFGA/.NET SDK for OpenFGA
-//
-// API version: 1.x
-// Website: https://openfga.dev
-// Documentation: https://openfga.dev/docs
-// Support: https://openfga.dev/community
-// License: [Apache-2.0](https://github.com/openfga/dotnet-sdk/blob/main/LICENSE)
-//
-// NOTE: This file was auto generated. DO NOT EDIT.
-//
-
 using Moq;
 using Moq.Protected;
 using OpenFga.Sdk.Api;
@@ -2845,10 +2833,8 @@ namespace OpenFga.Sdk.Test.Api {
             var delay1 = attemptTimes[1] - attemptTimes[0];
             var delay2 = attemptTimes[2] - attemptTimes[1];
 
-            Assert.True(delay1 >= 1000, $"First retry delay should be ~1000ms, got {delay1}ms");
-            Assert.True(delay1 < 1300, $"First retry delay should be ~1000ms, got {delay1}ms");
-            Assert.True(delay2 >= 2000, $"Second retry delay should be ~2000ms, got {delay2}ms");
-            Assert.True(delay2 < 2300, $"Second retry delay should be ~2000ms, got {delay2}ms");
+            Assert.InRange(delay1, 900, 1100);
+            Assert.InRange(delay2, 1900, 2100);
         }
 
         [Fact]

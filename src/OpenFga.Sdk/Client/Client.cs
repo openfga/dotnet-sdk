@@ -1,16 +1,3 @@
-//
-// OpenFGA/.NET SDK for OpenFGA
-//
-// API version: 1.x
-// Website: https://openfga.dev
-// Documentation: https://openfga.dev/docs
-// Support: https://openfga.dev/community
-// License: [Apache-2.0](https://github.com/openfga/dotnet-sdk/blob/main/LICENSE)
-//
-// NOTE: This file was auto generated. DO NOT EDIT.
-//
-
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,6 +9,7 @@ using System.Threading.Tasks;
 using OpenFga.Sdk.Api;
 using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Constants;
 #if NETSTANDARD2_0 || NET48
 using OpenFga.Sdk.Client.Extensions;
 #endif
@@ -33,10 +21,6 @@ namespace OpenFga.Sdk.Client;
 public class OpenFgaClient : IDisposable {
     private readonly ClientConfiguration _configuration;
     protected OpenFgaApi api;
-    private string CLIENT_BULK_REQUEST_ID_HEADER = "X-OpenFGA-Client-Bulk-Request-Id";
-    private string CLIENT_METHOD_HEADER = "X-OpenFGA-Client-Method";
-
-    private readonly int DEFAULT_MAX_METHOD_PARALLEL_REQS = 10;
 
     public OpenFgaClient(
         ClientConfiguration configuration,
@@ -359,7 +343,7 @@ public class OpenFgaClient : IDisposable {
             options?.Transaction?.MaxPerChunk ??
             1; // 1 has to be the default otherwise the chunks will be sent in transactions
         var maxParallelReqs =
-            options?.Transaction?.MaxParallelRequests ?? DEFAULT_MAX_METHOD_PARALLEL_REQS;
+            options?.Transaction?.MaxParallelRequests ?? FgaConstants.ClientMaxMethodParallelRequests;
         var authorizationModelId = GetAuthorizationModelId(options);
 
         if (options?.Transaction?.Disable != true) {
@@ -470,7 +454,7 @@ public class OpenFgaClient : IDisposable {
         CancellationToken cancellationToken = default) {
         var responses = new ConcurrentBag<BatchCheckSingleResponse>();
 
-        var maxParallelReqs = options?.MaxParallelRequests ?? DEFAULT_MAX_METHOD_PARALLEL_REQS;
+        var maxParallelReqs = options?.MaxParallelRequests ?? FgaConstants.ClientMaxMethodParallelRequests;
 
         await ProcessCheckRequestsAsync(body, responses, options, maxParallelReqs, cancellationToken);
 
