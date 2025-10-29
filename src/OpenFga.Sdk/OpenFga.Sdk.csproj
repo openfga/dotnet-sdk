@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -38,18 +38,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <!-- Common package references for all frameworks -->
-  <ItemGroup>
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.9" />
-  </ItemGroup>
-
   <!-- Packages needed for .NET versions < .NET 8 -->
   <ItemGroup Condition="'$(IsNet8OrGreater)' != 'true'">
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.9" />
-    <PackageReference Include="System.Net.Http.Json" Version="9.0.9" />
-    <PackageReference Include="System.Text.Json" Version="9.0.9" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.1" />
+    <PackageReference Include="System.Net.Http.Json" Version="8.0.1" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <!-- .NET Framework 4.8 specific packages -->
