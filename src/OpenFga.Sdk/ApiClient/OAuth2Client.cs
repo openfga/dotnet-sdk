@@ -19,9 +19,10 @@ namespace OpenFga.Sdk.ApiClient;
 /// </summary>
 public class OAuth2Client {
     private const int TOKEN_EXPIRY_BUFFER_THRESHOLD_IN_SEC = FgaConstants.TokenExpiryThresholdBufferInSec;
-
     private const int
         TOKEN_EXPIRY_JITTER_IN_SEC = FgaConstants.TokenExpiryJitterInSec; // We add some jitter so that token refreshes are less likely to collide
+
+    private const string DEFAULT_API_TOKEN_ISSUER_PATH = "/oauth/token";
 
     private static readonly Random _random = new();
     private readonly Metrics metrics;
@@ -97,12 +98,19 @@ public class OAuth2Client {
             throw new FgaRequiredParamError("OAuth2Client", "config.ClientSecret");
         }
 
-        if (string.IsNullOrWhiteSpace(credentialsConfig.Config.ApiTokenIssuer)) {
+        string? normalizedApiTokenIssuer = ApiTokenIssuerNormalizer.Normalize(credentialsConfig.Config.ApiTokenIssuer);
+        if (string.IsNullOrWhiteSpace(normalizedApiTokenIssuer)) {
             throw new FgaRequiredParamError("OAuth2Client", "config.ApiTokenIssuer");
         }
 
         _httpClient = httpClient;
-        _apiTokenIssuer = credentialsConfig.Config.ApiTokenIssuer;
+
+        var normalizedApiTokenIssuerUri = new Uri(normalizedApiTokenIssuer, UriKind.Absolute);
+        var normalizedApiTokenIssuerUriWithPath = string.IsNullOrWhiteSpace(normalizedApiTokenIssuerUri.AbsolutePath) || normalizedApiTokenIssuerUri.AbsolutePath.Equals("/")
+            ? new Uri(normalizedApiTokenIssuerUri, DEFAULT_API_TOKEN_ISSUER_PATH)
+            : normalizedApiTokenIssuerUri;
+        _apiTokenIssuer = normalizedApiTokenIssuerUriWithPath.ToString();
+
         _authRequest = new Dictionary<string, string> {
             { "client_id", credentialsConfig.Config.ClientId },
             { "client_secret", credentialsConfig.Config.ClientSecret },
@@ -125,8 +133,8 @@ public class OAuth2Client {
     private async Task ExchangeTokenAsync(CancellationToken cancellationToken = default) {
         var requestBuilder = new RequestBuilder<IDictionary<string, string>> {
             Method = HttpMethod.Post,
-            BasePath = $"https://{_apiTokenIssuer}",
-            PathTemplate = "/oauth/token",
+            BasePath = _apiTokenIssuer,
+            PathTemplate = "",
             Body = _authRequest,
             ContentType = "application/x-www-form-urlencode"
         };
