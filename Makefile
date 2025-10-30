@@ -15,21 +15,25 @@ help:
 test: test-net48 test-net8 test-net9
 	@echo "✅ All tests completed successfully!"
 
+# Restore NuGet packages
+restore:
+	@echo "📦 Restoring NuGet packages..."
+	@dotnet restore ./OpenFga.Sdk.sln
+
 # Run tests for .NET Framework 4.8
-test-net48:
+test-net48: restore
 	@echo "🚀 Running tests for .NET Framework 4.8..."
-	@dotnet test --framework net48 --no-restore
+	@dotnet test --framework net48 --no-build
 
 # Run tests for .NET 8.0
-test-net8:
+test-net8: restore
 	@echo "🚀 Running tests for .NET 8.0..."
-	@dotnet test --framework net8.0 --no-restore
+	@dotnet test --framework net8.0 --no-build
 
 # Run tests for .NET 9.0
-test-net9:
+test-net9: restore
 	@echo "🚀 Running tests for .NET 9.0..."
-	@dotnet test --framework net9.0 --no-restore
-
+	@dotnet test --framework net9.0 --no-build
 # Verify code formatting and analyzers
 lint:
 	@echo "🔍 Checking code formatting..."
@@ -62,5 +66,5 @@ fmt:
 	@echo "✅ Code formatting applied successfully!"
 
 # Convenience target to run all checks
-check: lint test
+check: fmt lint test
 	@echo "✨ All checks completed successfully!"
