@@ -475,12 +475,12 @@ public class OpenFgaClient : IDisposable {
    * - Fails fast on the first error
    * 
    * @param {ClientBatchCheckRequest} body - The batch check request with a list of checks
-   * @param {IClientBatchCheckOptions} options - Optional configuration
+   * @param {IClientServerBatchCheckOptions} options - Optional configuration
    * @param {CancellationToken} cancellationToken - Cancellation token
    * @returns {ClientBatchCheckResponse} Response with correlation ID mapping
    */
     public async Task<ClientBatchCheckResponse> BatchCheck(ClientBatchCheckRequest body,
-        IClientBatchCheckOptions? options = default,
+        IClientServerBatchCheckOptions? options = default,
         CancellationToken cancellationToken = default) {
         
         // If no checks provided, return empty result
@@ -490,6 +490,15 @@ public class OpenFgaClient : IDisposable {
 
         var maxBatchSize = options?.MaxBatchSize ?? FgaConstants.ClientMaxBatchSize;
         var maxParallelReqs = options?.MaxParallelRequests ?? FgaConstants.ClientMaxMethodParallelRequests;
+
+        // Validate parameters to prevent deadlock or invalid configurations
+        if (maxBatchSize <= 0) {
+            throw new FgaValidationError("MaxBatchSize must be greater than 0.");
+        }
+
+        if (maxParallelReqs <= 0) {
+            throw new FgaValidationError("MaxParallelRequests must be greater than 0.");
+        }
 
         // Track correlation IDs to original requests
         var correlationIdToCheck = new Dictionary<string, ClientBatchCheckItem>();

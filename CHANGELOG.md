@@ -2,6 +2,17 @@
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.8.0...HEAD)
 
+### Added
+- feat: add server-side `BatchCheck()` method using `/batch-check` API endpoint
+  - See [Batch Check documentation](README.md#batch-check) for details on `MaxBatchSize`, `MaxParallelRequests`, and `CorrelationId`
+
+### Changed
+- **BREAKING**: Renamed existing `BatchCheck()` to `ClientBatchCheck()`
+  - The previous method performed client-side parallel checks
+  - `ClientBatchCheck()` remains fully supported for small batches (< 10 checks)
+  - New server-side `BatchCheck()` uses the `/batch-check` endpoint
+
+### Fixed
 - fix: ApiToken credentials no longer cause reserved header exception (#146)
 
 ## v0.8.0

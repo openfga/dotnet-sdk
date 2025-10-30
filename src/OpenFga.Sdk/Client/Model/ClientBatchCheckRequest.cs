@@ -100,8 +100,8 @@ public class ClientBatchCheckItem : IEquatable<ClientBatchCheckItem>, IValidatab
 
     /// <inheritdoc />
     public override bool Equals(object? obj) {
-        if (obj is ClientBatchCheckItem other) {
-            return Equals(other);
+        if (obj != null && obj.GetType() == this.GetType()) {
+            return Equals((ClientBatchCheckItem)obj);
         }
         return false;
     }
@@ -161,8 +161,8 @@ public class ClientBatchCheckRequest : IEquatable<ClientBatchCheckRequest>, IVal
 
     /// <inheritdoc />
     public override bool Equals(object? obj) {
-        if (obj is ClientBatchCheckRequest other) {
-            return Equals(other);
+        if (obj != null && obj.GetType() == this.GetType()) {
+            return Equals((ClientBatchCheckRequest)obj);
         }
         return false;
     }
@@ -253,8 +253,8 @@ public class ClientBatchCheckSingleResponse : IEquatable<ClientBatchCheckSingleR
 
     /// <inheritdoc />
     public override bool Equals(object? obj) {
-        if (obj is ClientBatchCheckSingleResponse other) {
-            return Equals(other);
+        if (obj != null && obj.GetType() == this.GetType()) {
+            return Equals((ClientBatchCheckSingleResponse)obj);
         }
         return false;
     }
@@ -312,8 +312,8 @@ public class ClientBatchCheckResponse : IEquatable<ClientBatchCheckResponse>, IV
 
     /// <inheritdoc />
     public override bool Equals(object? obj) {
-        if (obj is ClientBatchCheckResponse other) {
-            return Equals(other);
+        if (obj != null && obj.GetType() == this.GetType()) {
+            return Equals((ClientBatchCheckResponse)obj);
         }
         return false;
     }

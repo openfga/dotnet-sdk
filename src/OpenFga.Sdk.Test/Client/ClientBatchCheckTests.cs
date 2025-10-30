@@ -183,12 +183,21 @@ public class ClientBatchCheckTests {
     }
 
     [Fact]
-    public void ClientBatchCheckOptions_MaxBatchSizeProperty_CanBeSet() {
-        var options = new ClientBatchCheckOptions {
+    public void ClientServerBatchCheckOptions_MaxBatchSizeProperty_CanBeSet() {
+        var options = new ClientServerBatchCheckOptions {
             MaxBatchSize = 100
         };
 
         Assert.Equal(100, options.MaxBatchSize);
+    }
+
+    [Fact]
+    public void ClientServerBatchCheckOptions_MaxParallelRequestsProperty_CanBeSet() {
+        var options = new ClientServerBatchCheckOptions {
+            MaxParallelRequests = 5
+        };
+
+        Assert.Equal(5, options.MaxParallelRequests);
     }
 
     [Fact]
