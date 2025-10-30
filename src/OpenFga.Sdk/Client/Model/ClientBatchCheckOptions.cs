@@ -8,6 +8,11 @@ public interface IClientBatchCheckOptions : IClientCheckOptions {
     ///     Max Requests to issue in parallel
     /// </summary>
     public int? MaxParallelRequests { get; set; }
+
+    /// <summary>
+    ///     Max number of checks to include in a single batch check request
+    /// </summary>
+    public int? MaxBatchSize { get; set; }
 }
 
 public class ClientBatchCheckOptions : IClientBatchCheckOptions {
@@ -21,6 +26,11 @@ public class ClientBatchCheckOptions : IClientBatchCheckOptions {
     ///     Max Requests to issue in parallel
     /// </summary>
     public int? MaxParallelRequests { get; set; }
+
+    /// <summary>
+    ///     Max number of checks to include in a single batch check request
+    /// </summary>
+    public int? MaxBatchSize { get; set; }
 
     /// <inheritdoc />
     public ConsistencyPreference? Consistency { get; set; }

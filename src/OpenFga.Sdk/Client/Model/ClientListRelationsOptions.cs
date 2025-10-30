@@ -18,6 +18,11 @@ public class ClientListRelationsOptions : IClientListRelationsOptions {
     /// </summary>
     public int? MaxParallelRequests { get; set; }
 
+    /// <summary>
+    ///     Max number of checks to include in a single batch check request
+    /// </summary>
+    public int? MaxBatchSize { get; set; }
+
     /// <inheritdoc />
     public ConsistencyPreference? Consistency { get; set; }
 

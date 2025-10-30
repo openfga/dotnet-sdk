@@ -232,9 +232,9 @@ public class Example1 {
             });
             Console.WriteLine("Allowed: " + checkResponse.Allowed);
 
-            // Batch checking for access with context
-            Console.WriteLine("Batch checking for access with context");
-            var batchCheckResponse = await fgaClient.BatchCheck(new List<ClientCheckRequest>() {
+            // Client-side batch checking (individual check calls in parallel)
+            Console.WriteLine("Client-side batch checking for access with context");
+            var clientBatchCheckResponse = await fgaClient.ClientBatchCheck(new List<ClientCheckRequest>() {
                 new () {
                     User = "user:anne",
                     Relation = "viewer",
@@ -242,7 +242,32 @@ public class Example1 {
                     Context = new { ViewCount = 100 }
                 }
             });
-            Console.WriteLine("Responses[0].Allowed: " + batchCheckResponse.Responses[0].Allowed);
+            Console.WriteLine("ClientBatchCheck - Responses[0].Allowed: " + clientBatchCheckResponse.Responses[0].Allowed);
+
+            // Server-side batch checking (using /batch-check endpoint)
+            Console.WriteLine("Server-side batch checking for access with context");
+            var batchCheckResponse = await fgaClient.BatchCheck(new ClientBatchCheckRequest {
+                Checks = new List<ClientBatchCheckItem>() {
+                    new () {
+                        User = "user:anne",
+                        Relation = "viewer",
+                        Object = "document:roadmap",
+                        Context = new { ViewCount = 100 },
+                        // CorrelationId is optional - will be auto-generated if not provided
+                    },
+                    new () {
+                        User = "user:anne",
+                        Relation = "writer",
+                        Object = "document:roadmap",
+                        Context = new { ViewCount = 100 },
+                        CorrelationId = "custom-correlation-id-123"
+                    }
+                }
+            });
+            Console.WriteLine("BatchCheck - Result count: " + batchCheckResponse.Result.Count);
+            foreach (var result in batchCheckResponse.Result) {
+                Console.WriteLine($"  CorrelationId: {result.CorrelationId}, Allowed: {result.Allowed}");
+            }
 
             // Listing relations with context
             Console.WriteLine("Listing relations with context");

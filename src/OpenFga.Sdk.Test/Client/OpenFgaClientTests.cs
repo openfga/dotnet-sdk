@@ -1411,7 +1411,7 @@ public class OpenFgaClientTests : IDisposable {
         var options = new ClientBatchCheckOptions {
             Consistency = ConsistencyPreference.HIGHERCONSISTENCY
         };
-        var response = await fgaClient.BatchCheck(body, options);
+        var response = await fgaClient.ClientBatchCheck(body, options);
 
         mockHandler.Protected().Verify(
             "SendAsync",
