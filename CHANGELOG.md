@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.8.0...HEAD)
 
+### Fixed
+- fix: ApiToken credentials no longer cause reserved header exception (#146)
+
 ## v0.8.0
 
 ### [0.8.0](https://github.com/openfga/dotnet-sdk/compare/v0.7.0...v0.8.0) (2025-10-22)
