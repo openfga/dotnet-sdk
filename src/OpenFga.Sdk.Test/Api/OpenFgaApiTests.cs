@@ -185,6 +185,28 @@ namespace OpenFga.Sdk.Test.Api {
         }
 
         /// <summary>
+        /// Test that ApiToken credentials do not cause reserved header exception
+        /// </summary>
+        [Fact]
+        public void ApiTokenDoesNotSetReservedHeaderInDefaultHeaders() {
+            var config = new Configuration.Configuration() {
+                ApiHost = _host,
+                Credentials = new Credentials() {
+                    Method = CredentialsMethod.ApiToken,
+                    Config = new CredentialsConfig() {
+                        ApiToken = "some-token"
+                    }
+                }
+            };
+
+            // This should not throw an exception about reserved headers
+            config.EnsureValid();
+
+            // Verify that Authorization is NOT in DefaultHeaders
+            Assert.DoesNotContain("Authorization", config.DefaultHeaders.Keys);
+        }
+
+        /// <summary>
         /// Test that providing no client id, secret, api token issuer or api audience when they are required should error
         /// </summary>
         [Fact]

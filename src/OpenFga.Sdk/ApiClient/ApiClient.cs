@@ -1,4 +1,3 @@
-using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
@@ -42,9 +41,8 @@ public class ApiClient : IDisposable {
 
         switch (_configuration.Credentials.Method) {
             case CredentialsMethod.ApiToken:
-                _configuration.DefaultHeaders["Authorization"] =
-                    $"Bearer {_configuration.Credentials.Config!.ApiToken}";
-                _baseClient = new BaseClient(_configuration, userHttpClient);
+                // ApiToken authorization is handled in BuildHeaders method to avoid
+                // modifying DefaultHeaders with reserved headers
                 break;
             case CredentialsMethod.ClientCredentials:
                 _oauth2Client = new OAuth2Client(_configuration.Credentials, _baseClient,
@@ -58,7 +56,32 @@ public class ApiClient : IDisposable {
     }
 
     /// <summary>
-    ///     Handles getting the access token, calling the API and potentially retrying
+    ///     Gets the authentication token based on the configured credentials method.
+    ///     For OAuth (ClientCredentials), fetches token from OAuth2Client.
+    ///     For ApiToken, returns the configured token directly.
+    /// </summary>
+    /// <param name="apiName">The API name for error reporting</param>
+    /// <returns>The authentication token, or null if no credentials are configured</returns>
+    /// <exception cref="FgaApiAuthenticationError">Thrown when OAuth token exchange fails</exception>
+    private async Task<string?> GetAuthenticationTokenAsync(string apiName) {
+        if (_oauth2Client != null) {
+            try {
+                return await _oauth2Client.GetAccessTokenAsync();
+            }
+            catch (ApiException e) {
+                throw new FgaApiAuthenticationError("Invalid Client Credentials", apiName, e);
+            }
+        }
+
+        if (_configuration.Credentials?.Method == CredentialsMethod.ApiToken) {
+            return _configuration.Credentials.Config?.ApiToken;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    ///     Handles getting the access token, calling the API, and potentially retrying
     ///     Based on:
     ///     https://github.com/auth0/auth0.net/blob/595ae80ccad8aa7764b80d26d2ef12f8b35bbeff/src/Auth0.ManagementApi/HttpClientManagementConnection.cs#L67
     /// </summary>
@@ -74,17 +97,8 @@ public class ApiClient : IDisposable {
         CancellationToken cancellationToken = default) {
         var sw = Stopwatch.StartNew();
 
-        string? oauthToken = null;
-        if (_oauth2Client != null) {
-            try {
-                oauthToken = await _oauth2Client.GetAccessTokenAsync();
-            }
-            catch (ApiException e) {
-                throw new FgaApiAuthenticationError("Invalid Client Credentials", apiName, e);
-            }
-        }
-
-        var additionalHeaders = BuildHeaders(_configuration, oauthToken, options);
+        var authToken = await GetAuthenticationTokenAsync(apiName);
+        var additionalHeaders = BuildHeaders(_configuration, authToken, options);
 
         var response = await Retry(async () =>
             await _baseClient.SendRequestAsync<TReq, TRes>(requestBuilder, additionalHeaders, apiName,
@@ -98,7 +112,7 @@ public class ApiClient : IDisposable {
     }
 
     /// <summary>
-    ///     Handles getting the access token, calling the API and potentially retrying (use for requests that return no
+    ///     Handles getting the access token, calling the API, and potentially retrying (use for requests that return no
     ///     content)
     /// </summary>
     /// <param name="requestBuilder"></param>
@@ -111,17 +125,8 @@ public class ApiClient : IDisposable {
         CancellationToken cancellationToken = default) {
         var sw = Stopwatch.StartNew();
 
-        string? oauthToken = null;
-        if (_oauth2Client != null) {
-            try {
-                oauthToken = await _oauth2Client.GetAccessTokenAsync();
-            }
-            catch (ApiException e) {
-                throw new FgaApiAuthenticationError("Invalid Client Credentials", apiName, e);
-            }
-        }
-
-        var additionalHeaders = BuildHeaders(_configuration, oauthToken, options);
+        var authToken = await GetAuthenticationTokenAsync(apiName);
+        var additionalHeaders = BuildHeaders(_configuration, authToken, options);
 
         var response = await Retry(async () =>
             await _baseClient.SendRequestAsync<TReq, object>(requestBuilder, additionalHeaders, apiName,
@@ -171,17 +176,17 @@ public class ApiClient : IDisposable {
     }
 
     /// <summary>
-    ///     Builds the complete headers dictionary by merging default headers, OAuth token, and per-request headers.
+    ///     Builds the complete headers dictionary by merging default headers, auth token, and per-request headers.
     ///     Validates per-request headers and performs case-insensitive merging.
-    ///     Header precedence (lowest to highest): DefaultHeaders → OAuth token → Per-request headers
+    ///     Header precedence (lowest to highest): DefaultHeaders → Auth token (OAuth or ApiToken) → Per-request headers
     /// </summary>
     /// <param name="configuration">Configuration containing default headers</param>
-    /// <param name="oauthToken">OAuth access token if available</param>
+    /// <param name="authToken">Authorization token (OAuth or ApiToken) if available</param>
     /// <param name="options">Request options containing custom headers</param>
     /// <returns>Merged headers dictionary or null if no headers to add</returns>
     /// <exception cref="ArgumentException">Thrown when header key is null, empty, or whitespace</exception>
     /// <exception cref="ArgumentNullException">Thrown when header value is null</exception>
-    private static IDictionary<string, string>? BuildHeaders(Configuration.Configuration configuration, string? oauthToken, IRequestOptions? options) {
+    private static IDictionary<string, string>? BuildHeaders(Configuration.Configuration configuration, string? authToken, IRequestOptions? options) {
         var defaultHeaders = configuration.DefaultHeaders;
         var perRequestHeaders = options?.Headers;
 
@@ -189,7 +194,7 @@ public class ApiClient : IDisposable {
         Configuration.Configuration.ValidateHeaders(perRequestHeaders, "options.Headers");
 
         // Return empty dictionary if no headers to add
-        if (string.IsNullOrEmpty(oauthToken) &&
+        if (string.IsNullOrEmpty(authToken) &&
             (defaultHeaders == null || defaultHeaders.Count == 0) &&
             (perRequestHeaders == null || perRequestHeaders.Count == 0)) {
             return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -206,8 +211,8 @@ public class ApiClient : IDisposable {
         }
 
         // Authorization token header, if set
-        if (!string.IsNullOrEmpty(oauthToken)) {
-            headers["Authorization"] = $"Bearer {oauthToken}";
+        if (!string.IsNullOrEmpty(authToken)) {
+            headers["Authorization"] = $"Bearer {authToken}";
         }
 
         // Per-request headers, if set
