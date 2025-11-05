@@ -170,7 +170,7 @@ public class BaseClient : IDisposable {
         }
 
         // Register cancellation token to dispose response and unblock stalled reads
-        var disposeResponseRegistration = cancellationToken.Register(static state => ((HttpResponseMessage)state!).Dispose(), response);
+        using var disposeResponseRegistration = cancellationToken.Register(static state => ((HttpResponseMessage)state!).Dispose(), response);
         
         try {
             // Stream and parse NDJSON response
@@ -227,7 +227,6 @@ public class BaseClient : IDisposable {
             }
         }
         finally {
-            disposeResponseRegistration.Dispose();
             response.Dispose();
         }
     }
