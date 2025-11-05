@@ -337,7 +337,7 @@ public class StreamedListObjectsTests {
         var fgaClient = new OpenFgaClient(config, httpClient);
 
         // Act & Assert
-        await Assert.ThrowsAsync<FgaValidationError>(async () => {
+        await Assert.ThrowsAsync<FgaRequiredParamError>(async () => {
             await foreach (var response in fgaClient.StreamedListObjects(
                 new ClientListObjectsRequest {
                     User = "user:anne",

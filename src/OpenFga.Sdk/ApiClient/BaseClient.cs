@@ -169,43 +169,66 @@ public class BaseClient : IDisposable {
             yield break;
         }
 
-        // Stream and parse NDJSON response
+        // Register cancellation token to dispose response and unblock stalled reads
+        var disposeResponseRegistration = cancellationToken.Register(static state => ((HttpResponseMessage)state!).Dispose(), response);
+        
+        try {
+            // Stream and parse NDJSON response
 #if NET6_0_OR_GREATER
-        await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #else
-        using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #endif
-        using var reader = new StreamReader(stream, Encoding.UTF8);
+            using var reader = new StreamReader(stream, Encoding.UTF8);
 
-        string? line;
-        while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null) {
-            cancellationToken.ThrowIfCancellationRequested();
+            while (true) {
+                string? line;
+                try {
+                    line = await reader.ReadLineAsync().ConfigureAwait(false);
+                }
+                catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) {
+                    throw new OperationCanceledException("Streaming request was cancelled.", cancellationToken);
+                }
+                catch (IOException ex) when (cancellationToken.IsCancellationRequested) {
+                    throw new OperationCanceledException("Streaming request was cancelled.", ex, cancellationToken);
+                }
 
-            if (string.IsNullOrWhiteSpace(line)) {
-                continue; // Skip empty lines
-            }
+                if (line == null) {
+                    break;
+                }
 
-            // Parse the NDJSON line - format is: {"result": {"object": "..."}}
-            // Note: Cannot use yield inside try-catch, so we parse first then yield
-            T? parsedResult = default;
+                cancellationToken.ThrowIfCancellationRequested();
 
-            try {
-                using var jsonDoc = JsonDocument.Parse(line);
-                var root = jsonDoc.RootElement;
+                if (string.IsNullOrWhiteSpace(line)) {
+                    continue; // Skip empty lines
+                }
 
-                if (root.TryGetProperty("result", out var resultElement)) {
-                    parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
+                // Parse the NDJSON line - format is: {"result": {"object": "..."}}
+                // Note: Cannot use yield inside try-catch, so we parse first then yield
+                T? parsedResult = default;
+
+                try {
+                    using var jsonDoc = JsonDocument.Parse(line);
+                    var root = jsonDoc.RootElement;
+
+                    if (root.TryGetProperty("result", out var resultElement)) {
+                        parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
+                    }
+                }
+                catch (JsonException) {
+                    // Skip invalid JSON lines - similar to JS SDK behavior
+                    // In production, malformed lines from the server should be rare
+                }
+
+                // Yield outside of try-catch block (C# language requirement)
+                if (parsedResult != null) {
+                    yield return parsedResult;
                 }
             }
-            catch (JsonException) {
-                // Skip invalid JSON lines - similar to JS SDK behavior
-                // In production, malformed lines from the server should be rare
-            }
-
-            // Yield outside of try-catch block (C# language requirement)
-            if (parsedResult != null) {
-                yield return parsedResult;
-            }
+        }
+        finally {
+            disposeResponseRegistration.Dispose();
+            response.Dispose();
         }
     }
 
