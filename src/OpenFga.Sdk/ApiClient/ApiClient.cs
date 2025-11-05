@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -135,6 +136,34 @@ public class ApiClient : IDisposable {
         sw.Stop();
         metrics.BuildForResponse(apiName, response.rawResponse, requestBuilder, sw,
             response.retryCount);
+    }
+
+    /// <summary>
+    ///     Handles streaming requests that return IAsyncEnumerable.
+    ///     Note: Streaming responses cannot be retried once the stream has started.
+    /// </summary>
+    /// <param name="requestBuilder">The request builder</param>
+    /// <param name="apiName">The API name for error reporting and telemetry</param>
+    /// <param name="options">Request options</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <typeparam name="TReq">Request type</typeparam>
+    /// <typeparam name="TRes">Response type for each streamed object</typeparam>
+    /// <returns>An async enumerable of response objects</returns>
+    /// <exception cref="FgaApiAuthenticationError"></exception>
+    public async IAsyncEnumerable<TRes> SendStreamingRequestAsync<TReq, TRes>(
+        RequestBuilder<TReq> requestBuilder,
+        string apiName,
+        IRequestOptions? options = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+        
+        var authToken = await GetAuthenticationTokenAsync(apiName);
+        var additionalHeaders = BuildHeaders(_configuration, authToken, options);
+        var streamIter = _baseClient.SendStreamingRequestAsync<TReq, TRes>(
+            requestBuilder, additionalHeaders, apiName, cancellationToken);
+        
+        await foreach (var item in streamIter) {
+            yield return item;
+        }
     }
 
     private async Task<ResponseWrapper<TResult>> Retry<TResult>(Func<Task<ResponseWrapper<TResult>>> retryable) {

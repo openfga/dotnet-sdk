@@ -2,6 +2,13 @@
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.8.0...HEAD)
 
+- feat: add support for [StreamedListObjects](https://openfga.dev/api/service#/Relationship%20Queries/StreamedListObjects)
+  - New `StreamedListObjects` method that returns `IAsyncEnumerable<StreamedListObjectsResponse>`
+  - Streams objects as they are received instead of waiting for complete response
+  - No pagination limits - only constrained by server timeout (OPENFGA_LIST_OBJECTS_DEADLINE)
+  - Supports all ListObjects parameters: authorization model ID, consistency, contextual tuples, context
+  - Proper resource cleanup on early termination and cancellation
+  - See [example](example/StreamedListObjectsExample) for usage
 - fix: ApiToken credentials no longer cause reserved header exception (#146)
 
 ## v0.8.0

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -500,6 +501,36 @@ public class OpenFgaClient : IDisposable {
             Consistency = options?.Consistency,
         }, options, cancellationToken);
 
+    /**
+     * StreamedListObjects - Stream all objects of a particular type that the user has a certain relation to (evaluates)
+     * 
+     * The Streamed ListObjects API is very similar to the ListObjects API, with two differences:
+     * 1. Instead of collecting all objects before returning a response, it streams them to the client as they are collected.
+     * 2. The number of results returned is only limited by the execution timeout specified in the flag OPENFGA_LIST_OBJECTS_DEADLINE.
+     * 
+     * Returns an async enumerable that yields StreamedListObjectsResponse objects as they are received from the server.
+     */
+    public async IAsyncEnumerable<StreamedListObjectsResponse> StreamedListObjects(
+        IClientListObjectsRequest body,
+        IClientListObjectsOptions? options = default,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+        
+        await foreach (var response in api.StreamedListObjects(GetStoreId(options), new ListObjectsRequest {
+            User = body.User,
+            Relation = body.Relation,
+            Type = body.Type,
+            ContextualTuples =
+                new ContextualTupleKeys {
+                    TupleKeys = body.ContextualTuples?.ConvertAll(tupleKey => tupleKey.ToTupleKey()) ??
+                                new List<TupleKey>()
+                },
+            Context = body.Context,
+            AuthorizationModelId = GetAuthorizationModelId(options),
+            Consistency = options?.Consistency,
+        }, options, cancellationToken)) {
+            yield return response;
+        }
+    }
 
     /**
      * ListRelations - List all the relations a user has with an object (evaluates)

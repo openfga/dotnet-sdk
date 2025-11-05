@@ -1,9 +1,12 @@
 using OpenFga.Sdk.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -125,6 +128,105 @@ public class BaseClient : IDisposable {
 
             return new ResponseWrapper<T> { rawResponse = response, responseContent = responseContent };
         }
+    }
+
+    /// <summary>
+    ///     Handles calling the API for streaming responses (e.g., NDJSON)
+    /// </summary>
+    /// <param name="request">The HTTP request message</param>
+    /// <param name="additionalHeaders">Additional headers to include</param>
+    /// <param name="apiName">The API name for error reporting</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <typeparam name="T">The type of each streamed response object</typeparam>
+    /// <returns>An async enumerable of parsed response objects</returns>
+    /// <exception cref="ApiException"></exception>
+    public async IAsyncEnumerable<T> SendStreamingRequestAsync<T>(
+        HttpRequestMessage request,
+        IDictionary<string, string>? additionalHeaders = null,
+        string? apiName = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+        
+        if (additionalHeaders != null) {
+            foreach (var header in additionalHeaders) {
+                if (header.Value != null) {
+                    request.Headers.Add(header.Key, header.Value);
+                }
+            }
+        }
+
+        // Use ResponseHeadersRead to start streaming before full response is received
+        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            .ConfigureAwait(false);
+
+        try {
+            response.EnsureSuccessStatusCode();
+        }
+        catch {
+            throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
+        }
+
+        if (response.Content == null) {
+            yield break;
+        }
+
+        // Stream and parse NDJSON response
+#if NET6_0_OR_GREATER
+        await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+#else
+        using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+#endif
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+
+        string? line;
+        while ((line = await reader.ReadLineAsync().ConfigureAwait(false)) != null) {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (string.IsNullOrWhiteSpace(line)) {
+                continue; // Skip empty lines
+            }
+
+            // Parse the NDJSON line - format is: {"result": {"object": "..."}}
+            // Note: Cannot use yield inside try-catch, so we parse first then yield
+            T? parsedResult = default;
+
+            try {
+                using var jsonDoc = JsonDocument.Parse(line);
+                var root = jsonDoc.RootElement;
+
+                if (root.TryGetProperty("result", out var resultElement)) {
+                    parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
+                }
+            }
+            catch (JsonException) {
+                // Skip invalid JSON lines - similar to JS SDK behavior
+                // In production, malformed lines from the server should be rare
+            }
+
+            // Yield outside of try-catch block (C# language requirement)
+            if (parsedResult != null) {
+                yield return parsedResult;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Handles calling the API for streaming responses (e.g., NDJSON) from a RequestBuilder
+    /// </summary>
+    /// <param name="requestBuilder">The request builder</param>
+    /// <param name="additionalHeaders">Additional headers to include</param>
+    /// <param name="apiName">The API name for error reporting</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <typeparam name="TReq">The request type</typeparam>
+    /// <typeparam name="TRes">The response type for each streamed object</typeparam>
+    /// <returns>An async enumerable of parsed response objects</returns>
+    public IAsyncEnumerable<TRes> SendStreamingRequestAsync<TReq, TRes>(
+        RequestBuilder<TReq> requestBuilder,
+        IDictionary<string, string>? additionalHeaders = null,
+        string? apiName = null,
+        CancellationToken cancellationToken = default) {
+        
+        var request = requestBuilder.BuildRequest();
+        return SendStreamingRequestAsync<TRes>(request, additionalHeaders, apiName, cancellationToken);
     }
 
     /// <summary>
