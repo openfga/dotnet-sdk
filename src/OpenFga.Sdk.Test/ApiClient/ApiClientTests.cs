@@ -22,6 +22,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using SdkConfiguration = OpenFga.Sdk.Configuration.Configuration;
 
 namespace OpenFga.Sdk.Test.ApiClient {
     /// <summary>
@@ -42,12 +43,12 @@ namespace OpenFga.Sdk.Test.ApiClient {
         /// <summary>
         /// Creates a Configuration with ApiToken credentials
         /// </summary>
-        private static Configuration.Configuration CreateApiTokenConfiguration(string apiToken = TestApiToken) {
+        private static SdkConfiguration CreateApiTokenConfiguration(string apiToken = TestApiToken) {
             var credentialsConfig = new CredentialsConfig {
                 ApiToken = apiToken
             };
 
-            return new Configuration.Configuration {
+            return new SdkConfiguration {
                 ApiHost = TestHost,
                 Credentials = new Credentials {
                     Method = CredentialsMethod.ApiToken,
@@ -59,7 +60,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
         /// <summary>
         /// Creates a Configuration with OAuth ClientCredentials
         /// </summary>
-        private static Configuration.Configuration CreateOAuthConfiguration() {
+        private static SdkConfiguration CreateOAuthConfiguration() {
             var credentialsConfig = new CredentialsConfig {
                 ClientId = TestClientId,
                 ClientSecret = TestClientSecret,
@@ -67,7 +68,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 ApiAudience = TestAudience
             };
 
-            return new Configuration.Configuration {
+            return new SdkConfiguration {
                 ApiHost = TestHost,
                 Credentials = new Credentials {
                     Method = CredentialsMethod.ClientCredentials,
@@ -79,8 +80,8 @@ namespace OpenFga.Sdk.Test.ApiClient {
         /// <summary>
         /// Creates a Configuration with no credentials
         /// </summary>
-        private static Configuration.Configuration CreateNoCredentialsConfiguration() {
-            return new Configuration.Configuration {
+        private static SdkConfiguration CreateNoCredentialsConfiguration() {
+            return new SdkConfiguration {
                 ApiHost = TestHost
             };
         }
