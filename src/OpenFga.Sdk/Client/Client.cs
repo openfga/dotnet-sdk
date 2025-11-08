@@ -18,7 +18,7 @@ using OpenFga.Sdk.Model;
 
 namespace OpenFga.Sdk.Client;
 
-public class OpenFgaClient : IDisposable {
+public class OpenFgaClient : IDisposable, IOpenFgaClient {
     private readonly ClientConfiguration _configuration;
     protected OpenFgaApi api;
 
@@ -226,30 +226,22 @@ public class OpenFgaClient : IDisposable {
      * Stores *
      **********/
 
-    /**
-   * ListStores - Get a paginated list of stores.
-   */
+    /// <inheritdoc />
     public async Task<ListStoresResponse> ListStores(IClientListStoresRequest? body, IClientListStoresOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.ListStores(options?.PageSize, options?.ContinuationToken, body?.Name, options, cancellationToken);
 
-    /**
-   * CreateStore - Initialize a store
-   */
+    /// <inheritdoc />
     public async Task<CreateStoreResponse> CreateStore(ClientCreateStoreRequest body,
         IClientRequestOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.CreateStore(body, options, cancellationToken);
 
-    /**
-   * GetStore - Get information about the current store
-   */
+    /// <inheritdoc />
     public async Task<GetStoreResponse> GetStore(IClientRequestOptionsWithStoreId? options = default, CancellationToken cancellationToken = default) =>
         await api.GetStore(GetStoreId(options), options, cancellationToken);
 
-    /**
-   * DeleteStore - Delete a store
-   */
+    /// <inheritdoc />
     public async Task DeleteStore(IClientRequestOptionsWithStoreId? options = default, CancellationToken cancellationToken = default) =>
         await api.DeleteStore(GetStoreId(options), options, cancellationToken);
 
@@ -257,25 +249,19 @@ public class OpenFgaClient : IDisposable {
      * Authorization Models *
      ************************/
 
-    /**
-     * ReadAuthorizationModels - Read all authorization models
-     */
+    /// <inheritdoc />
     public async Task<ReadAuthorizationModelsResponse> ReadAuthorizationModels(
         IClientReadAuthorizationModelsOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.ReadAuthorizationModels(GetStoreId(options), options?.PageSize, options?.ContinuationToken, options, cancellationToken);
 
-    /**
-     * WriteAuthorizationModel - Create a new version of the authorization model
-     */
+    /// <inheritdoc />
     public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(ClientWriteAuthorizationModelRequest body,
         IClientRequestOptionsWithStoreId? options = default,
         CancellationToken cancellationToken = default) =>
         await api.WriteAuthorizationModel(GetStoreId(options), body, options, cancellationToken);
 
-    /**
-     * ReadAuthorizationModel - Read the current authorization model
-     */
+    /// <inheritdoc />
     public async Task<ReadAuthorizationModelResponse> ReadAuthorizationModel(
         IClientReadAuthorizationModelOptions? options = default,
         CancellationToken cancellationToken = default) {
@@ -287,9 +273,7 @@ public class OpenFgaClient : IDisposable {
         return await api.ReadAuthorizationModel(GetStoreId(options), authorizationModelId, options, cancellationToken);
     }
 
-    /**
-     * ReadLatestAuthorizationModel - Read the latest authorization model for the current store
-     */
+    /// <inheritdoc />
     public async Task<ReadAuthorizationModelResponse?> ReadLatestAuthorizationModel(
         IClientRequestOptionsWithAuthZModelId? options = default,
         CancellationToken cancellationToken = default) {
@@ -307,17 +291,13 @@ public class OpenFgaClient : IDisposable {
      * Relationship Tuples *
      ***********************/
 
-    /**
-     * Read Changes - Read the list of historical relationship tuple writes and deletes
-     */
+    /// <inheritdoc />
     public async Task<ReadChangesResponse> ReadChanges(ClientReadChangesRequest? body = default,
         ClientReadChangesOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await api.ReadChanges(GetStoreId(options), body?.Type, options?.PageSize, options?.ContinuationToken, body?.StartTime, options, cancellationToken);
 
-    /**
-     * Read - Read tuples previously written to the store (does not evaluate)
-     */
+    /// <inheritdoc />
     public async Task<ReadResponse> Read(ClientReadRequest? body = default, IClientReadOptions? options = default,
         CancellationToken cancellationToken = default) {
         ReadRequestTupleKey tupleKey = null;
@@ -334,9 +314,7 @@ public class OpenFgaClient : IDisposable {
             }, options, cancellationToken);
     }
 
-    /**
-     * Write - Create or delete relationship tuples
-     */
+    /// <inheritdoc />
     public async Task<ClientWriteResponse> Write(ClientWriteRequest body, IClientWriteOptions? options = default,
         CancellationToken cancellationToken = default) {
         var maxPerChunk =
@@ -408,16 +386,12 @@ public class OpenFgaClient : IDisposable {
         return new ClientWriteResponse { Writes = writeResponses.ToList(), Deletes = deleteResponses.ToList() };
     }
 
-    /**
-     * WriteTuples - Utility method to write tuples, wraps Write
-     */
+    /// <inheritdoc />
     public async Task<ClientWriteResponse> WriteTuples(List<ClientTupleKey> body, IClientWriteOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await Write(new ClientWriteRequest { Writes = body }, options, cancellationToken);
 
-    /**
-     * DeleteTuples - Utility method to delete tuples, wraps Write
-     */
+    /// <inheritdoc />
     public async Task<ClientWriteResponse> DeleteTuples(List<ClientTupleKeyWithoutCondition> body, IClientWriteOptions? options = default,
         CancellationToken cancellationToken = default) =>
         await Write(new ClientWriteRequest { Deletes = body }, options, cancellationToken);
@@ -426,9 +400,7 @@ public class OpenFgaClient : IDisposable {
      * Relationship Queries *
      ************************/
 
-    /**
-   * Check - Check if a user has a particular relation with an object (evaluates)
-   */
+    /// <inheritdoc />
     public async Task<CheckResponse> Check(IClientCheckRequest body,
         IClientCheckOptions? options = default,
         CancellationToken cancellationToken = default) =>
@@ -446,9 +418,7 @@ public class OpenFgaClient : IDisposable {
                 Consistency = options?.Consistency,
             }, options, cancellationToken);
 
-    /**
-   * BatchCheck - Run a set of checks (evaluates)
-   */
+    /// <inheritdoc />
     public async Task<ClientBatchCheckClientResponse> BatchCheck(List<ClientCheckRequest> body,
         IClientBatchCheckOptions? options = default,
         CancellationToken cancellationToken = default) {
@@ -461,9 +431,7 @@ public class OpenFgaClient : IDisposable {
         return new ClientBatchCheckClientResponse { Responses = responses.ToList() };
     }
 
-    /**
-   * Expand - Expands the relationships in userset tree format (evaluates)
-   */
+    /// <inheritdoc />
     public async Task<ExpandResponse> Expand(IClientExpandRequest body,
         IClientExpandOptions? options = default,
         CancellationToken cancellationToken = default) =>
@@ -480,9 +448,7 @@ public class OpenFgaClient : IDisposable {
                 Consistency = options?.Consistency
             }, options, cancellationToken);
 
-    /**
-     * ListObjects - List the objects of a particular type that the user has a certain relation to (evaluates)
-     */
+    /// <inheritdoc />
     public async Task<ListObjectsResponse> ListObjects(IClientListObjectsRequest body,
         IClientListObjectsOptions? options = default,
         CancellationToken cancellationToken = default) =>
@@ -499,11 +465,8 @@ public class OpenFgaClient : IDisposable {
             AuthorizationModelId = GetAuthorizationModelId(options),
             Consistency = options?.Consistency,
         }, options, cancellationToken);
-
-
-    /**
-     * ListRelations - List all the relations a user has with an object (evaluates)
-     */
+    
+    /// <inheritdoc />
     public async Task<ListRelationsResponse> ListRelations(IClientListRelationsRequest body,
         IClientListRelationsOptions? options = default,
         CancellationToken cancellationToken = default) {
@@ -540,9 +503,7 @@ public class OpenFgaClient : IDisposable {
         return responses;
     }
 
-    /**
-     * ListUsers - List all users of the given type that the object has a relation with (evaluates)
-     */
+    /// <inheritdoc />
     public async Task<ListUsersResponse> ListUsers(IClientListUsersRequest body,
         IClientListUsersOptions? options = default,
         CancellationToken cancellationToken = default) =>
@@ -560,9 +521,7 @@ public class OpenFgaClient : IDisposable {
      * Assertions *
      **************/
 
-    /**
-   * ReadAssertions - Read assertions for a particular authorization model
-   */
+    /// <inheritdoc />
     public async Task<ReadAssertionsResponse> ReadAssertions(IClientReadAssertionsOptions? options = default,
         CancellationToken cancellationToken = default) {
         var authorizationModelId = GetAuthorizationModelId(options);
@@ -573,9 +532,7 @@ public class OpenFgaClient : IDisposable {
         return await api.ReadAssertions(GetStoreId(options), authorizationModelId, options, cancellationToken);
     }
 
-    /**
-     * WriteAssertions - Updates assertions for a particular authorization model
-     */
+    /// <inheritdoc />
     public async Task WriteAssertions(List<ClientAssertion> body,
         IClientWriteAssertionsOptions? options = default,
         CancellationToken cancellationToken = default) {
