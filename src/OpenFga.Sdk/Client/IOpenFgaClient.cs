@@ -149,7 +149,7 @@ public interface IOpenFgaClient
     /// <param name="body">The body of the request.</param>
     /// <param name="options">The request options.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>A response indicating whether the user has the specified relation with the object.</returns
+    /// <returns>A response indicating whether the user has the specified relation with the object.</returns>
     Task<CheckResponse> Check(IClientCheckRequest body,
         IClientCheckOptions? options = default,
         CancellationToken cancellationToken = default);
@@ -166,7 +166,7 @@ public interface IOpenFgaClient
         CancellationToken cancellationToken = default);
     
     /// <summary>
-    /// Expands the relationships in userset tree format (evaluates)
+    /// Expands the relationships in userset tree format (evaluates).
     /// </summary>
     /// <param name="body">The body of the request.</param>
     /// <param name="options">The request options.</param>
@@ -193,7 +193,7 @@ public interface IOpenFgaClient
     /// <param name="body">The body of the request.</param>
     /// <param name="options">The request options.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>>A response containing the list of relations.</returns>
+    /// <returns>A response containing the list of relations.</returns>
     Task<ListRelationsResponse> ListRelations(IClientListRelationsRequest body,
         IClientListRelationsOptions? options = default,
         CancellationToken cancellationToken = default);
@@ -204,7 +204,7 @@ public interface IOpenFgaClient
     /// <param name="body">The body of the request.</param>
     /// <param name="options">The request options.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>A response containing the list of users.</returns> 
+    /// <returns>A response containing the list of users.</returns>
     Task<ListUsersResponse> ListUsers(IClientListUsersRequest body,
         IClientListUsersOptions? options = default,
         CancellationToken cancellationToken = default);
@@ -214,7 +214,7 @@ public interface IOpenFgaClient
     /// </summary>
     /// <param name="options">The request options.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
-    /// <returns>A response containing the assertions for the specified authorization model.</returns>  
+    /// <returns>A response containing the assertions for the specified authorization model.</returns>
     Task<ReadAssertionsResponse> ReadAssertions(IClientReadAssertionsOptions? options = default,
         CancellationToken cancellationToken = default);
     
