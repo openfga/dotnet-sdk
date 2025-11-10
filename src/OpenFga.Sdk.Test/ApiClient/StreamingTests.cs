@@ -168,7 +168,7 @@ public class StreamingTests {
             Body = new { }
         };
 
-        var cts = new CancellationTokenSource();
+        using var cts = new CancellationTokenSource();
 
         var results = new List<StreamedListObjectsResponse>();
         await Assert.ThrowsAsync<OperationCanceledException>(async () => {
@@ -181,7 +181,6 @@ public class StreamingTests {
             }
         });
 
-        // Should have received at least one item before cancellation
         Assert.True(results.Count >= 1);
     }
 
