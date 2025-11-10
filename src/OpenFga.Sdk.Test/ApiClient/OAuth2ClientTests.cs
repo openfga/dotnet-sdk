@@ -1,16 +1,3 @@
-//
-// OpenFGA/.NET SDK for OpenFGA
-//
-// API version: 1.x
-// Website: https://openfga.dev
-// Documentation: https://openfga.dev/docs
-// Support: https://openfga.dev/community
-// License: [Apache-2.0](https://github.com/openfga/dotnet-sdk/blob/main/LICENSE)
-//
-// NOTE: This file was auto generated. DO NOT EDIT.
-//
-
-
 using Moq;
 using Moq.Protected;
 using OpenFga.Sdk.ApiClient;
@@ -25,6 +12,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using SdkConfiguration = OpenFga.Sdk.Configuration.Configuration;
 
 namespace OpenFga.Sdk.Test.ApiClient {
     /// <summary>
@@ -117,7 +105,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new Configuration.Configuration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -154,7 +142,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new Configuration.Configuration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -193,7 +181,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new Configuration.Configuration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -233,7 +221,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new Configuration.Configuration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -268,7 +256,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new Configuration.Configuration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -303,7 +291,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new Configuration.Configuration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -313,6 +301,59 @@ namespace OpenFga.Sdk.Test.ApiClient {
 
             Assert.NotNull(token);
             Assert.Equal(2, callCount);
+        }
+
+        #endregion
+
+        #region ApiTokenIssuer Path Handling
+
+        [Theory]
+        // No scheme should be normalized to https and use default path
+        [InlineData("issuer.fga.example", "https://issuer.fga.example/oauth/token")]
+        [InlineData("issuer.fga.example:8080", "https://issuer.fga.example:8080/oauth/token")]
+        // No scheme with custom path should be normalized to https and keep custom path
+        [InlineData("issuer.fga.example/custom/token", "https://issuer.fga.example/custom/token")]
+        [InlineData("issuer.fga.example:8080/custom/token", "https://issuer.fga.example:8080/custom/token")]
+        // Domain without path should use default /oauth/token
+        [InlineData("https://issuer.fga.example", "https://issuer.fga.example/oauth/token")]
+        [InlineData("http://issuer.fga.example", "http://issuer.fga.example/oauth/token")]
+        // Domain with trailing slash should use default /oauth/token
+        [InlineData("https://issuer.fga.example/", "https://issuer.fga.example/oauth/token")]
+        // Domain with port should use default /oauth/token
+        [InlineData("https://issuer.fga.example:8080", "https://issuer.fga.example:8080/oauth/token")]
+        [InlineData("https://issuer.fga.example:8080/", "https://issuer.fga.example:8080/oauth/token")]
+        // Domain with custom path should keep the custom path
+        [InlineData("https://issuer.fga.example/custom/token", "https://issuer.fga.example/custom/token")]
+        [InlineData("https://issuer.fga.example:8080/custom/token", "https://issuer.fga.example:8080/custom/token")]
+        public async Task OAuth2_Constructor_SetsCorrectTokenIssuerPath(string tokenIssuer, string expectedPath) {
+            // Arrange
+            var credentials = CreateTestCredentials(tokenIssuer: tokenIssuer);
+            
+            string? actualRequestUri = null;
+            var mockHandler = new Mock<HttpMessageHandler>();
+            mockHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync((HttpRequestMessage request, CancellationToken ct) => {
+                    actualRequestUri = request.RequestUri?.ToString();
+                    return CreateTokenResponse();
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
+            var baseClient = new BaseClient(configuration, httpClient);
+            var metrics = new Metrics(configuration);
+            var retryParams = CreateTestRetryParams();
+
+            // Act
+            var oauth2Client = new OAuth2Client(credentials, baseClient, retryParams, metrics);
+            await oauth2Client.GetAccessTokenAsync();
+
+            // Assert
+            Assert.Equal(expectedPath, actualRequestUri);
         }
 
         #endregion

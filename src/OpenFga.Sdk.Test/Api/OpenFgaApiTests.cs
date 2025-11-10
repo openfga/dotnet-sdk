@@ -16,6 +16,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using SdkConfiguration = OpenFga.Sdk.Configuration.Configuration;
 
 namespace OpenFga.Sdk.Test.Api {
     /// <summary>
@@ -24,11 +25,11 @@ namespace OpenFga.Sdk.Test.Api {
     public class OpenFgaApiTests : IDisposable {
         private readonly string _storeId;
         private readonly string _host = "api.fga.example";
-        private readonly Configuration.Configuration _config;
+        private readonly SdkConfiguration _config;
 
         public OpenFgaApiTests() {
             _storeId = "01H0H015178Y2V4CX10C2KGHF4";
-            _config = new Configuration.Configuration() { ApiHost = _host };
+            _config = new SdkConfiguration { ApiHost = _host };
         }
 
         private HttpResponseMessage GetCheckResponse(CheckResponse content, bool shouldRetry = false) {
@@ -56,7 +57,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public void StoreIdNotRequired() {
-            var storeIdRequiredConfig = new Configuration.Configuration() { ApiHost = _host };
+            var storeIdRequiredConfig = new SdkConfiguration { ApiHost = _host };
             storeIdRequiredConfig.EnsureValid();
         }
 
@@ -65,7 +66,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public async Task StoreIdRequiredWhenNeeded() {
-            var config = new Configuration.Configuration() { ApiHost = _host };
+            var config = new SdkConfiguration { ApiHost = _host };
             var openFgaApi = new OpenFgaApi(config);
 
             async Task<ReadAuthorizationModelsResponse> ActionMissingStoreId() => await openFgaApi.ReadAuthorizationModels(null, null);
@@ -78,7 +79,7 @@ namespace OpenFga.Sdk.Test.Api {
         // /// </summary>
         [Fact]
         public void ValidHostRequired() {
-            var config = new Configuration.Configuration() { };
+            var config = new SdkConfiguration();
             void ActionMissingHost() => config.EnsureValid();
             var exception = Assert.Throws<FgaRequiredParamError>(ActionMissingHost);
             Assert.Equal("Required parameter ApiUrl was not defined when calling Configuration.", exception.Message);
@@ -89,7 +90,7 @@ namespace OpenFga.Sdk.Test.Api {
         // /// </summary>
         [Fact]
         public void ValidHostWellFormed() {
-            var config = new Configuration.Configuration() { ApiHost = "https://api.fga.example" };
+            var config = new SdkConfiguration { ApiHost = "https://api.fga.example" };
             void ActionMalformedHost() => config.EnsureValid();
             var exception = Assert.Throws<FgaValidationError>(ActionMalformedHost);
             Assert.Equal("Configuration.ApiUrl (https://https://api.fga.example) does not form a valid URI (https://https://api.fga.example)", exception.Message);
@@ -100,7 +101,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public void ApiTokenRequired() {
-            var missingApiTokenConfig = new Configuration.Configuration() {
+            var missingApiTokenConfig = new SdkConfiguration {
                 ApiHost = _host,
                 Credentials = new Credentials() {
                     Method = CredentialsMethod.ApiToken,
@@ -119,14 +120,14 @@ namespace OpenFga.Sdk.Test.Api {
         // /// </summary>
         [Fact]
         public void ValidApiTokenIssuerWellFormed() {
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 Credentials = new Credentials() {
                     Method = CredentialsMethod.ClientCredentials,
                     Config = new CredentialsConfig() {
                         ClientId = "some-id",
                         ClientSecret = "some-secret",
-                        ApiTokenIssuer = "https://tokenissuer.fga.example",
+                        ApiTokenIssuer = "https://https://tokenissuer.fga.example",
                         ApiAudience = "some-audience",
                     }
                 }
@@ -142,7 +143,7 @@ namespace OpenFga.Sdk.Test.Api {
         [Fact]
         public async Task ApiTokenSentInHeader() {
             var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 Credentials = new Credentials() {
                     Method = CredentialsMethod.ApiToken,
@@ -189,7 +190,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public void ApiTokenDoesNotSetReservedHeaderInDefaultHeaders() {
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 Credentials = new Credentials() {
                     Method = CredentialsMethod.ApiToken,
@@ -211,7 +212,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public void ClientIdClientSecretRequired() {
-            var missingClientIdConfig = new Configuration.Configuration() {
+            var missingClientIdConfig = new SdkConfiguration {
                 StoreId = _storeId,
                 ApiHost = _host,
                 Credentials = new Credentials() {
@@ -230,7 +231,7 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.Equal("Required parameter ClientId was not defined when calling Configuration.",
                 exceptionMissingClientId.Message);
 
-            var missingClientSecretConfig = new Configuration.Configuration() {
+            var missingClientSecretConfig = new SdkConfiguration {
                 StoreId = _storeId,
                 ApiHost = _host,
                 Credentials = new Credentials() {
@@ -249,7 +250,7 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.Equal("Required parameter ClientSecret was not defined when calling Configuration.",
                 exceptionMissingClientSecret.Message);
 
-            var missingApiTokenIssuerConfig = new Configuration.Configuration() {
+            var missingApiTokenIssuerConfig = new SdkConfiguration {
                 StoreId = _storeId,
                 ApiHost = _host,
                 Credentials = new Credentials() {
@@ -268,7 +269,7 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.Equal("Required parameter ApiTokenIssuer was not defined when calling Configuration.",
                 exceptionMissingApiTokenIssuer.Message);
 
-            var missingApiAudienceConfig = new Configuration.Configuration() {
+            var missingApiAudienceConfig = new SdkConfiguration {
                 StoreId = _storeId,
                 ApiHost = _host,
                 Credentials = new Credentials() {
@@ -294,7 +295,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public async Task ExchangeCredentialsTest() {
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 StoreId = _storeId,
                 ApiHost = _host,
                 Credentials = new Credentials() {
@@ -394,7 +395,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public async Task ExchangeCredentialsAfterExpiryTest() {
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 Credentials = new Credentials() {
                     Method = CredentialsMethod.ClientCredentials,
@@ -493,7 +494,7 @@ namespace OpenFga.Sdk.Test.Api {
         /// </summary>
         [Fact]
         public async Task ExchangeCredentialsRetriesTest() {
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 Credentials = new Credentials() {
                     Method = CredentialsMethod.ClientCredentials,
@@ -658,7 +659,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var httpClient = new HttpClient(mockHandler.Object);
 
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 MaxRetry = 1,
             };
@@ -856,7 +857,7 @@ namespace OpenFga.Sdk.Test.Api {
                 .ReturnsAsync(GetCheckResponse(new CheckResponse { Allowed = true }, true));
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 StoreId = _storeId,
                 ApiHost = _host,
                 MaxRetry = 5,
@@ -954,7 +955,7 @@ namespace OpenFga.Sdk.Test.Api {
 
             var httpClient = new HttpClient(mockHandler.Object);
 
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 StoreId = _storeId,
                 ApiHost = _host,
                 MaxRetry = 3,
@@ -2018,7 +2019,7 @@ namespace OpenFga.Sdk.Test.Api {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 MaxRetry = 2,
             };
@@ -2090,7 +2091,7 @@ namespace OpenFga.Sdk.Test.Api {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 MaxRetry = 1,
             };
@@ -2198,7 +2199,7 @@ namespace OpenFga.Sdk.Test.Api {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 MaxRetry = 1,
             };
@@ -2257,7 +2258,7 @@ namespace OpenFga.Sdk.Test.Api {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 MaxRetry = 1,
             };
@@ -2320,7 +2321,7 @@ namespace OpenFga.Sdk.Test.Api {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 MaxRetry = 1,
             };
@@ -2383,7 +2384,7 @@ namespace OpenFga.Sdk.Test.Api {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 MaxRetry = 2,
             };
@@ -2437,7 +2438,7 @@ namespace OpenFga.Sdk.Test.Api {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 MaxRetry = 1,
             };
@@ -2611,7 +2612,7 @@ namespace OpenFga.Sdk.Test.Api {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var config = new Configuration.Configuration() {
+            var config = new SdkConfiguration {
                 ApiHost = _host,
                 MaxRetry = 1,
             };

@@ -40,25 +40,40 @@ public interface IClientCredentialsConfig {
     ///     Gets or sets the Client ID.
     /// </summary>
     /// <value>Client ID.</value>
-    public string? ClientId { get; set; }
+    string? ClientId { get; set; }
 
     /// <summary>
     ///     Gets or sets the Client Secret.
     /// </summary>
     /// <value>Client Secret.</value>
-    public string? ClientSecret { get; set; }
+    string? ClientSecret { get; set; }
 
     /// <summary>
     ///     Gets or sets the API Token Issuer.
+    ///     <para>
+    ///     The SDK automatically normalizes URLs:
+    ///     <list type="bullet">
+    ///         <item><description>URLs without a scheme are prefixed with "https://"</description></item>
+    ///         <item><description>If no path is provided (or only "/"), defaults to "/oauth/token"</description></item>
+    ///         <item><description>Otherwise, the path is preserved</description></item>
+    ///     </list>
+    ///     </para>
+    ///     <para>Examples:
+    ///     <list type="bullet">
+    ///         <item><description>"issuer.fga.example" → "https://issuer.fga.example/oauth/token"</description></item>
+    ///         <item><description>"https://issuer.fga.example" → "https://issuer.fga.example/oauth/token"</description></item>
+    ///         <item><description>"https://issuer.fga.example/custom/token" → "https://issuer.fga.example/custom/token"</description></item>
+    ///     </list>
+    ///     </para>
     /// </summary>
     /// <value>API Token Issuer.</value>
-    public string? ApiTokenIssuer { get; set; }
+    string? ApiTokenIssuer { get; set; }
 
     /// <summary>
     ///     Gets or sets the API Audience.
     /// </summary>
     /// <value>API Audience.</value>
-    public string? ApiAudience { get; set; }
+    string? ApiAudience { get; set; }
 }
 
 public interface ICredentialsConfig : IClientCredentialsConfig, IApiTokenConfig { }
@@ -80,6 +95,16 @@ public interface IAuthCredentialsConfig {
 ///
 /// </summary>
 public class Credentials : IAuthCredentialsConfig {
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Credentials" /> class
+    /// </summary>
+    /// <exception cref="FgaRequiredParamError"></exception>
+    /// <exception cref="FgaValidationError"></exception>
+    public Credentials() {
+        EnsureValid();
+    }
+
     /// <summary>
     /// credential methods
     /// </summary>
@@ -89,12 +114,6 @@ public class Credentials : IAuthCredentialsConfig {
     /// Credential config options
     /// </summary>
     public ICredentialsConfig? Config { get; set; }
-
-    private static bool IsWellFormedUriString(string uri) {
-        return Uri.TryCreate(uri, UriKind.Absolute, out var uriResult) &&
-               ((uriResult.ToString().Equals(uri) || uriResult.ToString().Equals($"{uri}/")) &&
-                (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps));
-    }
 
     /// <summary>
     ///     Ensures the credentials configuration is valid otherwise throws an error
@@ -125,9 +144,10 @@ public class Credentials : IAuthCredentialsConfig {
                     throw new FgaRequiredParamError("Configuration", nameof(Config.ApiAudience));
                 }
 
-                if (!string.IsNullOrWhiteSpace(Config?.ApiTokenIssuer) && !IsWellFormedUriString($"https://{Config.ApiTokenIssuer}")) {
-                    throw new FgaValidationError(
-                        $"Configuration.ApiTokenIssuer does not form a valid URI (https://{Config.ApiTokenIssuer})");
+                // Validate that the normalized URL is well-formed
+                var normalizedApiTokenIssuer = ApiTokenIssuerNormalizer.Normalize(Config?.ApiTokenIssuer);
+                if (!string.IsNullOrWhiteSpace(normalizedApiTokenIssuer) && !IsWellFormedUriString(normalizedApiTokenIssuer)) {
+                    throw new FgaValidationError($"Configuration.ApiTokenIssuer does not form a valid URI ({normalizedApiTokenIssuer})");
                 }
 
                 break;
@@ -137,12 +157,10 @@ public class Credentials : IAuthCredentialsConfig {
         }
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Credentials" /> class
-    /// </summary>
-    /// <exception cref="FgaRequiredParamError"></exception>
-    public Credentials() {
-        this.EnsureValid();
+    private static bool IsWellFormedUriString(string? uri) {
+        return Uri.TryCreate(uri, UriKind.Absolute, out var uriResult) &&
+               ((uriResult.ToString().Equals(uri) || uriResult.ToString().Equals($"{uri}/")) &&
+                (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps));
     }
 
     static Credentials Init(IAuthCredentialsConfig config) {
