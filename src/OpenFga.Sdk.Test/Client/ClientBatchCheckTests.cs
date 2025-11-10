@@ -1,6 +1,5 @@
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Client.Utils;
-using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
 using System;
 using System.Collections.Generic;

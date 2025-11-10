@@ -488,6 +488,12 @@ public class OpenFgaClient : IDisposable {
             return new ClientBatchCheckResponse(new List<ClientBatchCheckSingleResponse>());
         }
 
+        // Generate bulk request ID for tracking chunked requests
+        var bulkRequestId = Utils.ClientUtils.GenerateCorrelationId();
+        var headers = new Dictionary<string, string>(options?.Headers ?? new Dictionary<string, string>()) {
+            [FgaConstants.ClientBulkRequestIdHeader] = bulkRequestId
+        };
+
         var maxBatchSize = options?.MaxBatchSize ?? FgaConstants.ClientMaxBatchSize;
         var maxParallelReqs = options?.MaxParallelRequests ?? FgaConstants.ClientMaxMethodParallelRequests;
 
@@ -540,10 +546,18 @@ public class OpenFgaClient : IDisposable {
                     consistency: options?.Consistency
                 );
 
+                // Create options with headers for this batch
+                var batchOptions = new ClientServerBatchCheckOptions {
+                    StoreId = options?.StoreId,
+                    AuthorizationModelId = options?.AuthorizationModelId,
+                    Consistency = options?.Consistency,
+                    Headers = headers
+                };
+
                 var batchResponse = await api.BatchCheck(
                     GetStoreId(options),
                     batchRequest,
-                    options,
+                    batchOptions,
                     token
                 );
 
@@ -578,10 +592,18 @@ public class OpenFgaClient : IDisposable {
                         consistency: options?.Consistency
                     );
 
+                    // Create options with headers for this batch
+                    var batchOptions = new ClientServerBatchCheckOptions {
+                        StoreId = options?.StoreId,
+                        AuthorizationModelId = options?.AuthorizationModelId,
+                        Consistency = options?.Consistency,
+                        Headers = headers
+                    };
+
                     var batchResponse = await api.BatchCheck(
                         GetStoreId(options),
                         batchRequest,
-                        options,
+                        batchOptions,
                         cancellationToken
                     );
 
