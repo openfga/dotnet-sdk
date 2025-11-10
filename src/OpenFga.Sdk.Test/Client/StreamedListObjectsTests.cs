@@ -10,6 +10,7 @@ using Moq;
 using Moq.Protected;
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Constants;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
 using Xunit;
@@ -22,7 +23,7 @@ namespace OpenFga.Sdk.Test.Client;
 public class StreamedListObjectsTests {
     private const string StoreId = "01HVMMBYVFD2W7C21S9TW5XPWT";
     private const string AuthorizationModelId = "01HVMMBZ2EMDA86PXWBQJSVQFK";
-    private const string ApiUrl = "http://localhost:8080";
+    private static readonly string ApiUrl = FgaConstants.TestApiUrl;
 
     private Mock<HttpMessageHandler> CreateMockHttpHandler(
         HttpStatusCode statusCode,
