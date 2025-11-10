@@ -28,9 +28,19 @@ public static class ClientUtils {
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (chunkSize <= 0) throw new ArgumentException("Chunk size must be greater than 0", nameof(chunkSize));
 
+#if NET6_0_OR_GREATER
+        // Use built-in Enumerable.Chunk for .NET 6+
+        return source.Chunk(chunkSize).Select(chunk => chunk.ToList());
+#else
+        // Manual implementation for older frameworks
+        return ChunkListManual(source, chunkSize);
+    }
+
+    private static IEnumerable<List<T>> ChunkListManual<T>(List<T> source, int chunkSize) {
         for (int i = 0; i < source.Count; i += chunkSize) {
             yield return source.GetRange(i, Math.Min(chunkSize, source.Count - i));
         }
+#endif
     }
 
     /// <summary>
