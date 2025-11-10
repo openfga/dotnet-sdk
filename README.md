@@ -642,99 +642,68 @@ var response = await fgaClient.Check(body, options);
 
 ##### Batch Check
 
-Run a set of [checks](#check). Batch Check will return `allowed: false` if it encounters an error, and will return the error in the body.
-If 429s or 5xxs are encountered, the underlying check will retry up to 3 times before giving up.
+Similar to [check](#check), but instead of checking a single user-object relationship, accepts a list of relationships to check. Requires OpenFGA server version 1.8.0 or greater.
 
-> **Note**: The order of `BatchCheck` results is not guaranteed to match the order of the checks provided. Use `correlationId` to pair responses with requests.
+[API Documentation](https://openfga.dev/api/service#/Relationship%20Queries/BatchCheck)
+
+> **Note**: The order of `batchCheck` results is not guaranteed to match the order of the checks provided. Use `correlationId` to pair responses with requests.
 
 ```csharp
 var options = new ClientBatchCheckOptions {
-    // You can rely on the model id set in the configuration or override it for this specific request
     AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
-    MaxParallelRequests = 5, // Max number of requests to issue in parallel, defaults to 10
+    MaxBatchSize = 50, // optional, default is 50
+    MaxParallelRequests = 10 // optional, default is 10
 };
-var body = new List<ClientCheckRequest>(){
-    new() {
-        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-        Relation = "viewer",
-        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
-        ContextualTuples = new List<ClientTupleKey>() {
-            new() {
-                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                Relation = "editor",
-                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
-            }
+
+var corrId = Guid.NewGuid().ToString();
+var body = new ClientBatchCheckRequest {
+    Checks = new List<ClientBatchCheckItem> {
+        new() {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "viewer",
+            Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+            // Optional correlationId to associate request and response
+            // One will be generated if not provided
+            CorrelationId = corrId
         },
-    },
-    new() {
-        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-        Relation = "admin",
-        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
-        ContextualTuples = new List<ClientTupleKey>() {
-            new() {
-                User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-                Relation = "editor",
-                Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
-            }
-        },
-    },
-    new() {
-        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-        Relation = "creator",
-        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
-    },
-    new() {
-        User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-        Relation = "deleter",
-        Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
+        new() {
+            User = "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
+            Relation = "admin",
+            Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
+        }
     }
 };
 
 var response = await fgaClient.BatchCheck(body, options);
 
+var userAllowed = response.Result.Where(r => r.CorrelationId == corrId).ToList();
+Console.WriteLine($"User is allowed access to {userAllowed.Count} documents");
+foreach (var item in userAllowed) {
+    Console.WriteLine($"User is allowed access to {item.Request.Object}");
+}
+
 /*
-response.Responses = [{
-  Allowed: false,
+response.Result = [{
+  CorrelationId: "4187674b-0ec0-4ed5-abb5-327bd21c89a3",
+  Allowed: true,
   Request: {
     User: "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
     Relation: "viewer",
-    Object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
-    ContextualTuples: [{
-      User: "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-      Relation: "editor",
-      Object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
-    }]
+    Object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
   }
 }, {
+  CorrelationId: "5874b4fb-10f1-4e0c-ae32-559220b06dc8",
   Allowed: false,
   Request: {
     User: "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
     Relation: "admin",
-    Object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
-    ContextualTuples: [{
-      User: "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-      Relation: "editor",
-      Object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
-    }]
+    Object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"
   }
-}, {
-  Allowed: false,
-  Request: {
-    User: "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-    Relation: "creator",
-    Object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
-  },
-  Error: <FgaError ...>
-}, {
-  Allowed: true,
-  Request: {
-    User: "user:81684243-9356-4421-8fbf-a4f8d36aa31b",
-    Relation: "deleter",
-    Object: "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
-  }},
-]
+}]
 */
 ```
+
+If you are using an OpenFGA server version less than 1.8.0, you can use the `ClientBatchCheck()` method, which calls `check` in parallel. It will return `allowed: false` if it encounters an error, and will return the error in the body. If 429s or 5xxs are encountered, the underlying check will retry up to 3 times before giving up.
 
 ##### Expand
 
