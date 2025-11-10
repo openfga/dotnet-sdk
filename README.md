@@ -784,6 +784,35 @@ var response = await fgaClient.ListObjects(body, options);
 // response.Objects = ["document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"]
 ```
 
+##### Streamed List Objects
+
+The Streamed ListObjects API is very similar to the ListObjects API, with two differences:
+
+1. Instead of collecting all objects before returning a response, it streams them to the client as they are collected.
+2. The number of results returned is only limited by the execution timeout specified in the flag `OPENFGA_LIST_OBJECTS_DEADLINE`.
+
+[API Documentation](https://openfga.dev/api/service#/Relationship%20Queries/StreamedListObjects)
+
+```csharp
+var options = new ClientListObjectsOptions {
+    AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1",
+    Consistency = ConsistencyPreference.HIGHERCONSISTENCY
+};
+
+var objects = new List<string>();
+await foreach (var response in fgaClient.StreamedListObjects(
+    new ClientListObjectsRequest {
+        User = "user:anne",
+        Relation = "can_read",
+        Type = "document"
+    },
+    options)) {
+    objects.Add(response.Object);
+}
+
+// objects = ["document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a"]
+```
+
 ##### List Relations
 
 List the relations a user has on an object.
