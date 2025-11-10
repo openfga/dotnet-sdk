@@ -18,25 +18,6 @@ public static class ClientUtils {
     }
 
     /// <summary>
-    /// Chunks an array into smaller batches of a specified size
-    /// </summary>
-    /// <typeparam name="T">Type of items in the array</typeparam>
-    /// <param name="source">Source array to chunk</param>
-    /// <param name="chunkSize">Maximum size of each chunk</param>
-    /// <returns>Enumerable of arrays, each containing up to chunkSize elements</returns>
-    public static IEnumerable<T[]> ChunkArray<T>(T[] source, int chunkSize) {
-        if (source == null) throw new ArgumentNullException(nameof(source));
-        if (chunkSize <= 0) throw new ArgumentException("Chunk size must be greater than 0", nameof(chunkSize));
-
-        for (int i = 0; i < source.Length; i += chunkSize) {
-            int actualChunkSize = Math.Min(chunkSize, source.Length - i);
-            T[] chunk = new T[actualChunkSize];
-            Array.Copy(source, i, chunk, 0, actualChunkSize);
-            yield return chunk;
-        }
-    }
-
-    /// <summary>
     /// Chunks a list into smaller batches of a specified size
     /// </summary>
     /// <typeparam name="T">Type of items in the list</typeparam>
