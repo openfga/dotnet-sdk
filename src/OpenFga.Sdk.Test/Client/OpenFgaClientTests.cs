@@ -2805,7 +2805,7 @@ public class OpenFgaClientTests : IDisposable {
         };
         
         var bulkRequestIdHeaderFound = false;
-        var (client, mockHandler) = CreateTestClientForHeaders(expectedResponse, req => {
+        var (client, _) = CreateTestClientForHeaders(expectedResponse, req => {
             if (req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/batch-check") &&
                 req.Method == HttpMethod.Post &&
                 req.Headers.Contains(FgaConstants.ClientBulkRequestIdHeader)) {
