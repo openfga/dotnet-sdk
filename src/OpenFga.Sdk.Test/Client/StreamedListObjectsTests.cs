@@ -62,12 +62,12 @@ public class StreamedListObjectsTests {
                 Assert.Contains($"/stores/{StoreId}/streamed-list-objects", req.RequestUri!.ToString());
             });
 
-        var httpClient = new HttpClient(mockHandler.Object);
+        using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         var results = new List<string>();
         await foreach (var response in fgaClient.StreamedListObjects(
@@ -89,13 +89,13 @@ public class StreamedListObjectsTests {
         var ndjson = CreateNDJSONResponse(objects);
 
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
-        var httpClient = new HttpClient(mockHandler.Object);
+        using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId,
             AuthorizationModelId = AuthorizationModelId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         var results = new List<string>();
         await foreach (var response in fgaClient.StreamedListObjects(
@@ -118,12 +118,12 @@ public class StreamedListObjectsTests {
         var ndjson = CreateNDJSONResponse(objects);
 
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
-        var httpClient = new HttpClient(mockHandler.Object);
+        using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         var results = new List<string>();
         await foreach (var response in fgaClient.StreamedListObjects(
@@ -149,12 +149,12 @@ public class StreamedListObjectsTests {
         var ndjson = CreateNDJSONResponse(objects);
 
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
-        var httpClient = new HttpClient(mockHandler.Object);
+        using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         var results = new List<string>();
         await foreach (var response in fgaClient.StreamedListObjects(
@@ -184,12 +184,12 @@ public class StreamedListObjectsTests {
             HttpStatusCode.InternalServerError,
             "{\"code\":\"internal_error\",\"message\":\"Server error\"}");
 
-        var httpClient = new HttpClient(mockHandler.Object);
+        using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         await Assert.ThrowsAsync<FgaApiInternalError>(async () => {
             await foreach (var _ in fgaClient.StreamedListObjects(
@@ -209,12 +209,12 @@ public class StreamedListObjectsTests {
         var ndjson = CreateNDJSONResponse(objects);
 
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
-        var httpClient = new HttpClient(mockHandler.Object);
+        using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         var results = new List<string>();
         await foreach (var response in fgaClient.StreamedListObjects(
@@ -239,12 +239,12 @@ public class StreamedListObjectsTests {
         var ndjson = CreateNDJSONResponse(objects);
 
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
-        var httpClient = new HttpClient(mockHandler.Object);
+        using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         using var cts = new CancellationTokenSource();
 
@@ -271,12 +271,12 @@ public class StreamedListObjectsTests {
     public async Task StreamedListObjects_EmptyResult_ReturnsNoObjects() {
         var ndjson = ""; // Empty response
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
-        var httpClient = new HttpClient(mockHandler.Object);
+        using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         var results = new List<string>();
         await foreach (var response in fgaClient.StreamedListObjects(
@@ -298,7 +298,7 @@ public class StreamedListObjectsTests {
             ApiUrl = ApiUrl
             // No StoreId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         await Assert.ThrowsAsync<FgaRequiredParamError>(async () => {
             await foreach (var response in fgaClient.StreamedListObjects(
@@ -319,12 +319,12 @@ public class StreamedListObjectsTests {
         var ndjson = CreateNDJSONResponse(objects);
 
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
-        var httpClient = new HttpClient(mockHandler.Object);
+        using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         var results = new List<string>();
         await foreach (var response in fgaClient.StreamedListObjects(
@@ -347,16 +347,16 @@ public class StreamedListObjectsTests {
 
         // Create a new mock handler for each call
         var mockHandler1 = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
-        var httpClient1 = new HttpClient(mockHandler1.Object);
+        using var httpClient1 = new HttpClient(mockHandler1.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId
         };
-        var fgaClient1 = new OpenFgaClient(config, httpClient1);
+        using var fgaClient1 = new OpenFgaClient(config, httpClient1);
 
         var mockHandler2 = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
-        var httpClient2 = new HttpClient(mockHandler2.Object);
-        var fgaClient2 = new OpenFgaClient(config, httpClient2);
+        using var httpClient2 = new HttpClient(mockHandler2.Object);
+        using var fgaClient2 = new OpenFgaClient(config, httpClient2);
 
         // Act - Call twice
         var results1 = new List<string>();
@@ -397,12 +397,12 @@ public class StreamedListObjectsTests {
                 Assert.Equal("req-123", req.Headers.GetValues("X-Request-Id").First());
             });
 
-        var httpClient = new HttpClient(mockHandler.Object);
+        using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         var results = new List<string>();
         await foreach (var response in fgaClient.StreamedListObjects(
@@ -444,12 +444,12 @@ public class StreamedListObjectsTests {
                 }
             });
 
-        var httpClient = new HttpClient(mockHandler.Object);
+        using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId
         };
-        var fgaClient = new OpenFgaClient(config, httpClient);
+        using var fgaClient = new OpenFgaClient(config, httpClient);
 
         await Assert.ThrowsAsync<FgaApiRateLimitExceededError>(async () => {
             await foreach (var response in fgaClient.StreamedListObjects(
