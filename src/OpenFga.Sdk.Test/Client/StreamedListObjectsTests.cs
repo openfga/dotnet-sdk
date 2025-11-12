@@ -301,7 +301,7 @@ public class StreamedListObjectsTests {
         using var fgaClient = new OpenFgaClient(config, httpClient);
 
         await Assert.ThrowsAsync<FgaRequiredParamError>(async () => {
-            await foreach (var response in fgaClient.StreamedListObjects(
+            await foreach (var _ in fgaClient.StreamedListObjects(
                 new ClientListObjectsRequest {
                     User = "user:anne",
                     Relation = "can_read",
@@ -452,7 +452,7 @@ public class StreamedListObjectsTests {
         using var fgaClient = new OpenFgaClient(config, httpClient);
 
         await Assert.ThrowsAsync<FgaApiRateLimitExceededError>(async () => {
-            await foreach (var response in fgaClient.StreamedListObjects(
+            await foreach (var _ in fgaClient.StreamedListObjects(
                 new ClientListObjectsRequest {
                     User = "user:anne",
                     Relation = "can_read",
