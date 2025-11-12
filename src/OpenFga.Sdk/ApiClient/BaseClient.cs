@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace OpenFga.Sdk.ApiClient;
 
@@ -147,21 +148,19 @@ public class BaseClient : IDisposable {
         [EnumeratorCancellation] CancellationToken cancellationToken = default) {
         
         if (additionalHeaders != null) {
-            foreach (var header in additionalHeaders) {
-                if (header.Value != null) {
-                    request.Headers.Add(header.Key, header.Value);
-                }
+            foreach (var header in additionalHeaders.Where(header => header.Value != null)) {
+                request.Headers.Add(header.Key, header.Value);
             }
         }
 
         // Use ResponseHeadersRead to start streaming before full response is received
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+        using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
             .ConfigureAwait(false);
 
         try {
             response.EnsureSuccessStatusCode();
         }
-        catch {
+        catch (HttpRequestException) {
             throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
         }
 
@@ -172,62 +171,57 @@ public class BaseClient : IDisposable {
         // Register cancellation token to dispose response and unblock stalled reads
         using var disposeResponseRegistration = cancellationToken.Register(static state => ((HttpResponseMessage)state!).Dispose(), response);
         
-        try {
-            // Stream and parse NDJSON response
+        // Stream and parse NDJSON response
 #if NET6_0_OR_GREATER
-            await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+        await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #else
-            using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+        using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #endif
-            using var reader = new StreamReader(stream, Encoding.UTF8);
+        using var reader = new StreamReader(stream, Encoding.UTF8);
 
-            while (true) {
-                string? line;
-                try {
-                    line = await reader.ReadLineAsync().ConfigureAwait(false);
-                }
-                catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) {
-                    throw new OperationCanceledException("Streaming request was cancelled.", cancellationToken);
-                }
-                catch (IOException ex) when (cancellationToken.IsCancellationRequested) {
-                    throw new OperationCanceledException("Streaming request was cancelled.", ex, cancellationToken);
-                }
+        while (true) {
+            string? line;
+            try {
+                line = await reader.ReadLineAsync().ConfigureAwait(false);
+            }
+            catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) {
+                throw new OperationCanceledException("Streaming request was cancelled.", cancellationToken);
+            }
+            catch (IOException ex) when (cancellationToken.IsCancellationRequested) {
+                throw new OperationCanceledException("Streaming request was cancelled.", ex, cancellationToken);
+            }
 
-                if (line == null) {
-                    break;
-                }
+            if (line == null) {
+                break;
+            }
 
-                cancellationToken.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
 
-                if (string.IsNullOrWhiteSpace(line)) {
-                    continue; // Skip empty lines
-                }
+            if (string.IsNullOrWhiteSpace(line)) {
+                continue; // Skip empty lines
+            }
 
-                // Parse the NDJSON line - format is: {"result": {"object": "..."}}
-                // Note: Cannot use yield inside try-catch, so we parse first then yield
-                T? parsedResult = default;
+            // Parse the NDJSON line - format is: {"result": {"object": "..."}}
+            // Note: Cannot use yield inside try-catch, so we parse first then yield
+            T? parsedResult = default;
 
-                try {
-                    using var jsonDoc = JsonDocument.Parse(line);
-                    var root = jsonDoc.RootElement;
+            try {
+                using var jsonDoc = JsonDocument.Parse(line);
+                var root = jsonDoc.RootElement;
 
-                    if (root.TryGetProperty("result", out var resultElement)) {
-                        parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
-                    }
-                }
-                catch (JsonException) {
-                    // Skip invalid JSON lines - similar to JS SDK behavior
-                    // In production, malformed lines from the server should be rare
-                }
-
-                // Yield outside of try-catch block (C# language requirement)
-                if (parsedResult != null) {
-                    yield return parsedResult;
+                if (root.TryGetProperty("result", out var resultElement)) {
+                    parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
                 }
             }
-        }
-        finally {
-            response.Dispose();
+            catch (JsonException) {
+                // Skip invalid JSON lines - similar to JS SDK behavior
+                // In production, malformed lines from the server should be rare
+            }
+
+            // Yield outside of try-catch block (C# language requirement)
+            if (parsedResult != null) {
+                yield return parsedResult;
+            }
         }
     }
 

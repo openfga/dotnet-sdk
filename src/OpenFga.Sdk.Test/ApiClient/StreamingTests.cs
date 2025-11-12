@@ -28,7 +28,7 @@ public class StreamingTests {
                 ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>()
             )
-            .ReturnsAsync(new HttpResponseMessage {
+            .ReturnsAsync(() => new HttpResponseMessage {
                 StatusCode = statusCode,
                 Content = new StringContent(content, Encoding.UTF8, contentType)
             });

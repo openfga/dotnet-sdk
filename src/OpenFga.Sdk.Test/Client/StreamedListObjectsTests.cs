@@ -192,7 +192,7 @@ public class StreamedListObjectsTests {
         var fgaClient = new OpenFgaClient(config, httpClient);
 
         await Assert.ThrowsAsync<FgaApiInternalError>(async () => {
-            await foreach (var response in fgaClient.StreamedListObjects(
+            await foreach (var _ in fgaClient.StreamedListObjects(
                 new ClientListObjectsRequest {
                     User = "user:anne",
                     Relation = "can_read",
@@ -246,7 +246,7 @@ public class StreamedListObjectsTests {
         };
         var fgaClient = new OpenFgaClient(config, httpClient);
 
-        var cts = new CancellationTokenSource();
+        using var cts = new CancellationTokenSource();
 
         var results = new List<string>();
         await Assert.ThrowsAsync<OperationCanceledException>(async () => {
@@ -293,7 +293,7 @@ public class StreamedListObjectsTests {
 
     [Fact]
     public async Task StreamedListObjects_MissingStoreId_ThrowsValidationError() {
-        var httpClient = new HttpClient();
+        using var httpClient = new HttpClient();
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl
             // No StoreId
@@ -434,7 +434,7 @@ public class StreamedListObjectsTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(new HttpResponseMessage {
-                StatusCode = HttpStatusCode.TooManyRequests,
+                StatusCode = (HttpStatusCode)429, // TooManyRequests (not available in net48)
                 Content = new StringContent(
                     "{\"code\":\"rate_limit_exceeded\",\"message\":\"Too many requests\"}",
                     Encoding.UTF8,
