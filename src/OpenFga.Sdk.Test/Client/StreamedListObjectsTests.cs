@@ -264,7 +264,8 @@ public class StreamedListObjectsTests {
             }
         });
 
-        Assert.True(results.Count >= 1);
+        // Cancellation happens after the first item, but timing may allow more items before cancellation takes effect
+        Assert.True(results.Count >= 1, "At least one item should be processed before cancellation");
     }
 
     [Fact]

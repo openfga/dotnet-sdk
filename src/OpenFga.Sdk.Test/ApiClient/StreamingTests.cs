@@ -176,12 +176,13 @@ public class StreamingTests {
                 requestBuilder, null, "Test", cts.Token)) {
                 results.Add(item);
                 if (results.Count == 1) {
-                    cts.Cancel(); // Cancel after first item
+                    cts.Cancel(); // Cancel after the first item
                 }
             }
         });
 
-        Assert.True(results.Count >= 1);
+        // Cancellation happens after the first item, but timing may allow more items before cancellation takes effect
+        Assert.True(results.Count >= 1, "At least one item should be processed before cancellation");
     }
 
     [Fact]
@@ -203,7 +204,7 @@ public class StreamingTests {
         };
 
         await Assert.ThrowsAsync<FgaApiInternalError>(async () => {
-            await foreach (var item in baseClient.SendStreamingRequestAsync<object, StreamedListObjectsResponse>(
+            await foreach (var _ in baseClient.SendStreamingRequestAsync<object, StreamedListObjectsResponse>(
                 requestBuilder, null, "Test")) {
                 // Should not get here
             }
@@ -241,7 +242,7 @@ public class StreamingTests {
         }
 
         Assert.Equal(2, results.Count);
-        // If we get here without exceptions, resources were disposed properly
+        // If we get here without exceptions, resources were disposed of properly
     }
 
     [Fact]
