@@ -434,7 +434,7 @@ public class StreamedListObjectsTests {
                 ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>()
             )
-            .ReturnsAsync(new HttpResponseMessage {
+            .ReturnsAsync(() => new HttpResponseMessage {
                 StatusCode = (HttpStatusCode)429, // TooManyRequests (not available in net48)
                 Content = new StringContent(
                     "{\"code\":\"rate_limit_exceeded\",\"message\":\"Too many requests\"}",
