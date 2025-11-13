@@ -94,28 +94,40 @@ public class StreamedListObjectsExample {
             });
 
             Console.WriteLine("Writing tuples (1000 as owner, 1000 as viewer)");
-            var tuples = new List<ClientTupleKey>();
+            
+            // Write in batches of 100 (OpenFGA limit)
+            const int batchSize = 100;
+            int totalWritten = 0;
             
             // Write 1000 documents where anne is the owner
-            for (int i = 1; i <= 1000; i++) {
-                tuples.Add(new ClientTupleKey {
-                    User = "user:anne",
-                    Relation = "owner",
-                    Object = $"document:{i}"
-                });
+            for (int batch = 0; batch < 10; batch++) {
+                var tuples = new List<ClientTupleKey>();
+                for (int i = 1; i <= batchSize; i++) {
+                    tuples.Add(new ClientTupleKey {
+                        User = "user:anne",
+                        Relation = "owner",
+                        Object = $"document:{batch * batchSize + i}"
+                    });
+                }
+                await fga.WriteTuples(tuples);
+                totalWritten += tuples.Count;
             }
             
             // Write 1000 documents where anne is a viewer
-            for (int i = 1001; i <= 2000; i++) {
-                tuples.Add(new ClientTupleKey {
-                    User = "user:anne",
-                    Relation = "viewer",
-                    Object = $"document:{i}"
-                });
+            for (int batch = 0; batch < 10; batch++) {
+                var tuples = new List<ClientTupleKey>();
+                for (int i = 1; i <= batchSize; i++) {
+                    tuples.Add(new ClientTupleKey {
+                        User = "user:anne",
+                        Relation = "viewer",
+                        Object = $"document:{1000 + batch * batchSize + i}"
+                    });
+                }
+                await fga.WriteTuples(tuples);
+                totalWritten += tuples.Count;
             }
             
-            await fga.WriteTuples(tuples);
-            Console.WriteLine($"Wrote {tuples.Count} tuples");
+            Console.WriteLine($"Wrote {totalWritten} tuples");
 
             Console.WriteLine("Streaming objects via computed 'can_read' relation...");
             var count = 0;
