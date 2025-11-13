@@ -504,9 +504,11 @@ public class OpenFgaClient : IDisposable {
     /**
      * StreamedListObjects - Stream all objects of a particular type that the user has a certain relation to (evaluates)
      * 
-     * The Streamed ListObjects API is very similar to the ListObjects API, with two differences:
-     * 1. Instead of collecting all objects before returning a response, it streams them to the client as they are collected.
-     * 2. The number of results returned is only limited by the execution timeout specified in the flag OPENFGA_LIST_OBJECTS_DEADLINE.
+     * The Streamed ListObjects API is very similar to the ListObjects API, with two key differences:
+     * 1. Streaming Results: Instead of collecting all objects before returning a response, it streams them to the client as they are collected.
+     * 2. No Pagination Limit: Returns all results without the 1000-object limit of the standard ListObjects API.
+     * 
+     * This is particularly useful when querying computed relations that may return large result sets.
      * 
      * Returns an async enumerable that yields StreamedListObjectsResponse objects as they are received from the server.
      */

@@ -32,18 +32,53 @@ public class StreamedListObjectsExample {
                         Type = "document",
                         Relations = new Dictionary<string, Userset> {
                             {
-                                "can_read", new Userset {
+                                "owner", new Userset {
                                     This = new object()
+                                }
+                            },
+                            {
+                                "viewer", new Userset {
+                                    This = new object()
+                                }
+                            },
+                            {
+                                "can_read", new Userset {
+                                    Union = new Usersets {
+                                        Child = new List<Userset> {
+                                            new() {
+                                                ComputedUserset = new ObjectRelation {
+                                                    Relation = "owner"
+                                                }
+                                            },
+                                            new() {
+                                                ComputedUserset = new ObjectRelation {
+                                                    Relation = "viewer"
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         },
                         Metadata = new Metadata {
                             Relations = new Dictionary<string, RelationMetadata> {
                                 {
-                                    "can_read", new RelationMetadata {
+                                    "owner", new RelationMetadata {
                                         DirectlyRelatedUserTypes = new List<RelationReference> {
                                             new() { Type = "user" }
                                         }
+                                    }
+                                },
+                                {
+                                    "viewer", new RelationMetadata {
+                                        DirectlyRelatedUserTypes = new List<RelationReference> {
+                                            new() { Type = "user" }
+                                        }
+                                    }
+                                },
+                                {
+                                    "can_read", new RelationMetadata {
+                                        DirectlyRelatedUserTypes = new List<RelationReference>()
                                     }
                                 }
                             }
@@ -58,24 +93,36 @@ public class StreamedListObjectsExample {
                 AuthorizationModelId = authModel.AuthorizationModelId
             });
 
-            Console.WriteLine("Writing tuples");
+            Console.WriteLine("Writing tuples (1000 as owner, 1000 as viewer)");
             var tuples = new List<ClientTupleKey>();
-            for (int i = 1; i <= 2000; i++) {
+            
+            // Write 1000 documents where anne is the owner
+            for (int i = 1; i <= 1000; i++) {
                 tuples.Add(new ClientTupleKey {
                     User = "user:anne",
-                    Relation = "can_read",
+                    Relation = "owner",
                     Object = $"document:{i}"
                 });
             }
+            
+            // Write 1000 documents where anne is a viewer
+            for (int i = 1001; i <= 2000; i++) {
+                tuples.Add(new ClientTupleKey {
+                    User = "user:anne",
+                    Relation = "viewer",
+                    Object = $"document:{i}"
+                });
+            }
+            
             await fga.WriteTuples(tuples);
             Console.WriteLine($"Wrote {tuples.Count} tuples");
 
-            Console.WriteLine("Streaming objects...");
+            Console.WriteLine("Streaming objects via computed 'can_read' relation...");
             var count = 0;
             await foreach (var response in fga.StreamedListObjects(
                 new ClientListObjectsRequest {
                     User = "user:anne",
-                    Relation = "can_read",
+                    Relation = "can_read",  // Computed: owner OR viewer
                     Type = "document"
                 },
                 new ClientListObjectsOptions {
