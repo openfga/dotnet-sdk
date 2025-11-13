@@ -1,6 +1,7 @@
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
+using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
 
 namespace StreamedListObjectsExample;
@@ -152,7 +153,14 @@ public class StreamedListObjectsExample {
             Console.WriteLine("Done");
         }
         catch (Exception ex) {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Avoid logging sensitive data; only display generic info
+            if (ex is FgaValidationError) {
+                Console.Error.WriteLine("Validation error in configuration. Please check your configuration for errors.");
+            } else if (ex.Message?.Contains("Connection refused") == true || ex.InnerException?.Message?.Contains("Connection refused") == true) {
+                Console.Error.WriteLine("Is OpenFGA server running? Check FGA_API_URL environment variable or default http://localhost:8080");
+            } else {
+                Console.Error.WriteLine($"An error occurred. [{ex.GetType().Name}]");
+            }
             Environment.Exit(1);
         }
     }
