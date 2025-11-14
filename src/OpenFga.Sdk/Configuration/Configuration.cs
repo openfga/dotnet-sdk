@@ -130,7 +130,6 @@ public class Configuration {
 
     #endregion Constants
 
-
     #region Properties
 
     /// <summary>
