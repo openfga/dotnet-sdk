@@ -177,52 +177,95 @@ public class BaseClient : IDisposable {
 #else
         using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #endif
-        using var reader = new StreamReader(stream, Encoding.UTF8);
+            using var reader = new StreamReader(stream, Encoding.UTF8);
 
-        while (true) {
-            string? line;
-            try {
-                line = await reader.ReadLineAsync().ConfigureAwait(false);
-            }
-            catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) {
-                throw new OperationCanceledException("Streaming request was cancelled.", cancellationToken);
-            }
-            catch (IOException ex) when (cancellationToken.IsCancellationRequested) {
-                throw new OperationCanceledException("Streaming request was cancelled.", ex, cancellationToken);
-            }
+            // Replace the line-by-line reader with a buffered incremental reader to support partial NDJSON lines.
+            var sb = new StringBuilder(8 * 1024); // start with a reasonable buffer
+            var charBuffer = new char[4096];
 
-            if (line == null) {
-                break;
-            }
+            while (true) {
+                int read;
+                try {
+                    read = await reader.ReadAsync(charBuffer, 0, charBuffer.Length).ConfigureAwait(false);
+                }
+                catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) {
+                    throw new OperationCanceledException("Streaming request was cancelled.", cancellationToken);
+                }
+                catch (IOException ex) when (cancellationToken.IsCancellationRequested) {
+                    throw new OperationCanceledException("Streaming request was cancelled.", ex, cancellationToken);
+                }
 
-            cancellationToken.ThrowIfCancellationRequested();
+                if (read == 0) {
+                    // End of stream: flush any remaining partial record without trailing newline
+                    if (sb.Length > 0) {
+                        var line = sb.ToString();
+                        sb.Clear();
 
-            if (string.IsNullOrWhiteSpace(line)) {
-                continue; // Skip empty lines
-            }
+                        cancellationToken.ThrowIfCancellationRequested();
+                        if (!string.IsNullOrWhiteSpace(line)) {
+                            T? parsedResult = default;
+                            try {
+                                using var jsonDoc = JsonDocument.Parse(line);
+                                var root = jsonDoc.RootElement;
+                                if (root.TryGetProperty("result", out var resultElement)) {
+                                    parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
+                                }
+                            }
+                            catch (JsonException) {
+                                // Skip invalid trailing fragment
+                            }
+                            if (parsedResult != null) {
+                                yield return parsedResult;
+                            }
+                        }
+                    }
+                    break;
+                }
 
-            // Parse the NDJSON line - format is: {"result": {"object": "..."}}
-            // Note: Cannot use yield inside try-catch, so we parse first then yield
-            T? parsedResult = default;
+                sb.Append(charBuffer, 0, read);
 
-            try {
-                using var jsonDoc = JsonDocument.Parse(line);
-                var root = jsonDoc.RootElement;
+                // Process all complete lines currently in the buffer
+                int start = 0;
+                while (true) {
+                    var span = sb.ToString(); // materialize for IndexOf; small overhead acceptable per chunk
+                    int newlineIdx = span.IndexOf('\n', start);
+                    if (newlineIdx == -1) {
+                        // No complete line yet. Keep the current tail in StringBuilder.
+                        // Remove processed head (if any) to avoid repeated scanning.
+                        if (start > 0) {
+                            sb.Clear();
+                            sb.Append(span.Substring(start));
+                        }
+                        break;
+                    }
 
-                if (root.TryGetProperty("result", out var resultElement)) {
-                    parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
+                    int lineLen = newlineIdx - start;
+                    var line = lineLen > 0 ? span.Substring(start, lineLen) : string.Empty;
+                    start = newlineIdx + 1;
+
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    if (string.IsNullOrWhiteSpace(line)) {
+                        continue;
+                    }
+
+                    T? parsedResult = default;
+                    try {
+                        using var jsonDoc = JsonDocument.Parse(line);
+                        var root = jsonDoc.RootElement;
+                        if (root.TryGetProperty("result", out var resultElement)) {
+                            parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
+                        }
+                    }
+                    catch (JsonException) {
+                        // Skip malformed line
+                    }
+
+                    if (parsedResult != null) {
+                        yield return parsedResult;
+                    }
                 }
             }
-            catch (JsonException) {
-                // Skip invalid JSON lines - similar to JS SDK behavior
-                // In production, malformed lines from the server should be rare
-            }
-
-            // Yield outside of try-catch block (C# language requirement)
-            if (parsedResult != null) {
-                yield return parsedResult;
-            }
-        }
     }
 
     /// <summary>
