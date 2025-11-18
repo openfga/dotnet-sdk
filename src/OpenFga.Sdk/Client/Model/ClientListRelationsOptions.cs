@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace OpenFga.Sdk.Client.Model;
 
-public interface IClientListRelationsOptions : IClientBatchCheckOptions {
+public interface IClientListRelationsOptions : IClientBatchCheckClientOptions {
 }
 
 public class ClientListRelationsOptions : IClientListRelationsOptions {

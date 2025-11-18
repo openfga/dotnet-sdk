@@ -88,7 +88,7 @@ public class OpenFgaClient : IDisposable {
     private async Task ProcessCheckRequestsAsync(
         IEnumerable<ClientCheckRequest> requests,
         ConcurrentBag<BatchCheckSingleResponse> responses,
-        IClientBatchCheckOptions? options,
+        IClientBatchCheckClientOptions? options,
         int maxParallelReqs,
         CancellationToken cancellationToken) {
 
@@ -156,7 +156,7 @@ public class OpenFgaClient : IDisposable {
     private async Task ProcessCheckRequestsAsync(
         IEnumerable<ClientCheckRequest> requests,
         ConcurrentBag<BatchCheckSingleResponse> responses,
-        IClientBatchCheckOptions? options,
+        IClientBatchCheckClientOptions? options,
         int maxParallelReqs,
         CancellationToken cancellationToken) {
 
@@ -453,7 +453,7 @@ public class OpenFgaClient : IDisposable {
    * /batch-check endpoint, use the BatchCheck method instead.
    */
     public async Task<ClientBatchCheckClientResponse> ClientBatchCheck(List<ClientCheckRequest> body,
-        IClientBatchCheckOptions? options = default,
+        IClientBatchCheckClientOptions? options = default,
         CancellationToken cancellationToken = default) {
         var responses = new ConcurrentBag<BatchCheckSingleResponse>();
 
@@ -475,12 +475,12 @@ public class OpenFgaClient : IDisposable {
    * - Fails fast on the first error
    * 
    * @param {ClientBatchCheckRequest} body - The batch check request with a list of checks
-   * @param {IClientServerBatchCheckOptions} options - Optional configuration
+   * @param {IClientBatchCheckOptions} options - Optional configuration
    * @param {CancellationToken} cancellationToken - Cancellation token
    * @returns {ClientBatchCheckResponse} Response with correlation ID mapping
    */
     public async Task<ClientBatchCheckResponse> BatchCheck(ClientBatchCheckRequest body,
-        IClientServerBatchCheckOptions? options = default,
+        IClientBatchCheckOptions? options = default,
         CancellationToken cancellationToken = default) {
         
         // If no checks provided, return empty result
@@ -547,7 +547,7 @@ public class OpenFgaClient : IDisposable {
                 );
 
                 // Create options with headers for this batch
-                var batchOptions = new ClientServerBatchCheckOptions {
+                var batchOptions = new ClientBatchCheckOptions {
                     StoreId = options?.StoreId,
                     AuthorizationModelId = options?.AuthorizationModelId,
                     Consistency = options?.Consistency,
@@ -593,7 +593,7 @@ public class OpenFgaClient : IDisposable {
                     );
 
                     // Create options with headers for this batch
-                    var batchOptions = new ClientServerBatchCheckOptions {
+                    var batchOptions = new ClientBatchCheckOptions {
                         StoreId = options?.StoreId,
                         AuthorizationModelId = options?.AuthorizationModelId,
                         Consistency = options?.Consistency,

@@ -182,8 +182,8 @@ public class ClientBatchCheckTests {
     }
 
     [Fact]
-    public void ClientServerBatchCheckOptions_MaxBatchSizeProperty_CanBeSet() {
-        var options = new ClientServerBatchCheckOptions {
+    public void ClientBatchCheckOptions_MaxBatchSizeProperty_CanBeSet() {
+        var options = new ClientBatchCheckOptions {
             MaxBatchSize = 100
         };
 
@@ -191,8 +191,8 @@ public class ClientBatchCheckTests {
     }
 
     [Fact]
-    public void ClientServerBatchCheckOptions_MaxParallelRequestsProperty_CanBeSet() {
-        var options = new ClientServerBatchCheckOptions {
+    public void ClientBatchCheckOptions_MaxParallelRequestsProperty_CanBeSet() {
+        var options = new ClientBatchCheckOptions {
             MaxParallelRequests = 5
         };
 
@@ -200,8 +200,8 @@ public class ClientBatchCheckTests {
     }
 
     [Fact]
-    public void ClientBatchCheckOptions_MaxParallelRequestsProperty_CanBeSet() {
-        var options = new ClientBatchCheckOptions {
+    public void ClientBatchCheckClientOptions_MaxParallelRequestsProperty_CanBeSet() {
+        var options = new ClientBatchCheckClientOptions {
             MaxParallelRequests = 5
         };
 
