@@ -1,3 +1,4 @@
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -71,14 +72,14 @@ public class BatchCheckSingleResponse : IEquatable<BatchCheckSingleResponse>, IV
 
     public override int GetHashCode() {
         unchecked {
-            int hashCode = 9661;
-            hashCode = (hashCode * 9923) + Allowed.GetHashCode();
+            int hashCode = FgaConstants.HashCodeBasePrimeNumber;
+            hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + Allowed.GetHashCode();
             if (Request != null) {
-                hashCode = (hashCode * 9923) + Request.GetHashCode();
+                hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + Request.GetHashCode();
             }
             if (Error != null) {
-                hashCode = (hashCode * 9923) + Error.Message.GetHashCode();
-                hashCode = (hashCode * 9923) + Error.Message.GetHashCode();
+                hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + Error.Message.GetHashCode();
+                hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + Error.Message.GetHashCode();
             }
             return hashCode;
         }
@@ -136,10 +137,10 @@ public class ClientBatchCheckClientResponse : IEquatable<ClientBatchCheckClientR
 
     public override int GetHashCode() {
         unchecked {
-            int hashCode = 9661;
+            int hashCode = FgaConstants.HashCodeBasePrimeNumber;
             if (Responses != null) {
                 foreach (var response in Responses) {
-                    hashCode = (hashCode * 9923) + (response?.GetHashCode() ?? 0);
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (response?.GetHashCode() ?? 0);
                 }
             }
             return hashCode;

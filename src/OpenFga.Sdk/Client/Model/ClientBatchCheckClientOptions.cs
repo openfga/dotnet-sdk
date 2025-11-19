@@ -28,4 +28,3 @@ public class ClientBatchCheckClientOptions : IClientBatchCheckClientOptions {
     /// <inheritdoc />
     public IDictionary<string, string>? Headers { get; set; }
 }
-

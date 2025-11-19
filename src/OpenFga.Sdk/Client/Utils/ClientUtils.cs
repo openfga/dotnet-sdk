@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Model;
+using System;
+using System.Collections.Generic;
 
 namespace OpenFga.Sdk.Client.Utils;
 
@@ -51,7 +51,7 @@ public static class ClientUtils {
     /// <returns>BatchCheckItem for API call</returns>
     public static BatchCheckItem TransformToBatchCheckItem(ClientBatchCheckItem item, string correlationId) {
         if (item == null) throw new ArgumentNullException(nameof(item));
-        if (string.IsNullOrWhiteSpace(correlationId)) 
+        if (string.IsNullOrWhiteSpace(correlationId))
             throw new ArgumentException("Correlation ID cannot be null or empty", nameof(correlationId));
 
         return new BatchCheckItem(
@@ -66,5 +66,3 @@ public static class ClientUtils {
         );
     }
 }
-
-

@@ -4,13 +4,18 @@
 
 ### Added
 - feat: add server-side `BatchCheck()` method using `/batch-check` API endpoint
-  - See [Batch Check documentation](README.md#batch-check) for details on `MaxBatchSize`, `MaxParallelRequests`, and `CorrelationId`
+  - Automatically generates correlation IDs for checks without one
+  - Validates correlation ID uniqueness to prevent mapping conflicts
+  - Chunks large requests based on `MaxBatchSize` (default: 50 checks per batch)
+  - Executes batches in parallel with `MaxParallelRequests` (default: 10)
+  - Supports cross-framework parallelism (.NET 6+ uses `Parallel.ForEachAsync`, older frameworks use `SemaphoreSlim`)
+  - Returns `ClientBatchCheckResponse` with correlation ID mapping
+  - See [Batch Check documentation](README.md#batch-check) for usage examples
 
 ### Changed
 - **BREAKING**: Renamed existing `BatchCheck()` to `ClientBatchCheck()`
-  - The previous method performed client-side parallel checks
-  - `ClientBatchCheck()` remains fully supported for small batches (< 10 checks)
-  - New server-side `BatchCheck()` uses the `/batch-check` endpoint
+  - This method performs client-side parallel checks and remains supported
+  - New server-side `BatchCheck()` uses the `/batch-check` endpoint and requires [OpenFGA server v1.8.0+](https://github.com/openfga/openfga/releases/tag/v1.8.0)
 
 ### Fixed
 - fix: ApiToken credentials no longer cause reserved header exception (#146)

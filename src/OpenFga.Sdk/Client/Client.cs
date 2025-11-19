@@ -446,12 +446,19 @@ public class OpenFgaClient : IDisposable {
                 Consistency = options?.Consistency,
             }, options, cancellationToken);
 
-    /**
-   * ClientBatchCheck - Run a set of checks by executing individual /check calls in parallel (evaluates)
-   * 
-   * This method makes individual check API calls in parallel. For batching checks into the server-side
-   * /batch-check endpoint, use the BatchCheck method instead.
-   */
+    /// <summary>
+    /// ClientBatchCheck - Run a set of checks by executing individual /check calls in parallel (evaluates)
+    /// </summary>
+    /// <remarks>
+    /// This method makes individual check API calls in parallel on the client side.
+    /// Best for small batches (< 10 checks) when you need specific control over individual requests.
+    /// 
+    /// For larger batches or to use the server-side /batch-check endpoint, use the BatchCheck method instead.
+    /// </remarks>
+    /// <param name="body">List of check requests to execute</param>
+    /// <param name="options">Optional configuration including MaxParallelRequests</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>ClientBatchCheckClientResponse with list of individual check responses</returns>
     public async Task<ClientBatchCheckClientResponse> ClientBatchCheck(List<ClientCheckRequest> body,
         IClientBatchCheckClientOptions? options = default,
         CancellationToken cancellationToken = default) {
@@ -464,25 +471,27 @@ public class OpenFgaClient : IDisposable {
         return new ClientBatchCheckClientResponse { Responses = responses.ToList() };
     }
 
-    /**
-   * BatchCheck - Run a set of checks using the server-side /batch-check endpoint (evaluates)
-   * 
-   * This method uses the server-side batch check API endpoint. It automatically:
-   * - Generates correlation IDs for checks that don't have one
-   * - Validates that correlation IDs are unique
-   * - Chunks requests based on maxBatchSize (default: 50)
-   * - Executes batches in parallel based on maxParallelRequests (default: 10)
-   * - Fails fast on the first error
-   * 
-   * @param {ClientBatchCheckRequest} body - The batch check request with a list of checks
-   * @param {IClientBatchCheckOptions} options - Optional configuration
-   * @param {CancellationToken} cancellationToken - Cancellation token
-   * @returns {ClientBatchCheckResponse} Response with correlation ID mapping
-   */
+    /// <summary>
+    /// BatchCheck - Run a set of checks using the server-side /batch-check endpoint (evaluates)
+    /// </summary>
+    /// <remarks>
+    /// This method uses the server-side batch check API endpoint. It automatically:
+    /// - Generates correlation IDs for checks that don't have one
+    /// - Validates that correlation IDs are unique
+    /// - Chunks requests based on maxBatchSize (default: 50)
+    /// - Executes batches in parallel based on maxParallelRequests (default: 10)
+    /// 
+    /// Best for large batches (≥ 10 checks) as it leverages server-side optimizations.
+    /// For small batches with specific control needs, use ClientBatchCheck instead.
+    /// </remarks>
+    /// <param name="body">The batch check request with a list of checks</param>
+    /// <param name="options">Optional configuration including MaxBatchSize and MaxParallelRequests</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>ClientBatchCheckResponse with correlation ID mapping to results</returns>
     public async Task<ClientBatchCheckResponse> BatchCheck(ClientBatchCheckRequest body,
         IClientBatchCheckOptions? options = default,
         CancellationToken cancellationToken = default) {
-        
+
         // If no checks provided, return empty result
         if (body?.Checks == null || body.Checks.Count == 0) {
             return new ClientBatchCheckResponse(new List<ClientBatchCheckSingleResponse>());
@@ -535,50 +544,12 @@ public class OpenFgaClient : IDisposable {
 #if NET6_0_OR_GREATER
         // Process batches in parallel with degree of parallelism limit
         await Parallel.ForEachAsync(batches,
-            new ParallelOptions { 
-                MaxDegreeOfParallelism = maxParallelReqs, 
-                CancellationToken = cancellationToken 
+            new ParallelOptions {
+                MaxDegreeOfParallelism = maxParallelReqs,
+                CancellationToken = cancellationToken
             },
             async (batch, token) => {
-                var batchRequest = new BatchCheckRequest(
-                    checks: batch,
-                    authorizationModelId: GetAuthorizationModelId(options),
-                    consistency: options?.Consistency
-                );
-
-                // Create options with headers for this batch
-                var batchOptions = new ClientBatchCheckOptions {
-                    StoreId = options?.StoreId,
-                    AuthorizationModelId = options?.AuthorizationModelId,
-                    Consistency = options?.Consistency,
-                    Headers = headers
-                };
-
-                var batchResponse = await api.BatchCheck(
-                    GetStoreId(options),
-                    batchRequest,
-                    batchOptions,
-                    token
-                );
-
-                // Map responses back to original requests using correlation IDs
-                if (batchResponse.Result != null) {
-                    lock (results) {
-                        foreach (var kvp in batchResponse.Result) {
-                            var correlationId = kvp.Key;
-                            var result = kvp.Value;
-
-                            if (correlationIdToCheck.TryGetValue(correlationId, out var originalCheck)) {
-                                results.Add(new ClientBatchCheckSingleResponse(
-                                    allowed: result.Allowed ?? false,
-                                    request: originalCheck,
-                                    correlationId: correlationId,
-                                    error: result.Error
-                                ));
-                            }
-                        }
-                    }
-                }
+                await ProcessBatchAsync(batch, options, headers, correlationIdToCheck, results, token);
             });
 #else
         // For .NET Framework 4.8 and .NET Standard 2.0, use SemaphoreSlim for parallelism control
@@ -586,45 +557,7 @@ public class OpenFgaClient : IDisposable {
             var tasks = batches.Select(async batch => {
                 await throttler.WaitAsync(cancellationToken);
                 try {
-                    var batchRequest = new BatchCheckRequest(
-                        checks: batch,
-                        authorizationModelId: GetAuthorizationModelId(options),
-                        consistency: options?.Consistency
-                    );
-
-                    // Create options with headers for this batch
-                    var batchOptions = new ClientBatchCheckOptions {
-                        StoreId = options?.StoreId,
-                        AuthorizationModelId = options?.AuthorizationModelId,
-                        Consistency = options?.Consistency,
-                        Headers = headers
-                    };
-
-                    var batchResponse = await api.BatchCheck(
-                        GetStoreId(options),
-                        batchRequest,
-                        batchOptions,
-                        cancellationToken
-                    );
-
-                    // Map responses back to original requests using correlation IDs
-                    if (batchResponse.Result != null) {
-                        lock (results) {
-                            foreach (var kvp in batchResponse.Result) {
-                                var correlationId = kvp.Key;
-                                var result = kvp.Value;
-
-                                if (correlationIdToCheck.TryGetValue(correlationId, out var originalCheck)) {
-                                    results.Add(new ClientBatchCheckSingleResponse(
-                                        allowed: result.Allowed ?? false,
-                                        request: originalCheck,
-                                        correlationId: correlationId,
-                                        error: result.Error
-                                    ));
-                                }
-                            }
-                        }
-                    }
+                    await ProcessBatchAsync(batch, options, headers, correlationIdToCheck, results, cancellationToken);
                 }
                 finally {
                     throttler.Release();
@@ -636,6 +569,55 @@ public class OpenFgaClient : IDisposable {
 #endif
 
         return new ClientBatchCheckResponse(results);
+    }
+
+    private async Task ProcessBatchAsync(
+        List<BatchCheckItem> batch,
+        IClientBatchCheckOptions? options,
+        Dictionary<string, string> headers,
+        Dictionary<string, ClientBatchCheckItem> correlationIdToCheck,
+        List<ClientBatchCheckSingleResponse> results,
+        CancellationToken cancellationToken) {
+
+        var batchRequest = new BatchCheckRequest(
+            checks: batch,
+            authorizationModelId: GetAuthorizationModelId(options),
+            consistency: options?.Consistency
+        );
+
+        // Create options with headers for this batch
+        var batchOptions = new ClientBatchCheckOptions {
+            StoreId = options?.StoreId,
+            AuthorizationModelId = options?.AuthorizationModelId,
+            Consistency = options?.Consistency,
+            Headers = headers
+        };
+
+        var batchResponse = await api.BatchCheck(
+            GetStoreId(options),
+            batchRequest,
+            batchOptions,
+            cancellationToken
+        );
+
+        // Map responses back to original requests using correlation IDs
+        if (batchResponse.Result != null) {
+            lock (results) {
+                foreach (var kvp in batchResponse.Result) {
+                    var correlationId = kvp.Key;
+                    var result = kvp.Value;
+
+                    if (correlationIdToCheck.TryGetValue(correlationId, out var originalCheck)) {
+                        results.Add(new ClientBatchCheckSingleResponse(
+                            allowed: result.Allowed ?? false,
+                            request: originalCheck,
+                            correlationId: correlationId,
+                            error: result.Error
+                        ));
+                    }
+                }
+            }
+        }
     }
 
     /**

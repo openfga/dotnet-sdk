@@ -2803,13 +2803,13 @@ public class OpenFgaClientTests : IDisposable {
                 { "corr-1", new BatchCheckSingleResult { Allowed = true } }
             }
         };
-        
+
         var bulkRequestIdHeaderFound = false;
         var (client, _) = CreateTestClientForHeaders(expectedResponse, req => {
             if (req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/batch-check") &&
                 req.Method == HttpMethod.Post &&
                 req.Headers.Contains(FgaConstants.ClientBulkRequestIdHeader)) {
-                
+
                 var headerValue = req.Headers.GetValues(FgaConstants.ClientBulkRequestIdHeader).First();
                 // Verify it's a valid GUID
                 bulkRequestIdHeaderFound = Guid.TryParse(headerValue, out _);

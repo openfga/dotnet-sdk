@@ -208,4 +208,3 @@ public class ClientBatchCheckTests {
         Assert.Equal(5, options.MaxParallelRequests);
     }
 }
-

@@ -328,7 +328,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
         public async Task OAuth2_Constructor_SetsCorrectTokenIssuerPath(string tokenIssuer, string expectedPath) {
             // Arrange
             var credentials = CreateTestCredentials(tokenIssuer: tokenIssuer);
-            
+
             string? actualRequestUri = null;
             var mockHandler = new Mock<HttpMessageHandler>();
             mockHandler

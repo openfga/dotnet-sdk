@@ -1,10 +1,11 @@
+using OpenFga.Sdk.Constants;
+using OpenFga.Sdk.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
-using OpenFga.Sdk.Model;
 
 namespace OpenFga.Sdk.Client.Model;
 
@@ -112,13 +113,13 @@ public class ClientBatchCheckItem : IEquatable<ClientBatchCheckItem>, IValidatab
 
     public override int GetHashCode() {
         unchecked {
-            int hashCode = 9661;
-            hashCode = (hashCode * 9923) + (User?.GetHashCode() ?? 0);
-            hashCode = (hashCode * 9923) + (Relation?.GetHashCode() ?? 0);
-            hashCode = (hashCode * 9923) + (Object?.GetHashCode() ?? 0);
-            hashCode = (hashCode * 9923) + (CorrelationId?.GetHashCode() ?? 0);
-            hashCode = (hashCode * 9923) + (ContextualTuples?.GetHashCode() ?? 0);
-            hashCode = (hashCode * 9923) + (Context?.GetHashCode() ?? 0);
+            int hashCode = FgaConstants.HashCodeBasePrimeNumber;
+            hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (User?.GetHashCode() ?? 0);
+            hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (Relation?.GetHashCode() ?? 0);
+            hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (Object?.GetHashCode() ?? 0);
+            hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (CorrelationId?.GetHashCode() ?? 0);
+            hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (ContextualTuples?.GetHashCode() ?? 0);
+            hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (Context?.GetHashCode() ?? 0);
             return hashCode;
         }
     }
@@ -173,10 +174,10 @@ public class ClientBatchCheckRequest : IEquatable<ClientBatchCheckRequest>, IVal
 
     public override int GetHashCode() {
         unchecked {
-            int hashCode = 9661;
+            int hashCode = FgaConstants.HashCodeBasePrimeNumber;
             if (Checks != null) {
                 foreach (var check in Checks) {
-                    hashCode = (hashCode * 9923) + (check?.GetHashCode() ?? 0);
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (check?.GetHashCode() ?? 0);
                 }
             }
             return hashCode;
@@ -265,11 +266,11 @@ public class ClientBatchCheckSingleResponse : IEquatable<ClientBatchCheckSingleR
 
     public override int GetHashCode() {
         unchecked {
-            int hashCode = 9661;
-            hashCode = (hashCode * 9923) + Allowed.GetHashCode();
-            hashCode = (hashCode * 9923) + (Request?.GetHashCode() ?? 0);
-            hashCode = (hashCode * 9923) + (CorrelationId?.GetHashCode() ?? 0);
-            hashCode = (hashCode * 9923) + (Error?.GetHashCode() ?? 0);
+            int hashCode = FgaConstants.HashCodeBasePrimeNumber;
+            hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + Allowed.GetHashCode();
+            hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (Request?.GetHashCode() ?? 0);
+            hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (CorrelationId?.GetHashCode() ?? 0);
+            hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (Error?.GetHashCode() ?? 0);
             return hashCode;
         }
     }
@@ -324,15 +325,13 @@ public class ClientBatchCheckResponse : IEquatable<ClientBatchCheckResponse>, IV
 
     public override int GetHashCode() {
         unchecked {
-            int hashCode = 9661;
+            int hashCode = FgaConstants.HashCodeBasePrimeNumber;
             if (Result != null) {
                 foreach (var item in Result) {
-                    hashCode = (hashCode * 9923) + (item?.GetHashCode() ?? 0);
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + (item?.GetHashCode() ?? 0);
                 }
             }
             return hashCode;
         }
     }
 }
-
-
