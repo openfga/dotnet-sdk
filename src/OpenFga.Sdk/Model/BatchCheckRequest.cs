@@ -103,7 +103,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as BatchCheckRequest);
+            if (input == null || input.GetType() != this.GetType()) return false;
+            return this.Equals((BatchCheckRequest)input);
         }
 
         /// <summary>

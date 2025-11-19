@@ -89,7 +89,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as ConditionParamTypeRef);
+            if (input == null || input.GetType() != this.GetType()) return false;
+            return this.Equals((ConditionParamTypeRef)input);
         }
 
         /// <summary>
