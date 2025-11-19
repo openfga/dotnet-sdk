@@ -1,3 +1,10 @@
+using Moq;
+using Moq.Protected;
+using OpenFga.Sdk.Client;
+using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Constants;
+using OpenFga.Sdk.Exceptions;
+using OpenFga.Sdk.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,13 +13,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Moq;
-using Moq.Protected;
-using OpenFga.Sdk.Client;
-using OpenFga.Sdk.Client.Model;
-using OpenFga.Sdk.Constants;
-using OpenFga.Sdk.Exceptions;
-using OpenFga.Sdk.Model;
 using Xunit;
 
 namespace OpenFga.Sdk.Test.Client;
@@ -464,4 +464,3 @@ public class StreamedListObjectsTests {
         });
     }
 }
-

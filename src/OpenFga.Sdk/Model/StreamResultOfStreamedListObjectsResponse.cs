@@ -22,38 +22,44 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// The response for a StreamedListObjects RPC.
+    /// StreamResultOfStreamedListObjectsResponse
     /// </summary>
-    [DataContract(Name = "StreamedListObjectsResponse")]
-    public partial class StreamedListObjectsResponse : IEquatable<StreamedListObjectsResponse>, IValidatableObject {
+    [DataContract(Name = "Stream_result_of_StreamedListObjectsResponse")]
+    public partial class StreamResultOfStreamedListObjectsResponse : IEquatable<StreamResultOfStreamedListObjectsResponse>, IValidatableObject {
         /// <summary>
-        /// Initializes a new instance of the <see cref="StreamedListObjectsResponse" /> class.
+        /// Initializes a new instance of the <see cref="StreamResultOfStreamedListObjectsResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public StreamedListObjectsResponse() {
+        public StreamResultOfStreamedListObjectsResponse() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StreamedListObjectsResponse" /> class.
+        /// Initializes a new instance of the <see cref="StreamResultOfStreamedListObjectsResponse" /> class.
         /// </summary>
-        /// <param name="varObject">varObject (required).</param>
-        public StreamedListObjectsResponse(string varObject = default) {
-            // to ensure "varObject" is required (not null)
-            if (varObject == null) {
-                throw new ArgumentNullException("varObject is a required property for StreamedListObjectsResponse and cannot be null");
-            }
-            this.Object = varObject;
+        /// <param name="result">result.</param>
+        /// <param name="error">error.</param>
+        public StreamResultOfStreamedListObjectsResponse(StreamedListObjectsResponse result = default, Status error = default) {
+            this.Result = result;
+            this.Error = error;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Gets or Sets Object
+        /// Gets or Sets Result
         /// </summary>
-        [DataMember(Name = "object", IsRequired = true, EmitDefaultValue = false)]
-        [JsonPropertyName("object")]
+        [DataMember(Name = "result", EmitDefaultValue = false)]
+        [JsonPropertyName("result")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string Object { get; set; }
+        public StreamedListObjectsResponse? Result { get; set; }
+
+        /// <summary>
+        /// Gets or Sets Error
+        /// </summary>
+        [DataMember(Name = "error", EmitDefaultValue = false)]
+        [JsonPropertyName("error")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public Status? Error { get; set; }
 
         /// <summary>
         /// Gets or Sets additional properties
@@ -71,11 +77,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a StreamedListObjectsResponse from the JSON string presentation of the object
+        /// Builds a StreamResultOfStreamedListObjectsResponse from the JSON string presentation of the object
         /// </summary>
-        /// <returns>StreamedListObjectsResponse</returns>
-        public static StreamedListObjectsResponse FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<StreamedListObjectsResponse>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>StreamResultOfStreamedListObjectsResponse</returns>
+        public static StreamResultOfStreamedListObjectsResponse FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<StreamResultOfStreamedListObjectsResponse>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -84,23 +90,28 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as StreamedListObjectsResponse);
+            return this.Equals(input as StreamResultOfStreamedListObjectsResponse);
         }
 
         /// <summary>
-        /// Returns true if StreamedListObjectsResponse instances are equal
+        /// Returns true if StreamResultOfStreamedListObjectsResponse instances are equal
         /// </summary>
-        /// <param name="input">Instance of StreamedListObjectsResponse to be compared</param>
+        /// <param name="input">Instance of StreamResultOfStreamedListObjectsResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(StreamedListObjectsResponse input) {
+        public bool Equals(StreamResultOfStreamedListObjectsResponse input) {
             if (input == null) {
                 return false;
             }
             return
                 (
-                    this.Object == input.Object ||
-                    (this.Object != null &&
-                    this.Object.Equals(input.Object))
+                    this.Result == input.Result ||
+                    (this.Result != null &&
+                    this.Result.Equals(input.Result))
+                ) &&
+                (
+                    this.Error == input.Error ||
+                    (this.Error != null &&
+                    this.Error.Equals(input.Error))
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
         }
@@ -113,8 +124,11 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Object != null) {
-                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Object.GetHashCode();
+                if (this.Result != null) {
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Result.GetHashCode();
+                }
+                if (this.Error != null) {
+                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Error.GetHashCode();
                 }
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();

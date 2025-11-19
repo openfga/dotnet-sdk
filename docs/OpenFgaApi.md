@@ -18,6 +18,7 @@ Method | HTTP request | Description
 [**ReadAuthorizationModel**](OpenFgaApi.md#readauthorizationmodel) | **GET** /stores/{store_id}/authorization-models/{id} | Return a particular version of an authorization model
 [**ReadAuthorizationModels**](OpenFgaApi.md#readauthorizationmodels) | **GET** /stores/{store_id}/authorization-models | Return all the authorization models for a particular store
 [**ReadChanges**](OpenFgaApi.md#readchanges) | **GET** /stores/{store_id}/changes | Return a list of all the tuple changes
+[**StreamedListObjects**](OpenFgaApi.md#streamedlistobjects) | **POST** /stores/{store_id}/streamed-list-objects | Stream all objects of the given type that the user has a relation with
 [**Write**](OpenFgaApi.md#write) | **POST** /stores/{store_id}/write | Add or delete tuples from the store
 [**WriteAssertions**](OpenFgaApi.md#writeassertions) | **PUT** /stores/{store_id}/assertions/{authorization_model_id} | Upsert assertions for an authorization model ID
 [**WriteAuthorizationModel**](OpenFgaApi.md#writeauthorizationmodel) | **POST** /stores/{store_id}/authorization-models | Create a new authorization model
@@ -1150,6 +1151,87 @@ Name | Type | Description  | Notes
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | A successful response. |  -  |
+| **400** | Request failed due to invalid input. |  -  |
+| **401** | Not authenticated. |  -  |
+| **403** | Forbidden. |  -  |
+| **404** | Request failed due to incorrect path. |  -  |
+| **409** | Request was aborted due a transaction conflict. |  -  |
+| **422** | Request timed out due to excessive request throttling. |  -  |
+| **500** | Request failed due to internal server error. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+<a name="streamedlistobjects"></a>
+# **StreamedListObjects**
+> StreamResultOfStreamedListObjectsResponse StreamedListObjects (ListObjectsRequest body)
+
+Stream all objects of the given type that the user has a relation with
+
+The Streamed ListObjects API is very similar to the the ListObjects API, with two differences:  1. Instead of collecting all objects before returning a response, it streams them to the client as they are collected.  2. The number of results returned is only limited by the execution timeout specified in the flag OPENFGA_LIST_OBJECTS_DEADLINE.  
+
+### Example
+```csharp
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net.Http;
+using OpenFga.Sdk.Api;
+using OpenFga.Sdk.Client;
+using OpenFga.Sdk.Configuration;
+using OpenFga.Sdk.Model;
+
+namespace Example
+{
+    public class StreamedListObjectsExample
+    {
+        public static void Main()
+        {
+            var configuration = new Configuration() {
+                ApiScheme = Environment.GetEnvironmentVariable("OPENFGA_API_SCHEME"), // optional, defaults to "https"
+                ApiHost = Environment.GetEnvironmentVariable("OPENFGA_API_HOST"), // required, define without the scheme (e.g. api.fga.example instead of https://api.fga.example)
+                StoreId = Environment.GetEnvironmentVariable("OPENFGA_STORE_ID"), // not needed when calling `CreateStore` or `ListStores`
+            };
+            HttpClient httpClient = new HttpClient();
+            var openFgaApi = new OpenFgaApi(config, httpClient);
+            var body = new ListObjectsRequest(); // ListObjectsRequest | 
+
+            try
+            {
+                // Stream all objects of the given type that the user has a relation with
+                StreamResultOfStreamedListObjectsResponse response = await openFgaApi.StreamedListObjects(body);
+                Debug.WriteLine(response);
+            }
+            catch (ApiException  e)
+            {
+                Debug.Print("Exception when calling OpenFgaApi.StreamedListObjects: " + e.Message );
+                Debug.Print("Status Code: "+ e.ErrorCode);
+                Debug.Print(e.StackTrace);
+            }
+        }
+    }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **body** | [**ListObjectsRequest**](ListObjectsRequest.md)|  | 
+
+### Return type
+
+[**StreamResultOfStreamedListObjectsResponse**](StreamResultOfStreamedListObjectsResponse.md)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | A successful response.(streaming responses) |  -  |
 | **400** | Request failed due to invalid input. |  -  |
 | **401** | Not authenticated. |  -  |
 | **403** | Forbidden. |  -  |

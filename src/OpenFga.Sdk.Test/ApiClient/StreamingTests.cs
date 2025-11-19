@@ -1,3 +1,9 @@
+using Moq;
+using Moq.Protected;
+using OpenFga.Sdk.ApiClient;
+using OpenFga.Sdk.Constants;
+using OpenFga.Sdk.Exceptions;
+using OpenFga.Sdk.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,12 +12,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Moq;
-using Moq.Protected;
-using OpenFga.Sdk.ApiClient;
-using OpenFga.Sdk.Constants;
-using OpenFga.Sdk.Exceptions;
-using OpenFga.Sdk.Model;
 using Xunit;
 
 namespace OpenFga.Sdk.Test.ApiClient;
@@ -66,7 +66,7 @@ public class StreamingTests {
         return mockHandler;
     }
 
-    private Mock<HttpMessageHandler> CreateMockHttpHandlerWithChunks(HttpStatusCode statusCode, string[] chunks, 
+    private Mock<HttpMessageHandler> CreateMockHttpHandlerWithChunks(HttpStatusCode statusCode, string[] chunks,
         int delayMs = 0) {
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
@@ -87,7 +87,7 @@ public class StreamingTests {
         var ndjson = "{\"result\":{\"object\":\"document:1\"}}\n";
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -116,7 +116,7 @@ public class StreamingTests {
                      "{\"result\":{\"object\":\"document:3\"}}\n";
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -146,7 +146,7 @@ public class StreamingTests {
                      "{\"result\":{\"object\":\"document:2\"}}\n";
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -173,7 +173,7 @@ public class StreamingTests {
                      "{\"result\":{\"object\":\"document:2\"}}"; // No trailing newline
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -203,7 +203,7 @@ public class StreamingTests {
                      "{\"result\":{\"object\":\"document:3\"}}\n";
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -238,7 +238,7 @@ public class StreamingTests {
             "{\"code\":\"internal_error\",\"message\":\"Server error\"}",
             "application/json");
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -267,7 +267,7 @@ public class StreamingTests {
                      "{\"result\":{\"object\":\"document:5\"}}\n";
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -297,7 +297,7 @@ public class StreamingTests {
         var ndjson = "";
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -325,7 +325,7 @@ public class StreamingTests {
                      "{\"result\":{\"object\":\"document:2\"}}\n";
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -353,7 +353,7 @@ public class StreamingTests {
                      "{\"result\":{\"object\":\"document:2\"}}\n";
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -381,7 +381,7 @@ public class StreamingTests {
     // ============================================================
     // Partial NDJSON Handling Tests
     // ============================================================
-    
+
     [Fact]
     public async Task SendStreamingRequestAsync_ChunkedDataSplitsJsonMidObject_ParsesCorrectly() {
         // This is the critical test case: data arrives in chunks that split JSON objects mid-line
@@ -390,10 +390,10 @@ public class StreamingTests {
             "{\"result\":{\"object\":\"document:1\"}}\n{\"res", // Ends mid-JSON object
             "ult\":{\"object\":\"document:2\"}}\n"              // Completes the JSON object
         };
-        
+
         var mockHandler = CreateMockHttpHandlerWithChunks(HttpStatusCode.OK, chunks);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -426,10 +426,10 @@ public class StreamingTests {
             "2\"}}\n{\"result\":{\"object\":\"do",  // Fourth chunk: completes second, starts third
             "cument:3\"}}\n"                         // Fifth chunk: completes third
         };
-        
+
         var mockHandler = CreateMockHttpHandlerWithChunks(HttpStatusCode.OK, chunks);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -459,10 +459,10 @@ public class StreamingTests {
             "{\"result\":{\"object\":\"document:1\"}}\n\n{\"r", // Has empty line, splits second object
             "esult\":{\"object\":\"document:2\"}}\n"
         };
-        
+
         var mockHandler = CreateMockHttpHandlerWithChunks(HttpStatusCode.OK, chunks);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -492,10 +492,10 @@ public class StreamingTests {
             "{\"result\":{\"object\":\"document:1\"}}\n{\"result\":{\"ob",
             "ject\":\"document:2\"}}" // No trailing newline
         };
-        
+
         var mockHandler = CreateMockHttpHandlerWithChunks(HttpStatusCode.OK, chunks);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -525,10 +525,10 @@ public class StreamingTests {
             "{\"result\":{\"object\":\"document:1\"}}\n{\"result\":{\"ob",
             "ject\":\"document:2\"}}\n{\"invalid\":"  // Incomplete/invalid JSON at end
         };
-        
+
         var mockHandler = CreateMockHttpHandlerWithChunks(HttpStatusCode.OK, chunks);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -559,10 +559,10 @@ public class StreamingTests {
             "{\"result\":{\"object\":\"document:1\"}}\ninvalid ",
             "json line here\n{\"result\":{\"object\":\"document:2\"}}\n"
         };
-        
+
         var mockHandler = CreateMockHttpHandlerWithChunks(HttpStatusCode.OK, chunks);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -595,10 +595,10 @@ public class StreamingTests {
             "document:2\"}",
             "}\n"
         };
-        
+
         var mockHandler = CreateMockHttpHandlerWithChunks(HttpStatusCode.OK, chunks);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -630,10 +630,10 @@ public class StreamingTests {
             $"{largeValue}",
             "\"}}\n"
         };
-        
+
         var mockHandler = CreateMockHttpHandlerWithChunks(HttpStatusCode.OK, chunks);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -664,10 +664,10 @@ public class StreamingTests {
             "ult\":{\"object\":\"document:2\"}}\n",
             "{\"result\":{\"object\":\"document:3\"}}\n"
         };
-        
+
         var mockHandler = CreateMockHttpHandlerWithChunks(HttpStatusCode.OK, chunks, delayMs: 50);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -702,10 +702,10 @@ public class StreamingTests {
             "{\"result\":{\"object\":\"document:1\"}}\n{\"no",
             "_result\":true}\n{\"result\":{\"object\":\"document:2\"}}\n"
         };
-        
+
         var mockHandler = CreateMockHttpHandlerWithChunks(HttpStatusCode.OK, chunks);
         var httpClient = new HttpClient(mockHandler.Object);
-        var config = new OpenFga.Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
 
         var requestBuilder = new RequestBuilder<object> {
@@ -729,4 +729,3 @@ public class StreamingTests {
         Assert.Equal("document:2", results[1].Object);
     }
 }
-

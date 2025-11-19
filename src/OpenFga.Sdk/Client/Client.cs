@@ -516,7 +516,7 @@ public class OpenFgaClient : IDisposable {
         IClientListObjectsRequest body,
         IClientListObjectsOptions? options = default,
         [EnumeratorCancellation] CancellationToken cancellationToken = default) {
-        
+
         await foreach (var response in api.StreamedListObjects(GetStoreId(options), new ListObjectsRequest {
             User = body.User,
             Relation = body.Relation,

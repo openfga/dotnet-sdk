@@ -2,6 +2,7 @@ using OpenFga.Sdk.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -10,7 +11,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace OpenFga.Sdk.ApiClient;
 
@@ -146,7 +146,7 @@ public class BaseClient : IDisposable {
         IDictionary<string, string>? additionalHeaders = null,
         string? apiName = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default) {
-        
+
         if (additionalHeaders != null) {
             foreach (var header in additionalHeaders.Where(header => header.Value != null)) {
                 request.Headers.Add(header.Key, header.Value);
@@ -170,102 +170,102 @@ public class BaseClient : IDisposable {
 
         // Register cancellation token to dispose response and unblock stalled reads
         using var disposeResponseRegistration = cancellationToken.Register(static state => ((HttpResponseMessage)state!).Dispose(), response);
-        
+
         // Stream and parse NDJSON response
 #if NET6_0_OR_GREATER
         await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #else
         using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #endif
-            using var reader = new StreamReader(stream, Encoding.UTF8);
+        using var reader = new StreamReader(stream, Encoding.UTF8);
 
-            // Replace the line-by-line reader with a buffered incremental reader to support partial NDJSON lines.
-            var sb = new StringBuilder(8 * 1024); // start with a reasonable buffer
-            var charBuffer = new char[4096];
+        // Replace the line-by-line reader with a buffered incremental reader to support partial NDJSON lines.
+        var sb = new StringBuilder(8 * 1024); // start with a reasonable buffer
+        var charBuffer = new char[4096];
 
-            while (true) {
-                int read;
-                try {
-                    read = await reader.ReadAsync(charBuffer, 0, charBuffer.Length).ConfigureAwait(false);
-                }
-                catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) {
-                    throw new OperationCanceledException("Streaming request was cancelled.", cancellationToken);
-                }
-                catch (IOException ex) when (cancellationToken.IsCancellationRequested) {
-                    throw new OperationCanceledException("Streaming request was cancelled.", ex, cancellationToken);
-                }
+        while (true) {
+            int read;
+            try {
+                read = await reader.ReadAsync(charBuffer, 0, charBuffer.Length).ConfigureAwait(false);
+            }
+            catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) {
+                throw new OperationCanceledException("Streaming request was cancelled.", cancellationToken);
+            }
+            catch (IOException ex) when (cancellationToken.IsCancellationRequested) {
+                throw new OperationCanceledException("Streaming request was cancelled.", ex, cancellationToken);
+            }
 
-                if (read == 0) {
-                    // End of stream: flush any remaining partial record without trailing newline
-                    if (sb.Length > 0) {
-                        var line = sb.ToString();
-                        sb.Clear();
+            if (read == 0) {
+                // End of stream: flush any remaining partial record without trailing newline
+                if (sb.Length > 0) {
+                    var line = sb.ToString();
+                    sb.Clear();
 
-                        cancellationToken.ThrowIfCancellationRequested();
-                        if (!string.IsNullOrWhiteSpace(line)) {
-                            T? parsedResult = default;
-                            try {
-                                using var jsonDoc = JsonDocument.Parse(line);
-                                var root = jsonDoc.RootElement;
-                                if (root.TryGetProperty("result", out var resultElement)) {
-                                    parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
-                                }
-                            }
-                            catch (JsonException) {
-                                // Skip invalid trailing fragment
-                            }
-                            if (parsedResult != null) {
-                                yield return parsedResult;
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (!string.IsNullOrWhiteSpace(line)) {
+                        T? parsedResult = default;
+                        try {
+                            using var jsonDoc = JsonDocument.Parse(line);
+                            var root = jsonDoc.RootElement;
+                            if (root.TryGetProperty("result", out var resultElement)) {
+                                parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
                             }
                         }
+                        catch (JsonException) {
+                            // Skip invalid trailing fragment
+                        }
+                        if (parsedResult != null) {
+                            yield return parsedResult;
+                        }
+                    }
+                }
+                break;
+            }
+
+            sb.Append(charBuffer, 0, read);
+
+            // Process all complete lines currently in the buffer
+            int start = 0;
+            while (true) {
+                var span = sb.ToString(); // materialize for IndexOf; small overhead acceptable per chunk
+                int newlineIdx = span.IndexOf('\n', start);
+                if (newlineIdx == -1) {
+                    // No complete line yet. Keep the current tail in StringBuilder.
+                    // Remove processed head (if any) to avoid repeated scanning.
+                    if (start > 0) {
+                        sb.Clear();
+                        sb.Append(span.Substring(start));
                     }
                     break;
                 }
 
-                sb.Append(charBuffer, 0, read);
+                int lineLen = newlineIdx - start;
+                var line = lineLen > 0 ? span.Substring(start, lineLen) : string.Empty;
+                start = newlineIdx + 1;
 
-                // Process all complete lines currently in the buffer
-                int start = 0;
-                while (true) {
-                    var span = sb.ToString(); // materialize for IndexOf; small overhead acceptable per chunk
-                    int newlineIdx = span.IndexOf('\n', start);
-                    if (newlineIdx == -1) {
-                        // No complete line yet. Keep the current tail in StringBuilder.
-                        // Remove processed head (if any) to avoid repeated scanning.
-                        if (start > 0) {
-                            sb.Clear();
-                            sb.Append(span.Substring(start));
-                        }
-                        break;
-                    }
+                cancellationToken.ThrowIfCancellationRequested();
 
-                    int lineLen = newlineIdx - start;
-                    var line = lineLen > 0 ? span.Substring(start, lineLen) : string.Empty;
-                    start = newlineIdx + 1;
+                if (string.IsNullOrWhiteSpace(line)) {
+                    continue;
+                }
 
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    if (string.IsNullOrWhiteSpace(line)) {
-                        continue;
-                    }
-
-                    T? parsedResult = default;
-                    try {
-                        using var jsonDoc = JsonDocument.Parse(line);
-                        var root = jsonDoc.RootElement;
-                        if (root.TryGetProperty("result", out var resultElement)) {
-                            parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
-                        }
-                    }
-                    catch (JsonException) {
-                        // Skip malformed line
-                    }
-
-                    if (parsedResult != null) {
-                        yield return parsedResult;
+                T? parsedResult = default;
+                try {
+                    using var jsonDoc = JsonDocument.Parse(line);
+                    var root = jsonDoc.RootElement;
+                    if (root.TryGetProperty("result", out var resultElement)) {
+                        parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
                     }
                 }
+                catch (JsonException) {
+                    // Skip malformed line
+                }
+
+                if (parsedResult != null) {
+                    yield return parsedResult;
+                }
             }
+        }
     }
 
     /// <summary>
@@ -283,7 +283,7 @@ public class BaseClient : IDisposable {
         IDictionary<string, string>? additionalHeaders = null,
         string? apiName = null,
         CancellationToken cancellationToken = default) {
-        
+
         var request = requestBuilder.BuildRequest();
         return SendStreamingRequestAsync<TRes>(request, additionalHeaders, apiName, cancellationToken);
     }

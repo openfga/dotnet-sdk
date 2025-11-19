@@ -155,12 +155,12 @@ public class ApiClient : IDisposable {
         string apiName,
         IRequestOptions? options = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default) {
-        
+
         var authToken = await GetAuthenticationTokenAsync(apiName);
         var additionalHeaders = BuildHeaders(_configuration, authToken, options);
         var streamIter = _baseClient.SendStreamingRequestAsync<TReq, TRes>(
             requestBuilder, additionalHeaders, apiName, cancellationToken);
-        
+
         await foreach (var item in streamIter) {
             yield return item;
         }
