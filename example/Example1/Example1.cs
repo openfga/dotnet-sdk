@@ -43,7 +43,7 @@ public class Example1 {
                 else {
                     // ListStores
                     Console.WriteLine("Listing Stores");
-                    var stores1 = await fgaClient.ListStores();
+                    var stores1 = await fgaClient.ListStores(new ClientListStoresRequest{});
                     Console.WriteLine("Stores Count: " + stores1.Stores?.Count());
                 }
 
@@ -59,9 +59,9 @@ public class Example1 {
                     Console.WriteLine("Skipping Listing Stores");
                 }
                 else {
-                    // ListStores after Create
+                    // ListStores after Create, using the `Name` parameter to filter results.
                     Console.WriteLine("Listing Stores");
-                    var stores = await fgaClient.ListStores();
+                    var stores = await fgaClient.ListStores(new ClientListStoresRequest {Name = "Test Store"});
                     Console.WriteLine("Stores Count: " + stores.Stores?.Count());
                 }
 
@@ -145,13 +145,13 @@ public class Example1 {
                         Expression = "ViewCount < 200",
                         Parameters = new Dictionary<string, ConditionParamTypeRef> {
                             ["ViewCount"] = new ConditionParamTypeRef {
-                                TypeName = TypeName.INT
+                                TypeName = TypeName.TYPENAMEINT
                             },
                             ["Type"] = new ConditionParamTypeRef {
-                                TypeName = TypeName.STRING
+                                TypeName = TypeName.TYPENAMESTRING
                             },
                             ["Name"] = new ConditionParamTypeRef {
-                                TypeName = TypeName.STRING
+                                TypeName = TypeName.TYPENAMESTRING
                             }
                         }
                     }
