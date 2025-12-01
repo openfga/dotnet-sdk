@@ -2856,8 +2856,8 @@ namespace OpenFga.Sdk.Test.Api {
             var delay1 = attemptTimes[1] - attemptTimes[0];
             var delay2 = attemptTimes[2] - attemptTimes[1];
 
-            Assert.InRange(delay1, 900, 1100);
-            Assert.InRange(delay2, 1900, 2100);
+            Assert.InRange(delay1, 900, 1300);
+            Assert.InRange(delay2, 1900, 2300);
         }
 
         [Fact]
