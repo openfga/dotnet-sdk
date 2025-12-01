@@ -2,6 +2,16 @@
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.8.0...HEAD)
 
+### Added
+- feat: add server-side `BatchCheck()` method using `/batch-check` API endpoint
+  - See [Batch Check documentation](README.md#batch-check) for usage examples and configuration
+
+### Changed
+- **BREAKING**: Existing `BatchCheck()` renamed to `ClientBatchCheck()`
+  - New server-side `BatchCheck()` method requires [OpenFGA server v1.8.0+](https://github.com/openfga/openfga/releases/tag/v1.8.0)
+  - For configuration options and behavior details, see [README documentation](README.md#batch-check)
+
+### Fixed
 - fix: ApiToken credentials no longer cause reserved header exception (#146)
 
 ## v0.8.0

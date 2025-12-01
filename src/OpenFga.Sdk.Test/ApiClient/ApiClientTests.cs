@@ -15,6 +15,7 @@ using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Model;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -141,7 +142,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                     ItExpr.IsAny<CancellationToken>()
                 )
                 .ReturnsAsync(CreateSuccessResponse(new ReadAuthorizationModelsResponse {
-                    AuthorizationModels = new System.Collections.Generic.List<AuthorizationModel>()
+                    AuthorizationModels = new List<AuthorizationModel>()
                 }));
 
             var httpClient = new HttpClient(mockHandler.Object);
@@ -175,7 +176,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
         [Fact]
         public void ApiClient_WithApiToken_DoesNotModifyDefaultHeaders() {
             var config = CreateApiTokenConfiguration();
-            
+
             // Capture the original headers
             var originalHeadersCount = config.DefaultHeaders.Count;
             var containedAuthBefore = config.DefaultHeaders.ContainsKey("Authorization");
@@ -223,7 +224,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                     ItExpr.IsAny<CancellationToken>()
                 )
                 .ReturnsAsync(CreateSuccessResponse(new ReadAuthorizationModelsResponse {
-                    AuthorizationModels = new System.Collections.Generic.List<AuthorizationModel>()
+                    AuthorizationModels = new List<AuthorizationModel>()
                 }));
 
             var httpClient = new HttpClient(mockHandler.Object);
@@ -271,7 +272,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                     ItExpr.IsAny<CancellationToken>()
                 )
                 .ReturnsAsync(CreateSuccessResponse(new ReadAuthorizationModelsResponse {
-                    AuthorizationModels = new System.Collections.Generic.List<AuthorizationModel>()
+                    AuthorizationModels = new List<AuthorizationModel>()
                 }));
 
             var httpClient = new HttpClient(mockHandler.Object);
@@ -307,7 +308,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
         [Fact]
         public void Configuration_WithApiToken_PassesValidation() {
             var config = CreateApiTokenConfiguration();
-            
+
             // Should not throw
             config.EnsureValid();
         }
@@ -318,10 +319,10 @@ namespace OpenFga.Sdk.Test.ApiClient {
         [Fact]
         public void ApiClient_WithApiToken_CreatesSuccessfully() {
             var config = CreateApiTokenConfiguration();
-            
+
             // Should not throw
             var apiClient = new Sdk.ApiClient.ApiClient(config);
-            
+
             Assert.NotNull(apiClient);
         }
 
@@ -345,7 +346,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                     ItExpr.IsAny<CancellationToken>()
                 )
                 .ReturnsAsync(CreateSuccessResponse(new ReadAuthorizationModelsResponse {
-                    AuthorizationModels = new System.Collections.Generic.List<AuthorizationModel>()
+                    AuthorizationModels = new List<AuthorizationModel>()
                 }));
 
             var httpClient = new HttpClient(mockHandler.Object);
@@ -359,7 +360,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
             };
 
             var options = new ClientRequestOptions {
-                Headers = new System.Collections.Generic.Dictionary<string, string> {
+                Headers = new Dictionary<string, string> {
                     { "X-Custom-Header", "custom-value" }
                 }
             };
@@ -381,4 +382,3 @@ namespace OpenFga.Sdk.Test.ApiClient {
         #endregion
     }
 }
-
