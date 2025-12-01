@@ -22,44 +22,30 @@ using System.Text.Json.Serialization;
 
 namespace OpenFga.Sdk.Model {
     /// <summary>
-    /// ExpandRequestTupleKey
+    /// The response for a StreamedListObjects RPC.
     /// </summary>
-    [DataContract(Name = "ExpandRequestTupleKey")]
-    public partial class ExpandRequestTupleKey : IEquatable<ExpandRequestTupleKey>, IValidatableObject {
+    [DataContract(Name = "StreamedListObjectsResponse")]
+    public partial class StreamedListObjectsResponse : IEquatable<StreamedListObjectsResponse>, IValidatableObject {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExpandRequestTupleKey" /> class.
+        /// Initializes a new instance of the <see cref="StreamedListObjectsResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public ExpandRequestTupleKey() {
+        public StreamedListObjectsResponse() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExpandRequestTupleKey" /> class.
+        /// Initializes a new instance of the <see cref="StreamedListObjectsResponse" /> class.
         /// </summary>
-        /// <param name="relation">relation (required).</param>
         /// <param name="varObject">varObject (required).</param>
-        public ExpandRequestTupleKey(string relation = default, string varObject = default) {
-            // to ensure "relation" is required (not null)
-            if (relation == null) {
-                throw new ArgumentNullException("relation is a required property for ExpandRequestTupleKey and cannot be null");
-            }
-            this.Relation = relation;
+        public StreamedListObjectsResponse(string varObject = default) {
             // to ensure "varObject" is required (not null)
             if (varObject == null) {
-                throw new ArgumentNullException("varObject is a required property for ExpandRequestTupleKey and cannot be null");
+                throw new ArgumentNullException("varObject is a required property for StreamedListObjectsResponse and cannot be null");
             }
             this.Object = varObject;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
-
-        /// <summary>
-        /// Gets or Sets Relation
-        /// </summary>
-        [DataMember(Name = "relation", IsRequired = true, EmitDefaultValue = false)]
-        [JsonPropertyName("relation")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string Relation { get; set; }
 
         /// <summary>
         /// Gets or Sets Object
@@ -85,11 +71,11 @@ namespace OpenFga.Sdk.Model {
         }
 
         /// <summary>
-        /// Builds a ExpandRequestTupleKey from the JSON string presentation of the object
+        /// Builds a StreamedListObjectsResponse from the JSON string presentation of the object
         /// </summary>
-        /// <returns>ExpandRequestTupleKey</returns>
-        public static ExpandRequestTupleKey FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<ExpandRequestTupleKey>(jsonString) ?? throw new InvalidOperationException();
+        /// <returns>StreamedListObjectsResponse</returns>
+        public static StreamedListObjectsResponse FromJson(string jsonString) {
+            return JsonSerializer.Deserialize<StreamedListObjectsResponse>(jsonString) ?? throw new InvalidOperationException();
         }
 
         /// <summary>
@@ -99,24 +85,19 @@ namespace OpenFga.Sdk.Model {
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
-            return this.Equals((ExpandRequestTupleKey)input);
+            return this.Equals((StreamedListObjectsResponse)input);
         }
 
         /// <summary>
-        /// Returns true if ExpandRequestTupleKey instances are equal
+        /// Returns true if StreamedListObjectsResponse instances are equal
         /// </summary>
-        /// <param name="input">Instance of ExpandRequestTupleKey to be compared</param>
+        /// <param name="input">Instance of StreamedListObjectsResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ExpandRequestTupleKey input) {
+        public bool Equals(StreamedListObjectsResponse input) {
             if (input == null) {
                 return false;
             }
             return
-                (
-                    this.Relation == input.Relation ||
-                    (this.Relation != null &&
-                    this.Relation.Equals(input.Relation))
-                ) &&
                 (
                     this.Object == input.Object ||
                     (this.Object != null &&
@@ -133,9 +114,6 @@ namespace OpenFga.Sdk.Model {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Relation != null) {
-                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Relation.GetHashCode();
-                }
                 if (this.Object != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Object.GetHashCode();
                 }
@@ -152,16 +130,6 @@ namespace OpenFga.Sdk.Model {
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
-            // Relation (string) maxLength
-            if (this.Relation != null && this.Relation.Length > 50) {
-                yield return new ValidationResult("Invalid value for Relation, length must be less than 50.", new[] { "Relation" });
-            }
-
-            // Object (string) maxLength
-            if (this.Object != null && this.Object.Length > 256) {
-                yield return new ValidationResult("Invalid value for Object, length must be less than 256.", new[] { "Object" });
-            }
-
             yield break;
         }
 

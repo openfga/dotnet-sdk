@@ -1,8 +1,10 @@
 appveyor.yml
 git_push.sh
 api/openapi.yaml
+src/OpenFga.Sdk/ApiClient.cs
+src/OpenFga.Sdk/Client/*
 src/OpenFga.Sdk.Test/Api/*
 src/OpenFga.Sdk.Test/Client/*
 src/OpenFga.Sdk.Test/Model/*
-src/OpenFga.Sdk/ApiClient.cs
-src/OpenFga.Sdk/Client/*
+src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj
+src/OpenFga.Sdk/OpenFga.Sdk.csproj

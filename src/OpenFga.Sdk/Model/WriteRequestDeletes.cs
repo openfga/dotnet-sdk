@@ -114,7 +114,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as WriteRequestDeletes);
+            if (input == null || input.GetType() != this.GetType()) return false;
+            return this.Equals((WriteRequestDeletes)input);
         }
 
         /// <summary>
@@ -137,7 +138,7 @@ namespace OpenFga.Sdk.Model {
                     this.OnMissing == input.OnMissing ||
                     this.OnMissing.Equals(input.OnMissing)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.TryGetValue(kv.Key, out var inputValue) && Equals(kv.Value, inputValue)));
         }
 
         /// <summary>

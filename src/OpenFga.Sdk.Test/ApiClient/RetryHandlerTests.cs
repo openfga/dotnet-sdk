@@ -130,7 +130,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
             var attemptCount = 0;
 
             // Create TaskCanceledException with a cancelled token in a framework-compatible way
-            var cts = new CancellationTokenSource();
+            using var cts = new CancellationTokenSource();
             cts.Cancel();
 
             TaskCanceledException exception;

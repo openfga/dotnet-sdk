@@ -207,7 +207,7 @@ public class Attributes {
             attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestModelId, modelId));
         }
 
-        if (apiName is "Check" or "ListObjects" or "Write" or "Expand" or "ListUsers") {
+        if (apiName is "Check" or "ListObjects" or "StreamedListObjects" or "Write" or "Expand" or "ListUsers") {
             AddRequestBodyAttributes(requestBuilder, apiName, attributes);
         }
 
@@ -227,7 +227,7 @@ public class Attributes {
                             authModelId.GetString()));
                     }
 
-                    if (apiName is "Check" or "ListObjects" && root.TryGetProperty("user", out var fgaUser) &&
+                    if (apiName is "Check" or "ListObjects" or "StreamedListObjects" && root.TryGetProperty("user", out var fgaUser) &&
                         !string.IsNullOrEmpty(fgaUser.GetString())) {
                         attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.FgaRequestUser,
                             fgaUser.GetString()));

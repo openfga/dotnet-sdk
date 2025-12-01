@@ -2,6 +2,7 @@
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.8.0...HEAD)
 
+- feat: add support for [StreamedListObjects](https://openfga.dev/api/service#/Relationship%20Queries/StreamedListObjects). See [documentation](#streamed-list-objects)
 - fix: ApiToken credentials no longer cause reserved header exception (#146)
 
 ## v0.8.0

@@ -18,7 +18,7 @@ namespace OpenFga.Sdk.Test.Configuration {
         [InlineData("https://issuer.fga.example", "https://issuer.fga.example")]
         // HTTP scheme tests
         [InlineData("http://issuer.fga.example", "http://issuer.fga.example")]
-        public void Normalize_ReturnsExpectedResult(string input, string expected) {
+        public void Normalize_ReturnsExpectedResult(string? input, string? expected) {
             // Act
             var result = ApiTokenIssuerNormalizer.Normalize(input);
 
@@ -27,4 +27,3 @@ namespace OpenFga.Sdk.Test.Configuration {
         }
     }
 }
-

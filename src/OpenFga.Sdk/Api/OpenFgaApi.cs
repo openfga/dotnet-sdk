@@ -17,6 +17,7 @@ using OpenFga.Sdk.Model;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -517,6 +518,41 @@ public class OpenFgaApi : IDisposable {
 
         return await _apiClient.SendRequestAsync<Any, ReadChangesResponse>(requestBuilder,
             "ReadChanges", options, cancellationToken);
+    }
+
+    /// <summary>
+    /// Stream all objects of the given type that the user has a relation with The Streamed ListObjects API is very similar to the the ListObjects API, with two differences:  1. Instead of collecting all objects before returning a response, it streams them to the client as they are collected.  2. The number of results returned is only limited by the execution timeout specified in the flag OPENFGA_LIST_OBJECTS_DEADLINE.  
+    /// </summary>
+    /// <exception cref="ApiException">Thrown when fails to make API call</exception>
+    /// <param name="storeId"></param>
+    /// <param name="body"></param>
+    /// <param name="options">Request options.</param>
+    /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+    /// <returns>IAsyncEnumerable of StreamedListObjectsResponse</returns>
+    public async IAsyncEnumerable<StreamedListObjectsResponse> StreamedListObjects(string storeId, ListObjectsRequest body, IRequestOptions? options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+        var pathParams = new Dictionary<string, string> { };
+        if (string.IsNullOrWhiteSpace(storeId)) {
+            throw new FgaRequiredParamError("StreamedListObjects", "StoreId");
+        }
+
+        if (storeId != null) {
+            pathParams.Add("store_id", storeId.ToString());
+        }
+        var queryParams = new Dictionary<string, string>();
+
+        var requestBuilder = new RequestBuilder<ListObjectsRequest> {
+            Method = new HttpMethod("POST"),
+            BasePath = _configuration.BasePath,
+            PathTemplate = "/stores/{store_id}/streamed-list-objects",
+            PathParameters = pathParams,
+            Body = body,
+            QueryParameters = queryParams,
+        };
+
+        await foreach (var response in _apiClient.SendStreamingRequestAsync<ListObjectsRequest, StreamedListObjectsResponse>(requestBuilder,
+            "StreamedListObjects", options, cancellationToken)) {
+            yield return response;
+        }
     }
 
     /// <summary>
