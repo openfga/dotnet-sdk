@@ -190,6 +190,10 @@ namespace Example {
                     Credentials = new Credentials() {
                         Method = CredentialsMethod.ClientCredentials,
                         Config = new CredentialsConfig() {
+                            // API Token Issuer can contain:
+                            // - a scheme, defaults to https
+                            // - a path, defaults to /oauth/token
+                            // - a port
                             ApiTokenIssuer = Environment.GetEnvironmentVariable("FGA_API_TOKEN_ISSUER"),
                             ApiAudience = Environment.GetEnvironmentVariable("FGA_API_AUDIENCE"),
                             ClientId = Environment.GetEnvironmentVariable("FGA_CLIENT_ID"),
