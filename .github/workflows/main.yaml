@@ -209,6 +209,7 @@ jobs:
     permissions:
       id-token: write # For OIDC authentication with NuGet.org
       packages: write # For publishing to the GitHub Nuget Registry
+      contents: read
 
     steps:
       - name: Checkout code
