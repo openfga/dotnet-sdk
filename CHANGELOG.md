@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.8.0...HEAD)
+## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.9.0...HEAD)
+
+## v0.9.0
+
+### [0.9.0](https://github.com/openfga/dotnet-sdk/compare/v0.8.0...v0.9.0) (2025-12-01)
 
 ### Added
 - feat: add server-side `BatchCheck()` method using `/batch-check` API endpoint
