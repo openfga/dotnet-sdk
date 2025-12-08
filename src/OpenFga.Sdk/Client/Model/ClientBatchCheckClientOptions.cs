@@ -3,10 +3,14 @@ using System.Collections.Generic;
 
 namespace OpenFga.Sdk.Client.Model;
 
-public interface IClientListRelationsOptions : IClientBatchCheckClientOptions {
+public interface IClientBatchCheckClientOptions : IClientCheckOptions {
+    /// <summary>
+    ///     Max Requests to issue in parallel
+    /// </summary>
+    public int? MaxParallelRequests { get; set; }
 }
 
-public class ClientListRelationsOptions : IClientListRelationsOptions {
+public class ClientBatchCheckClientOptions : IClientBatchCheckClientOptions {
     /// <inheritdoc />
     public string? StoreId { get; set; }
 
