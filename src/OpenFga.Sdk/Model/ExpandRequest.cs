@@ -113,7 +113,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
         public override bool Equals(object input) {
-            return this.Equals(input as ExpandRequest);
+            if (input == null || input.GetType() != this.GetType()) return false;
+            return this.Equals((ExpandRequest)input);
         }
 
         /// <summary>
@@ -145,7 +146,7 @@ namespace OpenFga.Sdk.Model {
                     (this.ContextualTuples != null &&
                     this.ContextualTuples.Equals(input.ContextualTuples))
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.ContainsKey(kv.Key) && Equals(kv.Value, input.AdditionalProperties[kv.Key])));
+                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.TryGetValue(kv.Key, out var inputValue) && Equals(kv.Value, inputValue)));
         }
 
         /// <summary>

@@ -96,7 +96,6 @@ docs/WriteAuthorizationModelResponse.md
 docs/WriteRequest.md
 docs/WriteRequestDeletes.md
 docs/WriteRequestWrites.md
-src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj
 src/OpenFga.Sdk/Api/OpenFgaApi.cs
 src/OpenFga.Sdk/Constants/FgaConstants.cs
 src/OpenFga.Sdk/Model/AbortedMessageResponse.cs
@@ -155,7 +154,6 @@ src/OpenFga.Sdk/Model/ReadResponse.cs
 src/OpenFga.Sdk/Model/RelationMetadata.cs
 src/OpenFga.Sdk/Model/RelationReference.cs
 src/OpenFga.Sdk/Model/RelationshipCondition.cs
-src/OpenFga.Sdk/Model/RequestOptions.cs
 src/OpenFga.Sdk/Model/SourceInfo.cs
 src/OpenFga.Sdk/Model/Status.cs
 src/OpenFga.Sdk/Model/Store.cs
@@ -187,4 +185,3 @@ src/OpenFga.Sdk/Model/WriteAuthorizationModelResponse.cs
 src/OpenFga.Sdk/Model/WriteRequest.cs
 src/OpenFga.Sdk/Model/WriteRequestDeletes.cs
 src/OpenFga.Sdk/Model/WriteRequestWrites.cs
-src/OpenFga.Sdk/OpenFga.Sdk.csproj

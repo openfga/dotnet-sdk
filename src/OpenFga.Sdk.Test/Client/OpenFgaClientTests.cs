@@ -3,6 +3,7 @@ using Moq.Protected;
 using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Constants;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Exceptions.Parsers;
 using OpenFga.Sdk.Model;
@@ -1408,10 +1409,10 @@ public class OpenFgaClientTests : IDisposable {
                 Object = "document:0192ab2a-d83f-756d-9397-c5ed9f3cb69a",
             }
         };
-        var options = new ClientBatchCheckOptions {
+        var options = new ClientBatchCheckClientOptions {
             Consistency = ConsistencyPreference.HIGHERCONSISTENCY
         };
-        var response = await fgaClient.BatchCheck(body, options);
+        var response = await fgaClient.ClientBatchCheck(body, options);
 
         mockHandler.Protected().Verify(
             "SendAsync",
@@ -2790,6 +2791,48 @@ public class OpenFgaClientTests : IDisposable {
 
         Assert.NotNull(response.Users);
         AssertHeaderPresent(mockHandler, "X-List-Users", "users-123");
+    }
+
+    /// <summary>
+    /// Test BatchCheck includes bulk request ID header
+    /// </summary>
+    [Fact]
+    public async Task BatchCheck_IncludesBulkRequestIdHeader() {
+        var expectedResponse = new BatchCheckResponse() {
+            Result = new Dictionary<string, BatchCheckSingleResult> {
+                { "corr-1", new BatchCheckSingleResult { Allowed = true } }
+            }
+        };
+
+        var bulkRequestIdHeaderFound = false;
+        var (client, _) = CreateTestClientForHeaders(expectedResponse, req => {
+            if (req.RequestUri == new Uri($"{_config.BasePath}/stores/{_storeId}/batch-check") &&
+                req.Method == HttpMethod.Post &&
+                req.Headers.Contains(FgaConstants.ClientBulkRequestIdHeader)) {
+
+                var headerValue = req.Headers.GetValues(FgaConstants.ClientBulkRequestIdHeader).First();
+                // Verify it's a valid GUID
+                bulkRequestIdHeaderFound = Guid.TryParse(headerValue, out _);
+                return true;
+            }
+            return false;
+        });
+
+        var body = new ClientBatchCheckRequest {
+            Checks = new List<ClientBatchCheckItem> {
+                new() {
+                    User = "user:anne",
+                    Relation = "reader",
+                    Object = "document:budget",
+                    CorrelationId = "corr-1"
+                }
+            }
+        };
+
+        var response = await client.BatchCheck(body);
+
+        Assert.NotNull(response);
+        Assert.True(bulkRequestIdHeaderFound, "X-OpenFGA-Client-Bulk-Request-Id header should be present with valid GUID");
     }
 
     /// <summary>
