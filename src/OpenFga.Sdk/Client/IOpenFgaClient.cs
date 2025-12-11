@@ -10,7 +10,7 @@ namespace OpenFga.Sdk.Client;
 /// Interface for the OpenFGA client
 /// </summary>
 /// <remarks>
-/// This interface provisioned to support unit testing scenarios by making mocking feasible.
+/// This interface is provisioned to support unit testing scenarios by making mocking feasible.
 /// </remarks>
 public interface IOpenFgaClient
 {
@@ -36,7 +36,7 @@ public interface IOpenFgaClient
         IClientListStoresOptions? options = default,
         CancellationToken cancellationToken = default
     );
-    
+
     /// <summary>
     /// CreateStore - Initialize a store.
     /// </summary>
