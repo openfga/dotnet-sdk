@@ -199,17 +199,6 @@ public interface IOpenFgaClient
     /// <summary>
     /// BatchCheck - Run a set of checks using the server-side /batch-check endpoint (evaluates)
     /// </summary>
-    /// <param name="body"></param>
-    /// <param name="options"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<ClientBatchCheckClientResponse> BatchCheck(List<ClientCheckRequest> body, IClientBatchCheckOptions? options = default,
-        CancellationToken cancellationToken = default
-    );
-
-    /// <summary>
-    /// BatchCheck - Run a set of checks using the server-side /batch-check endpoint (evaluates)
-    /// </summary>
     /// <remarks>
     /// This method uses the server-side batch check API endpoint. It automatically:
     /// - Generates correlation IDs for checks that don't have one
