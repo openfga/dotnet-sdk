@@ -48,26 +48,7 @@ lint:
 # Apply formatting fixes
 fmt:
 	@echo "🎨 Applying code formatting..."
-	@# Create backups of project files
-	@cp src/OpenFga.Sdk/OpenFga.Sdk.csproj src/OpenFga.Sdk/OpenFga.Sdk.csproj.bak
-	@cp src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj.bak
-	
-	@# Use sed with appropriate flags for platform compatibility
-	@if [ "$$(uname)" = "Darwin" ]; then \
-		sed -i '' "s/<TargetFrameworks>.*<\\/TargetFrameworks>/<TargetFramework>net8.0<\\/TargetFramework>/" src/OpenFga.Sdk/OpenFga.Sdk.csproj && \
-		sed -i '' "s/<TargetFrameworks>.*<\\/TargetFrameworks>/<TargetFramework>net8.0<\\/TargetFramework>/" src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj; \
-	else \
-		sed -i "s/<TargetFrameworks>.*<\\/TargetFrameworks>/<TargetFramework>net8.0<\\/TargetFramework>/" src/OpenFga.Sdk/OpenFga.Sdk.csproj && \
-		sed -i "s/<TargetFrameworks>.*<\\/TargetFrameworks>/<TargetFramework>net8.0<\\/TargetFramework>/" src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj; \
-	fi
-	
-	@# Run formatting
-	@dotnet restore ./OpenFga.Sdk.sln
 	@dotnet format ./OpenFga.Sdk.sln
-	
-	@# Restore original project files
-	@mv src/OpenFga.Sdk/OpenFga.Sdk.csproj.bak src/OpenFga.Sdk/OpenFga.Sdk.csproj
-	@mv src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj.bak src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj
 	@echo "✅ Code formatting applied successfully!"
 
 # Convenience target to run all checks
