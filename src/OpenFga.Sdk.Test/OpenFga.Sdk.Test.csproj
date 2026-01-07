@@ -37,9 +37,9 @@
 
   <!-- Packages needed for .NET versions < .NET 8 -->
   <ItemGroup Condition="'$(IsNet8OrGreater)' != 'true'">
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.0" />
-    <PackageReference Include="System.Net.Http.Json" Version="10.0.0" />
-    <PackageReference Include="System.Text.Json" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.1" />
+    <PackageReference Include="System.Net.Http.Json" Version="10.0.1" />
+    <PackageReference Include="System.Text.Json" Version="10.0.1" />
   </ItemGroup>
 
   <!-- .NET Framework 4.8 specific packages -->
