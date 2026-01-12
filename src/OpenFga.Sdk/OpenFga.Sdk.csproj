@@ -40,7 +40,6 @@
 
   <!-- Packages needed for .NET versions < .NET 8 -->
   <ItemGroup Condition="'$(IsNet8OrGreater)' != 'true'">
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.1" />
     <PackageReference Include="System.Net.Http.Json" Version="10.0.1" />
