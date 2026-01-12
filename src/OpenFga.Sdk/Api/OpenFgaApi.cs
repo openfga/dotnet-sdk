@@ -521,6 +521,41 @@ public class OpenFgaApi : IDisposable {
     }
 
     /// <summary>
+    /// Stream all objects of the given type that the user has a relation with The Streamed ListObjects API is very similar to the the ListObjects API, with two differences:  1. Instead of collecting all objects before returning a response, it streams them to the client as they are collected.  2. The number of results returned is only limited by the execution timeout specified in the flag OPENFGA_LIST_OBJECTS_DEADLINE.  
+    /// </summary>
+    /// <exception cref="ApiException">Thrown when fails to make API call</exception>
+    /// <param name="storeId"></param>
+    /// <param name="body"></param>
+    /// <param name="options">Request options.</param>
+    /// <param name="cancellationToken">Cancellation Token to cancel the request.</param>
+    /// <returns>IAsyncEnumerable of StreamedListObjectsResponse</returns>
+    public async IAsyncEnumerable<StreamedListObjectsResponse> StreamedListObjects(string storeId, ListObjectsRequest body, IRequestOptions? options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+        var pathParams = new Dictionary<string, string> { };
+        if (string.IsNullOrWhiteSpace(storeId)) {
+            throw new FgaRequiredParamError("StreamedListObjects", "StoreId");
+        }
+
+        if (storeId != null) {
+            pathParams.Add("store_id", storeId.ToString());
+        }
+        var queryParams = new Dictionary<string, string>();
+
+        var requestBuilder = new RequestBuilder<ListObjectsRequest> {
+            Method = new HttpMethod("POST"),
+            BasePath = _configuration.BasePath,
+            PathTemplate = "/stores/{store_id}/streamed-list-objects",
+            PathParameters = pathParams,
+            Body = body,
+            QueryParameters = queryParams,
+        };
+
+        await foreach (var response in _apiClient.SendStreamingRequestAsync<ListObjectsRequest, StreamedListObjectsResponse>(requestBuilder,
+            "StreamedListObjects", options, cancellationToken)) {
+            yield return response;
+        }
+    }
+
+    /// <summary>
     /// Add or delete tuples from the store The Write API will transactionally update the tuples for a certain store. Tuples and type definitions allow OpenFGA to determine whether a relationship exists between an object and an user. In the body, &#x60;writes&#x60; adds new tuples and &#x60;deletes&#x60; removes existing tuples. When deleting a tuple, any &#x60;condition&#x60; specified with it is ignored. The API is not idempotent by default: if, later on, you try to add the same tuple key (even if the &#x60;condition&#x60; is different), or if you try to delete a non-existing tuple, it will throw an error. To allow writes when an identical tuple already exists in the database, set &#x60;\&quot;on_duplicate\&quot;: \&quot;ignore\&quot;&#x60; on the &#x60;writes&#x60; object. To allow deletes when a tuple was already removed from the database, set &#x60;\&quot;on_missing\&quot;: \&quot;ignore\&quot;&#x60; on the &#x60;deletes&#x60; object. If a Write request contains both idempotent (ignore) and non-idempotent (error) operations, the most restrictive action (error) will take precedence. If a condition fails for a sub-request with an error flag, the entire transaction will be rolled back. This gives developers explicit control over the atomicity of the requests. The API will not allow you to write tuples such as &#x60;document:2021-budget#viewer@document:2021-budget#viewer&#x60;, because they are implicit. An &#x60;authorization_model_id&#x60; may be specified in the body. If it is, it will be used to assert that each written tuple (not deleted) is valid for the model specified. If it is not specified, the latest authorization model ID will be used. ## Example ### Adding relationships To add &#x60;user:anne&#x60; as a &#x60;writer&#x60; for &#x60;document:2021-budget&#x60;, call write API with the following  &#x60;&#x60;&#x60;json {   \&quot;writes\&quot;: {     \&quot;tuple_keys\&quot;: [       {         \&quot;user\&quot;: \&quot;user:anne\&quot;,         \&quot;relation\&quot;: \&quot;writer\&quot;,         \&quot;object\&quot;: \&quot;document:2021-budget\&quot;       }     ],     \&quot;on_duplicate\&quot;: \&quot;ignore\&quot;   },   \&quot;authorization_model_id\&quot;: \&quot;01G50QVV17PECNVAHX1GG4Y5NC\&quot; } &#x60;&#x60;&#x60; ### Removing relationships To remove &#x60;user:bob&#x60; as a &#x60;reader&#x60; for &#x60;document:2021-budget&#x60;, call write API with the following  &#x60;&#x60;&#x60;json {   \&quot;deletes\&quot;: {     \&quot;tuple_keys\&quot;: [       {         \&quot;user\&quot;: \&quot;user:bob\&quot;,         \&quot;relation\&quot;: \&quot;reader\&quot;,         \&quot;object\&quot;: \&quot;document:2021-budget\&quot;       }     ],     \&quot;on_missing\&quot;: \&quot;ignore\&quot;   } } &#x60;&#x60;&#x60; 
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>

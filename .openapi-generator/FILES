@@ -68,6 +68,8 @@ docs/RelationshipCondition.md
 docs/SourceInfo.md
 docs/Status.md
 docs/Store.md
+docs/StreamResultOfStreamedListObjectsResponse.md
+docs/StreamedListObjectsResponse.md
 docs/Tuple.md
 docs/TupleChange.md
 docs/TupleKey.md
@@ -157,6 +159,8 @@ src/OpenFga.Sdk/Model/RelationshipCondition.cs
 src/OpenFga.Sdk/Model/SourceInfo.cs
 src/OpenFga.Sdk/Model/Status.cs
 src/OpenFga.Sdk/Model/Store.cs
+src/OpenFga.Sdk/Model/StreamResultOfStreamedListObjectsResponse.cs
+src/OpenFga.Sdk/Model/StreamedListObjectsResponse.cs
 src/OpenFga.Sdk/Model/Tuple.cs
 src/OpenFga.Sdk/Model/TupleChange.cs
 src/OpenFga.Sdk/Model/TupleKey.cs
