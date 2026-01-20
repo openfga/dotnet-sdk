@@ -140,11 +140,12 @@ public class OAuth2Client {
         };
 
         var sw = Stopwatch.StartNew();
-        var accessTokenResponse = await Retry(async () =>
+        var accessTokenResponse = await Retry(async (attemptCount) =>
             await _httpClient.SendRequestAsync<IDictionary<string, string>, AccessTokenResponse>(
                 requestBuilder,
                 null,
                 "ExchangeTokenAsync",
+                attemptCount,
                 cancellationToken),
             cancellationToken);
 
@@ -160,12 +161,12 @@ public class OAuth2Client {
         }
     }
 
-    private async Task<TResult> Retry<TResult>(Func<Task<TResult>> retryable, CancellationToken cancellationToken = default) {
+    private async Task<TResult> Retry<TResult>(Func<int, Task<TResult>> retryable, CancellationToken cancellationToken = default) {
         var attemptCount = 0; // 0 = initial request, 1+ = retry attempts
 
         while (true) {
             try {
-                return await retryable().ConfigureAwait(false);
+                return await retryable(attemptCount).ConfigureAwait(false);
             }
             catch (FgaApiError err) when (err is FgaApiRateLimitExceededError || err.ShouldRetry) {
                 // Check if we should retry based on status code and attempt count
