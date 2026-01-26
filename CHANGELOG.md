@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.9.0...HEAD)
+## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v1.0.0...HEAD)
+
+## v1.0.0
+
+### [1.0.0](https://github.com/openfga/dotnet-sdk/compare/v0.9.0...v1.0.0) (2026-01-26)
 
 - feat: add support for [StreamedListObjects](https://openfga.dev/api/service#/Relationship%20Queries/StreamedListObjects). See [documentation](#streamed-list-objects)
 
