@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// ListUsersResponse
     /// </summary>
     [DataContract(Name = "ListUsersResponse")]
-    public partial class ListUsersResponse : IEquatable<ListUsersResponse>, IValidatableObject {
+    public partial class ListUsersResponse : IEquatable<ListUsersResponse>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="ListUsersResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public ListUsersResponse() {
+        public ListUsersResponse()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -38,9 +43,11 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ListUsersResponse" /> class.
         /// </summary>
         /// <param name="users">users (required).</param>
-        public ListUsersResponse(List<User> users = default) {
+        public ListUsersResponse(List<User> users = default)
+        {
             // to ensure "users" is required (not null)
-            if (users == null) {
+            if (users == null)
+            {
                 throw new ArgumentNullException("users is a required property for ListUsersResponse and cannot be null");
             }
             this.Users = users;
@@ -66,7 +73,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -83,7 +91,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((ListUsersResponse)input);
         }
@@ -93,11 +102,13 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of ListUsersResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ListUsersResponse input) {
-            if (input == null) {
+        public bool Equals(ListUsersResponse input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.Users == input.Users ||
                     this.Users != null &&
@@ -111,14 +122,17 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Users != null) {
+                if (this.Users != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Users.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -130,7 +144,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

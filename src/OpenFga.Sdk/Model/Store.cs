@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// Store
     /// </summary>
     [DataContract(Name = "Store")]
-    public partial class Store : IEquatable<Store>, IValidatableObject {
+    public partial class Store : IEquatable<Store>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="Store" /> class.
         /// </summary>
         [JsonConstructor]
-        public Store() {
+        public Store()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -42,14 +47,17 @@ namespace OpenFga.Sdk.Model {
         /// <param name="createdAt">createdAt (required).</param>
         /// <param name="updatedAt">updatedAt (required).</param>
         /// <param name="deletedAt">deletedAt.</param>
-        public Store(string id = default, string name = default, DateTime createdAt = default, DateTime updatedAt = default, DateTime deletedAt = default) {
+        public Store(string id = default, string name = default, DateTime createdAt = default, DateTime updatedAt = default, DateTime deletedAt = default)
+        {
             // to ensure "id" is required (not null)
-            if (id == null) {
+            if (id == null)
+            {
                 throw new ArgumentNullException("id is a required property for Store and cannot be null");
             }
             this.Id = id;
             // to ensure "name" is required (not null)
-            if (name == null) {
+            if (name == null)
+            {
                 throw new ArgumentNullException("name is a required property for Store and cannot be null");
             }
             this.Name = name;
@@ -110,7 +118,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -127,7 +136,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((Store)input);
         }
@@ -137,31 +147,33 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of Store to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Store input) {
-            if (input == null) {
+        public bool Equals(Store input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.Id == input.Id ||
                     (this.Id != null &&
                     this.Id.Equals(input.Id))
-                ) &&
+                ) && 
                 (
                     this.Name == input.Name ||
                     (this.Name != null &&
                     this.Name.Equals(input.Name))
-                ) &&
+                ) && 
                 (
                     this.CreatedAt == input.CreatedAt ||
                     (this.CreatedAt != null &&
                     this.CreatedAt.Equals(input.CreatedAt))
-                ) &&
+                ) && 
                 (
                     this.UpdatedAt == input.UpdatedAt ||
                     (this.UpdatedAt != null &&
                     this.UpdatedAt.Equals(input.UpdatedAt))
-                ) &&
+                ) && 
                 (
                     this.DeletedAt == input.DeletedAt ||
                     (this.DeletedAt != null &&
@@ -174,26 +186,33 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Id != null) {
+                if (this.Id != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Id.GetHashCode();
                 }
-                if (this.Name != null) {
+                if (this.Name != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Name.GetHashCode();
                 }
-                if (this.CreatedAt != null) {
+                if (this.CreatedAt != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.CreatedAt.GetHashCode();
                 }
-                if (this.UpdatedAt != null) {
+                if (this.UpdatedAt != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.UpdatedAt.GetHashCode();
                 }
-                if (this.DeletedAt != null) {
+                if (this.DeletedAt != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.DeletedAt.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -205,7 +224,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

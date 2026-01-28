@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// Users
     /// </summary>
     [DataContract(Name = "Users")]
-    public partial class Users : IEquatable<Users>, IValidatableObject {
+    public partial class Users : IEquatable<Users>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="Users" /> class.
         /// </summary>
         [JsonConstructor]
-        public Users() {
+        public Users()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -38,9 +43,11 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="Users" /> class.
         /// </summary>
         /// <param name="varUsers">varUsers (required).</param>
-        public Users(List<string> varUsers = default) {
+        public Users(List<string> varUsers = default)
+        {
             // to ensure "varUsers" is required (not null)
-            if (varUsers == null) {
+            if (varUsers == null)
+            {
                 throw new ArgumentNullException("varUsers is a required property for Users and cannot be null");
             }
             this.VarUsers = varUsers;
@@ -66,7 +73,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -83,7 +91,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((Users)input);
         }
@@ -93,11 +102,13 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of Users to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Users input) {
-            if (input == null) {
+        public bool Equals(Users input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.VarUsers == input.VarUsers ||
                     this.VarUsers != null &&
@@ -111,14 +122,17 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.VarUsers != null) {
+                if (this.VarUsers != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.VarUsers.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -130,7 +144,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

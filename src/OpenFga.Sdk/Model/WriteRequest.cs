@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// WriteRequest
     /// </summary>
     [DataContract(Name = "Write_request")]
-    public partial class WriteRequest : IEquatable<WriteRequest>, IValidatableObject {
+    public partial class WriteRequest : IEquatable<WriteRequest>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="WriteRequest" /> class.
         /// </summary>
         [JsonConstructor]
-        public WriteRequest() {
+        public WriteRequest()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -40,7 +45,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="writes">writes.</param>
         /// <param name="deletes">deletes.</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
-        public WriteRequest(WriteRequestWrites writes = default, WriteRequestDeletes deletes = default, string authorizationModelId = default) {
+        public WriteRequest(WriteRequestWrites writes = default, WriteRequestDeletes deletes = default, string authorizationModelId = default)
+        {
             this.Writes = writes;
             this.Deletes = deletes;
             this.AuthorizationModelId = authorizationModelId;
@@ -82,7 +88,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -99,7 +106,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((WriteRequest)input);
         }
@@ -109,21 +117,23 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of WriteRequest to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(WriteRequest input) {
-            if (input == null) {
+        public bool Equals(WriteRequest input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.Writes == input.Writes ||
                     (this.Writes != null &&
                     this.Writes.Equals(input.Writes))
-                ) &&
+                ) && 
                 (
                     this.Deletes == input.Deletes ||
                     (this.Deletes != null &&
                     this.Deletes.Equals(input.Deletes))
-                ) &&
+                ) && 
                 (
                     this.AuthorizationModelId == input.AuthorizationModelId ||
                     (this.AuthorizationModelId != null &&
@@ -136,20 +146,25 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Writes != null) {
+                if (this.Writes != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Writes.GetHashCode();
                 }
-                if (this.Deletes != null) {
+                if (this.Deletes != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Deletes.GetHashCode();
                 }
-                if (this.AuthorizationModelId != null) {
+                if (this.AuthorizationModelId != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AuthorizationModelId.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -161,7 +176,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

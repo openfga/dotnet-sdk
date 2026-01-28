@@ -11,21 +11,25 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// PathUnknownErrorMessageResponse
     /// </summary>
     [DataContract(Name = "PathUnknownErrorMessageResponse")]
-    public partial class PathUnknownErrorMessageResponse : IEquatable<PathUnknownErrorMessageResponse>, IValidatableObject {
+    public partial class PathUnknownErrorMessageResponse : IEquatable<PathUnknownErrorMessageResponse>, IValidatableObject
+    {
 
         /// <summary>
         /// Gets or Sets Code
@@ -37,7 +41,8 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="PathUnknownErrorMessageResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public PathUnknownErrorMessageResponse() {
+        public PathUnknownErrorMessageResponse()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -46,7 +51,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="code">code.</param>
         /// <param name="message">message.</param>
-        public PathUnknownErrorMessageResponse(NotFoundErrorCode? code = default, string message = default) {
+        public PathUnknownErrorMessageResponse(NotFoundErrorCode? code = default, string message = default)
+        {
             this.Code = code;
             this.Message = message;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -71,7 +77,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -88,7 +95,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((PathUnknownErrorMessageResponse)input);
         }
@@ -98,15 +106,17 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of PathUnknownErrorMessageResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(PathUnknownErrorMessageResponse input) {
-            if (input == null) {
+        public bool Equals(PathUnknownErrorMessageResponse input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.Code == input.Code ||
                     this.Code.Equals(input.Code)
-                ) &&
+                ) && 
                 (
                     this.Message == input.Message ||
                     (this.Message != null &&
@@ -119,15 +129,18 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
                 hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Code.GetHashCode();
-                if (this.Message != null) {
+                if (this.Message != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Message.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -139,7 +152,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

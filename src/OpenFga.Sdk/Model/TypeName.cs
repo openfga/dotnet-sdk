@@ -11,21 +11,25 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// Defines TypeName
     /// </summary>
     [JsonConverter(typeof(JsonStringEnumMemberConverter<TypeName>))]
-    public enum TypeName {
+    public enum TypeName
+    {
         /// <summary>
         /// Enum TYPENAMEUNSPECIFIED for value: TYPE_NAME_UNSPECIFIED
         /// </summary>

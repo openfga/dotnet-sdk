@@ -11,21 +11,25 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// ConditionParamTypeRef
     /// </summary>
     [DataContract(Name = "ConditionParamTypeRef")]
-    public partial class ConditionParamTypeRef : IEquatable<ConditionParamTypeRef>, IValidatableObject {
+    public partial class ConditionParamTypeRef : IEquatable<ConditionParamTypeRef>, IValidatableObject
+    {
 
         /// <summary>
         /// Gets or Sets TypeName
@@ -37,7 +41,8 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="ConditionParamTypeRef" /> class.
         /// </summary>
         [JsonConstructor]
-        public ConditionParamTypeRef() {
+        public ConditionParamTypeRef()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -46,7 +51,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="typeName">typeName (required).</param>
         /// <param name="genericTypes">genericTypes.</param>
-        public ConditionParamTypeRef(TypeName typeName = default, List<ConditionParamTypeRef> genericTypes = default) {
+        public ConditionParamTypeRef(TypeName typeName = default, List<ConditionParamTypeRef> genericTypes = default)
+        {
             this.TypeName = typeName;
             this.GenericTypes = genericTypes;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -71,7 +77,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -88,7 +95,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((ConditionParamTypeRef)input);
         }
@@ -98,15 +106,17 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of ConditionParamTypeRef to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ConditionParamTypeRef input) {
-            if (input == null) {
+        public bool Equals(ConditionParamTypeRef input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.TypeName == input.TypeName ||
                     this.TypeName.Equals(input.TypeName)
-                ) &&
+                ) && 
                 (
                     this.GenericTypes == input.GenericTypes ||
                     this.GenericTypes != null &&
@@ -120,15 +130,18 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
                 hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.TypeName.GetHashCode();
-                if (this.GenericTypes != null) {
+                if (this.GenericTypes != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.GenericTypes.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -140,7 +153,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

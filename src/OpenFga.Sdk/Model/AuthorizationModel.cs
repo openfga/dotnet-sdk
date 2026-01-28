@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// AuthorizationModel
     /// </summary>
     [DataContract(Name = "AuthorizationModel")]
-    public partial class AuthorizationModel : IEquatable<AuthorizationModel>, IValidatableObject {
+    public partial class AuthorizationModel : IEquatable<AuthorizationModel>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthorizationModel" /> class.
         /// </summary>
         [JsonConstructor]
-        public AuthorizationModel() {
+        public AuthorizationModel()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -41,19 +46,23 @@ namespace OpenFga.Sdk.Model {
         /// <param name="schemaVersion">schemaVersion (required).</param>
         /// <param name="typeDefinitions">typeDefinitions (required).</param>
         /// <param name="conditions">conditions.</param>
-        public AuthorizationModel(string id = default, string schemaVersion = default, List<TypeDefinition> typeDefinitions = default, Dictionary<string, Condition> conditions = default) {
+        public AuthorizationModel(string id = default, string schemaVersion = default, List<TypeDefinition> typeDefinitions = default, Dictionary<string, Condition> conditions = default)
+        {
             // to ensure "id" is required (not null)
-            if (id == null) {
+            if (id == null)
+            {
                 throw new ArgumentNullException("id is a required property for AuthorizationModel and cannot be null");
             }
             this.Id = id;
             // to ensure "schemaVersion" is required (not null)
-            if (schemaVersion == null) {
+            if (schemaVersion == null)
+            {
                 throw new ArgumentNullException("schemaVersion is a required property for AuthorizationModel and cannot be null");
             }
             this.SchemaVersion = schemaVersion;
             // to ensure "typeDefinitions" is required (not null)
-            if (typeDefinitions == null) {
+            if (typeDefinitions == null)
+            {
                 throw new ArgumentNullException("typeDefinitions is a required property for AuthorizationModel and cannot be null");
             }
             this.TypeDefinitions = typeDefinitions;
@@ -104,7 +113,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -121,7 +131,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((AuthorizationModel)input);
         }
@@ -131,27 +142,29 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of AuthorizationModel to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(AuthorizationModel input) {
-            if (input == null) {
+        public bool Equals(AuthorizationModel input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.Id == input.Id ||
                     (this.Id != null &&
                     this.Id.Equals(input.Id))
-                ) &&
+                ) && 
                 (
                     this.SchemaVersion == input.SchemaVersion ||
                     (this.SchemaVersion != null &&
                     this.SchemaVersion.Equals(input.SchemaVersion))
-                ) &&
+                ) && 
                 (
                     this.TypeDefinitions == input.TypeDefinitions ||
                     this.TypeDefinitions != null &&
                     input.TypeDefinitions != null &&
                     this.TypeDefinitions.SequenceEqual(input.TypeDefinitions)
-                ) &&
+                ) && 
                 (
                     this.Conditions == input.Conditions ||
                     this.Conditions != null &&
@@ -165,23 +178,29 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Id != null) {
+                if (this.Id != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Id.GetHashCode();
                 }
-                if (this.SchemaVersion != null) {
+                if (this.SchemaVersion != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.SchemaVersion.GetHashCode();
                 }
-                if (this.TypeDefinitions != null) {
+                if (this.TypeDefinitions != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.TypeDefinitions.GetHashCode();
                 }
-                if (this.Conditions != null) {
+                if (this.Conditions != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Conditions.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -193,7 +212,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

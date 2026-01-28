@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// BatchCheckSingleResult
     /// </summary>
     [DataContract(Name = "BatchCheckSingleResult")]
-    public partial class BatchCheckSingleResult : IEquatable<BatchCheckSingleResult>, IValidatableObject {
+    public partial class BatchCheckSingleResult : IEquatable<BatchCheckSingleResult>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="BatchCheckSingleResult" /> class.
         /// </summary>
         [JsonConstructor]
-        public BatchCheckSingleResult() {
+        public BatchCheckSingleResult()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -39,7 +44,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="allowed">allowed.</param>
         /// <param name="error">error.</param>
-        public BatchCheckSingleResult(bool allowed = default, CheckError error = default) {
+        public BatchCheckSingleResult(bool allowed = default, CheckError error = default)
+        {
             this.Allowed = allowed;
             this.Error = error;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -72,7 +78,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -89,7 +96,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((BatchCheckSingleResult)input);
         }
@@ -99,15 +107,17 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of BatchCheckSingleResult to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(BatchCheckSingleResult input) {
-            if (input == null) {
+        public bool Equals(BatchCheckSingleResult input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.Allowed == input.Allowed ||
                     this.Allowed.Equals(input.Allowed)
-                ) &&
+                ) && 
                 (
                     this.Error == input.Error ||
                     (this.Error != null &&
@@ -120,15 +130,18 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
                 hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Allowed.GetHashCode();
-                if (this.Error != null) {
+                if (this.Error != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Error.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -140,7 +153,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

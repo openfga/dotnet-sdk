@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// ReadResponse
     /// </summary>
     [DataContract(Name = "ReadResponse")]
-    public partial class ReadResponse : IEquatable<ReadResponse>, IValidatableObject {
+    public partial class ReadResponse : IEquatable<ReadResponse>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public ReadResponse() {
+        public ReadResponse()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -39,14 +44,17 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tuples">tuples (required).</param>
         /// <param name="continuationToken">The continuation token will be empty if there are no more tuples. (required).</param>
-        public ReadResponse(List<Tuple> tuples = default, string continuationToken = default) {
+        public ReadResponse(List<Tuple> tuples = default, string continuationToken = default)
+        {
             // to ensure "tuples" is required (not null)
-            if (tuples == null) {
+            if (tuples == null)
+            {
                 throw new ArgumentNullException("tuples is a required property for ReadResponse and cannot be null");
             }
             this.Tuples = tuples;
             // to ensure "continuationToken" is required (not null)
-            if (continuationToken == null) {
+            if (continuationToken == null)
+            {
                 throw new ArgumentNullException("continuationToken is a required property for ReadResponse and cannot be null");
             }
             this.ContinuationToken = continuationToken;
@@ -81,7 +89,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -98,7 +107,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((ReadResponse)input);
         }
@@ -108,17 +118,19 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of ReadResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ReadResponse input) {
-            if (input == null) {
+        public bool Equals(ReadResponse input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.Tuples == input.Tuples ||
                     this.Tuples != null &&
                     input.Tuples != null &&
                     this.Tuples.SequenceEqual(input.Tuples)
-                ) &&
+                ) && 
                 (
                     this.ContinuationToken == input.ContinuationToken ||
                     (this.ContinuationToken != null &&
@@ -131,17 +143,21 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Tuples != null) {
+                if (this.Tuples != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Tuples.GetHashCode();
                 }
-                if (this.ContinuationToken != null) {
+                if (this.ContinuationToken != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.ContinuationToken.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -153,7 +169,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

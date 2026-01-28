@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// Condition
     /// </summary>
     [DataContract(Name = "Condition")]
-    public partial class Condition : IEquatable<Condition>, IValidatableObject {
+    public partial class Condition : IEquatable<Condition>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="Condition" /> class.
         /// </summary>
         [JsonConstructor]
-        public Condition() {
+        public Condition()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -41,14 +46,17 @@ namespace OpenFga.Sdk.Model {
         /// <param name="expression">A Google CEL expression, expressed as a string. (required).</param>
         /// <param name="parameters">A map of parameter names to the parameter&#39;s defined type reference..</param>
         /// <param name="metadata">metadata.</param>
-        public Condition(string name = default, string expression = default, Dictionary<string, ConditionParamTypeRef> parameters = default, ConditionMetadata metadata = default) {
+        public Condition(string name = default, string expression = default, Dictionary<string, ConditionParamTypeRef> parameters = default, ConditionMetadata metadata = default)
+        {
             // to ensure "name" is required (not null)
-            if (name == null) {
+            if (name == null)
+            {
                 throw new ArgumentNullException("name is a required property for Condition and cannot be null");
             }
             this.Name = name;
             // to ensure "expression" is required (not null)
-            if (expression == null) {
+            if (expression == null)
+            {
                 throw new ArgumentNullException("expression is a required property for Condition and cannot be null");
             }
             this.Expression = expression;
@@ -102,7 +110,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -119,7 +128,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((Condition)input);
         }
@@ -129,27 +139,29 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of Condition to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Condition input) {
-            if (input == null) {
+        public bool Equals(Condition input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.Name == input.Name ||
                     (this.Name != null &&
                     this.Name.Equals(input.Name))
-                ) &&
+                ) && 
                 (
                     this.Expression == input.Expression ||
                     (this.Expression != null &&
                     this.Expression.Equals(input.Expression))
-                ) &&
+                ) && 
                 (
                     this.Parameters == input.Parameters ||
                     this.Parameters != null &&
                     input.Parameters != null &&
                     this.Parameters.SequenceEqual(input.Parameters)
-                ) &&
+                ) && 
                 (
                     this.Metadata == input.Metadata ||
                     (this.Metadata != null &&
@@ -162,23 +174,29 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Name != null) {
+                if (this.Name != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Name.GetHashCode();
                 }
-                if (this.Expression != null) {
+                if (this.Expression != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Expression.GetHashCode();
                 }
-                if (this.Parameters != null) {
+                if (this.Parameters != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Parameters.GetHashCode();
                 }
-                if (this.Metadata != null) {
+                if (this.Metadata != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Metadata.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -190,7 +208,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

@@ -11,27 +11,32 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// WriteRequestWrites
     /// </summary>
     [DataContract(Name = "WriteRequestWrites")]
-    public partial class WriteRequestWrites : IEquatable<WriteRequestWrites>, IValidatableObject {
+    public partial class WriteRequestWrites : IEquatable<WriteRequestWrites>, IValidatableObject
+    {
         /// <summary>
         /// On &#39;error&#39; ( or unspecified ), the API returns an error if an identical tuple already exists. On &#39;ignore&#39;, identical writes are treated as no-ops (matching on user, relation, object, and RelationshipCondition).
         /// </summary>
         /// <value>On &#39;error&#39; ( or unspecified ), the API returns an error if an identical tuple already exists. On &#39;ignore&#39;, identical writes are treated as no-ops (matching on user, relation, object, and RelationshipCondition).</value>
         [JsonConverter(typeof(JsonStringEnumMemberConverter<OnDuplicateEnum>))]
-        public enum OnDuplicateEnum {
+        public enum OnDuplicateEnum
+        {
             /// <summary>
             /// Enum Error for value: error
             /// </summary>
@@ -58,7 +63,8 @@ namespace OpenFga.Sdk.Model {
         /// Initializes a new instance of the <see cref="WriteRequestWrites" /> class.
         /// </summary>
         [JsonConstructor]
-        public WriteRequestWrites() {
+        public WriteRequestWrites()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -67,9 +73,11 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="tupleKeys">tupleKeys (required).</param>
         /// <param name="onDuplicate">On &#39;error&#39; ( or unspecified ), the API returns an error if an identical tuple already exists. On &#39;ignore&#39;, identical writes are treated as no-ops (matching on user, relation, object, and RelationshipCondition). (default to OnDuplicateEnum.Error).</param>
-        public WriteRequestWrites(List<TupleKey> tupleKeys = default, OnDuplicateEnum? onDuplicate = OnDuplicateEnum.Error) {
+        public WriteRequestWrites(List<TupleKey> tupleKeys = default, OnDuplicateEnum? onDuplicate = OnDuplicateEnum.Error)
+        {
             // to ensure "tupleKeys" is required (not null)
-            if (tupleKeys == null) {
+            if (tupleKeys == null)
+            {
                 throw new ArgumentNullException("tupleKeys is a required property for WriteRequestWrites and cannot be null");
             }
             this.TupleKeys = tupleKeys;
@@ -96,7 +104,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -113,7 +122,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((WriteRequestWrites)input);
         }
@@ -123,17 +133,19 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of WriteRequestWrites to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(WriteRequestWrites input) {
-            if (input == null) {
+        public bool Equals(WriteRequestWrites input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.TupleKeys == input.TupleKeys ||
                     this.TupleKeys != null &&
                     input.TupleKeys != null &&
                     this.TupleKeys.SequenceEqual(input.TupleKeys)
-                ) &&
+                ) && 
                 (
                     this.OnDuplicate == input.OnDuplicate ||
                     this.OnDuplicate.Equals(input.OnDuplicate)
@@ -145,15 +157,18 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.TupleKeys != null) {
+                if (this.TupleKeys != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.TupleKeys.GetHashCode();
                 }
                 hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.OnDuplicate.GetHashCode();
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -165,7 +180,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

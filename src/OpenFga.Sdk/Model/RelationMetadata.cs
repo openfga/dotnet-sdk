@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// RelationMetadata
     /// </summary>
     [DataContract(Name = "RelationMetadata")]
-    public partial class RelationMetadata : IEquatable<RelationMetadata>, IValidatableObject {
+    public partial class RelationMetadata : IEquatable<RelationMetadata>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationMetadata" /> class.
         /// </summary>
         [JsonConstructor]
-        public RelationMetadata() {
+        public RelationMetadata()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -40,7 +45,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="directlyRelatedUserTypes">directlyRelatedUserTypes.</param>
         /// <param name="module">module.</param>
         /// <param name="sourceInfo">sourceInfo.</param>
-        public RelationMetadata(List<RelationReference> directlyRelatedUserTypes = default, string module = default, SourceInfo sourceInfo = default) {
+        public RelationMetadata(List<RelationReference> directlyRelatedUserTypes = default, string module = default, SourceInfo sourceInfo = default)
+        {
             this.DirectlyRelatedUserTypes = directlyRelatedUserTypes;
             this.Module = module;
             this.SourceInfo = sourceInfo;
@@ -82,7 +88,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -99,7 +106,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((RelationMetadata)input);
         }
@@ -109,22 +117,24 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of RelationMetadata to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(RelationMetadata input) {
-            if (input == null) {
+        public bool Equals(RelationMetadata input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.DirectlyRelatedUserTypes == input.DirectlyRelatedUserTypes ||
                     this.DirectlyRelatedUserTypes != null &&
                     input.DirectlyRelatedUserTypes != null &&
                     this.DirectlyRelatedUserTypes.SequenceEqual(input.DirectlyRelatedUserTypes)
-                ) &&
+                ) && 
                 (
                     this.Module == input.Module ||
                     (this.Module != null &&
                     this.Module.Equals(input.Module))
-                ) &&
+                ) && 
                 (
                     this.SourceInfo == input.SourceInfo ||
                     (this.SourceInfo != null &&
@@ -137,20 +147,25 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.DirectlyRelatedUserTypes != null) {
+                if (this.DirectlyRelatedUserTypes != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.DirectlyRelatedUserTypes.GetHashCode();
                 }
-                if (this.Module != null) {
+                if (this.Module != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Module.GetHashCode();
                 }
-                if (this.SourceInfo != null) {
+                if (this.SourceInfo != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.SourceInfo.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -162,7 +177,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

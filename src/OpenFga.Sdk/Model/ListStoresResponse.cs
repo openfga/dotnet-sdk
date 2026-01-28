@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// ListStoresResponse
     /// </summary>
     [DataContract(Name = "ListStoresResponse")]
-    public partial class ListStoresResponse : IEquatable<ListStoresResponse>, IValidatableObject {
+    public partial class ListStoresResponse : IEquatable<ListStoresResponse>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="ListStoresResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public ListStoresResponse() {
+        public ListStoresResponse()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -39,14 +44,17 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="stores">stores (required).</param>
         /// <param name="continuationToken">The continuation token will be empty if there are no more stores. (required).</param>
-        public ListStoresResponse(List<Store> stores = default, string continuationToken = default) {
+        public ListStoresResponse(List<Store> stores = default, string continuationToken = default)
+        {
             // to ensure "stores" is required (not null)
-            if (stores == null) {
+            if (stores == null)
+            {
                 throw new ArgumentNullException("stores is a required property for ListStoresResponse and cannot be null");
             }
             this.Stores = stores;
             // to ensure "continuationToken" is required (not null)
-            if (continuationToken == null) {
+            if (continuationToken == null)
+            {
                 throw new ArgumentNullException("continuationToken is a required property for ListStoresResponse and cannot be null");
             }
             this.ContinuationToken = continuationToken;
@@ -81,7 +89,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -98,7 +107,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((ListStoresResponse)input);
         }
@@ -108,17 +118,19 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of ListStoresResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ListStoresResponse input) {
-            if (input == null) {
+        public bool Equals(ListStoresResponse input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.Stores == input.Stores ||
                     this.Stores != null &&
                     input.Stores != null &&
                     this.Stores.SequenceEqual(input.Stores)
-                ) &&
+                ) && 
                 (
                     this.ContinuationToken == input.ContinuationToken ||
                     (this.ContinuationToken != null &&
@@ -131,17 +143,21 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Stores != null) {
+                if (this.Stores != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Stores.GetHashCode();
                 }
-                if (this.ContinuationToken != null) {
+                if (this.ContinuationToken != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.ContinuationToken.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -153,7 +169,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

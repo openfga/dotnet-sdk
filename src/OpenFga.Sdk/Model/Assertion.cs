@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// Assertion
     /// </summary>
     [DataContract(Name = "Assertion")]
-    public partial class Assertion : IEquatable<Assertion>, IValidatableObject {
+    public partial class Assertion : IEquatable<Assertion>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="Assertion" /> class.
         /// </summary>
         [JsonConstructor]
-        public Assertion() {
+        public Assertion()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -41,9 +46,11 @@ namespace OpenFga.Sdk.Model {
         /// <param name="expectation">expectation (required).</param>
         /// <param name="contextualTuples">contextualTuples.</param>
         /// <param name="context">Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation..</param>
-        public Assertion(AssertionTupleKey tupleKey = default, bool expectation = default, List<TupleKey> contextualTuples = default, Object context = default) {
+        public Assertion(AssertionTupleKey tupleKey = default, bool expectation = default, List<TupleKey> contextualTuples = default, Object context = default)
+        {
             // to ensure "tupleKey" is required (not null)
-            if (tupleKey == null) {
+            if (tupleKey == null)
+            {
                 throw new ArgumentNullException("tupleKey is a required property for Assertion and cannot be null");
             }
             this.TupleKey = tupleKey;
@@ -97,7 +104,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -114,7 +122,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((Assertion)input);
         }
@@ -124,26 +133,28 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of Assertion to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Assertion input) {
-            if (input == null) {
+        public bool Equals(Assertion input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.TupleKey == input.TupleKey ||
                     (this.TupleKey != null &&
                     this.TupleKey.Equals(input.TupleKey))
-                ) &&
+                ) && 
                 (
                     this.Expectation == input.Expectation ||
                     this.Expectation.Equals(input.Expectation)
-                ) &&
+                ) && 
                 (
                     this.ContextualTuples == input.ContextualTuples ||
                     this.ContextualTuples != null &&
                     input.ContextualTuples != null &&
                     this.ContextualTuples.SequenceEqual(input.ContextualTuples)
-                ) &&
+                ) && 
                 (
                     this.Context == input.Context ||
                     (this.Context != null &&
@@ -156,21 +167,26 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.TupleKey != null) {
+                if (this.TupleKey != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.TupleKey.GetHashCode();
                 }
                 hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Expectation.GetHashCode();
-                if (this.ContextualTuples != null) {
+                if (this.ContextualTuples != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.ContextualTuples.GetHashCode();
                 }
-                if (this.Context != null) {
+                if (this.Context != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Context.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -182,7 +198,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             yield break;
         }
 

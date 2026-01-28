@@ -11,26 +11,31 @@
 //
 
 
-using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OpenFga.Sdk.Model {
+
+using OpenFga.Sdk.Constants;
+
+namespace OpenFga.Sdk.Model
+{
     /// <summary>
     /// ReadRequestTupleKey
     /// </summary>
     [DataContract(Name = "ReadRequestTupleKey")]
-    public partial class ReadRequestTupleKey : IEquatable<ReadRequestTupleKey>, IValidatableObject {
+    public partial class ReadRequestTupleKey : IEquatable<ReadRequestTupleKey>, IValidatableObject
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadRequestTupleKey" /> class.
         /// </summary>
         [JsonConstructor]
-        public ReadRequestTupleKey() {
+        public ReadRequestTupleKey()
+        {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -40,7 +45,8 @@ namespace OpenFga.Sdk.Model {
         /// <param name="user">user.</param>
         /// <param name="relation">relation.</param>
         /// <param name="varObject">varObject.</param>
-        public ReadRequestTupleKey(string user = default, string relation = default, string varObject = default) {
+        public ReadRequestTupleKey(string user = default, string relation = default, string varObject = default)
+        {
             this.User = user;
             this.Relation = relation;
             this.Object = varObject;
@@ -82,7 +88,8 @@ namespace OpenFga.Sdk.Model {
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson() {
+        public virtual string ToJson()
+        {
             return JsonSerializer.Serialize(this);
         }
 
@@ -99,7 +106,8 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input) {
+        public override bool Equals(object input)
+        {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((ReadRequestTupleKey)input);
         }
@@ -109,21 +117,23 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="input">Instance of ReadRequestTupleKey to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ReadRequestTupleKey input) {
-            if (input == null) {
+        public bool Equals(ReadRequestTupleKey input)
+        {
+            if (input == null)
+            {
                 return false;
             }
-            return
+            return 
                 (
                     this.User == input.User ||
                     (this.User != null &&
                     this.User.Equals(input.User))
-                ) &&
+                ) && 
                 (
                     this.Relation == input.Relation ||
                     (this.Relation != null &&
                     this.Relation.Equals(input.Relation))
-                ) &&
+                ) && 
                 (
                     this.Object == input.Object ||
                     (this.Object != null &&
@@ -136,20 +146,25 @@ namespace OpenFga.Sdk.Model {
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.User != null) {
+                if (this.User != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.User.GetHashCode();
                 }
-                if (this.Relation != null) {
+                if (this.Relation != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Relation.GetHashCode();
                 }
-                if (this.Object != null) {
+                if (this.Object != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Object.GetHashCode();
                 }
-                if (this.AdditionalProperties != null) {
+                if (this.AdditionalProperties != null)
+                {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -161,20 +176,24 @@ namespace OpenFga.Sdk.Model {
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
+        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
+        {
             // User (string) maxLength
-            if (this.User != null && this.User.Length > 512) {
-                yield return new ValidationResult("Invalid value for User, length must be less than 512.", new[] { "User" });
+            if (this.User != null && this.User.Length > 512)
+            {
+                yield return new System.ComponentModel.DataAnnotations.ValidationResult("Invalid value for User, length must be less than 512.", new [] { "User" });
             }
 
             // Relation (string) maxLength
-            if (this.Relation != null && this.Relation.Length > 50) {
-                yield return new ValidationResult("Invalid value for Relation, length must be less than 50.", new[] { "Relation" });
+            if (this.Relation != null && this.Relation.Length > 50)
+            {
+                yield return new System.ComponentModel.DataAnnotations.ValidationResult("Invalid value for Relation, length must be less than 50.", new [] { "Relation" });
             }
 
             // Object (string) maxLength
-            if (this.Object != null && this.Object.Length > 256) {
-                yield return new ValidationResult("Invalid value for Object, length must be less than 256.", new[] { "Object" });
+            if (this.Object != null && this.Object.Length > 256)
+            {
+                yield return new System.ComponentModel.DataAnnotations.ValidationResult("Invalid value for Object, length must be less than 256.", new [] { "Object" });
             }
 
             yield break;
