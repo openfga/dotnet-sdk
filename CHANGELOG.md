@@ -3,14 +3,8 @@
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.9.0...HEAD)
 
 ### Added
-- feat: add support for [StreamedListObjects](https://openfga.dev/api/service#/Relationship%20Queries/StreamedListObjects). See [documentation](#streamed-list-objects)
-- feat: add API Executor for making custom API requests
-  - New `ApiExecutor` class accessible via `client.ApiExecutor()` method
-  - Fluent `ApiExecutorRequestBuilder` for constructing requests
-  - `ApiResponse<T>` wrapper providing both raw and typed responses
-  - Automatically leverages SDK authentication, retry logic, and error handling
-  - Supports custom headers, path parameters, query parameters, and request bodies
-  - See [Calling Other API Endpoints documentation](README.md#calling-other-api-endpoints) for usage examples
+- feat: add StreamedListObjects API support
+- feat: add ApiExecutor for custom API requests with fluent builder pattern
 
 ## v0.9.0
 
