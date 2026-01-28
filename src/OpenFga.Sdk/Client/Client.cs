@@ -22,6 +22,7 @@ namespace OpenFga.Sdk.Client;
 public class OpenFgaClient : IOpenFgaClient, IDisposable {
     private readonly ClientConfiguration _configuration;
     protected OpenFgaApi api;
+    private ApiExecutor.ApiExecutor? _apiExecutor;
 
     public OpenFgaClient(
         ClientConfiguration configuration,
@@ -44,7 +45,25 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
         set => _configuration.AuthorizationModelId = value;
     }
 
-    public void Dispose() => api.Dispose();
+    /// <summary>
+    /// Gets the ApiExecutor for making custom API requests.
+    /// The ApiExecutor allows you to call arbitrary OpenFGA API endpoints while
+    /// automatically leveraging the SDK's authentication, retry logic, and error handling.
+    /// </summary>
+    /// <returns>An ApiExecutor instance</returns>
+    public ApiExecutor.ApiExecutor ApiExecutor() {
+        if (_apiExecutor == null) {
+            _apiExecutor = new ApiExecutor.ApiExecutor(
+                api.ApiClientInternal,
+                _configuration);
+        }
+        return _apiExecutor;
+    }
+
+    public void Dispose() {
+        _apiExecutor?.Dispose();
+        api.Dispose();
+    }
 
 #if NET6_0_OR_GREATER
     private async Task ProcessWriteChunksAsync<T>(

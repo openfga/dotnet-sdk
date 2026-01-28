@@ -113,6 +113,46 @@ public class ApiClient : IDisposable {
     }
 
     /// <summary>
+    ///     Internal method that returns the full ResponseWrapper including raw response.
+    ///     Used by ApiExecutor to provide both raw and typed response data.
+    /// </summary>
+    /// <param name="requestBuilder"></param>
+    /// <param name="apiName"></param>
+    /// <param name="additionalHeaders">Additional headers to merge with auth headers</param>
+    /// <param name="cancellationToken"></param>
+    /// <typeparam name="TReq">Request Type</typeparam>
+    /// <typeparam name="TRes">Response Type</typeparam>
+    /// <returns>The full ResponseWrapper with raw response and deserialized content</returns>
+    /// <exception cref="FgaApiAuthenticationError"></exception>
+    internal async Task<ResponseWrapper<TRes>> SendRequestWithWrapperAsync<TReq, TRes>(
+        RequestBuilder<TReq> requestBuilder,
+        string apiName,
+        IDictionary<string, string>? additionalHeaders = null,
+        CancellationToken cancellationToken = default) {
+        var sw = Stopwatch.StartNew();
+
+        var authToken = await GetAuthenticationTokenAsync(apiName);
+        var mergedHeaders = BuildHeaders(_configuration, authToken, null);
+
+        // Merge additional headers (from ApiExecutor) with auth headers
+        if (additionalHeaders != null) {
+            foreach (var header in additionalHeaders) {
+                mergedHeaders[header.Key] = header.Value;
+            }
+        }
+
+        var response = await Retry(async () =>
+            await _baseClient.SendRequestAsync<TReq, TRes>(requestBuilder, mergedHeaders, apiName,
+                cancellationToken));
+
+        sw.Stop();
+        metrics.BuildForResponse(apiName, response.rawResponse, requestBuilder, sw,
+            response.retryCount);
+
+        return response;
+    }
+
+    /// <summary>
     ///     Handles getting the access token, calling the API, and potentially retrying (use for requests that return no
     ///     content)
     /// </summary>

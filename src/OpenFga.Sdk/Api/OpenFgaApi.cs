@@ -28,6 +28,11 @@ public class OpenFgaApi : IDisposable {
     private readonly Configuration.Configuration _configuration;
 
     /// <summary>
+    ///     Exposes the internal ApiClient for use by ApiExecutor.
+    /// </summary>
+    internal ApiClient.ApiClient ApiClientInternal => _apiClient;
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="OpenFgaApi"/> class.
     /// </summary>
     /// <param name="configuration"></param>
