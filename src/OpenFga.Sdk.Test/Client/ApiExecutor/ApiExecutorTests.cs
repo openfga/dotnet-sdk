@@ -3,6 +3,7 @@ using Moq.Protected;
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.ApiExecutor;
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
 using System;
@@ -397,9 +398,9 @@ public class ApiExecutorTests : IDisposable {
         var config = new ClientConfiguration {
             ApiUrl = _apiUrl,
             StoreId = _storeId,
-            Credentials = new Credentials.Credentials {
-                Method = Credentials.CredentialsMethod.ApiToken,
-                Config = new Credentials.CredentialsConfig {
+            Credentials = new Credentials {
+                Method = CredentialsMethod.ApiToken,
+                Config = new CredentialsConfig {
                     ApiToken = "test-token-123"
                 }
             }
