@@ -102,10 +102,10 @@ public class ApiExecutor : IDisposable {
             requestBuilder,
             "ApiExecutor",
             customHeaders,
-            cancellationToken);
+            cancellationToken).ConfigureAwait(false);
 
         // Read the raw response body
-        var rawResponse = await responseWrapper.rawResponse.Content.ReadAsStringAsync();
+        var rawResponse = await responseWrapper.rawResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         // Create and return ApiResponse with raw JSON as both RawResponse and Data
         return ApiResponse<string>.FromHttpResponse(

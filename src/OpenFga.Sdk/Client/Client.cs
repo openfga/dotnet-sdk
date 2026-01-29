@@ -22,7 +22,7 @@ namespace OpenFga.Sdk.Client;
 public class OpenFgaClient : IOpenFgaClient, IDisposable {
     private readonly ClientConfiguration _configuration;
     protected OpenFgaApi api;
-    private ApiExecutor.ApiExecutor? _apiExecutor;
+    private readonly Lazy<ApiExecutor.ApiExecutor> _apiExecutor;
 
     public OpenFgaClient(
         ClientConfiguration configuration,
@@ -31,6 +31,9 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
         configuration.EnsureValid();
         _configuration = configuration;
         api = new OpenFgaApi(_configuration, httpClient);
+        _apiExecutor = new Lazy<ApiExecutor.ApiExecutor>(() => new ApiExecutor.ApiExecutor(
+            api.ApiClientInternal,
+            _configuration));
     }
 
     /// <inheritdoc />
@@ -52,16 +55,13 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
     /// </summary>
     /// <returns>An ApiExecutor instance</returns>
     public ApiExecutor.ApiExecutor ApiExecutor() {
-        if (_apiExecutor == null) {
-            _apiExecutor = new ApiExecutor.ApiExecutor(
-                api.ApiClientInternal,
-                _configuration);
-        }
-        return _apiExecutor;
+        return _apiExecutor.Value;
     }
 
     public void Dispose() {
-        _apiExecutor?.Dispose();
+        if (_apiExecutor.IsValueCreated) {
+            _apiExecutor.Value?.Dispose();
+        }
         api.Dispose();
     }
 

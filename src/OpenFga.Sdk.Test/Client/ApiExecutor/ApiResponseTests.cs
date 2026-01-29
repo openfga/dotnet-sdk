@@ -138,7 +138,7 @@ public class ApiResponseTests {
     [Fact]
     public void FromHttpResponse_WithNullData_StoresNull() {
         // Arrange
-        var httpResponse = new HttpResponseMessage {
+        using var httpResponse = new HttpResponseMessage {
             StatusCode = HttpStatusCode.NoContent
         };
 

@@ -4,7 +4,7 @@
 
 ### Added
 - feat: add StreamedListObjects API support
-- feat: add ApiExecutor for custom API requests with fluent builder pattern
+- feat: add ApiExecutor for raw requests
 
 ## v0.9.0
 

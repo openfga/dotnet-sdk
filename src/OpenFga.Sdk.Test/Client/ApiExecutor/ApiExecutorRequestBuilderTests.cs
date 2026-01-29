@@ -269,10 +269,10 @@ public class ApiExecutorRequestBuilderTests {
         Assert.Equal(HttpMethod.Post, requestBuilder.Method);
         Assert.Equal("https://api.fga.example", requestBuilder.BasePath);
         Assert.Equal("/stores/{store_id}/check", requestBuilder.PathTemplate);
-        Assert.True(requestBuilder.PathParameters.ContainsKey("store_id"));
-        Assert.Equal("store123", requestBuilder.PathParameters["store_id"]);
-        Assert.True(requestBuilder.QueryParameters.ContainsKey("page_size"));
-        Assert.Equal("20", requestBuilder.QueryParameters["page_size"]);
+        Assert.True(requestBuilder.PathParameters.TryGetValue("store_id", out var storeIdValue));
+        Assert.Equal("store123", storeIdValue);
+        Assert.True(requestBuilder.QueryParameters.TryGetValue("page_size", out var pageSizeValue));
+        Assert.Equal("20", pageSizeValue);
         Assert.NotNull(requestBuilder.Body);
     }
 

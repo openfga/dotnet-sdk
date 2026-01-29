@@ -7,6 +7,7 @@ using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
@@ -506,15 +507,10 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
         Assert.NotEmpty(response.Data.Tuples);
 
         // Verify the tuple we wrote is present
-        var foundTuple = false;
-        foreach (var tuple in response.Data.Tuples) {
-            if (tuple.Key.User == "user:charlie" &&
-                tuple.Key.Relation == "reader" &&
-                tuple.Key.Object == "document:plan") {
-                foundTuple = true;
-                break;
-            }
-        }
+        var foundTuple = response.Data.Tuples.Any(tuple =>
+            tuple.Key.User == "user:charlie" &&
+            tuple.Key.Relation == "reader" &&
+            tuple.Key.Object == "document:plan");
         Assert.True(foundTuple, "Should find the tuple we wrote");
 
         // Clean up
