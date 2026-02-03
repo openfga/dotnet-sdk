@@ -381,7 +381,7 @@ public class ApiExecutorTests : IDisposable {
     [Fact]
     public async Task SendAsync_WithCredentials_IncludesAuthorizationHeader() {
         // Arrange
-        using var responseMessage = new HttpResponseMessage {
+        var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("{}", Encoding.UTF8, "application/json")
         };
