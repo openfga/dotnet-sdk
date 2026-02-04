@@ -89,10 +89,10 @@ public class ApiResponseTests {
         var response = ApiResponse<object>.FromHttpResponse(httpResponse, rawResponse, data);
 
         // Assert
-        Assert.True(response.Headers.ContainsKey("X-Request-Id"));
-        Assert.Equal("req-123", response.Headers["X-Request-Id"].First());
-        Assert.True(response.Headers.ContainsKey("X-Trace-Id"));
-        Assert.Equal("trace-456", response.Headers["X-Trace-Id"].First());
+        Assert.True(response.Headers.TryGetValue("X-Request-Id", out var requestId));
+        Assert.Equal("req-123", requestId.First());
+        Assert.True(response.Headers.TryGetValue("X-Trace-Id", out var traceId));
+        Assert.Equal("trace-456", traceId.First());
     }
 
     [Fact]
@@ -110,8 +110,8 @@ public class ApiResponseTests {
         var response = ApiResponse<object>.FromHttpResponse(httpResponse, rawResponse, data);
 
         // Assert
-        Assert.True(response.Headers.ContainsKey("Content-Type"));
-        Assert.Contains("application/json", response.Headers["Content-Type"].First());
+        Assert.True(response.Headers.TryGetValue("Content-Type", out var contentType));
+        Assert.Contains("application/json", contentType.First());
     }
 
     [Fact]
