@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// AssertionTupleKey
     /// </summary>
     [DataContract(Name = "AssertionTupleKey")]
-    public partial class AssertionTupleKey : IEquatable<AssertionTupleKey>, IValidatableObject
-    {
+    public partial class AssertionTupleKey : IEquatable<AssertionTupleKey>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="AssertionTupleKey" /> class.
         /// </summary>
         [JsonConstructor]
-        public AssertionTupleKey()
-        {
+        public AssertionTupleKey() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -45,23 +40,19 @@ namespace OpenFga.Sdk.Model
         /// <param name="varObject">varObject (required).</param>
         /// <param name="relation">relation (required).</param>
         /// <param name="user">user (required).</param>
-        public AssertionTupleKey(string varObject = default, string relation = default, string user = default)
-        {
+        public AssertionTupleKey(string varObject = default, string relation = default, string user = default) {
             // to ensure "varObject" is required (not null)
-            if (varObject == null)
-            {
+            if (varObject == null) {
                 throw new ArgumentNullException("varObject is a required property for AssertionTupleKey and cannot be null");
             }
             this.Object = varObject;
             // to ensure "relation" is required (not null)
-            if (relation == null)
-            {
+            if (relation == null) {
                 throw new ArgumentNullException("relation is a required property for AssertionTupleKey and cannot be null");
             }
             this.Relation = relation;
             // to ensure "user" is required (not null)
-            if (user == null)
-            {
+            if (user == null) {
                 throw new ArgumentNullException("user is a required property for AssertionTupleKey and cannot be null");
             }
             this.User = user;
@@ -103,8 +94,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -121,8 +111,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((AssertionTupleKey)input);
         }
@@ -132,23 +121,21 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of AssertionTupleKey to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(AssertionTupleKey input)
-        {
-            if (input == null)
-            {
+        public bool Equals(AssertionTupleKey input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Object == input.Object ||
                     (this.Object != null &&
                     this.Object.Equals(input.Object))
-                ) && 
+                ) &&
                 (
                     this.Relation == input.Relation ||
                     (this.Relation != null &&
                     this.Relation.Equals(input.Relation))
-                ) && 
+                ) &&
                 (
                     this.User == input.User ||
                     (this.User != null &&
@@ -161,25 +148,20 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Object != null)
-                {
+                if (this.Object != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Object.GetHashCode();
                 }
-                if (this.Relation != null)
-                {
+                if (this.Relation != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Relation.GetHashCode();
                 }
-                if (this.User != null)
-                {
+                if (this.User != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.User.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -191,24 +173,20 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             // Object (string) maxLength
-            if (this.Object != null && this.Object.Length > 256)
-            {
-                yield return new System.ComponentModel.DataAnnotations.ValidationResult("Invalid value for Object, length must be less than 256.", new [] { "Object" });
+            if (this.Object != null && this.Object.Length > 256) {
+                yield return new ValidationResult("Invalid value for Object, length must be less than 256.", new[] { "Object" });
             }
 
             // Relation (string) maxLength
-            if (this.Relation != null && this.Relation.Length > 50)
-            {
-                yield return new System.ComponentModel.DataAnnotations.ValidationResult("Invalid value for Relation, length must be less than 50.", new [] { "Relation" });
+            if (this.Relation != null && this.Relation.Length > 50) {
+                yield return new ValidationResult("Invalid value for Relation, length must be less than 50.", new[] { "Relation" });
             }
 
             // User (string) maxLength
-            if (this.User != null && this.User.Length > 512)
-            {
-                yield return new System.ComponentModel.DataAnnotations.ValidationResult("Invalid value for User, length must be less than 512.", new [] { "User" });
+            if (this.User != null && this.User.Length > 512) {
+                yield return new ValidationResult("Invalid value for User, length must be less than 512.", new[] { "User" });
             }
 
             yield break;

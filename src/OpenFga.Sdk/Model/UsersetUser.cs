@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Userset.  A set or group of users, represented in the &#x60;&lt;type&gt;:&lt;id&gt;#&lt;relation&gt;&#x60; format  &#x60;group:fga#member&#x60; represents all members of group FGA, not to be confused by &#x60;group:fga&#x60; which represents the group itself as a specific object.  See: https://openfga.dev/docs/modeling/building-blocks/usersets#what-is-a-userset
     /// </summary>
     [DataContract(Name = "UsersetUser")]
-    public partial class UsersetUser : IEquatable<UsersetUser>, IValidatableObject
-    {
+    public partial class UsersetUser : IEquatable<UsersetUser>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersetUser" /> class.
         /// </summary>
         [JsonConstructor]
-        public UsersetUser()
-        {
+        public UsersetUser() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -45,23 +40,19 @@ namespace OpenFga.Sdk.Model
         /// <param name="type">type (required).</param>
         /// <param name="id">id (required).</param>
         /// <param name="relation">relation (required).</param>
-        public UsersetUser(string type = default, string id = default, string relation = default)
-        {
+        public UsersetUser(string type = default, string id = default, string relation = default) {
             // to ensure "type" is required (not null)
-            if (type == null)
-            {
+            if (type == null) {
                 throw new ArgumentNullException("type is a required property for UsersetUser and cannot be null");
             }
             this.Type = type;
             // to ensure "id" is required (not null)
-            if (id == null)
-            {
+            if (id == null) {
                 throw new ArgumentNullException("id is a required property for UsersetUser and cannot be null");
             }
             this.Id = id;
             // to ensure "relation" is required (not null)
-            if (relation == null)
-            {
+            if (relation == null) {
                 throw new ArgumentNullException("relation is a required property for UsersetUser and cannot be null");
             }
             this.Relation = relation;
@@ -103,8 +94,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -121,8 +111,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((UsersetUser)input);
         }
@@ -132,23 +121,21 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of UsersetUser to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(UsersetUser input)
-        {
-            if (input == null)
-            {
+        public bool Equals(UsersetUser input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Type == input.Type ||
                     (this.Type != null &&
                     this.Type.Equals(input.Type))
-                ) && 
+                ) &&
                 (
                     this.Id == input.Id ||
                     (this.Id != null &&
                     this.Id.Equals(input.Id))
-                ) && 
+                ) &&
                 (
                     this.Relation == input.Relation ||
                     (this.Relation != null &&
@@ -161,25 +148,20 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Type != null)
-                {
+                if (this.Type != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Type.GetHashCode();
                 }
-                if (this.Id != null)
-                {
+                if (this.Id != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Id.GetHashCode();
                 }
-                if (this.Relation != null)
-                {
+                if (this.Relation != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Relation.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -191,8 +173,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

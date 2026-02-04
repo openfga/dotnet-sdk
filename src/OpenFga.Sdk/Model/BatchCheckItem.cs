@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// BatchCheckItem
     /// </summary>
     [DataContract(Name = "BatchCheckItem")]
-    public partial class BatchCheckItem : IEquatable<BatchCheckItem>, IValidatableObject
-    {
+    public partial class BatchCheckItem : IEquatable<BatchCheckItem>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="BatchCheckItem" /> class.
         /// </summary>
         [JsonConstructor]
-        public BatchCheckItem()
-        {
+        public BatchCheckItem() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -46,17 +41,14 @@ namespace OpenFga.Sdk.Model
         /// <param name="contextualTuples">contextualTuples.</param>
         /// <param name="context">context.</param>
         /// <param name="correlationId">correlation_id must be a string containing only letters, numbers, or hyphens, with length ≤ 36 characters. (required).</param>
-        public BatchCheckItem(CheckRequestTupleKey tupleKey = default, ContextualTupleKeys contextualTuples = default, Object context = default, string correlationId = default)
-        {
+        public BatchCheckItem(CheckRequestTupleKey tupleKey = default, ContextualTupleKeys contextualTuples = default, Object context = default, string correlationId = default) {
             // to ensure "tupleKey" is required (not null)
-            if (tupleKey == null)
-            {
+            if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for BatchCheckItem and cannot be null");
             }
             this.TupleKey = tupleKey;
             // to ensure "correlationId" is required (not null)
-            if (correlationId == null)
-            {
+            if (correlationId == null) {
                 throw new ArgumentNullException("correlationId is a required property for BatchCheckItem and cannot be null");
             }
             this.CorrelationId = correlationId;
@@ -109,8 +101,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -127,8 +118,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((BatchCheckItem)input);
         }
@@ -138,28 +128,26 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of BatchCheckItem to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(BatchCheckItem input)
-        {
-            if (input == null)
-            {
+        public bool Equals(BatchCheckItem input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.TupleKey == input.TupleKey ||
                     (this.TupleKey != null &&
                     this.TupleKey.Equals(input.TupleKey))
-                ) && 
+                ) &&
                 (
                     this.ContextualTuples == input.ContextualTuples ||
                     (this.ContextualTuples != null &&
                     this.ContextualTuples.Equals(input.ContextualTuples))
-                ) && 
+                ) &&
                 (
                     this.Context == input.Context ||
                     (this.Context != null &&
                     this.Context.Equals(input.Context))
-                ) && 
+                ) &&
                 (
                     this.CorrelationId == input.CorrelationId ||
                     (this.CorrelationId != null &&
@@ -172,29 +160,23 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.TupleKey != null)
-                {
+                if (this.TupleKey != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.TupleKey.GetHashCode();
                 }
-                if (this.ContextualTuples != null)
-                {
+                if (this.ContextualTuples != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.ContextualTuples.GetHashCode();
                 }
-                if (this.Context != null)
-                {
+                if (this.Context != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Context.GetHashCode();
                 }
-                if (this.CorrelationId != null)
-                {
+                if (this.CorrelationId != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.CorrelationId.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -206,8 +188,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

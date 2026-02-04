@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// RelationReference represents a relation of a particular object type (e.g. &#39;document#viewer&#39;).
     /// </summary>
     [DataContract(Name = "RelationReference")]
-    public partial class RelationReference : IEquatable<RelationReference>, IValidatableObject
-    {
+    public partial class RelationReference : IEquatable<RelationReference>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationReference" /> class.
         /// </summary>
         [JsonConstructor]
-        public RelationReference()
-        {
+        public RelationReference() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -46,11 +41,9 @@ namespace OpenFga.Sdk.Model
         /// <param name="relation">relation.</param>
         /// <param name="wildcard">wildcard.</param>
         /// <param name="condition">The name of a condition that is enforced over the allowed relation..</param>
-        public RelationReference(string type = default, string relation = default, Object wildcard = default, string condition = default)
-        {
+        public RelationReference(string type = default, string relation = default, Object wildcard = default, string condition = default) {
             // to ensure "type" is required (not null)
-            if (type == null)
-            {
+            if (type == null) {
                 throw new ArgumentNullException("type is a required property for RelationReference and cannot be null");
             }
             this.Type = type;
@@ -104,8 +97,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -122,8 +114,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((RelationReference)input);
         }
@@ -133,28 +124,26 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of RelationReference to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(RelationReference input)
-        {
-            if (input == null)
-            {
+        public bool Equals(RelationReference input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Type == input.Type ||
                     (this.Type != null &&
                     this.Type.Equals(input.Type))
-                ) && 
+                ) &&
                 (
                     this.Relation == input.Relation ||
                     (this.Relation != null &&
                     this.Relation.Equals(input.Relation))
-                ) && 
+                ) &&
                 (
                     this.Wildcard == input.Wildcard ||
                     (this.Wildcard != null &&
                     this.Wildcard.Equals(input.Wildcard))
-                ) && 
+                ) &&
                 (
                     this.Condition == input.Condition ||
                     (this.Condition != null &&
@@ -167,29 +156,23 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Type != null)
-                {
+                if (this.Type != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Type.GetHashCode();
                 }
-                if (this.Relation != null)
-                {
+                if (this.Relation != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Relation.GetHashCode();
                 }
-                if (this.Wildcard != null)
-                {
+                if (this.Wildcard != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Wildcard.GetHashCode();
                 }
-                if (this.Condition != null)
-                {
+                if (this.Condition != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Condition.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -201,8 +184,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

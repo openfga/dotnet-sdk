@@ -11,25 +11,21 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// CheckRequest
     /// </summary>
     [DataContract(Name = "Check_request")]
-    public partial class CheckRequest : IEquatable<CheckRequest>, IValidatableObject
-    {
+    public partial class CheckRequest : IEquatable<CheckRequest>, IValidatableObject {
 
         /// <summary>
         /// Gets or Sets Consistency
@@ -41,8 +37,7 @@ namespace OpenFga.Sdk.Model
         /// Initializes a new instance of the <see cref="CheckRequest" /> class.
         /// </summary>
         [JsonConstructor]
-        public CheckRequest()
-        {
+        public CheckRequest() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -54,11 +49,9 @@ namespace OpenFga.Sdk.Model
         /// <param name="authorizationModelId">authorizationModelId.</param>
         /// <param name="context">Additional request context that will be used to evaluate any ABAC conditions encountered in the query evaluation..</param>
         /// <param name="consistency">consistency.</param>
-        public CheckRequest(CheckRequestTupleKey tupleKey = default, ContextualTupleKeys contextualTuples = default, string authorizationModelId = default, Object context = default, ConsistencyPreference? consistency = default)
-        {
+        public CheckRequest(CheckRequestTupleKey tupleKey = default, ContextualTupleKeys contextualTuples = default, string authorizationModelId = default, Object context = default, ConsistencyPreference? consistency = default) {
             // to ensure "tupleKey" is required (not null)
-            if (tupleKey == null)
-            {
+            if (tupleKey == null) {
                 throw new ArgumentNullException("tupleKey is a required property for CheckRequest and cannot be null");
             }
             this.TupleKey = tupleKey;
@@ -106,8 +99,7 @@ namespace OpenFga.Sdk.Model
         /// Returns false as Trace should not be serialized given that it's read-only.
         /// </summary>
         /// <returns>false (boolean)</returns>
-        public bool ShouldSerializeTrace()
-        {
+        public bool ShouldSerializeTrace() {
             return false;
         }
         /// <summary>
@@ -130,8 +122,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -148,8 +139,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((CheckRequest)input);
         }
@@ -159,37 +149,35 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of CheckRequest to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(CheckRequest input)
-        {
-            if (input == null)
-            {
+        public bool Equals(CheckRequest input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.TupleKey == input.TupleKey ||
                     (this.TupleKey != null &&
                     this.TupleKey.Equals(input.TupleKey))
-                ) && 
+                ) &&
                 (
                     this.ContextualTuples == input.ContextualTuples ||
                     (this.ContextualTuples != null &&
                     this.ContextualTuples.Equals(input.ContextualTuples))
-                ) && 
+                ) &&
                 (
                     this.AuthorizationModelId == input.AuthorizationModelId ||
                     (this.AuthorizationModelId != null &&
                     this.AuthorizationModelId.Equals(input.AuthorizationModelId))
-                ) && 
+                ) &&
                 (
                     this.Trace == input.Trace ||
                     this.Trace.Equals(input.Trace)
-                ) && 
+                ) &&
                 (
                     this.Context == input.Context ||
                     (this.Context != null &&
                     this.Context.Equals(input.Context))
-                ) && 
+                ) &&
                 (
                     this.Consistency == input.Consistency ||
                     this.Consistency.Equals(input.Consistency)
@@ -201,31 +189,25 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.TupleKey != null)
-                {
+                if (this.TupleKey != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.TupleKey.GetHashCode();
                 }
-                if (this.ContextualTuples != null)
-                {
+                if (this.ContextualTuples != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.ContextualTuples.GetHashCode();
                 }
-                if (this.AuthorizationModelId != null)
-                {
+                if (this.AuthorizationModelId != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AuthorizationModelId.GetHashCode();
                 }
                 hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Trace.GetHashCode();
-                if (this.Context != null)
-                {
+                if (this.Context != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Context.GetHashCode();
                 }
                 hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Consistency.GetHashCode();
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -237,8 +219,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

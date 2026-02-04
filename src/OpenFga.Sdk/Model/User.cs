@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// User.  Represents any possible value for a user (subject or principal). Can be a: - Specific user object e.g.: &#39;user:will&#39;, &#39;folder:marketing&#39;, &#39;org:contoso&#39;, ...) - Specific userset (e.g. &#39;group:engineering#member&#39;) - Public-typed wildcard (e.g. &#39;user:*&#39;)  See https://openfga.dev/docs/concepts#what-is-a-user
     /// </summary>
     [DataContract(Name = "User")]
-    public partial class User : IEquatable<User>, IValidatableObject
-    {
+    public partial class User : IEquatable<User>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="User" /> class.
         /// </summary>
         [JsonConstructor]
-        public User()
-        {
+        public User() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -45,8 +40,7 @@ namespace OpenFga.Sdk.Model
         /// <param name="varObject">varObject.</param>
         /// <param name="userset">userset.</param>
         /// <param name="wildcard">wildcard.</param>
-        public User(FgaObject varObject = default, UsersetUser userset = default, TypedWildcard wildcard = default)
-        {
+        public User(FgaObject varObject = default, UsersetUser userset = default, TypedWildcard wildcard = default) {
             this.Object = varObject;
             this.Userset = userset;
             this.Wildcard = wildcard;
@@ -88,8 +82,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -106,8 +99,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((User)input);
         }
@@ -117,23 +109,21 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of User to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(User input)
-        {
-            if (input == null)
-            {
+        public bool Equals(User input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Object == input.Object ||
                     (this.Object != null &&
                     this.Object.Equals(input.Object))
-                ) && 
+                ) &&
                 (
                     this.Userset == input.Userset ||
                     (this.Userset != null &&
                     this.Userset.Equals(input.Userset))
-                ) && 
+                ) &&
                 (
                     this.Wildcard == input.Wildcard ||
                     (this.Wildcard != null &&
@@ -146,25 +136,20 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Object != null)
-                {
+                if (this.Object != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Object.GetHashCode();
                 }
-                if (this.Userset != null)
-                {
+                if (this.Userset != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Userset.GetHashCode();
                 }
-                if (this.Wildcard != null)
-                {
+                if (this.Wildcard != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Wildcard.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -176,8 +161,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

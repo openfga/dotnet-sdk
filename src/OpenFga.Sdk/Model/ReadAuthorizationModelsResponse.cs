@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// ReadAuthorizationModelsResponse
     /// </summary>
     [DataContract(Name = "ReadAuthorizationModelsResponse")]
-    public partial class ReadAuthorizationModelsResponse : IEquatable<ReadAuthorizationModelsResponse>, IValidatableObject
-    {
+    public partial class ReadAuthorizationModelsResponse : IEquatable<ReadAuthorizationModelsResponse>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadAuthorizationModelsResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public ReadAuthorizationModelsResponse()
-        {
+        public ReadAuthorizationModelsResponse() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -44,11 +39,9 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="authorizationModels">authorizationModels (required).</param>
         /// <param name="continuationToken">The continuation token will be empty if there are no more models..</param>
-        public ReadAuthorizationModelsResponse(List<AuthorizationModel> authorizationModels = default, string continuationToken = default)
-        {
+        public ReadAuthorizationModelsResponse(List<AuthorizationModel> authorizationModels = default, string continuationToken = default) {
             // to ensure "authorizationModels" is required (not null)
-            if (authorizationModels == null)
-            {
+            if (authorizationModels == null) {
                 throw new ArgumentNullException("authorizationModels is a required property for ReadAuthorizationModelsResponse and cannot be null");
             }
             this.AuthorizationModels = authorizationModels;
@@ -84,8 +77,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -102,8 +94,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((ReadAuthorizationModelsResponse)input);
         }
@@ -113,19 +104,17 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of ReadAuthorizationModelsResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ReadAuthorizationModelsResponse input)
-        {
-            if (input == null)
-            {
+        public bool Equals(ReadAuthorizationModelsResponse input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.AuthorizationModels == input.AuthorizationModels ||
                     this.AuthorizationModels != null &&
                     input.AuthorizationModels != null &&
                     this.AuthorizationModels.SequenceEqual(input.AuthorizationModels)
-                ) && 
+                ) &&
                 (
                     this.ContinuationToken == input.ContinuationToken ||
                     (this.ContinuationToken != null &&
@@ -138,21 +127,17 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.AuthorizationModels != null)
-                {
+                if (this.AuthorizationModels != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AuthorizationModels.GetHashCode();
                 }
-                if (this.ContinuationToken != null)
-                {
+                if (this.ContinuationToken != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.ContinuationToken.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -164,8 +149,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

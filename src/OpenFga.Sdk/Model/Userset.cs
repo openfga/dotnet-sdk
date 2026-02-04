@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Userset
     /// </summary>
     [DataContract(Name = "Userset")]
-    public partial class Userset : IEquatable<Userset>, IValidatableObject
-    {
+    public partial class Userset : IEquatable<Userset>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="Userset" /> class.
         /// </summary>
         [JsonConstructor]
-        public Userset()
-        {
+        public Userset() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -48,8 +43,7 @@ namespace OpenFga.Sdk.Model
         /// <param name="union">union.</param>
         /// <param name="intersection">intersection.</param>
         /// <param name="difference">difference.</param>
-        public Userset(Object varThis = default, ObjectRelation computedUserset = default, TupleToUserset tupleToUserset = default, Usersets union = default, Usersets intersection = default, Difference difference = default)
-        {
+        public Userset(Object varThis = default, ObjectRelation computedUserset = default, TupleToUserset tupleToUserset = default, Usersets union = default, Usersets intersection = default, Difference difference = default) {
             this.This = varThis;
             this.ComputedUserset = computedUserset;
             this.TupleToUserset = tupleToUserset;
@@ -119,8 +113,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -137,8 +130,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((Userset)input);
         }
@@ -148,38 +140,36 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of Userset to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Userset input)
-        {
-            if (input == null)
-            {
+        public bool Equals(Userset input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.This == input.This ||
                     (this.This != null &&
                     this.This.Equals(input.This))
-                ) && 
+                ) &&
                 (
                     this.ComputedUserset == input.ComputedUserset ||
                     (this.ComputedUserset != null &&
                     this.ComputedUserset.Equals(input.ComputedUserset))
-                ) && 
+                ) &&
                 (
                     this.TupleToUserset == input.TupleToUserset ||
                     (this.TupleToUserset != null &&
                     this.TupleToUserset.Equals(input.TupleToUserset))
-                ) && 
+                ) &&
                 (
                     this.Union == input.Union ||
                     (this.Union != null &&
                     this.Union.Equals(input.Union))
-                ) && 
+                ) &&
                 (
                     this.Intersection == input.Intersection ||
                     (this.Intersection != null &&
                     this.Intersection.Equals(input.Intersection))
-                ) && 
+                ) &&
                 (
                     this.Difference == input.Difference ||
                     (this.Difference != null &&
@@ -192,37 +182,29 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.This != null)
-                {
+                if (this.This != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.This.GetHashCode();
                 }
-                if (this.ComputedUserset != null)
-                {
+                if (this.ComputedUserset != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.ComputedUserset.GetHashCode();
                 }
-                if (this.TupleToUserset != null)
-                {
+                if (this.TupleToUserset != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.TupleToUserset.GetHashCode();
                 }
-                if (this.Union != null)
-                {
+                if (this.Union != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Union.GetHashCode();
                 }
-                if (this.Intersection != null)
-                {
+                if (this.Intersection != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Intersection.GetHashCode();
                 }
-                if (this.Difference != null)
-                {
+                if (this.Difference != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Difference.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -234,8 +216,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

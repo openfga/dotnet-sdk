@@ -11,25 +11,21 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Defines UnprocessableContentErrorCode
     /// </summary>
     [JsonConverter(typeof(JsonStringEnumMemberConverter<UnprocessableContentErrorCode>))]
-    public enum UnprocessableContentErrorCode
-    {
+    public enum UnprocessableContentErrorCode {
         /// <summary>
         /// Enum NoThrottledErrorCode for value: no_throttled_error_code
         /// </summary>

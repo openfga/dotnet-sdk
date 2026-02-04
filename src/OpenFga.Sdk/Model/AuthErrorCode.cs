@@ -11,25 +11,21 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Defines AuthErrorCode
     /// </summary>
     [JsonConverter(typeof(JsonStringEnumMemberConverter<AuthErrorCode>))]
-    public enum AuthErrorCode
-    {
+    public enum AuthErrorCode {
         /// <summary>
         /// Enum NoAuthError for value: no_auth_error
         /// </summary>

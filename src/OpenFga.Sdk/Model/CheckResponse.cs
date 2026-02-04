@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// CheckResponse
     /// </summary>
     [DataContract(Name = "CheckResponse")]
-    public partial class CheckResponse : IEquatable<CheckResponse>, IValidatableObject
-    {
+    public partial class CheckResponse : IEquatable<CheckResponse>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="CheckResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public CheckResponse()
-        {
+        public CheckResponse() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -44,8 +39,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="allowed">allowed.</param>
         /// <param name="resolution">For internal use only..</param>
-        public CheckResponse(bool allowed = default, string resolution = default)
-        {
+        public CheckResponse(bool allowed = default, string resolution = default) {
             this.Allowed = allowed;
             this.Resolution = resolution;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -79,8 +73,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -97,8 +90,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((CheckResponse)input);
         }
@@ -108,17 +100,15 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of CheckResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(CheckResponse input)
-        {
-            if (input == null)
-            {
+        public bool Equals(CheckResponse input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Allowed == input.Allowed ||
                     this.Allowed.Equals(input.Allowed)
-                ) && 
+                ) &&
                 (
                     this.Resolution == input.Resolution ||
                     (this.Resolution != null &&
@@ -131,18 +121,15 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
                 hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Allowed.GetHashCode();
-                if (this.Resolution != null)
-                {
+                if (this.Resolution != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Resolution.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -154,8 +141,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

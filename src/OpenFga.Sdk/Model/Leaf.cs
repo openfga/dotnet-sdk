@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// A leaf node contains either - a set of users (which may be individual users, or usersets   referencing other relations) - a computed node, which is the result of a computed userset   value in the authorization model - a tupleToUserset nodes, containing the result of expanding   a tupleToUserset value in a authorization model.
     /// </summary>
     [DataContract(Name = "Leaf")]
-    public partial class Leaf : IEquatable<Leaf>, IValidatableObject
-    {
+    public partial class Leaf : IEquatable<Leaf>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="Leaf" /> class.
         /// </summary>
         [JsonConstructor]
-        public Leaf()
-        {
+        public Leaf() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -45,8 +40,7 @@ namespace OpenFga.Sdk.Model
         /// <param name="users">users.</param>
         /// <param name="computed">computed.</param>
         /// <param name="tupleToUserset">tupleToUserset.</param>
-        public Leaf(Users users = default, Computed computed = default, UsersetTreeTupleToUserset tupleToUserset = default)
-        {
+        public Leaf(Users users = default, Computed computed = default, UsersetTreeTupleToUserset tupleToUserset = default) {
             this.Users = users;
             this.Computed = computed;
             this.TupleToUserset = tupleToUserset;
@@ -88,8 +82,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -106,8 +99,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((Leaf)input);
         }
@@ -117,23 +109,21 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of Leaf to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Leaf input)
-        {
-            if (input == null)
-            {
+        public bool Equals(Leaf input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Users == input.Users ||
                     (this.Users != null &&
                     this.Users.Equals(input.Users))
-                ) && 
+                ) &&
                 (
                     this.Computed == input.Computed ||
                     (this.Computed != null &&
                     this.Computed.Equals(input.Computed))
-                ) && 
+                ) &&
                 (
                     this.TupleToUserset == input.TupleToUserset ||
                     (this.TupleToUserset != null &&
@@ -146,25 +136,20 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Users != null)
-                {
+                if (this.Users != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Users.GetHashCode();
                 }
-                if (this.Computed != null)
-                {
+                if (this.Computed != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Computed.GetHashCode();
                 }
-                if (this.TupleToUserset != null)
-                {
+                if (this.TupleToUserset != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.TupleToUserset.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -176,8 +161,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

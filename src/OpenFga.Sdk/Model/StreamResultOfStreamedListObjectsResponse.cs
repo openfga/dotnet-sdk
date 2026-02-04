@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// StreamResultOfStreamedListObjectsResponse
     /// </summary>
     [DataContract(Name = "Stream_result_of_StreamedListObjectsResponse")]
-    public partial class StreamResultOfStreamedListObjectsResponse : IEquatable<StreamResultOfStreamedListObjectsResponse>, IValidatableObject
-    {
+    public partial class StreamResultOfStreamedListObjectsResponse : IEquatable<StreamResultOfStreamedListObjectsResponse>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="StreamResultOfStreamedListObjectsResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public StreamResultOfStreamedListObjectsResponse()
-        {
+        public StreamResultOfStreamedListObjectsResponse() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -44,8 +39,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="result">result.</param>
         /// <param name="error">error.</param>
-        public StreamResultOfStreamedListObjectsResponse(StreamedListObjectsResponse result = default, Status error = default)
-        {
+        public StreamResultOfStreamedListObjectsResponse(StreamedListObjectsResponse result = default, Status error = default) {
             this.Result = result;
             this.Error = error;
             this.AdditionalProperties = new Dictionary<string, object>();
@@ -78,8 +72,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -96,8 +89,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((StreamResultOfStreamedListObjectsResponse)input);
         }
@@ -107,18 +99,16 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of StreamResultOfStreamedListObjectsResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(StreamResultOfStreamedListObjectsResponse input)
-        {
-            if (input == null)
-            {
+        public bool Equals(StreamResultOfStreamedListObjectsResponse input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Result == input.Result ||
                     (this.Result != null &&
                     this.Result.Equals(input.Result))
-                ) && 
+                ) &&
                 (
                     this.Error == input.Error ||
                     (this.Error != null &&
@@ -131,21 +121,17 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Result != null)
-                {
+                if (this.Result != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Result.GetHashCode();
                 }
-                if (this.Error != null)
-                {
+                if (this.Error != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Error.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -157,8 +143,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

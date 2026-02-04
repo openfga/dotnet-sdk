@@ -433,7 +433,7 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
                 AuthorizationModelId = GetAuthorizationModelId(options),
                 Consistency = options?.Consistency,
             }, options, cancellationToken);
-    
+
     /// <inheritdoc />
     public async Task<ClientBatchCheckClientResponse> ClientBatchCheck(List<ClientCheckRequest> body,
         IClientBatchCheckClientOptions? options = default,

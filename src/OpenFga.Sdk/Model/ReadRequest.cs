@@ -11,25 +11,21 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// ReadRequest
     /// </summary>
     [DataContract(Name = "Read_request")]
-    public partial class ReadRequest : IEquatable<ReadRequest>, IValidatableObject
-    {
+    public partial class ReadRequest : IEquatable<ReadRequest>, IValidatableObject {
 
         /// <summary>
         /// Gets or Sets Consistency
@@ -41,8 +37,7 @@ namespace OpenFga.Sdk.Model
         /// Initializes a new instance of the <see cref="ReadRequest" /> class.
         /// </summary>
         [JsonConstructor]
-        public ReadRequest()
-        {
+        public ReadRequest() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -53,8 +48,7 @@ namespace OpenFga.Sdk.Model
         /// <param name="pageSize">pageSize.</param>
         /// <param name="continuationToken">continuationToken.</param>
         /// <param name="consistency">consistency.</param>
-        public ReadRequest(ReadRequestTupleKey tupleKey = default, int pageSize = default, string continuationToken = default, ConsistencyPreference? consistency = default)
-        {
+        public ReadRequest(ReadRequestTupleKey tupleKey = default, int pageSize = default, string continuationToken = default, ConsistencyPreference? consistency = default) {
             this.TupleKey = tupleKey;
             this.PageSize = pageSize;
             this.ContinuationToken = continuationToken;
@@ -97,8 +91,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -115,8 +108,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((ReadRequest)input);
         }
@@ -126,27 +118,25 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of ReadRequest to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ReadRequest input)
-        {
-            if (input == null)
-            {
+        public bool Equals(ReadRequest input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.TupleKey == input.TupleKey ||
                     (this.TupleKey != null &&
                     this.TupleKey.Equals(input.TupleKey))
-                ) && 
+                ) &&
                 (
                     this.PageSize == input.PageSize ||
                     this.PageSize.Equals(input.PageSize)
-                ) && 
+                ) &&
                 (
                     this.ContinuationToken == input.ContinuationToken ||
                     (this.ContinuationToken != null &&
                     this.ContinuationToken.Equals(input.ContinuationToken))
-                ) && 
+                ) &&
                 (
                     this.Consistency == input.Consistency ||
                     this.Consistency.Equals(input.Consistency)
@@ -158,23 +148,19 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.TupleKey != null)
-                {
+                if (this.TupleKey != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.TupleKey.GetHashCode();
                 }
                 hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.PageSize.GetHashCode();
-                if (this.ContinuationToken != null)
-                {
+                if (this.ContinuationToken != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.ContinuationToken.GetHashCode();
                 }
                 hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Consistency.GetHashCode();
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -186,18 +172,15 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             // PageSize (int) maximum
-            if (this.PageSize > 100)
-            {
-                yield return new System.ComponentModel.DataAnnotations.ValidationResult("Invalid value for PageSize, must be a value less than or equal to 100.", new [] { "PageSize" });
+            if (this.PageSize > 100) {
+                yield return new ValidationResult("Invalid value for PageSize, must be a value less than or equal to 100.", new[] { "PageSize" });
             }
 
             // PageSize (int) minimum
-            if (this.PageSize < 1)
-            {
-                yield return new System.ComponentModel.DataAnnotations.ValidationResult("Invalid value for PageSize, must be a value greater than or equal to 1.", new [] { "PageSize" });
+            if (this.PageSize < 1) {
+                yield return new ValidationResult("Invalid value for PageSize, must be a value greater than or equal to 1.", new[] { "PageSize" });
             }
 
             yield break;

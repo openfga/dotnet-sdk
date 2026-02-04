@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// ReadChangesResponse
     /// </summary>
     [DataContract(Name = "ReadChangesResponse")]
-    public partial class ReadChangesResponse : IEquatable<ReadChangesResponse>, IValidatableObject
-    {
+    public partial class ReadChangesResponse : IEquatable<ReadChangesResponse>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadChangesResponse" /> class.
         /// </summary>
         [JsonConstructor]
-        public ReadChangesResponse()
-        {
+        public ReadChangesResponse() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -44,11 +39,9 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="changes">changes (required).</param>
         /// <param name="continuationToken">The continuation token will be identical if there are no new changes..</param>
-        public ReadChangesResponse(List<TupleChange> changes = default, string continuationToken = default)
-        {
+        public ReadChangesResponse(List<TupleChange> changes = default, string continuationToken = default) {
             // to ensure "changes" is required (not null)
-            if (changes == null)
-            {
+            if (changes == null) {
                 throw new ArgumentNullException("changes is a required property for ReadChangesResponse and cannot be null");
             }
             this.Changes = changes;
@@ -84,8 +77,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -102,8 +94,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((ReadChangesResponse)input);
         }
@@ -113,19 +104,17 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of ReadChangesResponse to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(ReadChangesResponse input)
-        {
-            if (input == null)
-            {
+        public bool Equals(ReadChangesResponse input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Changes == input.Changes ||
                     this.Changes != null &&
                     input.Changes != null &&
                     this.Changes.SequenceEqual(input.Changes)
-                ) && 
+                ) &&
                 (
                     this.ContinuationToken == input.ContinuationToken ||
                     (this.ContinuationToken != null &&
@@ -138,21 +127,17 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Changes != null)
-                {
+                if (this.Changes != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Changes.GetHashCode();
                 }
-                if (this.ContinuationToken != null)
-                {
+                if (this.ContinuationToken != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.ContinuationToken.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -164,8 +149,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

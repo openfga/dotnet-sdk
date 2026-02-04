@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Difference
     /// </summary>
     [DataContract(Name = "Difference")]
-    public partial class Difference : IEquatable<Difference>, IValidatableObject
-    {
+    public partial class Difference : IEquatable<Difference>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="Difference" /> class.
         /// </summary>
         [JsonConstructor]
-        public Difference()
-        {
+        public Difference() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -44,17 +39,14 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="varBase">varBase (required).</param>
         /// <param name="subtract">subtract (required).</param>
-        public Difference(Userset varBase = default, Userset subtract = default)
-        {
+        public Difference(Userset varBase = default, Userset subtract = default) {
             // to ensure "varBase" is required (not null)
-            if (varBase == null)
-            {
+            if (varBase == null) {
                 throw new ArgumentNullException("varBase is a required property for Difference and cannot be null");
             }
             this.Base = varBase;
             // to ensure "subtract" is required (not null)
-            if (subtract == null)
-            {
+            if (subtract == null) {
                 throw new ArgumentNullException("subtract is a required property for Difference and cannot be null");
             }
             this.Subtract = subtract;
@@ -88,8 +80,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -106,8 +97,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((Difference)input);
         }
@@ -117,18 +107,16 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of Difference to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Difference input)
-        {
-            if (input == null)
-            {
+        public bool Equals(Difference input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Base == input.Base ||
                     (this.Base != null &&
                     this.Base.Equals(input.Base))
-                ) && 
+                ) &&
                 (
                     this.Subtract == input.Subtract ||
                     (this.Subtract != null &&
@@ -141,21 +129,17 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Base != null)
-                {
+                if (this.Base != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Base.GetHashCode();
                 }
-                if (this.Subtract != null)
-                {
+                if (this.Subtract != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Subtract.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -167,8 +151,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

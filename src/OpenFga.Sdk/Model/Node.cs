@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Node
     /// </summary>
     [DataContract(Name = "Node")]
-    public partial class Node : IEquatable<Node>, IValidatableObject
-    {
+    public partial class Node : IEquatable<Node>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="Node" /> class.
         /// </summary>
         [JsonConstructor]
-        public Node()
-        {
+        public Node() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -47,11 +42,9 @@ namespace OpenFga.Sdk.Model
         /// <param name="difference">difference.</param>
         /// <param name="union">union.</param>
         /// <param name="intersection">intersection.</param>
-        public Node(string name = default, Leaf leaf = default, UsersetTreeDifference difference = default, Nodes union = default, Nodes intersection = default)
-        {
+        public Node(string name = default, Leaf leaf = default, UsersetTreeDifference difference = default, Nodes union = default, Nodes intersection = default) {
             // to ensure "name" is required (not null)
-            if (name == null)
-            {
+            if (name == null) {
                 throw new ArgumentNullException("name is a required property for Node and cannot be null");
             }
             this.Name = name;
@@ -113,8 +106,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -131,8 +123,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((Node)input);
         }
@@ -142,33 +133,31 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of Node to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Node input)
-        {
-            if (input == null)
-            {
+        public bool Equals(Node input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Name == input.Name ||
                     (this.Name != null &&
                     this.Name.Equals(input.Name))
-                ) && 
+                ) &&
                 (
                     this.Leaf == input.Leaf ||
                     (this.Leaf != null &&
                     this.Leaf.Equals(input.Leaf))
-                ) && 
+                ) &&
                 (
                     this.Difference == input.Difference ||
                     (this.Difference != null &&
                     this.Difference.Equals(input.Difference))
-                ) && 
+                ) &&
                 (
                     this.Union == input.Union ||
                     (this.Union != null &&
                     this.Union.Equals(input.Union))
-                ) && 
+                ) &&
                 (
                     this.Intersection == input.Intersection ||
                     (this.Intersection != null &&
@@ -181,33 +170,26 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Name != null)
-                {
+                if (this.Name != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Name.GetHashCode();
                 }
-                if (this.Leaf != null)
-                {
+                if (this.Leaf != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Leaf.GetHashCode();
                 }
-                if (this.Difference != null)
-                {
+                if (this.Difference != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Difference.GetHashCode();
                 }
-                if (this.Union != null)
-                {
+                if (this.Union != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Union.GetHashCode();
                 }
-                if (this.Intersection != null)
-                {
+                if (this.Intersection != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Intersection.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -219,8 +201,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

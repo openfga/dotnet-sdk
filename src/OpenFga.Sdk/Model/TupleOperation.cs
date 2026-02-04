@@ -11,25 +11,21 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Defines TupleOperation
     /// </summary>
     [JsonConverter(typeof(JsonStringEnumMemberConverter<TupleOperation>))]
-    public enum TupleOperation
-    {
+    public enum TupleOperation {
         /// <summary>
         /// Enum TUPLEOPERATIONWRITE for value: TUPLE_OPERATION_WRITE
         /// </summary>

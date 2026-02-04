@@ -11,25 +11,21 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// BatchCheckRequest
     /// </summary>
     [DataContract(Name = "BatchCheck_request")]
-    public partial class BatchCheckRequest : IEquatable<BatchCheckRequest>, IValidatableObject
-    {
+    public partial class BatchCheckRequest : IEquatable<BatchCheckRequest>, IValidatableObject {
 
         /// <summary>
         /// Gets or Sets Consistency
@@ -41,8 +37,7 @@ namespace OpenFga.Sdk.Model
         /// Initializes a new instance of the <see cref="BatchCheckRequest" /> class.
         /// </summary>
         [JsonConstructor]
-        public BatchCheckRequest()
-        {
+        public BatchCheckRequest() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -52,11 +47,9 @@ namespace OpenFga.Sdk.Model
         /// <param name="checks">checks (required).</param>
         /// <param name="authorizationModelId">authorizationModelId.</param>
         /// <param name="consistency">consistency.</param>
-        public BatchCheckRequest(List<BatchCheckItem> checks = default, string authorizationModelId = default, ConsistencyPreference? consistency = default)
-        {
+        public BatchCheckRequest(List<BatchCheckItem> checks = default, string authorizationModelId = default, ConsistencyPreference? consistency = default) {
             // to ensure "checks" is required (not null)
-            if (checks == null)
-            {
+            if (checks == null) {
                 throw new ArgumentNullException("checks is a required property for BatchCheckRequest and cannot be null");
             }
             this.Checks = checks;
@@ -92,8 +85,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -110,8 +102,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((BatchCheckRequest)input);
         }
@@ -121,24 +112,22 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of BatchCheckRequest to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(BatchCheckRequest input)
-        {
-            if (input == null)
-            {
+        public bool Equals(BatchCheckRequest input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Checks == input.Checks ||
                     this.Checks != null &&
                     input.Checks != null &&
                     this.Checks.SequenceEqual(input.Checks)
-                ) && 
+                ) &&
                 (
                     this.AuthorizationModelId == input.AuthorizationModelId ||
                     (this.AuthorizationModelId != null &&
                     this.AuthorizationModelId.Equals(input.AuthorizationModelId))
-                ) && 
+                ) &&
                 (
                     this.Consistency == input.Consistency ||
                     this.Consistency.Equals(input.Consistency)
@@ -150,22 +139,18 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Checks != null)
-                {
+                if (this.Checks != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Checks.GetHashCode();
                 }
-                if (this.AuthorizationModelId != null)
-                {
+                if (this.AuthorizationModelId != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AuthorizationModelId.GetHashCode();
                 }
                 hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Consistency.GetHashCode();
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -177,8 +162,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

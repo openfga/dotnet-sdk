@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// A UsersetTree contains the result of an Expansion.
     /// </summary>
     [DataContract(Name = "UsersetTree")]
-    public partial class UsersetTree : IEquatable<UsersetTree>, IValidatableObject
-    {
+    public partial class UsersetTree : IEquatable<UsersetTree>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersetTree" /> class.
         /// </summary>
         [JsonConstructor]
-        public UsersetTree()
-        {
+        public UsersetTree() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -43,8 +38,7 @@ namespace OpenFga.Sdk.Model
         /// Initializes a new instance of the <see cref="UsersetTree" /> class.
         /// </summary>
         /// <param name="root">root.</param>
-        public UsersetTree(Node root = default)
-        {
+        public UsersetTree(Node root = default) {
             this.Root = root;
             this.AdditionalProperties = new Dictionary<string, object>();
         }
@@ -68,8 +62,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -86,8 +79,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((UsersetTree)input);
         }
@@ -97,13 +89,11 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of UsersetTree to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(UsersetTree input)
-        {
-            if (input == null)
-            {
+        public bool Equals(UsersetTree input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Root == input.Root ||
                     (this.Root != null &&
@@ -116,17 +106,14 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Root != null)
-                {
+                if (this.Root != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Root.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -138,8 +125,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 

@@ -11,31 +11,26 @@
 //
 
 
+using OpenFga.Sdk.Constants;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-
-using OpenFga.Sdk.Constants;
-
-namespace OpenFga.Sdk.Model
-{
+namespace OpenFga.Sdk.Model {
     /// <summary>
     /// Tuple
     /// </summary>
     [DataContract(Name = "Tuple")]
-    public partial class Tuple : IEquatable<Tuple>, IValidatableObject
-    {
+    public partial class Tuple : IEquatable<Tuple>, IValidatableObject {
         /// <summary>
         /// Initializes a new instance of the <see cref="Tuple" /> class.
         /// </summary>
         [JsonConstructor]
-        public Tuple()
-        {
+        public Tuple() {
             this.AdditionalProperties = new Dictionary<string, object>();
         }
 
@@ -44,11 +39,9 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="key">key (required).</param>
         /// <param name="timestamp">timestamp (required).</param>
-        public Tuple(TupleKey key = default, DateTime timestamp = default)
-        {
+        public Tuple(TupleKey key = default, DateTime timestamp = default) {
             // to ensure "key" is required (not null)
-            if (key == null)
-            {
+            if (key == null) {
                 throw new ArgumentNullException("key is a required property for Tuple and cannot be null");
             }
             this.Key = key;
@@ -83,8 +76,7 @@ namespace OpenFga.Sdk.Model
         /// Returns the JSON string presentation of the object
         /// </summary>
         /// <returns>JSON string presentation of the object</returns>
-        public virtual string ToJson()
-        {
+        public virtual string ToJson() {
             return JsonSerializer.Serialize(this);
         }
 
@@ -101,8 +93,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Object to be compared</param>
         /// <returns>Boolean</returns>
-        public override bool Equals(object input)
-        {
+        public override bool Equals(object input) {
             if (input == null || input.GetType() != this.GetType()) return false;
             return this.Equals((Tuple)input);
         }
@@ -112,18 +103,16 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="input">Instance of Tuple to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Tuple input)
-        {
-            if (input == null)
-            {
+        public bool Equals(Tuple input) {
+            if (input == null) {
                 return false;
             }
-            return 
+            return
                 (
                     this.Key == input.Key ||
                     (this.Key != null &&
                     this.Key.Equals(input.Key))
-                ) && 
+                ) &&
                 (
                     this.Timestamp == input.Timestamp ||
                     (this.Timestamp != null &&
@@ -136,21 +125,17 @@ namespace OpenFga.Sdk.Model
         /// Gets the hash code
         /// </summary>
         /// <returns>Hash code</returns>
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hashCode = FgaConstants.HashCodeBasePrimeNumber;
-                if (this.Key != null)
-                {
+                if (this.Key != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Key.GetHashCode();
                 }
-                if (this.Timestamp != null)
-                {
+                if (this.Timestamp != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Timestamp.GetHashCode();
                 }
-                if (this.AdditionalProperties != null)
-                {
+                if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
                 return hashCode;
@@ -162,8 +147,7 @@ namespace OpenFga.Sdk.Model
         /// </summary>
         /// <param name="validationContext">Validation context</param>
         /// <returns>Validation Result</returns>
-        public IEnumerable<System.ComponentModel.DataAnnotations.ValidationResult> Validate(ValidationContext validationContext)
-        {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) {
             yield break;
         }
 
