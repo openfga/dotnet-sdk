@@ -75,7 +75,7 @@ public class ApiResponseTests {
     [Fact]
     public void FromHttpResponse_ContainsAllResponseHeaders() {
         // Arrange
-        var httpResponse = new HttpResponseMessage {
+        using var httpResponse = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("{\"id\":\"123\"}", Encoding.UTF8, "application/json")
         };
@@ -98,7 +98,7 @@ public class ApiResponseTests {
     [Fact]
     public void FromHttpResponse_ContainsContentHeaders() {
         // Arrange
-        var httpResponse = new HttpResponseMessage {
+        using var httpResponse = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("{\"id\":\"123\"}", Encoding.UTF8, "application/json")
         };
@@ -117,7 +117,7 @@ public class ApiResponseTests {
     [Fact]
     public void Headers_AreCaseInsensitive() {
         // Arrange
-        var httpResponse = new HttpResponseMessage {
+        using var httpResponse = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("", Encoding.UTF8, "application/json")
         };

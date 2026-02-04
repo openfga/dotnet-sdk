@@ -53,7 +53,7 @@ public class ApiExecutorTests : IDisposable {
     public async Task SendAsync_ValidGetRequest_ReturnsSuccessResponse() {
         // Arrange
         var expectedResponse = new { id = _storeId, name = "test-store" };
-        var responseMessage = new HttpResponseMessage {
+        using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(
                 JsonSerializer.Serialize(expectedResponse),
@@ -72,7 +72,7 @@ public class ApiExecutorTests : IDisposable {
             .Build();
 
         // Act
-        var response = await client.ApiExecutor().SendAsync<dynamic>(request);
+        var response = await client.GetApiExecutor().SendAsync<dynamic>(request);
 
         // Assert
         Assert.NotNull(response);
@@ -88,7 +88,7 @@ public class ApiExecutorTests : IDisposable {
         // Arrange
         var requestBody = new { user = "user:anne", relation = "reader", @object = "document:2021-budget" };
         var expectedResponse = new { allowed = true };
-        var responseMessage = new HttpResponseMessage {
+        using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(
                 JsonSerializer.Serialize(expectedResponse),
@@ -96,7 +96,7 @@ public class ApiExecutorTests : IDisposable {
                 "application/json")
         };
 
-        var (client, mockHandler) = CreateMockClient(responseMessage, req =>
+        var (client, _) = CreateMockClient(responseMessage, req =>
             req.Method == HttpMethod.Post &&
             req.RequestUri.ToString().Contains("/stores/" + _storeId + "/check"));
 
@@ -107,7 +107,7 @@ public class ApiExecutorTests : IDisposable {
             .Build();
 
         // Act
-        var response = await client.ApiExecutor().SendAsync<dynamic>(request);
+        var response = await client.GetApiExecutor().SendAsync<dynamic>(request);
 
         // Assert
         Assert.NotNull(response);
@@ -119,7 +119,7 @@ public class ApiExecutorTests : IDisposable {
     [Fact]
     public async Task SendAsync_WithPathParams_ReplacesInUrl() {
         // Arrange
-        var responseMessage = new HttpResponseMessage {
+        using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("{}", Encoding.UTF8, "application/json")
         };
@@ -133,7 +133,7 @@ public class ApiExecutorTests : IDisposable {
             .Build();
 
         // Act
-        await client.ApiExecutor().SendAsync<dynamic>(request);
+        await client.GetApiExecutor().SendAsync<dynamic>(request);
 
         // Assert
         mockHandler.Protected().Verify(
@@ -148,7 +148,7 @@ public class ApiExecutorTests : IDisposable {
     [Fact]
     public async Task SendAsync_WithQueryParams_AppendsToUrl() {
         // Arrange
-        var responseMessage = new HttpResponseMessage {
+        using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("[]", Encoding.UTF8, "application/json")
         };
@@ -164,7 +164,7 @@ public class ApiExecutorTests : IDisposable {
             .Build();
 
         // Act
-        await client.ApiExecutor().SendAsync<dynamic>(request);
+        await client.GetApiExecutor().SendAsync<dynamic>(request);
 
         // Assert
         mockHandler.Protected().Verify(
@@ -180,7 +180,7 @@ public class ApiExecutorTests : IDisposable {
     [Fact]
     public async Task SendAsync_WithCustomHeaders_IncludesInRequest() {
         // Arrange
-        var responseMessage = new HttpResponseMessage {
+        using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("{}", Encoding.UTF8, "application/json")
         };
@@ -194,7 +194,7 @@ public class ApiExecutorTests : IDisposable {
             .Build();
 
         // Act
-        await client.ApiExecutor().SendAsync<dynamic>(request);
+        await client.GetApiExecutor().SendAsync<dynamic>(request);
 
         // Assert
         mockHandler.Protected().Verify(
@@ -213,7 +213,7 @@ public class ApiExecutorTests : IDisposable {
     public async Task SendAsync_WithBody_SerializesToJson() {
         // Arrange
         var requestBody = new { name = "test-store" };
-        var responseMessage = new HttpResponseMessage {
+        using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.Created,
             Content = new StringContent(
                 JsonSerializer.Serialize(new { id = "new-store-123" }),
@@ -229,7 +229,7 @@ public class ApiExecutorTests : IDisposable {
             .Build();
 
         // Act
-        await client.ApiExecutor().SendAsync<dynamic>(request);
+        await client.GetApiExecutor().SendAsync<dynamic>(request);
 
         // Assert
         mockHandler.Protected().Verify(
@@ -246,7 +246,7 @@ public class ApiExecutorTests : IDisposable {
     public async Task SendAsync_RawResponse_ReturnsJsonString() {
         // Arrange
         var expectedJson = "{\"id\":\"123\",\"name\":\"test\"}";
-        var responseMessage = new HttpResponseMessage {
+        using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(expectedJson, Encoding.UTF8, "application/json")
         };
@@ -259,7 +259,7 @@ public class ApiExecutorTests : IDisposable {
             .Build();
 
         // Act
-        var response = await client.ApiExecutor().SendAsync(request);
+        var response = await client.GetApiExecutor().SendAsync(request);
 
         // Assert
         Assert.NotNull(response);
@@ -275,7 +275,7 @@ public class ApiExecutorTests : IDisposable {
             code = "invalid_request",
             message = "Invalid request parameters"
         };
-        var responseMessage = new HttpResponseMessage {
+        using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.BadRequest,
             Content = new StringContent(
                 JsonSerializer.Serialize(errorResponse),
@@ -292,7 +292,7 @@ public class ApiExecutorTests : IDisposable {
 
         // Act & Assert
         await Assert.ThrowsAsync<FgaApiValidationError>(async () =>
-            await client.ApiExecutor().SendAsync<dynamic>(request));
+            await client.GetApiExecutor().SendAsync<dynamic>(request));
     }
 
     [Fact]
@@ -306,7 +306,7 @@ public class ApiExecutorTests : IDisposable {
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-            await client.ApiExecutor().SendAsync<dynamic>(null));
+            await client.GetApiExecutor().SendAsync<dynamic>(null));
     }
 
     [Fact]
@@ -319,8 +319,8 @@ public class ApiExecutorTests : IDisposable {
         var client = new OpenFgaClient(config);
 
         // Act
-        var executor1 = client.ApiExecutor();
-        var executor2 = client.ApiExecutor();
+        var executor1 = client.GetApiExecutor();
+        var executor2 = client.GetApiExecutor();
 
         // Assert
         Assert.Same(executor1, executor2);
@@ -332,7 +332,7 @@ public class ApiExecutorTests : IDisposable {
         var expectedResponse = new CheckResponse {
             Allowed = true
         };
-        var responseMessage = new HttpResponseMessage {
+        using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(
                 JsonSerializer.Serialize(expectedResponse),
@@ -349,7 +349,7 @@ public class ApiExecutorTests : IDisposable {
             .Build();
 
         // Act
-        var response = await client.ApiExecutor().SendAsync<CheckResponse>(request);
+        var response = await client.GetApiExecutor().SendAsync<CheckResponse>(request);
 
         // Assert
         Assert.NotNull(response);
@@ -360,7 +360,7 @@ public class ApiExecutorTests : IDisposable {
     [Fact]
     public async Task SendAsync_CancellationToken_CancelsRequest() {
         // Arrange
-        var cts = new CancellationTokenSource();
+        using var cts = new CancellationTokenSource();
         cts.Cancel(); // Cancel immediately
 
         var config = new ClientConfiguration {
@@ -375,13 +375,13 @@ public class ApiExecutorTests : IDisposable {
 
         // Act & Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            await client.ApiExecutor().SendAsync<dynamic>(request, cts.Token));
+            await client.GetApiExecutor().SendAsync<dynamic>(request, cts.Token));
     }
 
     [Fact]
     public async Task SendAsync_WithCredentials_IncludesAuthorizationHeader() {
         // Arrange
-        var responseMessage = new HttpResponseMessage {
+        using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent("{}", Encoding.UTF8, "application/json")
         };
@@ -412,7 +412,7 @@ public class ApiExecutorTests : IDisposable {
             .Build();
 
         // Act
-        await client.ApiExecutor().SendAsync<dynamic>(request);
+        await client.GetApiExecutor().SendAsync<dynamic>(request);
 
         // Assert
         mockHandler.Protected().Verify(

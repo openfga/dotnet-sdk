@@ -54,7 +54,7 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
     /// automatically leveraging the SDK's authentication, retry logic, and error handling.
     /// </summary>
     /// <returns>An ApiExecutor instance</returns>
-    public ApiExecutor.ApiExecutor ApiExecutor() {
+    public ApiExecutor.ApiExecutor GetApiExecutor() {
         return _apiExecutor.Value;
     }
 

@@ -166,9 +166,9 @@ public class ApiExecutorRequestBuilderTests {
         var builder = ApiExecutorRequestBuilder.Of(HttpMethod.Post, "/stores");
 
         // Act & Assert
-        var exception = Assert.Throws<ArgumentException>(() =>
+        var exception = Assert.Throws<ArgumentNullException>(() =>
             builder.Header(null, "value"));
-        Assert.Contains("name", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("key", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

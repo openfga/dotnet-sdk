@@ -68,7 +68,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Of(HttpMethod.Get, "/stores")
             .Build();
 
-        var response = await _fga!.ApiExecutor().SendAsync<ListStoresResponse>(request);
+        var response = await _fga!.GetApiExecutor().SendAsync<ListStoresResponse>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -79,13 +79,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
         Assert.NotEmpty(response.Data.Stores);
 
         // Verify we can find our store
-        var foundStore = false;
-        foreach (var store in response.Data.Stores) {
-            if (store.Name == storeName) {
-                foundStore = true;
-                break;
-            }
-        }
+        var foundStore = response.Data.Stores.Any(store => store.Name == storeName);
         Assert.True(foundStore, "Should find the store we created");
     }
 
@@ -107,7 +101,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Body(requestBody)
             .Build();
 
-        var response = await _fga!.ApiExecutor().SendAsync<CreateStoreResponse>(request);
+        var response = await _fga!.GetApiExecutor().SendAsync<CreateStoreResponse>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -136,7 +130,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Body(requestBody)
             .Build();
 
-        var response = await _fga!.ApiExecutor().SendAsync(request);
+        var response = await _fga!.GetApiExecutor().SendAsync(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -167,7 +161,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .PathParam("store_id", storeId)
             .Build();
 
-        var response = await _fga!.ApiExecutor().SendAsync<GetStoreResponse>(request);
+        var response = await _fga!.GetApiExecutor().SendAsync<GetStoreResponse>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -193,7 +187,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Of(HttpMethod.Get, "/stores/{store_id}")
             .Build();
 
-        var response = await _fga.ApiExecutor().SendAsync<GetStoreResponse>(request);
+        var response = await _fga.GetApiExecutor().SendAsync<GetStoreResponse>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -263,7 +257,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Body(requestBody)
             .Build();
 
-        var response = await _fga.ApiExecutor().SendAsync<WriteAuthorizationModelResponse>(request);
+        var response = await _fga.GetApiExecutor().SendAsync<WriteAuthorizationModelResponse>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -295,7 +289,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .QueryParam("page_size", "10")
             .Build();
 
-        var response = await _fga.ApiExecutor().SendAsync<ReadAuthorizationModelsResponse>(request);
+        var response = await _fga.GetApiExecutor().SendAsync<ReadAuthorizationModelsResponse>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -340,7 +334,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Body(checkBody)
             .Build();
 
-        var response = await _fga.ApiExecutor().SendAsync<CheckResponse>(request);
+        var response = await _fga.GetApiExecutor().SendAsync<CheckResponse>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -372,7 +366,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Header("X-Request-ID", "test-123")
             .Build();
 
-        var response = await _fga!.ApiExecutor().SendAsync<CreateStoreResponse>(request);
+        var response = await _fga!.GetApiExecutor().SendAsync<CreateStoreResponse>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -393,7 +387,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
 
         // Should throw an exception
         await Assert.ThrowsAnyAsync<FgaApiError>(async () =>
-            await _fga!.ApiExecutor().SendAsync<GetStoreResponse>(request));
+            await _fga!.GetApiExecutor().SendAsync<GetStoreResponse>(request));
     }
 
     /// <summary>
@@ -414,7 +408,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .QueryParam("page_size", "2")
             .Build();
 
-        var response = await _fga!.ApiExecutor().SendAsync<ListStoresResponse>(request);
+        var response = await _fga!.GetApiExecutor().SendAsync<ListStoresResponse>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -457,7 +451,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Body(writeBody)
             .Build();
 
-        var response = await _fga.ApiExecutor().SendAsync<object>(request);
+        var response = await _fga.GetApiExecutor().SendAsync<object>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -496,7 +490,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Body(readBody)
             .Build();
 
-        var response = await _fga.ApiExecutor().SendAsync<ReadResponse>(request);
+        var response = await _fga.GetApiExecutor().SendAsync<ReadResponse>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -532,7 +526,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .PathParam("store_id", storeId)
             .Build();
 
-        var response = await _fga!.ApiExecutor().SendAsync<object>(request);
+        var response = await _fga!.GetApiExecutor().SendAsync<object>(request);
 
         // Verify response
         Assert.NotNull(response);
@@ -552,7 +546,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Body(requestBody)
             .Build();
 
-        var response = await _fga!.ApiExecutor().SendAsync<CreateStoreResponse>(request);
+        var response = await _fga!.GetApiExecutor().SendAsync<CreateStoreResponse>(request);
         return response.Data.Id;
     }
 
@@ -604,7 +598,7 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Body(requestBody)
             .Build();
 
-        var response = await _fga!.ApiExecutor().SendAsync<WriteAuthorizationModelResponse>(request);
+        var response = await _fga!.GetApiExecutor().SendAsync<WriteAuthorizationModelResponse>(request);
         return response.Data.AuthorizationModelId;
     }
 
@@ -631,6 +625,6 @@ public class ApiExecutorIntegrationTests : IAsyncLifetime {
             .Body(requestBody)
             .Build();
 
-        await _fga!.ApiExecutor().SendAsync<object>(request);
+        await _fga!.GetApiExecutor().SendAsync<object>(request);
     }
 }
