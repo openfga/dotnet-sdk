@@ -62,7 +62,7 @@ public class ApiExecutorTests : IDisposable {
         };
         responseMessage.Headers.Add("X-Request-Id", "req-123");
 
-        var (client, mockHandler) = CreateMockClient(responseMessage, req =>
+        var (client, _) = CreateMockClient(responseMessage, req =>
             req.Method == HttpMethod.Get &&
             req.RequestUri.ToString().Contains("/stores/" + _storeId));
 
@@ -251,7 +251,7 @@ public class ApiExecutorTests : IDisposable {
             Content = new StringContent(expectedJson, Encoding.UTF8, "application/json")
         };
 
-        var (client, mockHandler) = CreateMockClient(responseMessage);
+        var (client, _) = CreateMockClient(responseMessage);
 
         var request = ApiExecutorRequestBuilder
             .Of(HttpMethod.Get, "/stores/{store_id}")
@@ -283,7 +283,7 @@ public class ApiExecutorTests : IDisposable {
                 "application/json")
         };
 
-        var (client, mockHandler) = CreateMockClient(responseMessage);
+        var (client, _) = CreateMockClient(responseMessage);
 
         var request = ApiExecutorRequestBuilder
             .Of(HttpMethod.Post, "/stores/{store_id}/check")
@@ -340,7 +340,7 @@ public class ApiExecutorTests : IDisposable {
                 "application/json")
         };
 
-        var (client, mockHandler) = CreateMockClient(responseMessage);
+        var (client, _) = CreateMockClient(responseMessage);
 
         var request = ApiExecutorRequestBuilder
             .Of(HttpMethod.Post, "/stores/{store_id}/check")
