@@ -1,10 +1,16 @@
 # Changelog
 
-## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.9.0...HEAD)
+## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.9.1...HEAD)
 
 ### Added
-- feat: add StreamedListObjects API support
 - feat: add ApiExecutor for raw requests
+
+## v0.9.1
+
+### [0.9.1](https://github.com/openfga/dotnet-sdk/compare/v0.9.0...v0.9.1) (2026-01-26)
+
+- feat: add support for streamed list objects (#156)
+- feat: add support for an interface on the client (#168)
 
 ## v0.9.0
 
