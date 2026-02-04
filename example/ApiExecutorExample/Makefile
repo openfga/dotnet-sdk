@@ -1,4 +1,4 @@
-.PHONY: help start-openfga stop-openfga run clean
+.PHONY: help start-openfga stop-openfga run run-all clean
 
 help:
 	@echo "ApiExecutor Example - Makefile Commands"

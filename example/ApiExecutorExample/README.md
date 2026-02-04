@@ -63,7 +63,7 @@ make stop-openfga   # Stop OpenFGA when done
 
 ## Example Output
 
-```
+```text
 === OpenFGA ApiExecutor Example ===
 
 📋 Example 1: List Stores
