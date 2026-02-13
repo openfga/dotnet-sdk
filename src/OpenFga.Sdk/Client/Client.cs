@@ -253,7 +253,7 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
         await api.ReadAuthorizationModels(GetStoreId(options), options?.PageSize, options?.ContinuationToken, options, cancellationToken);
 
     /// <inheritdoc />
-    public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(WriteAuthorizationModelRequest body,
+    public async Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(ClientWriteAuthorizationModelRequest body,
         IClientRequestOptionsWithStoreId? options = default,
         CancellationToken cancellationToken = default) =>
         await api.WriteAuthorizationModel(GetStoreId(options), body, options, cancellationToken);

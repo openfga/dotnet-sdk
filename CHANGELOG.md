@@ -2,8 +2,8 @@
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.9.1...HEAD)
 
-### Changed
-- feat: `WriteAuthorizationModel()` now accepts base `WriteAuthorizationModelRequest` type, enabling direct use of `FromJson()` (#177)
+### Added
+- feat: add `FromJson()` methods to `ClientWriteAuthorizationModelRequest` and `ClientCreateStoreRequest` to enable loading from JSON files (#179)
 
 ## v0.9.1
 
