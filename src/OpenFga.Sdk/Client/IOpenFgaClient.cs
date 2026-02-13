@@ -91,7 +91,7 @@ public interface IOpenFgaClient
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>A response indicating the result of the create operation.</returns>
     Task<WriteAuthorizationModelResponse> WriteAuthorizationModel(
-        ClientWriteAuthorizationModelRequest body,
+        WriteAuthorizationModelRequest body,
         IClientRequestOptionsWithStoreId? options = default,
         CancellationToken cancellationToken = default
     );

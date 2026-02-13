@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.9.1...HEAD)
 
+### Changed
+- feat: `WriteAuthorizationModel()` now accepts base `WriteAuthorizationModelRequest` type, enabling direct use of `FromJson()` (#177)
+
 ## v0.9.1
 
 ### [0.9.1](https://github.com/openfga/dotnet-sdk/compare/v0.9.0...v0.9.1) (2026-01-26)
