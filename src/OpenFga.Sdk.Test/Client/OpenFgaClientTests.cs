@@ -491,6 +491,58 @@ public class OpenFgaClientTests : IDisposable {
     }
 
     /// <summary>
+    /// Test CreateStore with ClientCreateStoreRequest.FromJson() deserialization
+    /// Validates that FromJson() correctly deserializes the request and that the name is sent correctly
+    /// </summary>
+    [Fact]
+    public async Task CreateStore_FromJson_Works() {
+        var storeJson = @"{
+            ""name"": ""Test Store From JSON""
+        }";
+
+        // Deserialize and validate the request before sending
+        var deserializedRequest = ClientCreateStoreRequest.FromJson(storeJson);
+        Assert.NotNull(deserializedRequest);
+        Assert.Equal("Test Store From JSON", deserializedRequest.Name);
+
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        var expectedResponse = new CreateStoreResponse() {
+            Id = "01H0H015178Y2V4CX10C2KGHF7",
+            Name = "Test Store From JSON",
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
+        };
+
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(() => new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(expectedResponse),
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        // Use the validated deserialized request
+        var response = await fgaClient.CreateStore(deserializedRequest);
+
+        Assert.IsType<CreateStoreResponse>(response);
+        Assert.Equal(expectedResponse.Id, response.Id);
+        Assert.Equal(expectedResponse.Name, response.Name);
+        mockHandler.Protected().Verify("SendAsync", Times.Once(),
+            ItExpr.Is<HttpRequestMessage>(req =>
+                req.RequestUri == new Uri($"{_config.BasePath}/stores") &&
+                req.Method == HttpMethod.Post),
+            ItExpr.IsAny<CancellationToken>());
+    }
+
+    /// <summary>
     /// Test GetStore
     /// </summary>
     [Fact]
@@ -655,6 +707,69 @@ public class OpenFgaClientTests : IDisposable {
         );
 
         Assert.IsType<WriteAuthorizationModelResponse>(response);
+    }
+
+    /// <summary>
+    /// Test WriteAuthorizationModel with ClientWriteAuthorizationModelRequest.FromJson() deserialization
+    /// Validates that FromJson() correctly deserializes the model and that the deserialized data is sent in the request
+    /// </summary>
+    [Fact]
+    public async Task WriteAuthorizationModel_FromJson_Works() {
+        const string authorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B3";
+
+        // Sample JSON - this could be loaded from a file
+        var modelJson = @"{
+            ""schema_version"": ""1.1"",
+            ""type_definitions"": [
+                {
+                    ""type"": ""user"",
+                    ""relations"": {}
+                },
+                {
+                    ""type"": ""document"",
+                    ""relations"": {
+                        ""viewer"": {
+                            ""this"": {}
+                        }
+                    }
+                }
+            ]
+        }";
+
+        // Deserialize and validate the request before sending
+        var deserializedRequest = ClientWriteAuthorizationModelRequest.FromJson(modelJson);
+        Assert.NotNull(deserializedRequest);
+        Assert.Equal("1.1", deserializedRequest.SchemaVersion);
+        Assert.NotNull(deserializedRequest.TypeDefinitions);
+        Assert.Equal(2, deserializedRequest.TypeDefinitions.Count);
+        Assert.Equal("user", deserializedRequest.TypeDefinitions[0].Type);
+        Assert.Equal("document", deserializedRequest.TypeDefinitions[1].Type);
+
+        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.Is<HttpRequestMessage>(req =>
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/authorization-models") &&
+                    req.Method == HttpMethod.Post),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(() => new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = Utils.CreateJsonStringContent(
+                    new WriteAuthorizationModelResponse() { AuthorizationModelId = authorizationModelId }),
+            });
+
+        var httpClient = new HttpClient(mockHandler.Object);
+        var fgaClient = new OpenFgaClient(_config, httpClient);
+
+        // Use the validated deserialized request
+        var response = await fgaClient.WriteAuthorizationModel(deserializedRequest);
+
+        Assert.NotNull(response);
+        Assert.Equal(authorizationModelId, response.AuthorizationModelId);
+        mockHandler.Protected().Verify("SendAsync", Times.Once(),
+            ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>());
     }
 
     /// <summary>

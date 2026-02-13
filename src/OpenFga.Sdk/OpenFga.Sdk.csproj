@@ -13,7 +13,7 @@
     <Description>.NET SDK for OpenFGA</Description>
     <Copyright>OpenFGA</Copyright>
     <RootNamespace>OpenFga.Sdk</RootNamespace>
-    <Version>0.9.0</Version>
+    <Version>0.9.1</Version>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\OpenFga.Sdk.xml</DocumentationFile>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -41,9 +41,9 @@
   <!-- Packages needed for .NET versions < .NET 8 -->
   <ItemGroup Condition="'$(IsNet8OrGreater)' != 'true'">
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.1" />
-    <PackageReference Include="System.Net.Http.Json" Version="10.0.1" />
-    <PackageReference Include="System.Text.Json" Version="10.0.1" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.2" />
+    <PackageReference Include="System.Net.Http.Json" Version="10.0.2" />
+    <PackageReference Include="System.Text.Json" Version="10.0.2" />
   </ItemGroup>
 
   <!-- .NET Framework 4.8 specific packages -->
@@ -54,7 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.2" />
     <Folder Include="Models"/>
     <None Include="../../assets/FGAIcon.png" Pack="true" Visible="false" PackagePath=""/>
     <None Include="../../README.md" Pack="true" PackagePath=""/>
