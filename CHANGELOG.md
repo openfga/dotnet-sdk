@@ -3,7 +3,7 @@
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.9.1...HEAD)
 
 ### Added
-- feat: add `FromJson()` methods to `ClientWriteAuthorizationModelRequest` and `ClientCreateStoreRequest` to enable loading from JSON files (#179)
+- feat: add `FromJson()` methods to `ClientWriteAuthorizationModelRequest` and `ClientCreateStoreRequest` to enable loading from JSON files (#180)
 
 ## v0.9.1
 
