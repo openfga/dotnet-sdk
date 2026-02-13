@@ -683,7 +683,8 @@ public class OpenFgaClientTests : IDisposable {
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/authorization-models") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync(new HttpResponseMessage() {
+            .ReturnsAsync(() => new HttpResponseMessage
+            {
                 StatusCode = HttpStatusCode.OK,
                 Content = Utils.CreateJsonStringContent(
                     new WriteAuthorizationModelResponse() { AuthorizationModelId = authorizationModelId }),
@@ -735,7 +736,8 @@ public class OpenFgaClientTests : IDisposable {
                     req.RequestUri == new Uri($"{_config.BasePath}/stores/{_config.StoreId}/authorization-models") &&
                     req.Method == HttpMethod.Post),
                 ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync(new HttpResponseMessage() {
+            .ReturnsAsync(() => new HttpResponseMessage
+            {
                 StatusCode = HttpStatusCode.OK,
                 Content = Utils.CreateJsonStringContent(
                     new WriteAuthorizationModelResponse() { AuthorizationModelId = authorizationModelId }),
