@@ -1,6 +1,6 @@
+using OpenFga.Sdk.Model;
 using System;
 using System.Text.Json;
-using OpenFga.Sdk.Model;
 
 namespace OpenFga.Sdk.Client.Model;
 

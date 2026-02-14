@@ -12,8 +12,7 @@ namespace OpenFga.Sdk.Client;
 /// <remarks>
 /// This interface is provisioned to support unit testing scenarios by making mocking feasible.
 /// </remarks>
-public interface IOpenFgaClient
-{
+public interface IOpenFgaClient {
     /// <summary>
     /// StoreId - The ID of the FGA store.
     /// </summary>

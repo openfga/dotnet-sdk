@@ -32,6 +32,11 @@ public static class TelemetryMeter {
     public static readonly string RequestCount = "fga-client.request.count";
 
     /// <summary>
+    ///     The duration of individual HTTP requests sent by the SDK.
+    /// </summary>
+    public static readonly string HttpRequestDuration = "fga-client.http_request.duration";
+
+    /// <summary>
     /// Return all supported meter names
     /// </summary>
     public static HashSet<string> GetAllMeters() {
@@ -39,7 +44,8 @@ public static class TelemetryMeter {
             RequestDuration,
             QueryDuration,
             TokenExchangeCount,
-            RequestCount
+            RequestCount,
+            HttpRequestDuration
         };
     }
 }

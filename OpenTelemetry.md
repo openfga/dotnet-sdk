@@ -10,12 +10,13 @@ In cases when metrics events are sent, they will not be viewable outside of infr
 
 ### Supported Metrics
 
-| Metric Name                     | Type      | Enabled by Default | Description                                                                          |
-|---------------------------------|-----------|--------------------|--------------------------------------------------------------------------------------|
-| `fga-client.request.duration`   | Histogram | Yes                | The total request time for FGA requests                                              |
-| `fga-client.query.duration`     | Histogram | Yes                | The amount of time the FGA server took to internally process nd evaluate the request |
-|` fga-client.credentials.request`| Counter   | Yes                | The total number of times a new token was requested when using ClientCredentials     |
-| `fga-client.request.count`      | Counter   | No                 | The total number of requests made to the FGA server                                  |
+| Metric Name                          | Type      | Enabled by Default | Description                                                                          |
+|--------------------------------------|-----------|--------------------|--------------------------------------------------------------------------------------|
+| `fga-client.request.duration`        | Histogram | Yes                | The total request time for FGA requests                                              |
+| `fga-client.query.duration`          | Histogram | Yes                | The amount of time the FGA server took to internally process and evaluate the request |
+| `fga-client.http_request.duration`   | Histogram | No                 | The duration of individual HTTP requests sent by the SDK                             |
+| `fga-client.credentials.request`     | Counter   | Yes                | The total number of times a new token was requested when using ClientCredentials     |
+| `fga-client.request.count`           | Counter   | No                 | The total number of requests made to the FGA server                                  |
 
 ### Supported attributes
 
@@ -94,7 +95,7 @@ If you do set the `Telemetry` property to anything other than `null`, the defaul
 ```csharp
 TelemetryConfig telemetryConfig = new () {
     Metrics = new Dictionary<string, MetricConfig> {
-        [TelemetryMeters.TokenExchangeCount] = new () {
+        [TelemetryMeter.TokenExchangeCount] = new () {
             Attributes = new HashSet<string> {
                 TelemetryAttribute.HttpScheme,
                 TelemetryAttribute.HttpMethod,
@@ -109,7 +110,7 @@ TelemetryConfig telemetryConfig = new () {
                 TelemetryAttribute.ResponseModelId
             }
         },
-        [TelemetryMeters.QueryDuration] = new () {
+        [TelemetryMeter.RequestDuration] = new () {
             Attributes = new HashSet<string> {
                 TelemetryAttribute.HttpStatus,
                 TelemetryAttribute.HttpUserAgent,
@@ -120,7 +121,18 @@ TelemetryConfig telemetryConfig = new () {
                 TelemetryAttribute.RequestRetryCount,
             }
         },
-        [TelemetryMeters.QueryDuration] = new () {
+        [TelemetryMeter.QueryDuration] = new () {
+            Attributes = new HashSet<string> {
+                TelemetryAttribute.HttpStatus,
+                TelemetryAttribute.HttpUserAgent,
+                TelemetryAttribute.RequestMethod,
+                TelemetryAttribute.RequestClientId,
+                TelemetryAttribute.RequestStoreId,
+                TelemetryAttribute.RequestModelId,
+                TelemetryAttribute.RequestRetryCount,
+            }
+        },
+        [TelemetryMeter.HttpRequestDuration] = new () {
             Attributes = new HashSet<string> {
                 TelemetryAttribute.HttpStatus,
                 TelemetryAttribute.HttpUserAgent,

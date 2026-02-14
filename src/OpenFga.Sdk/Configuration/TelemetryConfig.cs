@@ -74,6 +74,7 @@ public class TelemetryConfig {
             { TelemetryMeter.TokenExchangeCount, new MetricConfig { Attributes = defaultAttributes } },
             { TelemetryMeter.RequestDuration, new MetricConfig { Attributes = defaultAttributes } },
             { TelemetryMeter.QueryDuration, new MetricConfig { Attributes = defaultAttributes } },
+            // { TelemetryMeter.HttpRequestDuration, new MetricConfig { Attributes = defaultAttributes } },
             // { TelemetryMeters.RequestCount, new MetricConfig { Attributes = defaultAttributes } }
         };
     }

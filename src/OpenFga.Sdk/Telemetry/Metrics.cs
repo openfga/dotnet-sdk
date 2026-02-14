@@ -100,4 +100,34 @@ public class Metrics {
     public void BuildForClientCredentialsResponse<T>(
         HttpResponseMessage response, RequestBuilder<T> requestBuilder, Stopwatch requestDuration, int retryCount) =>
         BuildForResponse("ClientCredentialsExchange", response, requestBuilder, requestDuration, retryCount);
+
+    /// <summary>
+    ///     Builds metrics for an individual HTTP request.
+    /// </summary>
+    /// <typeparam name="T">The type of the request builder response.</typeparam>
+    /// <param name="apiName">The API name.</param>
+    /// <param name="response">The HTTP response message.</param>
+    /// <param name="requestBuilder">The request builder.</param>
+    /// <param name="httpRequestDuration">The stopwatch measuring the HTTP request duration.</param>
+    /// <param name="retryCount">The number of retries attempted (0 for the initial request).</param>
+    public void BuildForHttpRequest<T>(string apiName,
+        HttpResponseMessage response, RequestBuilder<T> requestBuilder, Stopwatch httpRequestDuration, int retryCount) {
+        var metrics = _telemetryConfig?.Metrics;
+        if (metrics == null || metrics.Count == 0) {
+            // No point processing if all metrics are disabled
+            return;
+        }
+
+        if (!metrics.TryGetValue(TelemetryMeter.HttpRequestDuration, out var httpRequestDurationConfig)) {
+            // HTTP request duration metric is not enabled
+            return;
+        }
+
+        // Compute all enabled attributes once
+        var attributes = Attributes.BuildAttributesForResponse(
+            _allEnabledAttributes, _credentialsConfig, apiName, response, requestBuilder, httpRequestDuration, retryCount);
+
+        Histograms.RecordHttpRequestDuration(httpRequestDuration,
+            Attributes.FilterAttributes(attributes, httpRequestDurationConfig?.Attributes));
+    }
 }

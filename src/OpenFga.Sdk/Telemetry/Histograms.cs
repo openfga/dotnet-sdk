@@ -21,6 +21,11 @@ public class TelemetryHistograms {
     public Histogram<float> RequestDurationHistogram { get; }
 
     /// <summary>
+    /// Histogram for HTTP request duration.
+    /// </summary>
+    public Histogram<float> HttpRequestDurationHistogram { get; }
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="TelemetryHistograms" /> class.
     /// </summary>
     /// <param name="meter">The meter used to create histograms.</param>
@@ -29,6 +34,8 @@ public class TelemetryHistograms {
             meter.CreateHistogram<float>(TelemetryMeter.RequestDuration, "The duration of requests", "milliseconds");
         QueryDurationHistogram = meter.CreateHistogram<float>(TelemetryMeter.QueryDuration,
             "The duration of queries on the FGA server", "milliseconds");
+        HttpRequestDurationHistogram = meter.CreateHistogram<float>(TelemetryMeter.HttpRequestDuration,
+            "The duration of individual HTTP requests", "milliseconds");
     }
 
     /// <summary>
@@ -54,4 +61,12 @@ public class TelemetryHistograms {
     /// <param name="attributes">The attributes associated with the telemetry data.</param>
     public void RecordRequestDuration(Stopwatch requestDuration, TagList attributes) =>
         RequestDurationHistogram.Record(requestDuration.ElapsedMilliseconds, attributes);
+
+    /// <summary>
+    ///     Records the duration of an individual HTTP request.
+    /// </summary>
+    /// <param name="httpRequestDuration">The stopwatch measuring the HTTP request duration.</param>
+    /// <param name="attributes">The attributes associated with the telemetry data.</param>
+    public void RecordHttpRequestDuration(Stopwatch httpRequestDuration, TagList attributes) =>
+        HttpRequestDurationHistogram.Record(httpRequestDuration.ElapsedMilliseconds, attributes);
 }
