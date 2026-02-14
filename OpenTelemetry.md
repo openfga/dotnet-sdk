@@ -14,7 +14,7 @@ In cases when metrics events are sent, they will not be viewable outside of infr
 |--------------------------------------|-----------|--------------------|--------------------------------------------------------------------------------------|
 | `fga-client.request.duration`        | Histogram | Yes                | The total request time for FGA requests                                              |
 | `fga-client.query.duration`          | Histogram | Yes                | The amount of time the FGA server took to internally process and evaluate the request |
-| `fga-client.http_request.duration`   | Histogram | Yes                | The duration of individual HTTP requests sent by the SDK                             |
+| `fga-client.http_request.duration`   | Histogram | No                 | The duration of individual HTTP requests sent by the SDK                             |
 | `fga-client.credentials.request`     | Counter   | Yes                | The total number of times a new token was requested when using ClientCredentials     |
 | `fga-client.request.count`           | Counter   | No                 | The total number of requests made to the FGA server                                  |
 
