@@ -31,10 +31,9 @@ public class ApiClient : IDisposable {
     public ApiClient(Configuration.Configuration configuration, HttpClient? userHttpClient = null) {
         configuration.EnsureValid();
         _configuration = configuration;
-        _baseClient = new BaseClient(configuration, userHttpClient);
-        _retryHandler = new RetryHandler(new RetryParams { MaxRetry = _configuration.MaxRetry, MinWaitInMs = _configuration.MinWaitInMs });
-
         metrics = new Metrics(_configuration);
+        _baseClient = new BaseClient(configuration, userHttpClient, metrics);
+        _retryHandler = new RetryHandler(new RetryParams { MaxRetry = _configuration.MaxRetry, MinWaitInMs = _configuration.MinWaitInMs });
 
         if (_configuration.Credentials == null) {
             return;
@@ -101,9 +100,9 @@ public class ApiClient : IDisposable {
         var authToken = await GetAuthenticationTokenAsync(apiName);
         var additionalHeaders = BuildHeaders(_configuration, authToken, options);
 
-        var response = await Retry(async () =>
+        var response = await Retry(async (attemptCount) =>
             await _baseClient.SendRequestAsync<TReq, TRes>(requestBuilder, additionalHeaders, apiName,
-                cancellationToken));
+                attemptCount, cancellationToken));
 
         sw.Stop();
         metrics.BuildForResponse(apiName, response.rawResponse, requestBuilder, sw,
@@ -129,9 +128,9 @@ public class ApiClient : IDisposable {
         var authToken = await GetAuthenticationTokenAsync(apiName);
         var additionalHeaders = BuildHeaders(_configuration, authToken, options);
 
-        var response = await Retry(async () =>
+        var response = await Retry(async (attemptCount) =>
             await _baseClient.SendRequestAsync<TReq, object>(requestBuilder, additionalHeaders, apiName,
-                cancellationToken));
+                attemptCount, cancellationToken));
 
         sw.Stop();
         metrics.BuildForResponse(apiName, response.rawResponse, requestBuilder, sw,
@@ -166,7 +165,7 @@ public class ApiClient : IDisposable {
         }
     }
 
-    private async Task<ResponseWrapper<TResult>> Retry<TResult>(Func<Task<ResponseWrapper<TResult>>> retryable) {
+    private async Task<ResponseWrapper<TResult>> Retry<TResult>(Func<int, Task<ResponseWrapper<TResult>>> retryable) {
         var requestCount = 0;
         var attemptCount = 0; // 0 = initial request, 1+ = retry attempts
 
@@ -174,7 +173,7 @@ public class ApiClient : IDisposable {
             try {
                 requestCount++;
 
-                var response = await retryable();
+                var response = await retryable(attemptCount);
 
                 response.retryCount =
                     requestCount - 1; // OTEL spec specifies that the original request is not included in the count
