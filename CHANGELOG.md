@@ -4,6 +4,8 @@
 
 ### Added
 - feat: add ApiExecutor for raw requests
+- feat: add `FromJson()` methods to `ClientWriteAuthorizationModelRequest` and `ClientCreateStoreRequest` to enable loading from JSON string (#180)
+- feat: report a per call HTTP metric (#173)
 
 ## v0.9.1
 

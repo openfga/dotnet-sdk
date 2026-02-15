@@ -64,6 +64,17 @@ public class OpenTelemetryExample {
                             TelemetryAttribute.RequestRetryCount,
                         }
                     },
+                    [TelemetryMeter.HttpRequestDuration] = new () {
+                        Attributes = new HashSet<string> {
+                            TelemetryAttribute.HttpStatus,
+                            TelemetryAttribute.HttpUserAgent,
+                            TelemetryAttribute.RequestMethod,
+                            TelemetryAttribute.RequestClientId,
+                            TelemetryAttribute.RequestStoreId,
+                            TelemetryAttribute.RequestModelId,
+                            TelemetryAttribute.RequestRetryCount,
+                        }
+                    },
                 }
             };
 
