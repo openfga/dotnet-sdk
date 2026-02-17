@@ -140,9 +140,9 @@ public class ApiClient : IDisposable {
             }
         }
 
-        var response = await Retry(async () =>
+        var response = await Retry(async (attemptCount) =>
             await _baseClient.SendRequestAsync<TReq, TRes>(requestBuilder, mergedHeaders, apiName,
-                cancellationToken));
+                attemptCount, cancellationToken));
 
         sw.Stop();
         metrics.BuildForResponse(apiName, response.rawResponse, requestBuilder, sw,
