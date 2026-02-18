@@ -61,7 +61,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Testcontainers" Version="3.10.0"><PrivateAssets>all</PrivateAssets></PackageReference>
   </ItemGroup>
 
   <ItemGroup>
