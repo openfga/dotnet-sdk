@@ -44,7 +44,33 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
         set => _configuration.AuthorizationModelId = value;
     }
 
-    public void Dispose() => api.Dispose();
+    /// <summary>
+    /// Gets the ApiExecutor for making custom API requests.
+    /// Use this when you need to call OpenFGA API endpoints not yet available in the SDK's typed methods,
+    /// or when you need access to full response details (status code, headers, raw response).
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var executor = client.ApiExecutor;
+    /// var request = RequestBuilder&lt;object&gt;
+    ///     .Create(HttpMethod.Get, config.ApiUrl, "/stores/{store_id}")
+    ///     .WithPathParameter("store_id", storeId);
+    /// var response = await executor.ExecuteAsync&lt;object, GetStoreResponse&gt;(request, "GetStore");
+    /// </code>
+    /// </example>
+    public ApiExecutor ApiExecutor => api.ApiClientInternal.ApiExecutor;
+
+    /// <summary>
+    /// Gets the underlying ApiClient (internal use).
+    /// </summary>
+    /// <returns>The ApiClient instance used by this client</returns>
+    internal ApiClient.ApiClient GetApiClient() {
+        return api.ApiClientInternal;
+    }
+
+    public void Dispose() {
+        api.Dispose();
+    }
 
 #if NET6_0_OR_GREATER
     private async Task ProcessWriteChunksAsync<T>(
