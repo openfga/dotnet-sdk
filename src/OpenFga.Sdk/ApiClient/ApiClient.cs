@@ -113,19 +113,8 @@ public class ApiClient : IDisposable {
     public async Task<TRes> SendRequestAsync<TReq, TRes>(RequestBuilder<TReq> requestBuilder, string apiName,
         IRequestOptions? options = null,
         CancellationToken cancellationToken = default) {
-        var sw = Stopwatch.StartNew();
-
-        var authToken = await GetAuthenticationTokenAsync(apiName);
-        var additionalHeaders = BuildHeaders(_configuration, authToken, options);
-
-        var response = await Retry(async (attemptCount) =>
-            await _baseClient.SendRequestAsync<TReq, TRes>(requestBuilder, additionalHeaders, apiName,
-                attemptCount, cancellationToken));
-
-        sw.Stop();
-        metrics.BuildForResponse(apiName, response.rawResponse, requestBuilder, sw,
-            response.retryCount);
-
+        var response = await SendRequestInternalAsync<TReq, TRes>(
+            requestBuilder, apiName, options, cancellationToken);
         return response.responseContent;
     }
 
@@ -141,18 +130,8 @@ public class ApiClient : IDisposable {
     public async Task SendRequestAsync<TReq>(RequestBuilder<TReq> requestBuilder, string apiName,
         IRequestOptions? options = null,
         CancellationToken cancellationToken = default) {
-        var sw = Stopwatch.StartNew();
-
-        var authToken = await GetAuthenticationTokenAsync(apiName);
-        var additionalHeaders = BuildHeaders(_configuration, authToken, options);
-
-        var response = await Retry(async (attemptCount) =>
-            await _baseClient.SendRequestAsync<TReq, object>(requestBuilder, additionalHeaders, apiName,
-                attemptCount, cancellationToken));
-
-        sw.Stop();
-        metrics.BuildForResponse(apiName, response.rawResponse, requestBuilder, sw,
-            response.retryCount);
+        await SendRequestInternalAsync<TReq, object>(
+            requestBuilder, apiName, options, cancellationToken);
     }
 
     /// <summary>
@@ -286,7 +265,7 @@ public class ApiClient : IDisposable {
 
     /// <summary>
     ///     Executes an API request using RequestBuilder and returns an ApiResponse with full response details.
-    ///     This provides a lower-level API for custom requests while leveraging authentication, retry logic, and error handling.
+    ///     This builds on top of SendRequestAsync by wrapping the response with additional metadata.
     /// </summary>
     /// <typeparam name="TReq">The type of the request body</typeparam>
     /// <typeparam name="TRes">The type of the response body</typeparam>
@@ -303,7 +282,7 @@ public class ApiClient : IDisposable {
         IRequestOptions? options = null,
         CancellationToken cancellationToken = default) {
 
-        var responseWrapper = await ExecuteRequestWithWrapperAsync<TReq, TRes>(
+        var responseWrapper = await SendRequestInternalAsync<TReq, TRes>(
             requestBuilder, apiName, options, cancellationToken);
 
         var rawResponse = await responseWrapper.rawResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -333,7 +312,7 @@ public class ApiClient : IDisposable {
         CancellationToken cancellationToken = default) {
 
         // Use object as intermediate type to avoid strong typing
-        var responseWrapper = await ExecuteRequestWithWrapperAsync<TReq, object>(
+        var responseWrapper = await SendRequestInternalAsync<TReq, object>(
             requestBuilder, apiName, options, cancellationToken);
 
         var rawResponse = await responseWrapper.rawResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -345,10 +324,10 @@ public class ApiClient : IDisposable {
     }
 
     /// <summary>
-    ///     Private helper method that executes a request and returns the ResponseWrapper.
-    ///     This consolidates common logic used by both ExecuteAsync overloads.
+    ///     Core private method that handles authentication, retry logic, and metrics.
+    ///     Both SendRequestAsync and ExecuteAsync build on top of this shared implementation.
     /// </summary>
-    private async Task<ResponseWrapper<TRes>> ExecuteRequestWithWrapperAsync<TReq, TRes>(
+    private async Task<ResponseWrapper<TRes>> SendRequestInternalAsync<TReq, TRes>(
         RequestBuilder<TReq> requestBuilder,
         string apiName,
         IRequestOptions? options,
