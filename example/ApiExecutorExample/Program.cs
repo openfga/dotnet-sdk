@@ -1,21 +1,23 @@
+using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Client;
-using OpenFga.Sdk.Client.ApiExecutor;
+using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Model;
 using System.Net.Http;
+using FgaApiClient = OpenFga.Sdk.ApiClient.ApiClient;
 
 namespace ApiExecutorExample;
 
 /// <summary>
-/// This example demonstrates how to use the ApiExecutor to make raw HTTP requests
-/// to the OpenFGA API without using the SDK's typed methods.
+/// This example demonstrates how to use ApiClient.ExecuteAsync to make custom HTTP requests
+/// to the OpenFGA API with full response details (status code, headers, raw response, typed data).
 ///
 /// Prerequisites: Run an OpenFGA server on localhost:8080
 ///   docker run -p 8080:8080 openfga/openfga:latest run
 /// </summary>
 class Program {
     static async Task Main(string[] args) {
-        Console.WriteLine("=== OpenFGA ApiExecutor Example ===\n");
+        Console.WriteLine("=== OpenFGA Custom API Requests Example ===\n");
 
         // Configure client to connect to local OpenFGA instance
         var config = new ClientConfiguration {
@@ -23,37 +25,41 @@ class Program {
         };
 
         using var client = new OpenFgaClient(config);
+        var apiClient = client.GetApiClient(); // Get the ApiClient for custom requests
 
         try {
             // Example 1: List stores using raw GET request
-            await ListStoresExample(client);
+            await ListStoresExample(apiClient, config.ApiUrl);
 
             // Example 2: Create a store using raw POST request with typed response
-            var storeId = await CreateStoreExample(client);
+            var storeId = await CreateStoreExample(apiClient, config.ApiUrl);
 
             // Example 3: Get store details using path parameters
-            await GetStoreExample(client, storeId);
+            await GetStoreExample(apiClient, config.ApiUrl, storeId);
 
             // Example 4: Create an authorization model
-            var modelId = await CreateAuthorizationModelExample(client, storeId);
+            var modelId = await CreateAuthorizationModelExample(apiClient, config.ApiUrl, storeId);
 
             // Example 5: Write relationship tuples
-            await WriteTuplesExample(client, storeId);
+            await WriteTuplesExample(apiClient, config.ApiUrl, storeId);
 
             // Example 6: Read relationship tuples
-            await ReadTuplesExample(client, storeId);
+            await ReadTuplesExample(apiClient, config.ApiUrl, storeId);
 
             // Example 7: Check permissions
-            await CheckPermissionExample(client, storeId, modelId);
+            await CheckPermissionExample(apiClient, config.ApiUrl, storeId, modelId);
 
             // Example 8: Use raw JSON response instead of typed
-            await RawJsonResponseExample(client);
+            await RawJsonResponseExample(apiClient, config.ApiUrl);
 
             // Example 9: Custom headers
-            await CustomHeadersExample(client);
+            await CustomHeadersExample(apiClient, config.ApiUrl);
+
+            // Example 10: Fluent API for building requests
+            await FluentApiExample(apiClient, config.ApiUrl);
 
             // Cleanup: Delete the store we created
-            await DeleteStoreExample(client, storeId);
+            await DeleteStoreExample(apiClient, config.ApiUrl, storeId);
 
             Console.WriteLine("\n=== All examples completed successfully! ===");
         } catch (Exception ex) {
@@ -64,22 +70,27 @@ class Program {
         }
     }
 
-    static async Task ListStoresExample(OpenFgaClient client) {
+    static async Task ListStoresExample(FgaApiClient apiClient, string basePath) {
         Console.WriteLine("📋 Example 1: List Stores");
         Console.WriteLine("Making GET request to /stores");
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Get, "/stores")
-            .Build();
+        var request = new RequestBuilder<Any> {
+            Method = HttpMethod.Get,
+            BasePath = basePath,
+            PathTemplate = "/stores",
+            PathParameters = new Dictionary<string, string>(),
+            QueryParameters = new Dictionary<string, string>()
+        };
 
-        var response = await client.GetApiExecutor().SendAsync<ListStoresResponse>(request);
+        var response = await apiClient.ExecuteAsync<Any, ListStoresResponse>(request, "ListStores");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
+        Console.WriteLine($"   Is Successful: {response.IsSuccessful}");
         Console.WriteLine($"   Found {response.Data.Stores?.Count ?? 0} store(s)");
         Console.WriteLine();
     }
 
-    static async Task<string> CreateStoreExample(OpenFgaClient client) {
+    static async Task<string> CreateStoreExample(FgaApiClient apiClient, string basePath) {
         Console.WriteLine("🏪 Example 2: Create Store");
         Console.WriteLine("Making POST request to /stores");
 
@@ -88,39 +99,48 @@ class Program {
             { "name", storeName }
         };
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Post, "/stores")
-            .Body(requestBody)
-            .Build();
+        var request = new RequestBuilder<object> {
+            Method = HttpMethod.Post,
+            BasePath = basePath,
+            PathTemplate = "/stores",
+            PathParameters = new Dictionary<string, string>(),
+            QueryParameters = new Dictionary<string, string>(),
+            Body = requestBody
+        };
 
-        var response = await client.GetApiExecutor().SendAsync<CreateStoreResponse>(request);
+        var response = await apiClient.ExecuteAsync<object, CreateStoreResponse>(request, "CreateStore");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Store ID: {response.Data.Id}");
         Console.WriteLine($"   Store Name: {response.Data.Name}");
+        Console.WriteLine($"   Raw Response Length: {response.RawResponse.Length} chars");
         Console.WriteLine();
 
         return response.Data.Id!;
     }
 
-    static async Task GetStoreExample(OpenFgaClient client, string storeId) {
+    static async Task GetStoreExample(FgaApiClient apiClient, string basePath, string storeId) {
         Console.WriteLine("🔍 Example 3: Get Store Details");
         Console.WriteLine($"Making GET request to /stores/{{store_id}}");
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Get, "/stores/{store_id}")
-            .PathParam("store_id", storeId)
-            .Build();
+        var request = new RequestBuilder<Any> {
+            Method = HttpMethod.Get,
+            BasePath = basePath,
+            PathTemplate = "/stores/{store_id}",
+            PathParameters = new Dictionary<string, string> { { "store_id", storeId } },
+            QueryParameters = new Dictionary<string, string>()
+        };
 
-        var response = await client.GetApiExecutor().SendAsync<GetStoreResponse>(request);
+        var response = await apiClient.ExecuteAsync<Any, GetStoreResponse>(request, "GetStore");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Store Name: {response.Data.Name}");
         Console.WriteLine($"   Created At: {response.Data.CreatedAt}");
+        Console.WriteLine($"   Response Headers: {response.Headers.Count}");
         Console.WriteLine();
     }
 
-    static async Task<string> CreateAuthorizationModelExample(OpenFgaClient client, string storeId) {
+    static async Task<string> CreateAuthorizationModelExample(FgaApiClient apiClient, string basePath, string storeId) {
         Console.WriteLine("📝 Example 4: Create Authorization Model");
         Console.WriteLine("Making POST request to /stores/{store_id}/authorization-models");
 
@@ -179,13 +199,16 @@ class Program {
             }
         };
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Post, "/stores/{store_id}/authorization-models")
-            .PathParam("store_id", storeId)
-            .Body(requestBody)
-            .Build();
+        var request = new RequestBuilder<object> {
+            Method = HttpMethod.Post,
+            BasePath = basePath,
+            PathTemplate = "/stores/{store_id}/authorization-models",
+            PathParameters = new Dictionary<string, string> { { "store_id", storeId } },
+            QueryParameters = new Dictionary<string, string>(),
+            Body = requestBody
+        };
 
-        var response = await client.GetApiExecutor().SendAsync<WriteAuthorizationModelResponse>(request);
+        var response = await apiClient.ExecuteAsync<object, WriteAuthorizationModelResponse>(request, "WriteAuthorizationModel");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Model ID: {response.Data.AuthorizationModelId}");
@@ -194,7 +217,7 @@ class Program {
         return response.Data.AuthorizationModelId!;
     }
 
-    static async Task WriteTuplesExample(OpenFgaClient client, string storeId) {
+    static async Task WriteTuplesExample(FgaApiClient apiClient, string basePath, string storeId) {
         Console.WriteLine("✍️  Example 5: Write Relationship Tuples");
         Console.WriteLine("Making POST request to /stores/{store_id}/write");
 
@@ -219,20 +242,23 @@ class Program {
             }
         };
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Post, "/stores/{store_id}/write")
-            .PathParam("store_id", storeId)
-            .Body(requestBody)
-            .Build();
+        var request = new RequestBuilder<object> {
+            Method = HttpMethod.Post,
+            BasePath = basePath,
+            PathTemplate = "/stores/{store_id}/write",
+            PathParameters = new Dictionary<string, string> { { "store_id", storeId } },
+            QueryParameters = new Dictionary<string, string>(),
+            Body = requestBody
+        };
 
-        var response = await client.GetApiExecutor().SendAsync<object>(request);
+        var response = await apiClient.ExecuteAsync<object, object>(request, "Write");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine("   Tuples written successfully");
         Console.WriteLine();
     }
 
-    static async Task ReadTuplesExample(OpenFgaClient client, string storeId) {
+    static async Task ReadTuplesExample(FgaApiClient apiClient, string basePath, string storeId) {
         Console.WriteLine("📖 Example 6: Read Relationship Tuples");
         Console.WriteLine("Making POST request to /stores/{store_id}/read");
 
@@ -244,13 +270,16 @@ class Program {
             }
         };
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Post, "/stores/{store_id}/read")
-            .PathParam("store_id", storeId)
-            .Body(requestBody)
-            .Build();
+        var request = new RequestBuilder<object> {
+            Method = HttpMethod.Post,
+            BasePath = basePath,
+            PathTemplate = "/stores/{store_id}/read",
+            PathParameters = new Dictionary<string, string> { { "store_id", storeId } },
+            QueryParameters = new Dictionary<string, string>(),
+            Body = requestBody
+        };
 
-        var response = await client.GetApiExecutor().SendAsync<ReadResponse>(request);
+        var response = await apiClient.ExecuteAsync<object, ReadResponse>(request, "Read");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Found {response.Data.Tuples?.Count ?? 0} tuple(s):");
@@ -262,7 +291,7 @@ class Program {
         Console.WriteLine();
     }
 
-    static async Task CheckPermissionExample(OpenFgaClient client, string storeId, string modelId) {
+    static async Task CheckPermissionExample(FgaApiClient apiClient, string basePath, string storeId, string modelId) {
         Console.WriteLine("🔐 Example 7: Check Permission");
         Console.WriteLine("Making POST request to /stores/{store_id}/check");
 
@@ -277,63 +306,102 @@ class Program {
             }
         };
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Post, "/stores/{store_id}/check")
-            .PathParam("store_id", storeId)
-            .Body(requestBody)
-            .Build();
+        var request = new RequestBuilder<object> {
+            Method = HttpMethod.Post,
+            BasePath = basePath,
+            PathTemplate = "/stores/{store_id}/check",
+            PathParameters = new Dictionary<string, string> { { "store_id", storeId } },
+            QueryParameters = new Dictionary<string, string>(),
+            Body = requestBody
+        };
 
-        var response = await client.GetApiExecutor().SendAsync<CheckResponse>(request);
+        var response = await apiClient.ExecuteAsync<object, CheckResponse>(request, "Check");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Allowed: {response.Data.Allowed}");
         Console.WriteLine();
     }
 
-    static async Task RawJsonResponseExample(OpenFgaClient client) {
+    static async Task RawJsonResponseExample(FgaApiClient apiClient, string basePath) {
         Console.WriteLine("📄 Example 8: Raw JSON Response");
         Console.WriteLine("Getting response as raw JSON string instead of typed object");
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Get, "/stores")
-            .QueryParam("page_size", "5")
-            .Build();
+        var request = new RequestBuilder<Any> {
+            Method = HttpMethod.Get,
+            BasePath = basePath,
+            PathTemplate = "/stores",
+            PathParameters = new Dictionary<string, string>(),
+            QueryParameters = new Dictionary<string, string> { { "page_size", "5" } }
+        };
 
-        // Use SendAsync without type parameter to get raw JSON string
-        var response = await client.GetApiExecutor().SendAsync(request);
+        // Use ExecuteAsync without second type parameter to get raw JSON string
+        var response = await apiClient.ExecuteAsync(request, "ListStores");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
-        Console.WriteLine($"   Raw JSON: {response.Data?.Substring(0, Math.Min(100, response.Data.Length))}...");
+        Console.WriteLine($"   Raw JSON (first 100 chars): {response.Data?.Substring(0, Math.Min(100, response.Data.Length))}...");
+        Console.WriteLine($"   RawResponse and Data are the same: {response.RawResponse == response.Data}");
         Console.WriteLine();
     }
 
-    static async Task CustomHeadersExample(OpenFgaClient client) {
+    static async Task CustomHeadersExample(FgaApiClient apiClient, string basePath) {
         Console.WriteLine("📨 Example 9: Custom Headers");
         Console.WriteLine("Making request with custom headers");
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Get, "/stores")
-            .Header("X-Custom-Header", "example-value")
-            .Header("X-Request-ID", Guid.NewGuid().ToString())
-            .Build();
+        var request = new RequestBuilder<Any> {
+            Method = HttpMethod.Get,
+            BasePath = basePath,
+            PathTemplate = "/stores",
+            PathParameters = new Dictionary<string, string>(),
+            QueryParameters = new Dictionary<string, string>()
+        };
 
-        var response = await client.GetApiExecutor().SendAsync<ListStoresResponse>(request);
+        // Pass custom headers via ClientRequestOptions
+        var options = new ClientRequestOptions {
+            Headers = new Dictionary<string, string> {
+                { "X-Custom-Header", "example-value" },
+                { "X-Request-ID", Guid.NewGuid().ToString() }
+            }
+        };
+
+        var response = await apiClient.ExecuteAsync<Any, ListStoresResponse>(request, "ListStores", options);
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine("   Custom headers sent successfully");
+        Console.WriteLine($"   Response has {response.Headers.Count} headers");
         Console.WriteLine();
     }
 
-    static async Task DeleteStoreExample(OpenFgaClient client, string storeId) {
+    static async Task FluentApiExample(FgaApiClient apiClient, string basePath) {
+        Console.WriteLine("🎯 Example 10: Fluent API for Request Building");
+        Console.WriteLine("Using the enhanced RequestBuilder with fluent methods");
+
+        // Use the new fluent API - much cleaner!
+        var request = RequestBuilder<Any>
+            .Create(HttpMethod.Get, basePath, "/stores")
+            .WithQueryParameter("page_size", "10")
+            .WithQueryParameter("continuation_token", "");
+
+        var response = await apiClient.ExecuteAsync<Any, ListStoresResponse>(request, "ListStores");
+
+        Console.WriteLine($"✅ Status: {response.StatusCode}");
+        Console.WriteLine($"   Found {response.Data.Stores?.Count ?? 0} store(s) using fluent API");
+        Console.WriteLine("   Note: Fluent API provides better validation and cleaner syntax!");
+        Console.WriteLine();
+    }
+
+    static async Task DeleteStoreExample(FgaApiClient apiClient, string basePath, string storeId) {
         Console.WriteLine("🗑️  Cleanup: Delete Store");
         Console.WriteLine($"Making DELETE request to /stores/{{store_id}}");
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Delete, "/stores/{store_id}")
-            .PathParam("store_id", storeId)
-            .Build();
+        var request = new RequestBuilder<Any> {
+            Method = HttpMethod.Delete,
+            BasePath = basePath,
+            PathTemplate = "/stores/{store_id}",
+            PathParameters = new Dictionary<string, string> { { "store_id", storeId } },
+            QueryParameters = new Dictionary<string, string>()
+        };
 
-        var response = await client.GetApiExecutor().SendAsync<object>(request);
+        var response = await apiClient.ExecuteAsync<Any, object>(request, "DeleteStore");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine("   Store deleted successfully");

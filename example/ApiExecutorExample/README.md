@@ -1,6 +1,6 @@
-# ApiExecutor Example
+# Custom API Requests Example
 
-This example demonstrates how to use the `ApiExecutor` to make raw HTTP requests to the OpenFGA API without using the SDK's typed methods. This is useful when you need more control over the HTTP requests or want to call endpoints that aren't yet supported by the SDK's typed API.
+This example demonstrates how to use `ApiClient.ExecuteAsync()` to make custom HTTP requests to the OpenFGA API with full response details (status code, headers, raw response, typed data). This is useful when you need more control over HTTP requests or want to call endpoints that aren't yet supported by the SDK's typed API.
 
 ## What This Example Demonstrates
 
@@ -12,7 +12,52 @@ This example demonstrates how to use the `ApiExecutor` to make raw HTTP requests
 6. **Read Tuples** - Reading relationship tuples with filters
 7. **Check Permission** - Checking if a user has permission
 8. **Raw JSON Response** - Getting responses as raw JSON strings
-9. **Custom Headers** - Adding custom headers to requests
+9. **Custom Headers** - Adding custom headers to requests via ClientRequestOptions
+10. **Fluent API** - Using the enhanced RequestBuilder with fluent methods
+
+## Key Concepts
+
+### ApiClient.ExecuteAsync vs Standard SDK Methods
+
+The SDK provides two ways to interact with the OpenFGA API:
+
+1. **Standard SDK Methods** (recommended for most use cases):
+   ```csharp
+   var response = await client.Check(checkRequest);
+   ```
+
+2. **Custom API Requests** (for advanced scenarios):
+   ```csharp
+   var apiClient = client.GetApiClient();
+   var request = RequestBuilder<object>.Create(...);
+   var response = await apiClient.ExecuteAsync<object, CheckResponse>(request, "Check");
+   // Now you have: response.StatusCode, response.Headers, response.RawResponse, response.Data
+   ```
+
+### RequestBuilder: Two Styles
+
+You can build requests using either style:
+
+**Object Initializer** (compatible with existing patterns):
+```csharp
+var request = new RequestBuilder<object> {
+    Method = HttpMethod.Post,
+    BasePath = config.ApiUrl,
+    PathTemplate = "/stores/{store_id}/check",
+    PathParameters = new Dictionary<string, string> { { "store_id", storeId } },
+    QueryParameters = new Dictionary<string, string>(),
+    Body = requestBody
+};
+```
+
+**Fluent API** (enhanced developer experience):
+```csharp
+var request = RequestBuilder<object>
+    .Create(HttpMethod.Post, config.ApiUrl, "/stores/{store_id}/check")
+    .WithPathParameter("store_id", storeId)
+    .WithQueryParameter("timeout", "30s")
+    .WithBody(requestBody);
+```
 
 ## Prerequisites
 
@@ -64,11 +109,12 @@ make stop-openfga   # Stop OpenFGA when done
 ## Example Output
 
 ```text
-=== OpenFGA ApiExecutor Example ===
+=== OpenFGA Custom API Requests Example ===
 
 📋 Example 1: List Stores
 Making GET request to /stores
 ✅ Status: OK
+   Is Successful: True
    Found 0 store(s)
 
 🏪 Example 2: Create Store
@@ -76,12 +122,14 @@ Making POST request to /stores
 ✅ Status: Created
    Store ID: 01JQWXYZ123ABC456DEF789GHJ
    Store Name: ApiExecutor-Example-1738713600000
+   Raw Response Length: 245 chars
 
 🔍 Example 3: Get Store Details
 Making GET request to /stores/{store_id}
 ✅ Status: OK
    Store Name: ApiExecutor-Example-1738713600000
    Created At: 2025-02-04T10:00:00Z
+   Response Headers: 8
 
 📝 Example 4: Create Authorization Model
 Making POST request to /stores/{store_id}/authorization-models
@@ -108,12 +156,20 @@ Making POST request to /stores/{store_id}/check
 📄 Example 8: Raw JSON Response
 Getting response as raw JSON string instead of typed object
 ✅ Status: OK
-   Raw JSON: {"stores":[],"continuation_token":""}...
+   Raw JSON (first 100 chars): {"stores":[],"continuation_token":""}...
+   RawResponse and Data are the same: True
 
 📨 Example 9: Custom Headers
 Making request with custom headers
 ✅ Status: OK
    Custom headers sent successfully
+   Response has 8 headers
+
+🎯 Example 10: Fluent API for Request Building
+Using the enhanced RequestBuilder with fluent methods
+✅ Status: OK
+   Found 0 store(s) using fluent API
+   Note: Fluent API provides better validation and cleaner syntax!
 
 🗑️  Cleanup: Delete Store
 Making DELETE request to /stores/{store_id}
@@ -123,57 +179,129 @@ Making DELETE request to /stores/{store_id}
 === All examples completed successfully! ===
 ```
 
-## Key Concepts
+## Architecture
 
-### 1. Creating Requests
+### How It Works
 
-Use `ApiExecutorRequestBuilder` to construct requests:
+```
+OpenFgaClient
+    └── GetApiClient() → ApiClient (core building block)
+            └── ExecuteAsync() → Full response details
+                    ├── Authentication (OAuth/ApiToken)
+                    ├── Retry logic with exponential backoff  
+                    ├── Error handling
+                    └── Metrics & telemetry
 
-```csharp
-var request = ApiExecutorRequestBuilder
-    .Of(HttpMethod.Post, "/stores/{store_id}/write")
-    .PathParam("store_id", storeId)
-    .QueryParam("page_size", "10")
-    .Header("X-Custom-Header", "value")
-    .Body(requestBody)
-    .Build();
+RequestBuilder
+    ├── Object initializer (existing style)
+    └── Fluent API (enhanced style)
 ```
 
-### 2. Sending Requests
+### Benefits of ExecuteAsync
 
-Send requests using the ApiExecutor:
+1. **Full Response Access**
+   - `response.StatusCode` - HTTP status code
+   - `response.Headers` - All response headers
+   - `response.RawResponse` - Raw JSON string
+   - `response.Data` - Strongly-typed response object
+   - `response.IsSuccessful` - Quick success check
 
+2. **Shared Infrastructure**
+   - Same authentication as standard SDK methods
+   - Same retry logic with exponential backoff
+   - Same error handling and exceptions
+   - Same metrics and telemetry
+
+3. **Flexibility**
+   - Call any OpenFGA endpoint
+   - Add custom headers via `ClientRequestOptions`
+   - Get raw JSON or strongly-typed responses
+   - Use path and query parameters easily
+
+## When to Use Custom API Requests
+
+### Use Standard SDK Methods When:
+- The operation is available in the SDK (Check, Write, Read, etc.)
+- You don't need access to response headers
+- You want the simplest API
+
+### Use ApiClient.ExecuteAsync When:
+- Calling endpoints not yet in the SDK
+- You need response headers or status codes
+- Building custom integrations
+- Need fine-grained control over requests
+- Working with experimental API features
+
+## Code Examples
+
+### Basic Request
 ```csharp
-// With typed response
-var response = await client.GetApiExecutor().SendAsync<CreateStoreResponse>(request);
+using OpenFga.Sdk.ApiClient;
+using OpenFga.Sdk.Client;
+using OpenFga.Sdk.Configuration;
+using OpenFga.Sdk.Model;
+// Optional: Use an alias to avoid namespace/class name conflicts
+using FgaApiClient = OpenFga.Sdk.ApiClient.ApiClient;
 
-// With raw JSON response
-var response = await client.GetApiExecutor().SendAsync(request);
-```
+var client = new OpenFgaClient(config);
+var apiClient = client.GetApiClient();
 
-### 3. Working with Responses
+var request = new RequestBuilder<object> {
+    Method = HttpMethod.Get,
+    BasePath = config.ApiUrl,
+    PathTemplate = "/stores",
+    PathParameters = new Dictionary<string, string>(),
+    QueryParameters = new Dictionary<string, string>()
+};
 
-Access response data through the `ApiResponse` object:
+var response = await apiClient.ExecuteAsync<object, ListStoresResponse>(
+    request, 
+    "ListStores"
+);
 
-```csharp
 Console.WriteLine($"Status: {response.StatusCode}");
-Console.WriteLine($"Success: {response.IsSuccessful}");
-Console.WriteLine($"Data: {response.Data}");
-Console.WriteLine($"Raw Response: {response.RawResponse}");
-Console.WriteLine($"Headers: {string.Join(", ", response.Headers.Keys)}");
+Console.WriteLine($"Stores: {response.Data.Stores.Count}");
 ```
 
-## When to Use ApiExecutor
+> **Note:** If you get namespace conflicts with `ApiClient`, you can use a type alias:
+> ```csharp
+> using FgaApiClient = OpenFga.Sdk.ApiClient.ApiClient;
+> ```
+> Then use `FgaApiClient` as the type in your method signatures.
 
-The ApiExecutor is useful when you need to:
+### Fluent API Style
+```csharp
+var request = RequestBuilder<object>
+    .Create(HttpMethod.Post, config.ApiUrl, "/stores/{store_id}/check")
+    .WithPathParameter("store_id", storeId)
+    .WithQueryParameter("timeout", "30s")
+    .WithBody(new { 
+        tuple_key = new { user = "user:anne", relation = "reader", @object = "doc:1" }
+    });
 
-- Call OpenFGA API endpoints not yet available in the SDK's typed API
-- Have fine-grained control over HTTP requests
-- Work with custom or experimental API features
-- Debug API interactions at the HTTP level
-- Build custom abstractions on top of the OpenFGA API
+var response = await apiClient.ExecuteAsync<object, CheckResponse>(
+    request,
+    "Check",
+    new ClientRequestOptions {
+        Headers = new Dictionary<string, string> {
+            { "X-Trace-Id", traceId }
+        }
+    }
+);
+```
 
-## Troubleshooting
+### Raw JSON Response
+```csharp
+// When you want the raw JSON without deserialization
+var response = await apiClient.ExecuteAsync(request, "CustomEndpoint");
+string json = response.Data; // Raw JSON string
+```
+
+## Resources
+
+- [OpenFGA API Documentation](https://openfga.dev/api)
+
+## Common Issues
 
 ### OpenFGA Connection Failed
 

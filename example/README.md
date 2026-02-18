@@ -13,8 +13,8 @@ Demonstrates how to use the StreamedListObjects API to efficiently list objects 
 **OpenTelemetryExample:**
 Shows how to integrate OpenTelemetry for observability and tracing of OpenFGA SDK operations.
 
-**ApiExecutorExample:**
-Demonstrates how to use the ApiExecutor to make raw HTTP requests to the OpenFGA API. This is useful when you need more control over requests or want to call endpoints not yet available in the SDK's typed API. Includes a Makefile for easy execution with a local OpenFGA server.
+**Custom API Requests Example:**
+Demonstrates how to use `ApiClient.ExecuteAsync()` to make custom HTTP requests to the OpenFGA API with full response details. This is useful when you need more control over requests or want to call endpoints not yet available in the SDK's typed API. Includes a Makefile for easy execution with a local OpenFGA server.
 
 
 ### Running the Examples
