@@ -22,7 +22,6 @@ namespace OpenFga.Sdk.Client;
 public class OpenFgaClient : IOpenFgaClient, IDisposable {
     private readonly ClientConfiguration _configuration;
     protected OpenFgaApi api;
-    private readonly Lazy<ApiExecutor.ApiExecutor> _apiExecutor;
 
     public OpenFgaClient(
         ClientConfiguration configuration,
@@ -31,9 +30,6 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
         configuration.EnsureValid();
         _configuration = configuration;
         api = new OpenFgaApi(_configuration, httpClient);
-        _apiExecutor = new Lazy<ApiExecutor.ApiExecutor>(() => new ApiExecutor.ApiExecutor(
-            api.ApiClientInternal,
-            _configuration));
     }
 
     /// <inheritdoc />
@@ -49,19 +45,17 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
     }
 
     /// <summary>
-    /// Gets the ApiExecutor for making custom API requests.
-    /// The ApiExecutor allows you to call arbitrary OpenFGA API endpoints while
-    /// automatically leveraging the SDK's authentication, retry logic, and error handling.
+    /// Gets the underlying ApiClient for making custom API requests.
+    /// The ApiClient allows you to call arbitrary OpenFGA API endpoints using RequestBuilder
+    /// while automatically leveraging the SDK's authentication, retry logic, and error handling.
+    /// Use ApiClient.ExecuteAsync() methods for custom requests that return full response details.
     /// </summary>
-    /// <returns>An ApiExecutor instance</returns>
-    public ApiExecutor.ApiExecutor GetApiExecutor() {
-        return _apiExecutor.Value;
+    /// <returns>The ApiClient instance used by this client</returns>
+    public ApiClient.ApiClient GetApiClient() {
+        return api.ApiClientInternal;
     }
 
     public void Dispose() {
-        if (_apiExecutor.IsValueCreated) {
-            _apiExecutor.Value?.Dispose();
-        }
         api.Dispose();
     }
 

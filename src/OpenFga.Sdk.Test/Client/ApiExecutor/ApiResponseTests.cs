@@ -1,4 +1,4 @@
-using OpenFga.Sdk.Client.ApiExecutor;
+using OpenFga.Sdk.ApiClient;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;

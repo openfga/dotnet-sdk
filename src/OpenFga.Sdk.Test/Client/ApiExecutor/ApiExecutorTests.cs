@@ -1,7 +1,7 @@
 using Moq;
 using Moq.Protected;
+using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Client;
-using OpenFga.Sdk.Client.ApiExecutor;
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
@@ -50,7 +50,7 @@ public class ApiExecutorTests : IDisposable {
     }
 
     [Fact]
-    public async Task SendAsync_ValidGetRequest_ReturnsSuccessResponse() {
+    public async Task ExecuteAsync_ValidGetRequest_ReturnsSuccessResponse() {
         // Arrange
         var expectedResponse = new { id = _storeId, name = "test-store" };
         using var responseMessage = new HttpResponseMessage {
@@ -66,13 +66,16 @@ public class ApiExecutorTests : IDisposable {
             req.Method == HttpMethod.Get &&
             req.RequestUri.ToString().Contains("/stores/" + _storeId));
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Get, "/stores/{store_id}")
-            .PathParam("store_id", _storeId)
-            .Build();
+        var requestBuilder = new RequestBuilder<Any> {
+            Method = HttpMethod.Get,
+            BasePath = _apiUrl,
+            PathTemplate = "/stores/{store_id}",
+            PathParameters = new Dictionary<string, string> { { "store_id", _storeId } },
+            QueryParameters = new Dictionary<string, string>()
+        };
 
         // Act
-        var response = await client.GetApiExecutor().SendAsync<dynamic>(request);
+        var response = await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "GetStore");
 
         // Assert
         Assert.NotNull(response);
@@ -84,7 +87,7 @@ public class ApiExecutorTests : IDisposable {
     }
 
     [Fact]
-    public async Task SendAsync_ValidPostRequest_ReturnsSuccessResponse() {
+    public async Task ExecuteAsync_ValidPostRequest_ReturnsSuccessResponse() {
         // Arrange
         var requestBody = new { user = "user:anne", relation = "reader", @object = "document:2021-budget" };
         var expectedResponse = new { allowed = true };
@@ -100,14 +103,17 @@ public class ApiExecutorTests : IDisposable {
             req.Method == HttpMethod.Post &&
             req.RequestUri.ToString().Contains("/stores/" + _storeId + "/check"));
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Post, "/stores/{store_id}/check")
-            .PathParam("store_id", _storeId)
-            .Body(requestBody)
-            .Build();
+        var requestBuilder = new RequestBuilder<object> {
+            Method = HttpMethod.Post,
+            BasePath = _apiUrl,
+            PathTemplate = "/stores/{store_id}/check",
+            PathParameters = new Dictionary<string, string> { { "store_id", _storeId } },
+            QueryParameters = new Dictionary<string, string>(),
+            Body = requestBody
+        };
 
         // Act
-        var response = await client.GetApiExecutor().SendAsync<dynamic>(request);
+        var response = await client.GetApiClient().ExecuteAsync<object, dynamic>(requestBuilder, "Check");
 
         // Assert
         Assert.NotNull(response);
@@ -117,7 +123,7 @@ public class ApiExecutorTests : IDisposable {
     }
 
     [Fact]
-    public async Task SendAsync_WithPathParams_ReplacesInUrl() {
+    public async Task ExecuteAsync_WithPathParams_ReplacesInUrl() {
         // Arrange
         using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
@@ -127,13 +133,16 @@ public class ApiExecutorTests : IDisposable {
         var (client, mockHandler) = CreateMockClient(responseMessage, req =>
             req.RequestUri.ToString().Contains("/stores/" + _storeId + "/check"));
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Post, "/stores/{store_id}/check")
-            .PathParam("store_id", _storeId)
-            .Build();
+        var requestBuilder = new RequestBuilder<Any> {
+            Method = HttpMethod.Post,
+            BasePath = _apiUrl,
+            PathTemplate = "/stores/{store_id}/check",
+            PathParameters = new Dictionary<string, string> { { "store_id", _storeId } },
+            QueryParameters = new Dictionary<string, string>()
+        };
 
         // Act
-        await client.GetApiExecutor().SendAsync<dynamic>(request);
+        await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "Check");
 
         // Assert
         mockHandler.Protected().Verify(
@@ -146,7 +155,7 @@ public class ApiExecutorTests : IDisposable {
     }
 
     [Fact]
-    public async Task SendAsync_WithQueryParams_AppendsToUrl() {
+    public async Task ExecuteAsync_WithQueryParams_AppendsToUrl() {
         // Arrange
         using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
@@ -157,14 +166,19 @@ public class ApiExecutorTests : IDisposable {
             req.RequestUri.ToString().Contains("page_size=20") &&
             req.RequestUri.ToString().Contains("continuation_token=abc123"));
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Get, "/stores")
-            .QueryParam("page_size", "20")
-            .QueryParam("continuation_token", "abc123")
-            .Build();
+        var requestBuilder = new RequestBuilder<Any> {
+            Method = HttpMethod.Get,
+            BasePath = _apiUrl,
+            PathTemplate = "/stores",
+            PathParameters = new Dictionary<string, string>(),
+            QueryParameters = new Dictionary<string, string> {
+                { "page_size", "20" },
+                { "continuation_token", "abc123" }
+            }
+        };
 
         // Act
-        await client.GetApiExecutor().SendAsync<dynamic>(request);
+        await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "ListStores");
 
         // Assert
         mockHandler.Protected().Verify(
@@ -178,7 +192,7 @@ public class ApiExecutorTests : IDisposable {
     }
 
     [Fact]
-    public async Task SendAsync_WithCustomHeaders_IncludesInRequest() {
+    public async Task ExecuteAsync_WithCustomHeaders_IncludesInRequest() {
         // Arrange
         using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
@@ -187,14 +201,23 @@ public class ApiExecutorTests : IDisposable {
 
         var (client, mockHandler) = CreateMockClient(responseMessage);
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Post, "/stores")
-            .Header("X-Custom-Header", "custom-value")
-            .Header("X-Another-Header", "another-value")
-            .Build();
+        var requestBuilder = new RequestBuilder<Any> {
+            Method = HttpMethod.Post,
+            BasePath = _apiUrl,
+            PathTemplate = "/stores",
+            PathParameters = new Dictionary<string, string>(),
+            QueryParameters = new Dictionary<string, string>()
+        };
+
+        var options = new ClientRequestOptions {
+            Headers = new Dictionary<string, string> {
+                { "X-Custom-Header", "custom-value" },
+                { "X-Another-Header", "another-value" }
+            }
+        };
 
         // Act
-        await client.GetApiExecutor().SendAsync<dynamic>(request);
+        await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "CreateStore", options);
 
         // Assert
         mockHandler.Protected().Verify(
@@ -210,7 +233,7 @@ public class ApiExecutorTests : IDisposable {
     }
 
     [Fact]
-    public async Task SendAsync_WithBody_SerializesToJson() {
+    public async Task ExecuteAsync_WithBody_SerializesToJson() {
         // Arrange
         var requestBody = new { name = "test-store" };
         using var responseMessage = new HttpResponseMessage {
@@ -223,13 +246,17 @@ public class ApiExecutorTests : IDisposable {
 
         var (client, mockHandler) = CreateMockClient(responseMessage);
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Post, "/stores")
-            .Body(requestBody)
-            .Build();
+        var requestBuilder = new RequestBuilder<object> {
+            Method = HttpMethod.Post,
+            BasePath = _apiUrl,
+            PathTemplate = "/stores",
+            PathParameters = new Dictionary<string, string>(),
+            QueryParameters = new Dictionary<string, string>(),
+            Body = requestBody
+        };
 
         // Act
-        await client.GetApiExecutor().SendAsync<dynamic>(request);
+        await client.GetApiClient().ExecuteAsync<object, dynamic>(requestBuilder, "CreateStore");
 
         // Assert
         mockHandler.Protected().Verify(
@@ -243,7 +270,7 @@ public class ApiExecutorTests : IDisposable {
     }
 
     [Fact]
-    public async Task SendAsync_RawResponse_ReturnsJsonString() {
+    public async Task ExecuteAsync_RawResponse_ReturnsJsonString() {
         // Arrange
         var expectedJson = "{\"id\":\"123\",\"name\":\"test\"}";
         using var responseMessage = new HttpResponseMessage {
@@ -253,13 +280,16 @@ public class ApiExecutorTests : IDisposable {
 
         var (client, _) = CreateMockClient(responseMessage);
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Get, "/stores/{store_id}")
-            .PathParam("store_id", _storeId)
-            .Build();
+        var requestBuilder = new RequestBuilder<Any> {
+            Method = HttpMethod.Get,
+            BasePath = _apiUrl,
+            PathTemplate = "/stores/{store_id}",
+            PathParameters = new Dictionary<string, string> { { "store_id", _storeId } },
+            QueryParameters = new Dictionary<string, string>()
+        };
 
         // Act
-        var response = await client.GetApiExecutor().SendAsync(request);
+        var response = await client.GetApiClient().ExecuteAsync(requestBuilder, "GetStore");
 
         // Assert
         Assert.NotNull(response);
@@ -269,7 +299,7 @@ public class ApiExecutorTests : IDisposable {
     }
 
     [Fact]
-    public async Task SendAsync_ApiError_ThrowsFgaApiError() {
+    public async Task ExecuteAsync_ApiError_ThrowsFgaApiError() {
         // Arrange
         var errorResponse = new {
             code = "invalid_request",
@@ -285,32 +315,21 @@ public class ApiExecutorTests : IDisposable {
 
         var (client, _) = CreateMockClient(responseMessage);
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Post, "/stores/{store_id}/check")
-            .PathParam("store_id", _storeId)
-            .Build();
+        var requestBuilder = new RequestBuilder<Any> {
+            Method = HttpMethod.Post,
+            BasePath = _apiUrl,
+            PathTemplate = "/stores/{store_id}/check",
+            PathParameters = new Dictionary<string, string> { { "store_id", _storeId } },
+            QueryParameters = new Dictionary<string, string>()
+        };
 
         // Act & Assert
         await Assert.ThrowsAsync<FgaApiValidationError>(async () =>
-            await client.GetApiExecutor().SendAsync<dynamic>(request));
+            await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "Check"));
     }
 
     [Fact]
-    public async Task SendAsync_NullRequest_ThrowsArgumentNullException() {
-        // Arrange
-        var config = new ClientConfiguration {
-            ApiUrl = _apiUrl,
-            StoreId = _storeId
-        };
-        var client = new OpenFgaClient(config);
-
-        // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
-            await client.GetApiExecutor().SendAsync<dynamic>(null));
-    }
-
-    [Fact]
-    public void ApiExecutor_CalledMultipleTimes_ReturnsSameInstance() {
+    public void GetApiClient_CalledMultipleTimes_ReturnsSameInstance() {
         // Arrange
         var config = new ClientConfiguration {
             ApiUrl = _apiUrl,
@@ -319,15 +338,15 @@ public class ApiExecutorTests : IDisposable {
         var client = new OpenFgaClient(config);
 
         // Act
-        var executor1 = client.GetApiExecutor();
-        var executor2 = client.GetApiExecutor();
+        var apiClient1 = client.GetApiClient();
+        var apiClient2 = client.GetApiClient();
 
         // Assert
-        Assert.Same(executor1, executor2);
+        Assert.Same(apiClient1, apiClient2);
     }
 
     [Fact]
-    public async Task SendAsync_TypedResponse_DeserializesCorrectly() {
+    public async Task ExecuteAsync_TypedResponse_DeserializesCorrectly() {
         // Arrange
         var expectedResponse = new CheckResponse {
             Allowed = true
@@ -342,14 +361,17 @@ public class ApiExecutorTests : IDisposable {
 
         var (client, _) = CreateMockClient(responseMessage);
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Post, "/stores/{store_id}/check")
-            .PathParam("store_id", _storeId)
-            .Body(new { user = "user:anne", relation = "reader", @object = "document:test" })
-            .Build();
+        var requestBuilder = new RequestBuilder<object> {
+            Method = HttpMethod.Post,
+            BasePath = _apiUrl,
+            PathTemplate = "/stores/{store_id}/check",
+            PathParameters = new Dictionary<string, string> { { "store_id", _storeId } },
+            QueryParameters = new Dictionary<string, string>(),
+            Body = new { user = "user:anne", relation = "reader", @object = "document:test" }
+        };
 
         // Act
-        var response = await client.GetApiExecutor().SendAsync<CheckResponse>(request);
+        var response = await client.GetApiClient().ExecuteAsync<object, CheckResponse>(requestBuilder, "Check");
 
         // Assert
         Assert.NotNull(response);
@@ -358,7 +380,7 @@ public class ApiExecutorTests : IDisposable {
     }
 
     [Fact]
-    public async Task SendAsync_CancellationToken_CancelsRequest() {
+    public async Task ExecuteAsync_CancellationToken_CancelsRequest() {
         // Arrange
         using var cts = new CancellationTokenSource();
         cts.Cancel(); // Cancel immediately
@@ -369,17 +391,21 @@ public class ApiExecutorTests : IDisposable {
         };
         var client = new OpenFgaClient(config);
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Get, "/stores")
-            .Build();
+        var requestBuilder = new RequestBuilder<Any> {
+            Method = HttpMethod.Get,
+            BasePath = _apiUrl,
+            PathTemplate = "/stores",
+            PathParameters = new Dictionary<string, string>(),
+            QueryParameters = new Dictionary<string, string>()
+        };
 
         // Act & Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            await client.GetApiExecutor().SendAsync<dynamic>(request, cts.Token));
+            await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "ListStores", null, cts.Token));
     }
 
     [Fact]
-    public async Task SendAsync_WithCredentials_IncludesAuthorizationHeader() {
+    public async Task ExecuteAsync_WithCredentials_IncludesAuthorizationHeader() {
         // Arrange
         using var responseMessage = new HttpResponseMessage {
             StatusCode = HttpStatusCode.OK,
@@ -407,12 +433,16 @@ public class ApiExecutorTests : IDisposable {
         };
         var client = new OpenFgaClient(config, new HttpClient(mockHandler.Object));
 
-        var request = ApiExecutorRequestBuilder
-            .Of(HttpMethod.Get, "/stores")
-            .Build();
+        var requestBuilder = new RequestBuilder<Any> {
+            Method = HttpMethod.Get,
+            BasePath = _apiUrl,
+            PathTemplate = "/stores",
+            PathParameters = new Dictionary<string, string>(),
+            QueryParameters = new Dictionary<string, string>()
+        };
 
         // Act
-        await client.GetApiExecutor().SendAsync<dynamic>(request);
+        await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "ListStores");
 
         // Assert
         mockHandler.Protected().Verify(
@@ -425,4 +455,71 @@ public class ApiExecutorTests : IDisposable {
             ItExpr.IsAny<CancellationToken>()
         );
     }
+
+    [Fact]
+    public async Task ExecuteAsync_UsingFluentApi_WorksCorrectly() {
+        // Arrange
+        var expectedResponse = new { id = _storeId, name = "test-store" };
+        using var responseMessage = new HttpResponseMessage {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent(
+                JsonSerializer.Serialize(expectedResponse),
+                Encoding.UTF8,
+                "application/json")
+        };
+
+        var (client, _) = CreateMockClient(responseMessage, req =>
+            req.Method == HttpMethod.Get &&
+            req.RequestUri.ToString().Contains("/stores/" + _storeId));
+
+        // Demonstrate the new fluent API inspired by ApiExecutorRequestBuilder
+        var requestBuilder = RequestBuilder<Any>
+            .Create(HttpMethod.Get, _apiUrl, "/stores/{store_id}")
+            .WithPathParameter("store_id", _storeId);
+
+        // Act
+        var response = await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "GetStore");
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.True(response.IsSuccessful);
+        Assert.NotNull(response.Data);
+        Assert.Contains("test-store", response.RawResponse);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_FluentApiWithMultipleParams_WorksCorrectly() {
+        // Arrange
+        var requestBody = new { user = "user:anne", relation = "reader", @object = "document:2021-budget" };
+        var expectedResponse = new { allowed = true };
+        using var responseMessage = new HttpResponseMessage {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent(
+                JsonSerializer.Serialize(expectedResponse),
+                Encoding.UTF8,
+                "application/json")
+        };
+
+        var (client, _) = CreateMockClient(responseMessage, req =>
+            req.Method == HttpMethod.Post &&
+            req.RequestUri.ToString().Contains("/stores/" + _storeId + "/check") &&
+            req.RequestUri.ToString().Contains("consistency="));
+
+        // Fluent API with method chaining
+        var requestBuilder = RequestBuilder<object>
+            .Create(HttpMethod.Post, _apiUrl, "/stores/{store_id}/check")
+            .WithPathParameter("store_id", _storeId)
+            .WithQueryParameter("consistency", "HIGHER_CONSISTENCY")
+            .WithBody(requestBody);
+
+        // Act
+        var response = await client.GetApiClient().ExecuteAsync<object, dynamic>(requestBuilder, "Check");
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.True(response.IsSuccessful);
+    }
 }
+

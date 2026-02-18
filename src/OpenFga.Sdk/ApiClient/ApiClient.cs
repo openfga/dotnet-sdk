@@ -112,46 +112,6 @@ public class ApiClient : IDisposable {
     }
 
     /// <summary>
-    ///     Internal method that returns the full ResponseWrapper including raw response.
-    ///     Used by ApiExecutor to provide both raw and typed response data.
-    /// </summary>
-    /// <param name="requestBuilder"></param>
-    /// <param name="apiName"></param>
-    /// <param name="additionalHeaders">Additional headers to merge with auth headers</param>
-    /// <param name="cancellationToken"></param>
-    /// <typeparam name="TReq">Request Type</typeparam>
-    /// <typeparam name="TRes">Response Type</typeparam>
-    /// <returns>The full ResponseWrapper with raw response and deserialized content</returns>
-    /// <exception cref="FgaApiAuthenticationError"></exception>
-    internal async Task<ResponseWrapper<TRes>> SendRequestWithWrapperAsync<TReq, TRes>(
-        RequestBuilder<TReq> requestBuilder,
-        string apiName,
-        IDictionary<string, string>? additionalHeaders = null,
-        CancellationToken cancellationToken = default) {
-        var sw = Stopwatch.StartNew();
-
-        var authToken = await GetAuthenticationTokenAsync(apiName);
-        var mergedHeaders = BuildHeaders(_configuration, authToken, null);
-
-        // Merge additional headers (from ApiExecutor) with auth headers
-        if (additionalHeaders != null) {
-            foreach (var header in additionalHeaders) {
-                mergedHeaders[header.Key] = header.Value;
-            }
-        }
-
-        var response = await Retry(async (attemptCount) =>
-            await _baseClient.SendRequestAsync<TReq, TRes>(requestBuilder, mergedHeaders, apiName,
-                attemptCount, cancellationToken));
-
-        sw.Stop();
-        metrics.BuildForResponse(apiName, response.rawResponse, requestBuilder, sw,
-            response.retryCount);
-
-        return response;
-    }
-
-    /// <summary>
     ///     Handles getting the access token, calling the API, and potentially retrying (use for requests that return no
     ///     content)
     /// </summary>
@@ -304,6 +264,92 @@ public class ApiClient : IDisposable {
             error.RetryAfter = retryInfo.retryAfterSeconds;
             error.RetryAfterRaw = retryInfo.retryAfterRaw;
         }
+    }
+
+    /// <summary>
+    ///     Executes an API request using RequestBuilder and returns an ApiResponse with full response details.
+    ///     This provides a lower-level API for custom requests while leveraging authentication, retry logic, and error handling.
+    /// </summary>
+    /// <typeparam name="TReq">The type of the request body</typeparam>
+    /// <typeparam name="TRes">The type of the response body</typeparam>
+    /// <param name="requestBuilder">The request builder containing request details</param>
+    /// <param name="apiName">The API name for telemetry and error reporting</param>
+    /// <param name="options">Request options including custom headers</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>An ApiResponse containing status code, headers, raw response, and typed data</returns>
+    /// <exception cref="FgaApiAuthenticationError">Thrown when authentication fails</exception>
+    /// <exception cref="FgaApiError">Thrown when the API returns an error response</exception>
+    public async Task<ApiResponse<TRes>> ExecuteAsync<TReq, TRes>(
+        RequestBuilder<TReq> requestBuilder,
+        string apiName,
+        IRequestOptions? options = null,
+        CancellationToken cancellationToken = default) {
+
+        var responseWrapper = await ExecuteRequestWithWrapperAsync<TReq, TRes>(
+            requestBuilder, apiName, options, cancellationToken);
+
+        var rawResponse = await responseWrapper.rawResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        return ApiResponse<TRes>.FromHttpResponse(
+            responseWrapper.rawResponse,
+            rawResponse,
+            responseWrapper.responseContent);
+    }
+
+    /// <summary>
+    ///     Executes an API request using RequestBuilder and returns an ApiResponse with raw JSON string.
+    ///     This variant is useful when you want to process the JSON response manually.
+    /// </summary>
+    /// <typeparam name="TReq">The type of the request body</typeparam>
+    /// <param name="requestBuilder">The request builder containing request details</param>
+    /// <param name="apiName">The API name for telemetry and error reporting</param>
+    /// <param name="options">Request options including custom headers</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>An ApiResponse with the raw JSON response as the Data property</returns>
+    /// <exception cref="FgaApiAuthenticationError">Thrown when authentication fails</exception>
+    /// <exception cref="FgaApiError">Thrown when the API returns an error response</exception>
+    public async Task<ApiResponse<string>> ExecuteAsync<TReq>(
+        RequestBuilder<TReq> requestBuilder,
+        string apiName,
+        IRequestOptions? options = null,
+        CancellationToken cancellationToken = default) {
+
+        // Use object as intermediate type to avoid strong typing
+        var responseWrapper = await ExecuteRequestWithWrapperAsync<TReq, object>(
+            requestBuilder, apiName, options, cancellationToken);
+
+        var rawResponse = await responseWrapper.rawResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        return ApiResponse<string>.FromHttpResponse(
+            responseWrapper.rawResponse,
+            rawResponse,
+            rawResponse);
+    }
+
+    /// <summary>
+    ///     Private helper method that executes a request and returns the ResponseWrapper.
+    ///     This consolidates common logic used by both ExecuteAsync overloads.
+    /// </summary>
+    private async Task<ResponseWrapper<TRes>> ExecuteRequestWithWrapperAsync<TReq, TRes>(
+        RequestBuilder<TReq> requestBuilder,
+        string apiName,
+        IRequestOptions? options,
+        CancellationToken cancellationToken) {
+
+        var sw = Stopwatch.StartNew();
+
+        var authToken = await GetAuthenticationTokenAsync(apiName);
+        var additionalHeaders = BuildHeaders(_configuration, authToken, options);
+
+        var response = await Retry(async (attemptCount) =>
+            await _baseClient.SendRequestAsync<TReq, TRes>(requestBuilder, additionalHeaders, apiName,
+                attemptCount, cancellationToken));
+
+        sw.Stop();
+        metrics.BuildForResponse(apiName, response.rawResponse, requestBuilder, sw,
+            response.retryCount);
+
+        return response;
     }
 
     public void Dispose() => _baseClient.Dispose();

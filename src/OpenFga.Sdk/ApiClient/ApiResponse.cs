@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 
-namespace OpenFga.Sdk.Client.ApiExecutor;
+namespace OpenFga.Sdk.ApiClient;
 
 /// <summary>
-/// Represents the response from an API Executor request, containing both raw and typed response data.
+/// Represents the response from an API request executed via ApiClient.ExecuteAsync,
+/// containing both raw and typed response data.
 /// </summary>
 /// <typeparam name="T">The type of the deserialized response data</typeparam>
 public class ApiResponse<T> {
@@ -101,3 +101,4 @@ public class ApiResponse<T> {
         return headers;
     }
 }
+
