@@ -58,7 +58,7 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
     /// var response = await executor.ExecuteAsync&lt;object, GetStoreResponse&gt;(request, "GetStore");
     /// </code>
     /// </example>
-    public ApiClient.ApiExecutor ApiExecutor => api.ApiClientInternal.ApiExecutor;
+    public ApiExecutor ApiExecutor => api.ApiClientInternal.ApiExecutor;
 
     /// <summary>
     /// Gets the underlying ApiClient (internal use).

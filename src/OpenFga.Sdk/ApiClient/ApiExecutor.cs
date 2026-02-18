@@ -1,7 +1,7 @@
-using System.Threading;
-using System.Threading.Tasks;
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Model;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OpenFga.Sdk.ApiClient;
 
@@ -79,12 +79,10 @@ public class ApiExecutor {
         string apiName,
         IRequestOptions? options = null,
         CancellationToken cancellationToken = default) {
-        return await _apiClient.ExecuteAsync<TRequest>(
+        return await _apiClient.ExecuteAsync(
             requestBuilder,
             apiName,
             options,
             cancellationToken);
     }
 }
-
-
