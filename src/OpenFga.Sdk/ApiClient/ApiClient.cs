@@ -22,6 +22,7 @@ public class ApiClient : IDisposable {
     private readonly OAuth2Client? _oauth2Client;
     private readonly Metrics metrics;
     private readonly RetryHandler _retryHandler;
+    private readonly Lazy<ApiExecutor> _apiExecutor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ApiClient" /> class.
@@ -34,6 +35,7 @@ public class ApiClient : IDisposable {
         metrics = new Metrics(_configuration);
         _baseClient = new BaseClient(configuration, userHttpClient, metrics);
         _retryHandler = new RetryHandler(new RetryParams { MaxRetry = _configuration.MaxRetry, MinWaitInMs = _configuration.MinWaitInMs });
+        _apiExecutor = new Lazy<ApiExecutor>(() => new ApiExecutor(this));
 
         if (_configuration.Credentials == null) {
             return;
@@ -54,6 +56,22 @@ public class ApiClient : IDisposable {
                 break;
         }
     }
+
+    /// <summary>
+    /// Gets the ApiExecutor for making custom API requests.
+    /// Use this when you need to call OpenFGA API endpoints not yet available in the SDK's typed methods,
+    /// or when you need access to full response details (status code, headers, raw response).
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var executor = apiClient.ApiExecutor;
+    /// var request = RequestBuilder&lt;object&gt;
+    ///     .Create(HttpMethod.Get, config.ApiUrl, "/stores/{store_id}")
+    ///     .WithPathParameter("store_id", storeId);
+    /// var response = await executor.ExecuteAsync&lt;object, GetStoreResponse&gt;(request, "GetStore");
+    /// </code>
+    /// </example>
+    public ApiExecutor ApiExecutor => _apiExecutor.Value;
 
     /// <summary>
     ///     Gets the authentication token based on the configured credentials method.

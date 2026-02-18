@@ -978,10 +978,9 @@ For advanced use cases where you need to call API endpoints not yet available in
 
 ```csharp
 using OpenFga.Sdk.ApiClient;
-using FgaApiClient = OpenFga.Sdk.ApiClient.ApiClient;
 
 var client = new OpenFgaClient(configuration);
-var apiClient = client.GetApiClient();
+var executor = client.ApiExecutor;
 
 // Build a request using RequestBuilder
 var request = new RequestBuilder<object> {
@@ -993,7 +992,14 @@ var request = new RequestBuilder<object> {
 };
 
 // Execute and get full response details
-var response = await apiClient.ExecuteAsync<object, GetStoreResponse>(request, "GetStore");
+var response = await executor.ExecuteAsync<object, GetStoreResponse>(request, "GetStore");
+
+// Always check if the request was successful
+if (!response.IsSuccessful) {
+    Console.WriteLine($"Request failed: {response.StatusCode}");
+    Console.WriteLine($"Error: {response.RawResponse}");
+    return;
+}
 
 // Access response details
 Console.WriteLine($"Status: {response.StatusCode}");
@@ -1013,7 +1019,7 @@ var request = RequestBuilder<object>
     .WithQueryParameter("consistency", "HIGHER_CONSISTENCY")
     .WithBody(checkRequest);
 
-var response = await apiClient.ExecuteAsync<object, CheckResponse>(request, "Check");
+var response = await executor.ExecuteAsync<object, CheckResponse>(request, "Check");
 ```
 
 #### Custom Headers
@@ -1026,14 +1032,48 @@ var options = new ClientRequestOptions {
     }
 };
 
-var response = await apiClient.ExecuteAsync<object, TResponse>(
+var response = await executor.ExecuteAsync<object, TResponse>(
     request, 
     "CustomEndpoint", 
     options
 );
 ```
 
-For a complete example with all features, see the [Custom API Requests Example](./example/ApiExecutorExample/).
+#### Error Handling
+
+Always check `response.IsSuccessful` and handle different status codes appropriately:
+
+```csharp
+var response = await executor.ExecuteAsync<object, GetStoreResponse>(request, "GetStore");
+
+if (!response.IsSuccessful)
+{
+    switch ((int)response.StatusCode)
+    {
+        case 404:
+            Console.WriteLine("Store not found");
+            break;
+        case 401:
+            Console.WriteLine("Unauthorized - check your credentials");
+            break;
+        case 429:
+            Console.WriteLine("Rate limited - retry after delay");
+            break;
+        case >= 500:
+            Console.WriteLine($"Server error: {response.RawResponse}");
+            break;
+        default:
+            Console.WriteLine($"Request failed: {response.StatusCode}");
+            break;
+    }
+    return;
+}
+
+// Safe to use response.Data here
+Console.WriteLine($"Store Name: {response.Data.Name}");
+```
+
+For a complete example with all features, see the [ApiExecutor Example](./example/ApiExecutorExample/).
 
 ### Retries
 

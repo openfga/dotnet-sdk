@@ -1,6 +1,6 @@
 # Custom API Requests Example
 
-This example demonstrates how to use `ApiClient.ExecuteAsync()` to make custom HTTP requests to the OpenFGA API with full response details (status code, headers, raw response, typed data). This is useful when you need more control over HTTP requests or want to call endpoints that aren't yet supported by the SDK's typed API.
+This example demonstrates how to use `ApiExecutor` to make custom HTTP requests to the OpenFGA API with full response details (status code, headers, raw response, typed data). This is useful when you need more control over HTTP requests or want to call endpoints that aren't yet supported by the SDK's typed API.
 
 ## What This Example Demonstrates
 
@@ -28,9 +28,9 @@ The SDK provides two ways to interact with the OpenFGA API:
 
 2. **Custom API Requests** (for advanced scenarios):
    ```csharp
-   var apiClient = client.GetApiClient();
+   var executor = client.ApiExecutor;
    var request = RequestBuilder<object>.Create(...);
-   var response = await apiClient.ExecuteAsync<object, CheckResponse>(request, "Check");
+   var response = await executor.ExecuteAsync<object, CheckResponse>(request, "Check");
    // Now you have: response.StatusCode, response.Headers, response.RawResponse, response.Data
    ```
 
@@ -244,7 +244,7 @@ using OpenFga.Sdk.Model;
 using FgaApiClient = OpenFga.Sdk.ApiClient.ApiClient;
 
 var client = new OpenFgaClient(config);
-var apiClient = client.GetApiClient();
+var executor = client.ApiExecutor;
 
 var request = new RequestBuilder<object> {
     Method = HttpMethod.Get,
@@ -254,7 +254,7 @@ var request = new RequestBuilder<object> {
     QueryParameters = new Dictionary<string, string>()
 };
 
-var response = await apiClient.ExecuteAsync<object, ListStoresResponse>(
+var response = await executor.ExecuteAsync<object, ListStoresResponse>(
     request, 
     "ListStores"
 );
@@ -279,7 +279,7 @@ var request = RequestBuilder<object>
         tuple_key = new { user = "user:anne", relation = "reader", @object = "doc:1" }
     });
 
-var response = await apiClient.ExecuteAsync<object, CheckResponse>(
+var response = await executor.ExecuteAsync<object, CheckResponse>(
     request,
     "Check",
     new ClientRequestOptions {
@@ -293,7 +293,7 @@ var response = await apiClient.ExecuteAsync<object, CheckResponse>(
 ### Raw JSON Response
 ```csharp
 // When you want the raw JSON without deserialization
-var response = await apiClient.ExecuteAsync(request, "CustomEndpoint");
+var response = await executor.ExecuteAsync(request, "CustomEndpoint");
 string json = response.Data; // Raw JSON string
 ```
 

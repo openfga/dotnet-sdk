@@ -4,12 +4,11 @@ using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Model;
 using System.Net.Http;
-using FgaApiClient = OpenFga.Sdk.ApiClient.ApiClient;
 
 namespace ApiExecutorExample;
 
 /// <summary>
-/// This example demonstrates how to use ApiClient.ExecuteAsync to make custom HTTP requests
+/// This example demonstrates how to use ApiExecutor to make custom HTTP requests
 /// to the OpenFGA API with full response details (status code, headers, raw response, typed data).
 ///
 /// Prerequisites: Run an OpenFGA server on localhost:8080
@@ -25,41 +24,41 @@ class Program {
         };
 
         using var client = new OpenFgaClient(config);
-        var apiClient = client.GetApiClient(); // Get the ApiClient for custom requests
+        var executor = client.ApiExecutor; // Get the ApiExecutor for custom requests
 
         try {
             // Example 1: List stores using raw GET request
-            await ListStoresExample(apiClient, config.ApiUrl);
+            await ListStoresExample(executor, config.ApiUrl);
 
             // Example 2: Create a store using raw POST request with typed response
-            var storeId = await CreateStoreExample(apiClient, config.ApiUrl);
+            var storeId = await CreateStoreExample(executor, config.ApiUrl);
 
             // Example 3: Get store details using path parameters
-            await GetStoreExample(apiClient, config.ApiUrl, storeId);
+            await GetStoreExample(executor, config.ApiUrl, storeId);
 
             // Example 4: Create an authorization model
-            var modelId = await CreateAuthorizationModelExample(apiClient, config.ApiUrl, storeId);
+            var modelId = await CreateAuthorizationModelExample(executor, config.ApiUrl, storeId);
 
             // Example 5: Write relationship tuples
-            await WriteTuplesExample(apiClient, config.ApiUrl, storeId);
+            await WriteTuplesExample(executor, config.ApiUrl, storeId);
 
             // Example 6: Read relationship tuples
-            await ReadTuplesExample(apiClient, config.ApiUrl, storeId);
+            await ReadTuplesExample(executor, config.ApiUrl, storeId);
 
             // Example 7: Check permissions
-            await CheckPermissionExample(apiClient, config.ApiUrl, storeId, modelId);
+            await CheckPermissionExample(executor, config.ApiUrl, storeId, modelId);
 
             // Example 8: Use raw JSON response instead of typed
-            await RawJsonResponseExample(apiClient, config.ApiUrl);
+            await RawJsonResponseExample(executor, config.ApiUrl);
 
             // Example 9: Custom headers
-            await CustomHeadersExample(apiClient, config.ApiUrl);
+            await CustomHeadersExample(executor, config.ApiUrl);
 
             // Example 10: Fluent API for building requests
-            await FluentApiExample(apiClient, config.ApiUrl);
+            await FluentApiExample(executor, config.ApiUrl);
 
             // Cleanup: Delete the store we created
-            await DeleteStoreExample(apiClient, config.ApiUrl, storeId);
+            await DeleteStoreExample(executor, config.ApiUrl, storeId);
 
             Console.WriteLine("\n=== All examples completed successfully! ===");
         } catch (Exception ex) {
@@ -70,7 +69,7 @@ class Program {
         }
     }
 
-    static async Task ListStoresExample(FgaApiClient apiClient, string basePath) {
+    static async Task ListStoresExample(ApiExecutor executor, string basePath) {
         Console.WriteLine("📋 Example 1: List Stores");
         Console.WriteLine("Making GET request to /stores");
 
@@ -82,7 +81,7 @@ class Program {
             QueryParameters = new Dictionary<string, string>()
         };
 
-        var response = await apiClient.ExecuteAsync<Any, ListStoresResponse>(request, "ListStores");
+        var response = await executor.ExecuteAsync<Any, ListStoresResponse>(request, "ListStores");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Is Successful: {response.IsSuccessful}");
@@ -90,7 +89,7 @@ class Program {
         Console.WriteLine();
     }
 
-    static async Task<string> CreateStoreExample(FgaApiClient apiClient, string basePath) {
+    static async Task<string> CreateStoreExample(ApiExecutor executor, string basePath) {
         Console.WriteLine("🏪 Example 2: Create Store");
         Console.WriteLine("Making POST request to /stores");
 
@@ -108,7 +107,7 @@ class Program {
             Body = requestBody
         };
 
-        var response = await apiClient.ExecuteAsync<object, CreateStoreResponse>(request, "CreateStore");
+        var response = await executor.ExecuteAsync<object, CreateStoreResponse>(request, "CreateStore");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Store ID: {response.Data.Id}");
@@ -119,7 +118,7 @@ class Program {
         return response.Data.Id!;
     }
 
-    static async Task GetStoreExample(FgaApiClient apiClient, string basePath, string storeId) {
+    static async Task GetStoreExample(ApiExecutor executor, string basePath, string storeId) {
         Console.WriteLine("🔍 Example 3: Get Store Details");
         Console.WriteLine($"Making GET request to /stores/{{store_id}}");
 
@@ -131,7 +130,7 @@ class Program {
             QueryParameters = new Dictionary<string, string>()
         };
 
-        var response = await apiClient.ExecuteAsync<Any, GetStoreResponse>(request, "GetStore");
+        var response = await executor.ExecuteAsync<Any, GetStoreResponse>(request, "GetStore");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Store Name: {response.Data.Name}");
@@ -140,7 +139,7 @@ class Program {
         Console.WriteLine();
     }
 
-    static async Task<string> CreateAuthorizationModelExample(FgaApiClient apiClient, string basePath, string storeId) {
+    static async Task<string> CreateAuthorizationModelExample(ApiExecutor executor, string basePath, string storeId) {
         Console.WriteLine("📝 Example 4: Create Authorization Model");
         Console.WriteLine("Making POST request to /stores/{store_id}/authorization-models");
 
@@ -208,7 +207,7 @@ class Program {
             Body = requestBody
         };
 
-        var response = await apiClient.ExecuteAsync<object, WriteAuthorizationModelResponse>(request, "WriteAuthorizationModel");
+        var response = await executor.ExecuteAsync<object, WriteAuthorizationModelResponse>(request, "WriteAuthorizationModel");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Model ID: {response.Data.AuthorizationModelId}");
@@ -217,7 +216,7 @@ class Program {
         return response.Data.AuthorizationModelId!;
     }
 
-    static async Task WriteTuplesExample(FgaApiClient apiClient, string basePath, string storeId) {
+    static async Task WriteTuplesExample(ApiExecutor executor, string basePath, string storeId) {
         Console.WriteLine("✍️  Example 5: Write Relationship Tuples");
         Console.WriteLine("Making POST request to /stores/{store_id}/write");
 
@@ -251,14 +250,14 @@ class Program {
             Body = requestBody
         };
 
-        var response = await apiClient.ExecuteAsync<object, object>(request, "Write");
+        var response = await executor.ExecuteAsync<object, object>(request, "Write");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine("   Tuples written successfully");
         Console.WriteLine();
     }
 
-    static async Task ReadTuplesExample(FgaApiClient apiClient, string basePath, string storeId) {
+    static async Task ReadTuplesExample(ApiExecutor executor, string basePath, string storeId) {
         Console.WriteLine("📖 Example 6: Read Relationship Tuples");
         Console.WriteLine("Making POST request to /stores/{store_id}/read");
 
@@ -279,7 +278,7 @@ class Program {
             Body = requestBody
         };
 
-        var response = await apiClient.ExecuteAsync<object, ReadResponse>(request, "Read");
+        var response = await executor.ExecuteAsync<object, ReadResponse>(request, "Read");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Found {response.Data.Tuples?.Count ?? 0} tuple(s):");
@@ -291,7 +290,7 @@ class Program {
         Console.WriteLine();
     }
 
-    static async Task CheckPermissionExample(FgaApiClient apiClient, string basePath, string storeId, string modelId) {
+    static async Task CheckPermissionExample(ApiExecutor executor, string basePath, string storeId, string modelId) {
         Console.WriteLine("🔐 Example 7: Check Permission");
         Console.WriteLine("Making POST request to /stores/{store_id}/check");
 
@@ -315,14 +314,14 @@ class Program {
             Body = requestBody
         };
 
-        var response = await apiClient.ExecuteAsync<object, CheckResponse>(request, "Check");
+        var response = await executor.ExecuteAsync<object, CheckResponse>(request, "Check");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Allowed: {response.Data.Allowed}");
         Console.WriteLine();
     }
 
-    static async Task RawJsonResponseExample(FgaApiClient apiClient, string basePath) {
+    static async Task RawJsonResponseExample(ApiExecutor executor, string basePath) {
         Console.WriteLine("📄 Example 8: Raw JSON Response");
         Console.WriteLine("Getting response as raw JSON string instead of typed object");
 
@@ -335,7 +334,7 @@ class Program {
         };
 
         // Use ExecuteAsync without second type parameter to get raw JSON string
-        var response = await apiClient.ExecuteAsync(request, "ListStores");
+        var response = await executor.ExecuteAsync(request, "ListStores");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Raw JSON (first 100 chars): {response.Data?.Substring(0, Math.Min(100, response.Data.Length))}...");
@@ -343,7 +342,7 @@ class Program {
         Console.WriteLine();
     }
 
-    static async Task CustomHeadersExample(FgaApiClient apiClient, string basePath) {
+    static async Task CustomHeadersExample(ApiExecutor executor, string basePath) {
         Console.WriteLine("📨 Example 9: Custom Headers");
         Console.WriteLine("Making request with custom headers");
 
@@ -363,7 +362,7 @@ class Program {
             }
         };
 
-        var response = await apiClient.ExecuteAsync<Any, ListStoresResponse>(request, "ListStores", options);
+        var response = await executor.ExecuteAsync<Any, ListStoresResponse>(request, "ListStores", options);
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine("   Custom headers sent successfully");
@@ -371,7 +370,7 @@ class Program {
         Console.WriteLine();
     }
 
-    static async Task FluentApiExample(FgaApiClient apiClient, string basePath) {
+    static async Task FluentApiExample(ApiExecutor executor, string basePath) {
         Console.WriteLine("🎯 Example 10: Fluent API for Request Building");
         Console.WriteLine("Using the enhanced RequestBuilder with fluent methods");
 
@@ -381,7 +380,7 @@ class Program {
             .WithQueryParameter("page_size", "10")
             .WithQueryParameter("continuation_token", "");
 
-        var response = await apiClient.ExecuteAsync<Any, ListStoresResponse>(request, "ListStores");
+        var response = await executor.ExecuteAsync<Any, ListStoresResponse>(request, "ListStores");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Found {response.Data.Stores?.Count ?? 0} store(s) using fluent API");
@@ -389,7 +388,7 @@ class Program {
         Console.WriteLine();
     }
 
-    static async Task DeleteStoreExample(FgaApiClient apiClient, string basePath, string storeId) {
+    static async Task DeleteStoreExample(ApiExecutor executor, string basePath, string storeId) {
         Console.WriteLine("🗑️  Cleanup: Delete Store");
         Console.WriteLine($"Making DELETE request to /stores/{{store_id}}");
 
@@ -401,7 +400,7 @@ class Program {
             QueryParameters = new Dictionary<string, string>()
         };
 
-        var response = await apiClient.ExecuteAsync<Any, object>(request, "DeleteStore");
+        var response = await executor.ExecuteAsync<Any, object>(request, "DeleteStore");
 
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine("   Store deleted successfully");

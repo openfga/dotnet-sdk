@@ -45,13 +45,26 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
     }
 
     /// <summary>
-    /// Gets the underlying ApiClient for making custom API requests.
-    /// The ApiClient allows you to call arbitrary OpenFGA API endpoints using RequestBuilder
-    /// while automatically leveraging the SDK's authentication, retry logic, and error handling.
-    /// Use ApiClient.ExecuteAsync() methods for custom requests that return full response details.
+    /// Gets the ApiExecutor for making custom API requests.
+    /// Use this when you need to call OpenFGA API endpoints not yet available in the SDK's typed methods,
+    /// or when you need access to full response details (status code, headers, raw response).
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var executor = client.ApiExecutor;
+    /// var request = RequestBuilder&lt;object&gt;
+    ///     .Create(HttpMethod.Get, config.ApiUrl, "/stores/{store_id}")
+    ///     .WithPathParameter("store_id", storeId);
+    /// var response = await executor.ExecuteAsync&lt;object, GetStoreResponse&gt;(request, "GetStore");
+    /// </code>
+    /// </example>
+    public ApiClient.ApiExecutor ApiExecutor => api.ApiClientInternal.ApiExecutor;
+
+    /// <summary>
+    /// Gets the underlying ApiClient (internal use).
     /// </summary>
     /// <returns>The ApiClient instance used by this client</returns>
-    public ApiClient.ApiClient GetApiClient() {
+    internal ApiClient.ApiClient GetApiClient() {
         return api.ApiClientInternal;
     }
 

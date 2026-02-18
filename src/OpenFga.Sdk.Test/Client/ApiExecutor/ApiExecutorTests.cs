@@ -75,7 +75,7 @@ public class ApiExecutorTests : IDisposable {
         };
 
         // Act
-        var response = await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "GetStore");
+        var response = await client.ApiExecutor.ExecuteAsync<Any, dynamic>(requestBuilder, "GetStore");
 
         // Assert
         Assert.NotNull(response);
@@ -113,7 +113,7 @@ public class ApiExecutorTests : IDisposable {
         };
 
         // Act
-        var response = await client.GetApiClient().ExecuteAsync<object, dynamic>(requestBuilder, "Check");
+        var response = await client.ApiExecutor.ExecuteAsync<object, dynamic>(requestBuilder, "Check");
 
         // Assert
         Assert.NotNull(response);
@@ -142,7 +142,7 @@ public class ApiExecutorTests : IDisposable {
         };
 
         // Act
-        await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "Check");
+        await client.ApiExecutor.ExecuteAsync<Any, dynamic>(requestBuilder, "Check");
 
         // Assert
         mockHandler.Protected().Verify(
@@ -178,7 +178,7 @@ public class ApiExecutorTests : IDisposable {
         };
 
         // Act
-        await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "ListStores");
+        await client.ApiExecutor.ExecuteAsync<Any, dynamic>(requestBuilder, "ListStores");
 
         // Assert
         mockHandler.Protected().Verify(
@@ -217,7 +217,7 @@ public class ApiExecutorTests : IDisposable {
         };
 
         // Act
-        await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "CreateStore", options);
+        await client.ApiExecutor.ExecuteAsync<Any, dynamic>(requestBuilder, "CreateStore", options);
 
         // Assert
         mockHandler.Protected().Verify(
@@ -256,7 +256,7 @@ public class ApiExecutorTests : IDisposable {
         };
 
         // Act
-        await client.GetApiClient().ExecuteAsync<object, dynamic>(requestBuilder, "CreateStore");
+        await client.ApiExecutor.ExecuteAsync<object, dynamic>(requestBuilder, "CreateStore");
 
         // Assert
         mockHandler.Protected().Verify(
@@ -289,7 +289,7 @@ public class ApiExecutorTests : IDisposable {
         };
 
         // Act
-        var response = await client.GetApiClient().ExecuteAsync(requestBuilder, "GetStore");
+        var response = await client.ApiExecutor.ExecuteAsync(requestBuilder, "GetStore");
 
         // Assert
         Assert.NotNull(response);
@@ -325,7 +325,7 @@ public class ApiExecutorTests : IDisposable {
 
         // Act & Assert
         await Assert.ThrowsAsync<FgaApiValidationError>(async () =>
-            await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "Check"));
+            await client.ApiExecutor.ExecuteAsync<Any, dynamic>(requestBuilder, "Check"));
     }
 
     [Fact]
@@ -338,8 +338,8 @@ public class ApiExecutorTests : IDisposable {
         var client = new OpenFgaClient(config);
 
         // Act
-        var apiClient1 = client.GetApiClient();
-        var apiClient2 = client.GetApiClient();
+        var apiClient1 = client.ApiExecutor;
+        var apiClient2 = client.ApiExecutor;
 
         // Assert
         Assert.Same(apiClient1, apiClient2);
@@ -371,7 +371,7 @@ public class ApiExecutorTests : IDisposable {
         };
 
         // Act
-        var response = await client.GetApiClient().ExecuteAsync<object, CheckResponse>(requestBuilder, "Check");
+        var response = await client.ApiExecutor.ExecuteAsync<object, CheckResponse>(requestBuilder, "Check");
 
         // Assert
         Assert.NotNull(response);
@@ -401,7 +401,7 @@ public class ApiExecutorTests : IDisposable {
 
         // Act & Assert
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-            await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "ListStores", null, cts.Token));
+            await client.ApiExecutor.ExecuteAsync<Any, dynamic>(requestBuilder, "ListStores", null, cts.Token));
     }
 
     [Fact]
@@ -442,7 +442,7 @@ public class ApiExecutorTests : IDisposable {
         };
 
         // Act
-        await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "ListStores");
+        await client.ApiExecutor.ExecuteAsync<Any, dynamic>(requestBuilder, "ListStores");
 
         // Assert
         mockHandler.Protected().Verify(
@@ -478,7 +478,7 @@ public class ApiExecutorTests : IDisposable {
             .WithPathParameter("store_id", _storeId);
 
         // Act
-        var response = await client.GetApiClient().ExecuteAsync<Any, dynamic>(requestBuilder, "GetStore");
+        var response = await client.ApiExecutor.ExecuteAsync<Any, dynamic>(requestBuilder, "GetStore");
 
         // Assert
         Assert.NotNull(response);
@@ -514,7 +514,7 @@ public class ApiExecutorTests : IDisposable {
             .WithBody(requestBody);
 
         // Act
-        var response = await client.GetApiClient().ExecuteAsync<object, dynamic>(requestBuilder, "Check");
+        var response = await client.ApiExecutor.ExecuteAsync<object, dynamic>(requestBuilder, "Check");
 
         // Assert
         Assert.NotNull(response);
