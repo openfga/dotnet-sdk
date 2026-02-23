@@ -249,7 +249,9 @@ public class ApiClient : IDisposable {
         var responseWrapper = await SendRequestInternalAsync<TReq, TRes>(
             requestBuilder, apiName, options, cancellationToken);
 
-        var rawResponse = await responseWrapper.rawResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var rawResponse = responseWrapper.rawResponse.Content != null
+            ? await responseWrapper.rawResponse.Content.ReadAsStringAsync().ConfigureAwait(false)
+            : string.Empty;
 
         return ApiResponse<TRes>.FromHttpResponse(
             responseWrapper.rawResponse,
@@ -279,7 +281,9 @@ public class ApiClient : IDisposable {
         var responseWrapper = await SendRequestInternalAsync<TReq, object>(
             requestBuilder, apiName, options, cancellationToken);
 
-        var rawResponse = await responseWrapper.rawResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var rawResponse = responseWrapper.rawResponse.Content != null
+            ? await responseWrapper.rawResponse.Content.ReadAsStringAsync().ConfigureAwait(false)
+            : string.Empty;
 
         return ApiResponse<string>.FromHttpResponse(
             responseWrapper.rawResponse,
