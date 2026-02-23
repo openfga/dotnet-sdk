@@ -98,41 +98,6 @@ public class ApiClient : IDisposable {
         return null;
     }
 
-    /// <summary>
-    ///     Handles getting the access token, calling the API, and potentially retrying
-    ///     Based on:
-    ///     https://github.com/auth0/auth0.net/blob/595ae80ccad8aa7764b80d26d2ef12f8b35bbeff/src/Auth0.ManagementApi/HttpClientManagementConnection.cs#L67
-    /// </summary>
-    /// <param name="requestBuilder"></param>
-    /// <param name="apiName"></param>
-    /// <param name="options">Request options.</param>
-    /// <param name="cancellationToken"></param>
-    /// <typeparam name="T">Response Type</typeparam>
-    /// <returns></returns>
-    /// <exception cref="FgaApiAuthenticationError"></exception>
-    public async Task<TRes> SendRequestAsync<TReq, TRes>(RequestBuilder<TReq> requestBuilder, string apiName,
-        IRequestOptions? options = null,
-        CancellationToken cancellationToken = default) {
-        var response = await SendRequestInternalAsync<TReq, TRes>(
-            requestBuilder, apiName, options, cancellationToken);
-        return response.responseContent;
-    }
-
-    /// <summary>
-    ///     Handles getting the access token, calling the API, and potentially retrying (use for requests that return no
-    ///     content)
-    /// </summary>
-    /// <param name="requestBuilder"></param>
-    /// <param name="apiName"></param>
-    /// <param name="options">Request options.</param>
-    /// <param name="cancellationToken"></param>
-    /// <exception cref="FgaApiAuthenticationError"></exception>
-    public async Task SendRequestAsync<TReq>(RequestBuilder<TReq> requestBuilder, string apiName,
-        IRequestOptions? options = null,
-        CancellationToken cancellationToken = default) {
-        await SendRequestInternalAsync<TReq, object>(
-            requestBuilder, apiName, options, cancellationToken);
-    }
 
     /// <summary>
     ///     Handles streaming requests that return IAsyncEnumerable.
@@ -265,7 +230,6 @@ public class ApiClient : IDisposable {
 
     /// <summary>
     ///     Executes an API request using RequestBuilder and returns an ApiResponse with full response details.
-    ///     This builds on top of SendRequestAsync by wrapping the response with additional metadata.
     /// </summary>
     /// <typeparam name="TReq">The type of the request body</typeparam>
     /// <typeparam name="TRes">The type of the response body</typeparam>
@@ -325,7 +289,7 @@ public class ApiClient : IDisposable {
 
     /// <summary>
     ///     Core private method that handles authentication, retry logic, and metrics.
-    ///     Both SendRequestAsync and ExecuteAsync build on top of this shared implementation.
+    ///     ExecuteAsync builds on top of this shared implementation.
     /// </summary>
     private async Task<ResponseWrapper<TRes>> SendRequestInternalAsync<TReq, TRes>(
         RequestBuilder<TReq> requestBuilder,

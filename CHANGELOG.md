@@ -7,6 +7,21 @@
 - feat: add `FromJson()` methods to `ClientWriteAuthorizationModelRequest` and `ClientCreateStoreRequest` to enable loading from JSON string (#180)
 - feat: report a per call HTTP metric (#173)
 
+### Breaking Changes
+
+> [!WARNING]
+> - **`ApiClient.SendRequestAsync` removed**: If you were calling `SendRequestAsync` directly on `ApiClient`, switch to `ApiExecutor.ExecuteAsync`:
+>
+>   Before:
+>   ```csharp
+>   var result = await apiClient.SendRequestAsync<MyRequest, MyResponse>(requestBuilder, "ApiName");
+>   ```
+>
+>   After:
+>   ```csharp
+>   var result = (await apiClient.ApiExecutor.ExecuteAsync<MyRequest, MyResponse>(requestBuilder, "ApiName")).Data;
+>   ```
+
 ## v0.9.1
 
 ### [0.9.1](https://github.com/openfga/dotnet-sdk/compare/v0.9.0...v0.9.1) (2026-01-26)

@@ -75,8 +75,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<BatchCheckRequest, BatchCheckResponse>(requestBuilder,
-            "BatchCheck", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<BatchCheckRequest, BatchCheckResponse>(requestBuilder,
+            "BatchCheck", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -108,8 +108,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<CheckRequest, CheckResponse>(requestBuilder,
-            "Check", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<CheckRequest, CheckResponse>(requestBuilder,
+            "Check", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -134,8 +134,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<CreateStoreRequest, CreateStoreResponse>(requestBuilder,
-            "CreateStore", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<CreateStoreRequest, CreateStoreResponse>(requestBuilder,
+            "CreateStore", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -165,7 +165,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        await _apiClient.SendRequestAsync(requestBuilder,
+        await _apiClient.ApiExecutor.ExecuteAsync<Any, object>(requestBuilder,
             "DeleteStore", options, cancellationToken);
     }
 
@@ -198,8 +198,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<ExpandRequest, ExpandResponse>(requestBuilder,
-            "Expand", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<ExpandRequest, ExpandResponse>(requestBuilder,
+            "Expand", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -229,8 +229,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, GetStoreResponse>(requestBuilder,
-            "GetStore", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, GetStoreResponse>(requestBuilder,
+            "GetStore", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -262,8 +262,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<ListObjectsRequest, ListObjectsResponse>(requestBuilder,
-            "ListObjects", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<ListObjectsRequest, ListObjectsResponse>(requestBuilder,
+            "ListObjects", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -298,8 +298,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, ListStoresResponse>(requestBuilder,
-            "ListStores", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, ListStoresResponse>(requestBuilder,
+            "ListStores", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -331,8 +331,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<ListUsersRequest, ListUsersResponse>(requestBuilder,
-            "ListUsers", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<ListUsersRequest, ListUsersResponse>(requestBuilder,
+            "ListUsers", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -364,8 +364,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<ReadRequest, ReadResponse>(requestBuilder,
-            "Read", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<ReadRequest, ReadResponse>(requestBuilder,
+            "Read", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -399,8 +399,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, ReadAssertionsResponse>(requestBuilder,
-            "ReadAssertions", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, ReadAssertionsResponse>(requestBuilder,
+            "ReadAssertions", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -434,8 +434,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, ReadAuthorizationModelResponse>(requestBuilder,
-            "ReadAuthorizationModel", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, ReadAuthorizationModelResponse>(requestBuilder,
+            "ReadAuthorizationModel", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -473,8 +473,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, ReadAuthorizationModelsResponse>(requestBuilder,
-            "ReadAuthorizationModels", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, ReadAuthorizationModelsResponse>(requestBuilder,
+            "ReadAuthorizationModels", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -521,8 +521,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, ReadChangesResponse>(requestBuilder,
-            "ReadChanges", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, ReadChangesResponse>(requestBuilder,
+            "ReadChanges", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -589,8 +589,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<WriteRequest, Object>(requestBuilder,
-            "Write", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<WriteRequest, Object>(requestBuilder,
+            "Write", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -626,7 +626,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        await _apiClient.SendRequestAsync(requestBuilder,
+        await _apiClient.ApiExecutor.ExecuteAsync<WriteAssertionsRequest, object>(requestBuilder,
             "WriteAssertions", options, cancellationToken);
     }
 
@@ -659,8 +659,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<WriteAuthorizationModelRequest, WriteAuthorizationModelResponse>(requestBuilder,
-            "WriteAuthorizationModel", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<WriteAuthorizationModelRequest, WriteAuthorizationModelResponse>(requestBuilder,
+            "WriteAuthorizationModel", options, cancellationToken)).Data!;
     }
 
 
