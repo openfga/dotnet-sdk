@@ -246,7 +246,7 @@ public class Attributes {
             }
         }
         catch {
-            // Handle parsing errors if necessary
+            // Telemetry attribute extraction is best-effort; silently ignore any parsing errors
         }
 
         return attributes;
@@ -267,7 +267,7 @@ public class Attributes {
             }
         }
         catch {
-            // Handle parsing errors if necessary
+            // Telemetry attribute extraction is best-effort; silently ignore any parsing errors
         }
 
         return attributes;
