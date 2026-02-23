@@ -227,8 +227,9 @@ public class Attributes {
     private static TagList AddRequestBodyAttributes<T>(
         RequestBuilder<T> requestBuilder, string apiName, TagList attributes) {
         try {
-            if (requestBuilder.JsonBody != null) {
-                using (var document = JsonDocument.Parse(requestBuilder.JsonBody)) {
+            var jsonBody = requestBuilder.JsonBody;
+            if (jsonBody != null) {
+                using (var document = JsonDocument.Parse(jsonBody)) {
                     var root = document.RootElement;
 
                     if (root.TryGetProperty("authorization_model_id", out var authModelId) &&
@@ -254,8 +255,9 @@ public class Attributes {
 
     private static TagList AddBatchCheckSizeAttribute<T>(RequestBuilder<T> requestBuilder, TagList attributes) {
         try {
-            if (requestBuilder.JsonBody != null) {
-                using (var document = JsonDocument.Parse(requestBuilder.JsonBody)) {
+            var jsonBody = requestBuilder.JsonBody;
+            if (jsonBody != null) {
+                using (var document = JsonDocument.Parse(jsonBody)) {
                     var root = document.RootElement;
 
                     if (root.TryGetProperty("checks", out var checks) &&
