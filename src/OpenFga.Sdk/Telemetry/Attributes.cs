@@ -36,6 +36,11 @@ public static class TelemetryAttribute {
     /// </summary>
     public static readonly string RequestClientId = "fga-client.request.client_id";
 
+    /// <summary>
+    ///     The number of checks in a batch check request, if applicable.
+    /// </summary>
+    public static readonly string RequestBatchCheckSize = "fga-client.request.batch_check_size";
+
     // Attributes (tags) associated with the response //
 
     /// <summary>
@@ -97,6 +102,7 @@ public static class TelemetryAttribute {
             RequestStoreId,
             RequestModelId,
             RequestClientId,
+            RequestBatchCheckSize,
             ResponseModelId,
             FgaRequestUser,
             HttpMethod,
@@ -188,6 +194,10 @@ public class Attributes {
             attributes = AddRequestModelIdAttributes(requestBuilder, apiName, attributes);
         }
 
+        if (enabledAttributes.Contains(TelemetryAttribute.RequestBatchCheckSize) && apiName is "BatchCheck") {
+            attributes = AddBatchCheckSizeAttribute(requestBuilder, attributes);
+        }
+
         return attributes;
     }
 
@@ -231,6 +241,27 @@ public class Attributes {
                         !string.IsNullOrEmpty(fgaUser.GetString())) {
                         attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.FgaRequestUser,
                             fgaUser.GetString()));
+                    }
+                }
+            }
+        }
+        catch {
+            // Handle parsing errors if necessary
+        }
+
+        return attributes;
+    }
+
+    private static TagList AddBatchCheckSizeAttribute<T>(RequestBuilder<T> requestBuilder, TagList attributes) {
+        try {
+            if (requestBuilder.JsonBody != null) {
+                using (var document = JsonDocument.Parse(requestBuilder.JsonBody)) {
+                    var root = document.RootElement;
+
+                    if (root.TryGetProperty("checks", out var checks) &&
+                        checks.ValueKind == JsonValueKind.Array) {
+                        attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestBatchCheckSize,
+                            checks.GetArrayLength()));
                     }
                 }
             }
