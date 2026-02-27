@@ -156,7 +156,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 Body = null
             };
 
-            await apiClient.SendRequestAsync<object, ReadAuthorizationModelsResponse>(
+            await apiClient.ApiExecutor.ExecuteAsync<object, ReadAuthorizationModelsResponse>(
                 requestBuilder,
                 "ReadAuthorizationModels"
             );
@@ -237,7 +237,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 Body = null
             };
 
-            await apiClient.SendRequestAsync<object, ReadAuthorizationModelsResponse>(
+            await apiClient.ApiExecutor.ExecuteAsync<object, ReadAuthorizationModelsResponse>(
                 requestBuilder,
                 "ReadAuthorizationModels"
             );
@@ -285,7 +285,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 Body = null
             };
 
-            await apiClient.SendRequestAsync<object, ReadAuthorizationModelsResponse>(
+            await apiClient.ApiExecutor.ExecuteAsync<object, ReadAuthorizationModelsResponse>(
                 requestBuilder,
                 "ReadAuthorizationModels"
             );
@@ -365,7 +365,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 }
             };
 
-            await apiClient.SendRequestAsync<object, ReadAuthorizationModelsResponse>(
+            await apiClient.ApiExecutor.ExecuteAsync<object, ReadAuthorizationModelsResponse>(
                 requestBuilder,
                 "ReadAuthorizationModels",
                 options

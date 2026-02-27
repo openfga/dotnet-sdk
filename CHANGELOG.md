@@ -3,8 +3,24 @@
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.9.1...HEAD)
 
 ### Added
+- feat: add ApiExecutor for raw requests (#176)
 - feat: add `FromJson()` methods to `ClientWriteAuthorizationModelRequest` and `ClientCreateStoreRequest` to enable loading from JSON string (#180)
 - feat: report a per call HTTP metric (#173)
+
+### Breaking Changes
+
+> [!WARNING]
+> - **`ApiClient.SendRequestAsync` removed**: If you were calling `SendRequestAsync` directly on `ApiClient`, switch to `ApiExecutor.ExecuteAsync`:
+>
+>   Before:
+>   ```csharp
+>   var result = await apiClient.SendRequestAsync<MyRequest, MyResponse>(requestBuilder, "ApiName");
+>   ```
+>
+>   After:
+>   ```csharp
+>   var result = (await apiClient.ApiExecutor.ExecuteAsync<MyRequest, MyResponse>(requestBuilder, "ApiName")).Data;
+>   ```
 
 ## v0.9.1
 
