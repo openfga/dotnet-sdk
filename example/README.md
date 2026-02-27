@@ -3,8 +3,18 @@
 A set of Examples on how to call the OpenFGA .NET SDK
 
 ### Examples
-Example 1:
+
+**Example 1:**
 A bare bones example. It creates a store, and runs a set of calls against it including creating a model, writing tuples and checking for access.
+
+**StreamedListObjectsExample:**
+Demonstrates how to use the StreamedListObjects API to efficiently list objects with streaming responses.
+
+**OpenTelemetryExample:**
+Shows how to integrate OpenTelemetry for observability and tracing of OpenFGA SDK operations.
+
+**ApiExecutor Example:**
+Demonstrates how to use the `ApiExecutor` to make custom HTTP requests to the OpenFGA API with full response details. This is useful when you need more control over requests or want to call endpoints not yet available in the SDK's typed API. Includes a Makefile for easy execution with a local OpenFGA server.
 
 
 ### Running the Examples

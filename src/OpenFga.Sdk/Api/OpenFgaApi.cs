@@ -42,6 +42,11 @@ public class OpenFgaApi : IDisposable {
     }
 
     /// <summary>
+    /// Gets the internal ApiClient instance for making custom API requests.
+    /// </summary>
+    internal ApiClient.ApiClient ApiClientInternal => _apiClient;
+
+    /// <summary>
     /// Send a list of &#x60;check&#x60; operations in a single request The &#x60;BatchCheck&#x60; API functions nearly identically to &#x60;Check&#x60;, but instead of checking a single user-object relationship BatchCheck accepts a list of relationships to check and returns a map containing &#x60;BatchCheckItem&#x60; response for each check it received.  An associated &#x60;correlation_id&#x60; is required for each check in the batch. This ID is used to correlate a check to the appropriate response. It is a string consisting of only alphanumeric characters or hyphens with a maximum length of 36 characters. This &#x60;correlation_id&#x60; is used to map the result of each check to the item which was checked, so it must be unique for each item in the batch. We recommend using a UUID or ULID as the &#x60;correlation_id&#x60;, but you can use whatever unique identifier you need as long  as it matches this regex pattern: &#x60;^[\\w\\d-]{1,36}$&#x60;  NOTE: The maximum number of checks that can be passed in the &#x60;BatchCheck&#x60; API is configurable via the [OPENFGA_MAX_CHECKS_PER_BATCH_CHECK](https://openfga.dev/docs/getting-started/setup-openfga/configuration#OPENFGA_MAX_CHECKS_PER_BATCH_CHECK) environment variable. If &#x60;BatchCheck&#x60; is called using the SDK, the SDK can split the batch check requests for you.  For more details on how &#x60;Check&#x60; functions, see the docs for &#x60;/check&#x60;.  ### Examples #### A BatchCheckRequest &#x60;&#x60;&#x60;json {   \&quot;checks\&quot;: [      {        \&quot;tuple_key\&quot;: {          \&quot;object\&quot;: \&quot;document:2021-budget\&quot;          \&quot;relation\&quot;: \&quot;reader\&quot;,          \&quot;user\&quot;: \&quot;user:anne\&quot;,        },        \&quot;contextual_tuples\&quot;: {...}        \&quot;context\&quot;: {}        \&quot;correlation_id\&quot;: \&quot;01JA8PM3QM7VBPGB8KMPK8SBD5\&quot;      },      {        \&quot;tuple_key\&quot;: {          \&quot;object\&quot;: \&quot;document:2021-budget\&quot;          \&quot;relation\&quot;: \&quot;reader\&quot;,          \&quot;user\&quot;: \&quot;user:bob\&quot;,        },        \&quot;contextual_tuples\&quot;: {...}        \&quot;context\&quot;: {}        \&quot;correlation_id\&quot;: \&quot;01JA8PMM6A90NV5ET0F28CYSZQ\&quot;      }    ] } &#x60;&#x60;&#x60;  Below is a possible response to the above request. Note that the result map&#39;s keys are the &#x60;correlation_id&#x60; values from the checked items in the request: &#x60;&#x60;&#x60;json {    \&quot;result\&quot;: {      \&quot;01JA8PMM6A90NV5ET0F28CYSZQ\&quot;: {        \&quot;allowed\&quot;: false,         \&quot;error\&quot;: {\&quot;message\&quot;: \&quot;\&quot;}      },      \&quot;01JA8PM3QM7VBPGB8KMPK8SBD5\&quot;: {        \&quot;allowed\&quot;: true,         \&quot;error\&quot;: {\&quot;message\&quot;: \&quot;\&quot;}      } } &#x60;&#x60;&#x60; 
     /// </summary>
     /// <exception cref="ApiException">Thrown when fails to make API call</exception>
@@ -70,8 +75,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<BatchCheckRequest, BatchCheckResponse>(requestBuilder,
-            "BatchCheck", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<BatchCheckRequest, BatchCheckResponse>(requestBuilder,
+            "BatchCheck", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -103,8 +108,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<CheckRequest, CheckResponse>(requestBuilder,
-            "Check", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<CheckRequest, CheckResponse>(requestBuilder,
+            "Check", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -129,8 +134,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<CreateStoreRequest, CreateStoreResponse>(requestBuilder,
-            "CreateStore", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<CreateStoreRequest, CreateStoreResponse>(requestBuilder,
+            "CreateStore", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -160,7 +165,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        await _apiClient.SendRequestAsync(requestBuilder,
+        await _apiClient.ApiExecutor.ExecuteAsync<Any, object>(requestBuilder,
             "DeleteStore", options, cancellationToken);
     }
 
@@ -193,8 +198,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<ExpandRequest, ExpandResponse>(requestBuilder,
-            "Expand", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<ExpandRequest, ExpandResponse>(requestBuilder,
+            "Expand", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -224,8 +229,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, GetStoreResponse>(requestBuilder,
-            "GetStore", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, GetStoreResponse>(requestBuilder,
+            "GetStore", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -257,8 +262,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<ListObjectsRequest, ListObjectsResponse>(requestBuilder,
-            "ListObjects", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<ListObjectsRequest, ListObjectsResponse>(requestBuilder,
+            "ListObjects", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -293,8 +298,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, ListStoresResponse>(requestBuilder,
-            "ListStores", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, ListStoresResponse>(requestBuilder,
+            "ListStores", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -326,8 +331,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<ListUsersRequest, ListUsersResponse>(requestBuilder,
-            "ListUsers", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<ListUsersRequest, ListUsersResponse>(requestBuilder,
+            "ListUsers", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -359,8 +364,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<ReadRequest, ReadResponse>(requestBuilder,
-            "Read", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<ReadRequest, ReadResponse>(requestBuilder,
+            "Read", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -394,8 +399,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, ReadAssertionsResponse>(requestBuilder,
-            "ReadAssertions", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, ReadAssertionsResponse>(requestBuilder,
+            "ReadAssertions", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -429,8 +434,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, ReadAuthorizationModelResponse>(requestBuilder,
-            "ReadAuthorizationModel", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, ReadAuthorizationModelResponse>(requestBuilder,
+            "ReadAuthorizationModel", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -468,8 +473,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, ReadAuthorizationModelsResponse>(requestBuilder,
-            "ReadAuthorizationModels", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, ReadAuthorizationModelsResponse>(requestBuilder,
+            "ReadAuthorizationModels", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -516,8 +521,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<Any, ReadChangesResponse>(requestBuilder,
-            "ReadChanges", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<Any, ReadChangesResponse>(requestBuilder,
+            "ReadChanges", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -584,8 +589,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<WriteRequest, Object>(requestBuilder,
-            "Write", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<WriteRequest, Object>(requestBuilder,
+            "Write", options, cancellationToken)).Data!;
     }
 
     /// <summary>
@@ -621,7 +626,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        await _apiClient.SendRequestAsync(requestBuilder,
+        await _apiClient.ApiExecutor.ExecuteAsync<WriteAssertionsRequest, object>(requestBuilder,
             "WriteAssertions", options, cancellationToken);
     }
 
@@ -654,8 +659,8 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        return await _apiClient.SendRequestAsync<WriteAuthorizationModelRequest, WriteAuthorizationModelResponse>(requestBuilder,
-            "WriteAuthorizationModel", options, cancellationToken);
+        return (await _apiClient.ApiExecutor.ExecuteAsync<WriteAuthorizationModelRequest, WriteAuthorizationModelResponse>(requestBuilder,
+            "WriteAuthorizationModel", options, cancellationToken)).Data!;
     }
 
 
