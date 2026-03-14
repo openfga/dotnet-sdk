@@ -299,6 +299,14 @@ fgaClient.StoreId = storeId;
 // continue calling the API normally
 ```
 
+You can also load the request from a JSON string:
+
+```csharp
+var store = await fgaClient.CreateStore(ClientCreateStoreRequest.FromJson("{\"name\":\"FGA Demo\"}"));
+
+// store.Id = "01FQH7V8BEG3GPQW93KTRFR8JB"
+```
+
 ##### Get Store
 
 Get information about the current store.
@@ -392,6 +400,41 @@ var body = new ClientWriteAuthorizationModelRequest {
         }
     }
 };
+
+var response = await fgaClient.WriteAuthorizationModel(body);
+
+// response.AuthorizationModelId = "01GXSA8YR785C4FYS3C0RTG7B1"
+```
+
+You can also load the request from a JSON string (e.g. a model file):
+
+```csharp
+var body = ClientWriteAuthorizationModelRequest.FromJson(@"{
+  ""schema_version"": ""1.1"",
+  ""type_definitions"": [
+    { ""type"": ""user"", ""relations"": {} },
+    {
+      ""type"": ""document"",
+      ""relations"": {
+        ""writer"": { ""this"": {} },
+        ""viewer"": {
+          ""union"": {
+            ""child"": [
+              { ""this"": {} },
+              { ""computed_userset"": { ""relation"": ""writer"" } }
+            ]
+          }
+        }
+      },
+      ""metadata"": {
+        ""relations"": {
+          ""writer"": { ""directly_related_user_types"": [{ ""type"": ""user"" }] },
+          ""viewer"": { ""directly_related_user_types"": [{ ""type"": ""user"" }] }
+        }
+      }
+    }
+  ]
+}");
 
 var response = await fgaClient.WriteAuthorizationModel(body);
 
