@@ -58,7 +58,7 @@ class Program {
             await FluentApiExample(executor, config.ApiUrl);
 
             // Example 11: Streaming API via ExecuteStreamingAsync
-            await StreamingExample(executor, config.ApiUrl, storeId, modelId);
+            await StreamingExample(executor, config.ApiUrl);
 
             // Cleanup: Delete the store we created
             await DeleteStoreExample(executor, config.ApiUrl, storeId);
@@ -391,29 +391,147 @@ class Program {
         Console.WriteLine();
     }
 
-    static async Task StreamingExample(ApiExecutor executor, string basePath, string storeId, string modelId) {
-        Console.WriteLine("🌊 Example 11: Streaming API");
-        Console.WriteLine("Streaming list-objects results via ExecuteStreamingAsync");
+    static async Task StreamingExample(ApiExecutor executor, string basePath) {
+        Console.WriteLine("Example 11: Streaming API");
+        Console.WriteLine("Streaming list-objects for a computed relation via ExecuteStreamingAsync");
 
-        var requestBody = new Dictionary<string, object> {
-            { "authorization_model_id", modelId },
-            { "user", "user:alice" },
-            { "relation", "writer" },
-            { "type", "document" }
-        };
+        // Create a dedicated store for this streaming demo
+        var storeResponse = await executor.ExecuteAsync<object, CreateStoreResponse>(
+            RequestBuilder<object>
+                .Create(HttpMethod.Post, basePath, "/stores")
+                .WithBody(new Dictionary<string, object> { { "name", "streaming-demo" } }),
+            "CreateStore");
+        var streamStoreId = storeResponse.Data.Id!;
+        Console.WriteLine($"   Created store: {streamStoreId}");
 
-        var request = RequestBuilder<object>
-            .Create(HttpMethod.Post, basePath, "/stores/{store_id}/streamed-list-objects")
-            .WithPathParameter("store_id", storeId)
-            .WithBody(requestBody);
+        // Write an authorization model with owner, viewer, and a computed can_read relation
+        var modelResponse = await executor.ExecuteAsync<object, WriteAuthorizationModelResponse>(
+            RequestBuilder<object>
+                .Create(HttpMethod.Post, basePath, "/stores/{store_id}/authorization-models")
+                .WithPathParameter("store_id", streamStoreId)
+                .WithBody(new Dictionary<string, object> {
+                    { "schema_version", "1.1" },
+                    {
+                        "type_definitions", new List<Dictionary<string, object>> {
+                            new() {
+                                { "type", "user" },
+                                { "relations", new Dictionary<string, object>() }
+                            },
+                            new() {
+                                { "type", "document" },
+                                {
+                                    "relations", new Dictionary<string, object> {
+                                        { "owner",  new Dictionary<string, object> { { "this", new Dictionary<string, object>() } } },
+                                        { "viewer", new Dictionary<string, object> { { "this", new Dictionary<string, object>() } } },
+                                        {
+                                            "can_read", new Dictionary<string, object> {
+                                                {
+                                                    "union", new Dictionary<string, object> {
+                                                        {
+                                                            "child", new List<Dictionary<string, object>> {
+                                                                new() { { "computedUserset", new Dictionary<string, object> { { "relation", "owner" } } } },
+                                                                new() { { "computedUserset", new Dictionary<string, object> { { "relation", "viewer" } } } }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "metadata", new Dictionary<string, object> {
+                                        {
+                                            "relations", new Dictionary<string, object> {
+                                                { "owner",   new Dictionary<string, object> { { "directly_related_user_types", new List<Dictionary<string, string>> { new() { { "type", "user" } } } } } },
+                                                { "viewer",  new Dictionary<string, object> { { "directly_related_user_types", new List<Dictionary<string, string>> { new() { { "type", "user" } } } } } },
+                                                { "can_read", new Dictionary<string, object> { { "directly_related_user_types", new List<Dictionary<string, string>>() } } }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }),
+            "WriteAuthorizationModel");
+        var streamModelId = modelResponse.Data.AuthorizationModelId!;
+        Console.WriteLine($"   Created model: {streamModelId}");
 
-        var count = 0;
-        await foreach (var item in executor.ExecuteStreamingAsync<object, StreamedListObjectsResponse>(request, "StreamedListObjects")) {
-            count++;
-            Console.WriteLine($"   Streamed object: {item.Object}");
+        // Write 1000 documents where anne is the owner and 1000 where she is a viewer (batches of 100)
+        Console.WriteLine("   Writing tuples (1000 as owner, 1000 as viewer)...");
+        const int batchSize = 100;
+        var totalWritten = 0;
+
+        for (var batch = 0; batch < 10; batch++) {
+            var tuples = new List<Dictionary<string, string>>();
+            for (var i = 1; i <= batchSize; i++) {
+                tuples.Add(new Dictionary<string, string> {
+                    { "user", "user:anne" }, { "relation", "owner" }, { "object", $"document:{batch * batchSize + i}" }
+                });
+            }
+            await executor.ExecuteAsync<object, object>(
+                RequestBuilder<object>
+                    .Create(HttpMethod.Post, basePath, "/stores/{store_id}/write")
+                    .WithPathParameter("store_id", streamStoreId)
+                    .WithBody(new Dictionary<string, object> {
+                        { "writes", new Dictionary<string, object> { { "tuple_keys", tuples } } },
+                        { "authorization_model_id", streamModelId }
+                    }),
+                "Write");
+            totalWritten += tuples.Count;
         }
 
-        Console.WriteLine($"✅ Received {count} streamed object(s)");
+        for (var batch = 0; batch < 10; batch++) {
+            var tuples = new List<Dictionary<string, string>>();
+            for (var i = 1; i <= batchSize; i++) {
+                tuples.Add(new Dictionary<string, string> {
+                    { "user", "user:anne" }, { "relation", "viewer" }, { "object", $"document:{1000 + batch * batchSize + i}" }
+                });
+            }
+            await executor.ExecuteAsync<object, object>(
+                RequestBuilder<object>
+                    .Create(HttpMethod.Post, basePath, "/stores/{store_id}/write")
+                    .WithPathParameter("store_id", streamStoreId)
+                    .WithBody(new Dictionary<string, object> {
+                        { "writes", new Dictionary<string, object> { { "tuple_keys", tuples } } },
+                        { "authorization_model_id", streamModelId }
+                    }),
+                "Write");
+            totalWritten += tuples.Count;
+        }
+
+        Console.WriteLine($"   Wrote {totalWritten} tuples");
+
+        // Stream objects via the computed can_read relation using ExecuteStreamingAsync
+        Console.WriteLine("   Streaming objects via computed 'can_read' relation...");
+        var count = 0;
+        var streamRequest = RequestBuilder<object>
+            .Create(HttpMethod.Post, basePath, "/stores/{store_id}/streamed-list-objects")
+            .WithPathParameter("store_id", streamStoreId)
+            .WithBody(new Dictionary<string, object> {
+                { "user", "user:anne" },
+                { "relation", "can_read" },
+                { "type", "document" },
+                { "authorization_model_id", streamModelId }
+            });
+
+        await foreach (var item in executor.ExecuteStreamingAsync<object, StreamedListObjectsResponse>(streamRequest, "StreamedListObjects")) {
+            count++;
+            if (count <= 3 || count % 500 == 0) {
+                Console.WriteLine($"   - {item.Object}");
+            }
+        }
+
+        Console.WriteLine($"✓ Streamed {count} objects");
+
+        // Clean up the streaming demo store
+        await executor.ExecuteAsync<Any, object>(
+            RequestBuilder<Any>
+                .Create(HttpMethod.Delete, basePath, "/stores/{store_id}")
+                .WithPathParameter("store_id", streamStoreId),
+            "DeleteStore");
+        Console.WriteLine("   Streaming demo store deleted");
         Console.WriteLine();
     }
 

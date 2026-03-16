@@ -14,7 +14,7 @@ This example demonstrates how to use `ApiExecutor` to make custom HTTP requests 
 8. **Raw JSON Response** - Getting responses as raw JSON strings
 9. **Custom Headers** - Adding custom headers to requests via ClientRequestOptions
 10. **Fluent API** - Using the enhanced RequestBuilder with fluent methods
-11. **Streaming** - Streaming results via `ExecuteStreamingAsync` (e.g., streamed-list-objects)
+11. **Streaming** - Stream results using `ExecuteStreamingAsync` against the streamed-list-objects endpoint
 
 ## Key Concepts
 
@@ -172,10 +172,22 @@ Using the enhanced RequestBuilder with fluent methods
    Found 0 store(s) using fluent API
    Note: Fluent API provides better validation and cleaner syntax!
 
-🌊 Example 11: Streaming API
-Streaming list-objects results via ExecuteStreamingAsync
-   Streamed object: document:roadmap
-✅ Received 1 streamed object(s)
+Example 11: Streaming API
+Streaming list-objects for a computed relation via ExecuteStreamingAsync
+   Created store: 01JQWXYZ...
+   Created model: 01JQWXYZ...
+   Writing tuples (1000 as owner, 1000 as viewer)...
+   Wrote 2000 tuples
+   Streaming objects via computed 'can_read' relation...
+   - document:1
+   - document:2
+   - document:3
+   - document:500
+   - document:1000
+   - document:1500
+   - document:2000
+✓ Streamed 2000 objects
+   Streaming demo store deleted
 
 🗑️  Cleanup: Delete Store
 Making DELETE request to /stores/{store_id}
@@ -223,7 +235,7 @@ RequestBuilder
    - Add custom headers via `ClientRequestOptions`
    - Get raw JSON or strongly-typed responses
    - Use path and query parameters easily
-   - Stream results with `ExecuteStreamingAsync` for endpoints that return server-sent event streams
+   - Stream results with `ExecuteStreamingAsync` for streaming endpoints
 
 ## When to Use Custom API Requests
 
@@ -306,20 +318,19 @@ string json = response.Data; // Raw JSON string
 
 ### Streaming Request
 ```csharp
-// For endpoints that stream results (e.g., streamed-list-objects)
 var request = RequestBuilder<object>
     .Create(HttpMethod.Post, config.ApiUrl, "/stores/{store_id}/streamed-list-objects")
     .WithPathParameter("store_id", storeId)
     .WithBody(new {
         user = "user:anne",
-        relation = "viewer",
+        relation = "can_read",
         type = "document",
         authorization_model_id = modelId
     });
 
 await foreach (var item in executor.ExecuteStreamingAsync<object, StreamedListObjectsResponse>(
     request, "StreamedListObjects")) {
-    Console.WriteLine($"Object: {item.Object}");
+    Console.WriteLine(item.Object);
 }
 ```
 

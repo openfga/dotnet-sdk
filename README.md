@@ -1086,24 +1086,22 @@ Console.WriteLine($"Store Name: {response.Data.Name}");
 
 #### Streaming Requests
 
-For endpoints that stream results (such as `/stores/{store_id}/streamed-list-objects`), use `ExecuteStreamingAsync`. This returns an `IAsyncEnumerable<TResponse>` that yields items as they arrive from the server — no pagination limit applies.
+For endpoints that stream results (such as `/stores/{store_id}/streamed-list-objects`), use `ExecuteStreamingAsync`. It returns an `IAsyncEnumerable<TResponse>` with no 1000-object pagination limit.
 
 ```csharp
-var requestBody = new {
-    user = "user:anne",
-    relation = "viewer",
-    type = "document",
-    authorization_model_id = authorizationModelId
-};
-
 var request = RequestBuilder<object>
     .Create(HttpMethod.Post, configuration.ApiUrl, "/stores/{store_id}/streamed-list-objects")
     .WithPathParameter("store_id", storeId)
-    .WithBody(requestBody);
+    .WithBody(new {
+        user = "user:anne",
+        relation = "can_read",
+        type = "document",
+        authorization_model_id = authorizationModelId
+    });
 
 await foreach (var item in executor.ExecuteStreamingAsync<object, StreamedListObjectsResponse>(
     request, "StreamedListObjects")) {
-    Console.WriteLine($"Object: {item.Object}");
+    Console.WriteLine(item.Object);
 }
 ```
 
