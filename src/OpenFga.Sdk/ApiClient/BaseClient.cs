@@ -168,37 +168,63 @@ public class BaseClient : IDisposable {
     }
 
     /// <summary>
-    ///     Handles calling the API for streaming responses (e.g., NDJSON)
+    ///     Establishes the HTTP connection for a streaming request by sending the request and validating the
+    ///     response status code. The response body stream is not read yet, making this phase safe to retry.
     /// </summary>
-    /// <param name="request">The HTTP request message</param>
+    /// <param name="requestBuilder">The request builder (a fresh HttpRequestMessage is created per attempt)</param>
     /// <param name="additionalHeaders">Additional headers to include</param>
-    /// <param name="apiName">The API name for error reporting</param>
+    /// <param name="apiName">The API name for metrics and error reporting</param>
+    /// <param name="retryCount">The current retry attempt count (0 for the initial request)</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <typeparam name="T">The type of each streamed response object</typeparam>
-    /// <returns>An async enumerable of parsed response objects</returns>
-    /// <exception cref="ApiException"></exception>
-    public async IAsyncEnumerable<T> SendStreamingRequestAsync<T>(
-        HttpRequestMessage request,
-        IDictionary<string, string>? additionalHeaders = null,
-        string? apiName = null,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+    /// <typeparam name="TReq">The request body type</typeparam>
+    /// <returns>A ResponseWrapper containing the established HttpResponseMessage (caller takes ownership)</returns>
+    internal async Task<ResponseWrapper<HttpResponseMessage>> EstablishStreamingConnectionAsync<TReq>(
+        RequestBuilder<TReq> requestBuilder,
+        IDictionary<string, string>? additionalHeaders,
+        string? apiName,
+        int retryCount,
+        CancellationToken cancellationToken) {
+
+        var request = requestBuilder.BuildRequest();
 
         if (additionalHeaders != null) {
-            foreach (var header in additionalHeaders.Where(header => header.Value != null)) {
+            foreach (var header in additionalHeaders.Where(h => h.Value != null)) {
                 request.Headers.Add(header.Key, header.Value);
             }
         }
 
-        // Use ResponseHeadersRead to start streaming before full response is received
-        using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+        var httpRequestStopwatch = System.Diagnostics.Stopwatch.StartNew();
+        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
             .ConfigureAwait(false);
+        httpRequestStopwatch.Stop();
+
+        if (_metrics != null && apiName != null) {
+            _metrics.BuildForHttpRequest(apiName, response, requestBuilder, httpRequestStopwatch, retryCount);
+        }
 
         try {
             response.EnsureSuccessStatusCode();
         }
         catch (HttpRequestException) {
-            throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
+            using (response) {
+                throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
+            }
         }
+
+        return new ResponseWrapper<HttpResponseMessage> { rawResponse = response, responseContent = response };
+    }
+
+    /// <summary>
+    ///     Parses an NDJSON stream from an already-established HTTP response, yielding each item as it arrives.
+    ///     This phase should not be retried once started, as partial results may already have been delivered.
+    /// </summary>
+    /// <param name="response">The established HTTP response with an open body stream</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <typeparam name="T">The type of each streamed response object</typeparam>
+    /// <returns>An async enumerable of parsed response objects</returns>
+    internal async IAsyncEnumerable<T> StreamFromResponseAsync<T>(
+        HttpResponseMessage response,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default) {
 
         if (response.Content == null) {
             yield break;
@@ -215,7 +241,7 @@ public class BaseClient : IDisposable {
 #endif
         using var reader = new StreamReader(stream, Encoding.UTF8);
 
-        // Replace the line-by-line reader with a buffered incremental reader to support partial NDJSON lines.
+        // Buffered incremental reader to support partial NDJSON lines.
         var sb = new StringBuilder(8 * 1024); // start with a reasonable buffer
         var charBuffer = new char[4096];
 
@@ -301,6 +327,44 @@ public class BaseClient : IDisposable {
                     yield return parsedResult;
                 }
             }
+        }
+    }
+
+    /// <summary>
+    ///     Handles calling the API for streaming responses (e.g., NDJSON)
+    /// </summary>
+    /// <param name="request">The HTTP request message</param>
+    /// <param name="additionalHeaders">Additional headers to include</param>
+    /// <param name="apiName">The API name for error reporting</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <typeparam name="T">The type of each streamed response object</typeparam>
+    /// <returns>An async enumerable of parsed response objects</returns>
+    /// <exception cref="ApiException"></exception>
+    public async IAsyncEnumerable<T> SendStreamingRequestAsync<T>(
+        HttpRequestMessage request,
+        IDictionary<string, string>? additionalHeaders = null,
+        string? apiName = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+
+        if (additionalHeaders != null) {
+            foreach (var header in additionalHeaders.Where(header => header.Value != null)) {
+                request.Headers.Add(header.Key, header.Value);
+            }
+        }
+
+        // Use ResponseHeadersRead to start streaming before full response is received
+        using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            .ConfigureAwait(false);
+
+        try {
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException) {
+            throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
+        }
+
+        await foreach (var item in StreamFromResponseAsync<T>(response, cancellationToken)) {
+            yield return item;
         }
     }
 

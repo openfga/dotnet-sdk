@@ -439,16 +439,15 @@ public class StreamedListObjectsTests {
                 Content = new StringContent(
                     "{\"code\":\"rate_limit_exceeded\",\"message\":\"Too many requests\"}",
                     Encoding.UTF8,
-                    "application/json"),
-                Headers = {
-                    { "Retry-After", "1" }
-                }
+                    "application/json")
             });
 
         using var httpClient = new HttpClient(mockHandler.Object);
+        // MaxRetry=0: verify the error is thrown without spending time on retries
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
-            StoreId = StoreId
+            StoreId = StoreId,
+            RetryParams = new RetryParams { MaxRetry = 0, MinWaitInMs = 0 }
         };
         using var fgaClient = new OpenFgaClient(config, httpClient);
 
@@ -462,5 +461,111 @@ public class StreamedListObjectsTests {
                 // Should not reach here
             }
         });
+    }
+
+    [Fact]
+    public async Task StreamedListObjects_TransientConnectionError_RetriesAndSucceeds() {
+        var objects = new[] { "document:1", "document:2" };
+        var ndjson = CreateNDJSONResponse(objects);
+
+        // First call returns 500, second call returns 200 with results
+        var callCount = 0;
+        var mockHandler = new Mock<HttpMessageHandler>();
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync((HttpRequestMessage req, CancellationToken ct) => {
+                callCount++;
+                if (callCount == 1) {
+                    return new HttpResponseMessage {
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        Content = new StringContent(
+                            "{\"code\":\"internal_error\",\"message\":\"Transient error\"}",
+                            Encoding.UTF8,
+                            "application/json")
+                    };
+                }
+                return new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(ndjson, Encoding.UTF8, "application/x-ndjson")
+                };
+            });
+
+        using var httpClient = new HttpClient(mockHandler.Object);
+        var config = new ClientConfiguration {
+            ApiUrl = ApiUrl,
+            StoreId = StoreId,
+            RetryParams = new RetryParams { MaxRetry = 1, MinWaitInMs = 0 }
+        };
+        using var fgaClient = new OpenFgaClient(config, httpClient);
+
+        var results = new List<string>();
+        await foreach (var response in fgaClient.StreamedListObjects(
+            new ClientListObjectsRequest {
+                User = "user:anne",
+                Relation = "can_read",
+                Type = "document"
+            })) {
+            results.Add(response.Object);
+        }
+
+        Assert.Equal(2, callCount); // Verify exactly one retry occurred
+        Assert.Equal(objects, results.ToArray());
+    }
+
+    [Fact]
+    public async Task StreamedListObjects_RateLimitError_RetriesAndSucceeds() {
+        var objects = new[] { "document:1" };
+        var ndjson = CreateNDJSONResponse(objects);
+
+        // First call returns 429, second call succeeds
+        var callCount = 0;
+        var mockHandler = new Mock<HttpMessageHandler>();
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync((HttpRequestMessage req, CancellationToken ct) => {
+                callCount++;
+                if (callCount == 1) {
+                    return new HttpResponseMessage {
+                        StatusCode = (HttpStatusCode)429,
+                        Content = new StringContent(
+                            "{\"code\":\"rate_limit_exceeded\",\"message\":\"Too many requests\"}",
+                            Encoding.UTF8,
+                            "application/json")
+                    };
+                }
+                return new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(ndjson, Encoding.UTF8, "application/x-ndjson")
+                };
+            });
+
+        using var httpClient = new HttpClient(mockHandler.Object);
+        var config = new ClientConfiguration {
+            ApiUrl = ApiUrl,
+            StoreId = StoreId,
+            RetryParams = new RetryParams { MaxRetry = 1, MinWaitInMs = 0 }
+        };
+        using var fgaClient = new OpenFgaClient(config, httpClient);
+
+        var results = new List<string>();
+        await foreach (var response in fgaClient.StreamedListObjects(
+            new ClientListObjectsRequest {
+                User = "user:anne",
+                Relation = "can_read",
+                Type = "document"
+            })) {
+            results.Add(response.Object);
+        }
+
+        Assert.Equal(2, callCount); // Verify exactly one retry occurred
+        Assert.Equal(objects, results.ToArray());
     }
 }

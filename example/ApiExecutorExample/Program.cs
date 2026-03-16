@@ -57,6 +57,9 @@ class Program {
             // Example 10: Fluent API for building requests
             await FluentApiExample(executor, config.ApiUrl);
 
+            // Example 11: Streaming API via ExecuteStreamingAsync
+            await StreamingExample(executor, config.ApiUrl, storeId, modelId);
+
             // Cleanup: Delete the store we created
             await DeleteStoreExample(executor, config.ApiUrl, storeId);
 
@@ -385,6 +388,32 @@ class Program {
         Console.WriteLine($"✅ Status: {response.StatusCode}");
         Console.WriteLine($"   Found {response.Data.Stores?.Count ?? 0} store(s) using fluent API");
         Console.WriteLine("   Note: Fluent API provides better validation and cleaner syntax!");
+        Console.WriteLine();
+    }
+
+    static async Task StreamingExample(ApiExecutor executor, string basePath, string storeId, string modelId) {
+        Console.WriteLine("🌊 Example 11: Streaming API");
+        Console.WriteLine("Streaming list-objects results via ExecuteStreamingAsync");
+
+        var requestBody = new Dictionary<string, object> {
+            { "authorization_model_id", modelId },
+            { "user", "user:alice" },
+            { "relation", "writer" },
+            { "type", "document" }
+        };
+
+        var request = RequestBuilder<object>
+            .Create(HttpMethod.Post, basePath, "/stores/{store_id}/streamed-list-objects")
+            .WithPathParameter("store_id", storeId)
+            .WithBody(requestBody);
+
+        var count = 0;
+        await foreach (var item in executor.ExecuteStreamingAsync<object, StreamedListObjectsResponse>(request, "StreamedListObjects")) {
+            count++;
+            Console.WriteLine($"   Streamed object: {item.Object}");
+        }
+
+        Console.WriteLine($"✅ Received {count} streamed object(s)");
         Console.WriteLine();
     }
 

@@ -14,6 +14,7 @@ This example demonstrates how to use `ApiExecutor` to make custom HTTP requests 
 8. **Raw JSON Response** - Getting responses as raw JSON strings
 9. **Custom Headers** - Adding custom headers to requests via ClientRequestOptions
 10. **Fluent API** - Using the enhanced RequestBuilder with fluent methods
+11. **Streaming** - Streaming results via `ExecuteStreamingAsync` (e.g., streamed-list-objects)
 
 ## Key Concepts
 
@@ -171,6 +172,11 @@ Using the enhanced RequestBuilder with fluent methods
    Found 0 store(s) using fluent API
    Note: Fluent API provides better validation and cleaner syntax!
 
+🌊 Example 11: Streaming API
+Streaming list-objects results via ExecuteStreamingAsync
+   Streamed object: document:roadmap
+✅ Received 1 streamed object(s)
+
 🗑️  Cleanup: Delete Store
 Making DELETE request to /stores/{store_id}
 ✅ Status: NoContent
@@ -217,6 +223,7 @@ RequestBuilder
    - Add custom headers via `ClientRequestOptions`
    - Get raw JSON or strongly-typed responses
    - Use path and query parameters easily
+   - Stream results with `ExecuteStreamingAsync` for endpoints that return server-sent event streams
 
 ## When to Use Custom API Requests
 
@@ -295,6 +302,25 @@ var response = await executor.ExecuteAsync<object, CheckResponse>(
 // When you want the raw JSON without deserialization
 var response = await executor.ExecuteAsync(request, "CustomEndpoint");
 string json = response.Data; // Raw JSON string
+```
+
+### Streaming Request
+```csharp
+// For endpoints that stream results (e.g., streamed-list-objects)
+var request = RequestBuilder<object>
+    .Create(HttpMethod.Post, config.ApiUrl, "/stores/{store_id}/streamed-list-objects")
+    .WithPathParameter("store_id", storeId)
+    .WithBody(new {
+        user = "user:anne",
+        relation = "viewer",
+        type = "document",
+        authorization_model_id = modelId
+    });
+
+await foreach (var item in executor.ExecuteStreamingAsync<object, StreamedListObjectsResponse>(
+    request, "StreamedListObjects")) {
+    Console.WriteLine($"Object: {item.Object}");
+}
 ```
 
 ## Resources
