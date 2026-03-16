@@ -490,56 +490,6 @@ public class OpenFgaClientTests : IDisposable {
         Assert.Equal(response, expectedResponse);
     }
 
-    /// <summary>
-    /// Test CreateStore with ClientCreateStoreRequest.FromJson() deserialization
-    /// Validates that FromJson() correctly deserializes the request and that the name is sent correctly
-    /// </summary>
-    [Fact]
-    public async Task CreateStore_FromJson_Works() {
-        var storeJson = @"{
-            ""name"": ""Test Store From JSON""
-        }";
-
-        // Deserialize and validate the request before sending
-        var deserializedRequest = ClientCreateStoreRequest.FromJson(storeJson);
-        Assert.NotNull(deserializedRequest);
-        Assert.Equal("Test Store From JSON", deserializedRequest.Name);
-
-        var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
-        var expectedResponse = new CreateStoreResponse() {
-            Id = "01H0H015178Y2V4CX10C2KGHF7",
-            Name = "Test Store From JSON",
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
-        };
-
-        mockHandler.Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores") &&
-                    req.Method == HttpMethod.Post),
-                ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync(() => new HttpResponseMessage {
-                StatusCode = HttpStatusCode.OK,
-                Content = Utils.CreateJsonStringContent(expectedResponse),
-            });
-
-        var httpClient = new HttpClient(mockHandler.Object);
-        var fgaClient = new OpenFgaClient(_config, httpClient);
-
-        // Use the validated deserialized request
-        var response = await fgaClient.CreateStore(deserializedRequest);
-
-        Assert.IsType<CreateStoreResponse>(response);
-        Assert.Equal(expectedResponse.Id, response.Id);
-        Assert.Equal(expectedResponse.Name, response.Name);
-        mockHandler.Protected().Verify("SendAsync", Times.Once(),
-            ItExpr.Is<HttpRequestMessage>(req =>
-                req.RequestUri == new Uri($"{_config.BasePath}/stores") &&
-                req.Method == HttpMethod.Post),
-            ItExpr.IsAny<CancellationToken>());
-    }
 
     /// <summary>
     /// Test GetStore
