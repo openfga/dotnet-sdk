@@ -218,7 +218,7 @@ public class Attributes {
         }
 
         if (apiName is "Check" or "ListObjects" or "StreamedListObjects" or "Write" or "Expand" or "ListUsers") {
-            AddRequestBodyAttributes(requestBuilder, apiName, attributes);
+            attributes = AddRequestBodyAttributes(requestBuilder, apiName, attributes); // Assign the return value
         }
 
         return attributes;
@@ -255,15 +255,20 @@ public class Attributes {
 
     private static TagList AddBatchCheckSizeAttribute<T>(RequestBuilder<T> requestBuilder, TagList attributes) {
         try {
-            var jsonBody = requestBuilder.JsonBody;
-            if (jsonBody != null) {
-                using (var document = JsonDocument.Parse(jsonBody)) {
-                    var root = document.RootElement;
-
-                    if (root.TryGetProperty("checks", out var checks) &&
-                        checks.ValueKind == JsonValueKind.Array) {
-                        attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestBatchCheckSize,
-                            checks.GetArrayLength()));
+            // Try to use the strongly-typed Body property if possible
+            if (requestBuilder.Body is Model.BatchCheckRequest batchCheckRequest && batchCheckRequest.Checks != null) {
+                attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestBatchCheckSize, batchCheckRequest.Checks.Count));
+            }
+            else {
+                var jsonBody = requestBuilder.JsonBody;
+                if (jsonBody != null) {
+                    using (var document = JsonDocument.Parse(jsonBody)) {
+                        var root = document.RootElement;
+                        if (root.TryGetProperty("checks", out var checks) &&
+                            checks.ValueKind == JsonValueKind.Array) {
+                            attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestBatchCheckSize,
+                                checks.GetArrayLength()));
+                        }
                     }
                 }
             }

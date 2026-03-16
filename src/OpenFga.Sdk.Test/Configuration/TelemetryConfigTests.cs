@@ -84,7 +84,7 @@ namespace OpenFga.Sdk.Test.Configuration {
             var customConfig = new TelemetryConfig(new Dictionary<string, MetricConfig> {
                 {
                     TelemetryMeter.RequestDuration, new MetricConfig {
-                        Attributes = new System.Collections.Generic.HashSet<string> {
+                        Attributes = new HashSet<string> {
                             TelemetryAttribute.RequestBatchCheckSize
                         }
                     }
@@ -108,4 +108,3 @@ namespace OpenFga.Sdk.Test.Configuration {
         }
     }
 }
-

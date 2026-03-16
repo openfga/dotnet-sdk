@@ -17,8 +17,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Text.Json;
 using Xunit;
 
 namespace OpenFga.Sdk.Test.Telemetry {
@@ -249,5 +247,3 @@ namespace OpenFga.Sdk.Test.Telemetry {
         #endregion
     }
 }
-
-
