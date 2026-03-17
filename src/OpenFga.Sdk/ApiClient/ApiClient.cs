@@ -119,6 +119,10 @@ public class ApiClient : IDisposable {
         IRequestOptions? options = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default) {
 
+        // For streaming, the Stopwatch intentionally covers only authentication + connection establishment
+        // (i.e. time until response headers are received / "time to stream ready"). Total streaming
+        // duration is dominated by data volume and is not a useful latency signal — the HTTP-level
+        // metric (BuildForHttpRequest) is already recorded inside EstablishStreamingConnectionAsync.
         var sw = Stopwatch.StartNew();
         var authToken = await GetAuthenticationTokenAsync(apiName);
         var additionalHeaders = BuildHeaders(_configuration, authToken, options);

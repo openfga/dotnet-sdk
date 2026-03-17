@@ -168,12 +168,7 @@ public class RequestBuilder<TReq> {
             return "";
         }
 
-        var query = "?";
-        foreach (var parameter in QueryParameters) {
-            query = query + parameter.Key + "=" + HttpUtility.UrlEncode(parameter.Value) + "&";
-        }
-
-        return query;
+        return "?" + string.Join("&", QueryParameters.Select(p => $"{p.Key}={HttpUtility.UrlEncode(p.Value)}"));
     }
 
     public Uri BuildUri() {

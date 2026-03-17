@@ -98,7 +98,8 @@ public class BaseClient : IDisposable {
         TRes responseContent = default;
         if (response.Content != null && response.StatusCode != HttpStatusCode.NoContent) {
             using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            if (contentStream.Length > 0) {
+            // Guard against empty responses; fall back to always attempting deserialization on non-seekable streams
+            if (!contentStream.CanSeek || contentStream.Length > 0) {
                 responseContent = await JsonSerializer.DeserializeAsync<TRes>(contentStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
                                   throw new FgaError();
             }
@@ -157,7 +158,8 @@ public class BaseClient : IDisposable {
             T responseContent = default;
             if (response.Content != null && response.StatusCode != HttpStatusCode.NoContent) {
                 using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                if (contentStream.Length > 0) {
+                // Guard against empty responses; fall back to always attempting deserialization on non-seekable streams
+                if (!contentStream.CanSeek || contentStream.Length > 0) {
                     responseContent = await JsonSerializer.DeserializeAsync<T>(contentStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
                                       throw new FgaError();
                 }
@@ -215,8 +217,10 @@ public class BaseClient : IDisposable {
     }
 
     /// <summary>
-    ///     Parses an NDJSON stream from an already-established HTTP response, yielding each item as it arrives.
+    ///     Parses a streaming response from an already-established HTTP response, yielding each item as it arrives.
     ///     This phase should not be retried once started, as partial results may already have been delivered.
+    ///     Uses <see cref="StreamReader.ReadLineAsync()"/> which handles internal buffering, partial chunks,
+    ///     and last-line-without-newline naturally.
     /// </summary>
     /// <param name="response">The established HTTP response with an open body stream</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -230,10 +234,10 @@ public class BaseClient : IDisposable {
             yield break;
         }
 
-        // Register cancellation token to dispose response and unblock stalled reads
+        // Register cancellation token to dispose response and unblock stalled reads on older runtimes
         using var disposeResponseRegistration = cancellationToken.Register(static state => ((HttpResponseMessage)state!).Dispose(), response);
 
-        // Stream and parse NDJSON response
+        // Stream and parse the response
 #if NET6_0_OR_GREATER
         await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 #else
@@ -241,14 +245,15 @@ public class BaseClient : IDisposable {
 #endif
         using var reader = new StreamReader(stream, Encoding.UTF8);
 
-        // Buffered incremental reader to support partial NDJSON lines.
-        var sb = new StringBuilder(8 * 1024); // start with a reasonable buffer
-        var charBuffer = new char[4096];
-
         while (true) {
-            int read;
+            string? line;
             try {
-                read = await reader.ReadAsync(charBuffer, 0, charBuffer.Length).ConfigureAwait(false);
+#if NET7_0_OR_GREATER
+                // ReadLineAsync(CancellationToken) available from .NET 7+
+                line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+#else
+                line = await reader.ReadLineAsync().ConfigureAwait(false);
+#endif
             }
             catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) {
                 throw new OperationCanceledException("Streaming request was cancelled.", cancellationToken);
@@ -257,81 +262,36 @@ public class BaseClient : IDisposable {
                 throw new OperationCanceledException("Streaming request was cancelled.", ex, cancellationToken);
             }
 
-            if (read == 0) {
-                // End of stream: flush any remaining partial record without trailing newline
-                if (sb.Length > 0) {
-                    var line = sb.ToString();
-                    sb.Clear();
-
-                    cancellationToken.ThrowIfCancellationRequested();
-                    if (!string.IsNullOrWhiteSpace(line)) {
-                        T? parsedResult = default;
-                        try {
-                            using var jsonDoc = JsonDocument.Parse(line);
-                            var root = jsonDoc.RootElement;
-                            if (root.TryGetProperty("result", out var resultElement)) {
-                                parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
-                            }
-                        }
-                        catch (JsonException) {
-                            // Skip invalid trailing fragment
-                        }
-                        if (parsedResult != null) {
-                            yield return parsedResult;
-                        }
-                    }
-                }
-                break;
+            if (line == null) {
+                break; // End of stream (ReadLineAsync returns null at EOF)
             }
 
-            sb.Append(charBuffer, 0, read);
+            cancellationToken.ThrowIfCancellationRequested();
 
-            // Process all complete lines currently in the buffer
-            int start = 0;
-            while (true) {
-                var span = sb.ToString(); // materialize for IndexOf; small overhead acceptable per chunk
-                int newlineIdx = span.IndexOf('\n', start);
-                if (newlineIdx == -1) {
-                    // No complete line yet. Keep the current tail in StringBuilder.
-                    // Remove processed head (if any) to avoid repeated scanning.
-                    if (start > 0) {
-                        sb.Clear();
-                        sb.Append(span.Substring(start));
-                    }
-                    break;
+            if (string.IsNullOrWhiteSpace(line)) {
+                continue;
+            }
+
+            T? parsedResult = default;
+            try {
+                using var jsonDoc = JsonDocument.Parse(line);
+                var root = jsonDoc.RootElement;
+                if (root.TryGetProperty("result", out var resultElement)) {
+                    parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
                 }
+            }
+            catch (JsonException) {
+                // Skip malformed lines — the server may send error envelopes or keep-alive pings
+            }
 
-                int lineLen = newlineIdx - start;
-                var line = lineLen > 0 ? span.Substring(start, lineLen) : string.Empty;
-                start = newlineIdx + 1;
-
-                cancellationToken.ThrowIfCancellationRequested();
-
-                if (string.IsNullOrWhiteSpace(line)) {
-                    continue;
-                }
-
-                T? parsedResult = default;
-                try {
-                    using var jsonDoc = JsonDocument.Parse(line);
-                    var root = jsonDoc.RootElement;
-                    if (root.TryGetProperty("result", out var resultElement)) {
-                        parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
-                    }
-                }
-                catch (JsonException) {
-                    // Skip malformed line
-                }
-
-                if (parsedResult != null) {
-                    yield return parsedResult;
-                }
+            if (parsedResult != null) {
+                yield return parsedResult;
             }
         }
     }
 
     /// <summary>
-    ///     Handles calling the API for streaming responses (e.g., NDJSON)
+    ///     Handles calling the API for streaming responses (e.g., streaming)
     /// </summary>
     /// <param name="request">The HTTP request message</param>
     /// <param name="additionalHeaders">Additional headers to include</param>
@@ -369,7 +329,7 @@ public class BaseClient : IDisposable {
     }
 
     /// <summary>
-    ///     Handles calling the API for streaming responses (e.g., NDJSON) from a RequestBuilder
+    ///     Handles calling the API for streaming responses (e.g., streaming) from a RequestBuilder
     /// </summary>
     /// <param name="requestBuilder">The request builder</param>
     /// <param name="additionalHeaders">Additional headers to include</param>

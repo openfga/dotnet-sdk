@@ -17,11 +17,11 @@ using Xunit;
 namespace OpenFga.Sdk.Test.ApiClient;
 
 /// <summary>
-/// Tests for NDJSON streaming functionality in BaseClient
+/// Tests for streaming response functionality in BaseClient
 /// </summary>
 public class StreamingTests {
     /// <summary>
-    /// Custom HttpContent that emits data in controlled chunks to test partial NDJSON handling
+    /// Custom HttpContent that emits data in controlled chunks to test partial streaming response handling
     /// </summary>
     private class ChunkedStreamContent : HttpContent {
         private readonly string[] _chunks;
@@ -30,7 +30,7 @@ public class StreamingTests {
         public ChunkedStreamContent(string[] chunks, int delayMs = 0) {
             _chunks = chunks;
             _delayMs = delayMs;
-            Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-ndjson");
+            Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
         }
 
         protected override async Task SerializeToStreamAsync(Stream stream, TransportContext context) {
@@ -51,7 +51,7 @@ public class StreamingTests {
     }
 
     private Mock<HttpMessageHandler> CreateMockHttpHandler(HttpStatusCode statusCode, string content,
-        string contentType = "application/x-ndjson") {
+        string contentType = "application/json") {
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -83,9 +83,9 @@ public class StreamingTests {
     }
 
     [Fact]
-    public async Task SendStreamingRequestAsync_SingleLineNDJSON_ParsesCorrectly() {
-        var ndjson = "{\"result\":{\"object\":\"document:1\"}}\n";
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+    public async Task SendStreamingRequestAsync_SingleLineStreaming_ParsesCorrectly() {
+        var streamContent = "{\"result\":{\"object\":\"document:1\"}}\n";
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         var httpClient = new HttpClient(mockHandler.Object);
         var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
@@ -110,11 +110,11 @@ public class StreamingTests {
     }
 
     [Fact]
-    public async Task SendStreamingRequestAsync_MultipleLineNDJSON_ParsesAllLines() {
-        var ndjson = "{\"result\":{\"object\":\"document:1\"}}\n" +
+    public async Task SendStreamingRequestAsync_MultipleLineStreaming_ParsesAllLines() {
+        var streamContent = "{\"result\":{\"object\":\"document:1\"}}\n" +
                      "{\"result\":{\"object\":\"document:2\"}}\n" +
                      "{\"result\":{\"object\":\"document:3\"}}\n";
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         var httpClient = new HttpClient(mockHandler.Object);
         var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
@@ -142,9 +142,9 @@ public class StreamingTests {
 
     [Fact]
     public async Task SendStreamingRequestAsync_EmptyLines_SkipsEmptyLines() {
-        var ndjson = "{\"result\":{\"object\":\"document:1\"}}\n\n" +
+        var streamContent = "{\"result\":{\"object\":\"document:1\"}}\n\n" +
                      "{\"result\":{\"object\":\"document:2\"}}\n";
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         var httpClient = new HttpClient(mockHandler.Object);
         var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
@@ -169,9 +169,9 @@ public class StreamingTests {
 
     [Fact]
     public async Task SendStreamingRequestAsync_LastLineWithoutNewline_ParsesCorrectly() {
-        var ndjson = "{\"result\":{\"object\":\"document:1\"}}\n" +
+        var streamContent = "{\"result\":{\"object\":\"document:1\"}}\n" +
                      "{\"result\":{\"object\":\"document:2\"}}"; // No trailing newline
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         var httpClient = new HttpClient(mockHandler.Object);
         var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
@@ -198,10 +198,10 @@ public class StreamingTests {
 
     [Fact]
     public async Task SendStreamingRequestAsync_CancellationToken_CancelsStream() {
-        var ndjson = "{\"result\":{\"object\":\"document:1\"}}\n" +
+        var streamContent = "{\"result\":{\"object\":\"document:1\"}}\n" +
                      "{\"result\":{\"object\":\"document:2\"}}\n" +
                      "{\"result\":{\"object\":\"document:3\"}}\n";
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         var httpClient = new HttpClient(mockHandler.Object);
         var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
@@ -260,12 +260,12 @@ public class StreamingTests {
 
     [Fact]
     public async Task SendStreamingRequestAsync_EarlyBreak_DisposesResourcesProperly() {
-        var ndjson = "{\"result\":{\"object\":\"document:1\"}}\n" +
+        var streamContent = "{\"result\":{\"object\":\"document:1\"}}\n" +
                      "{\"result\":{\"object\":\"document:2\"}}\n" +
                      "{\"result\":{\"object\":\"document:3\"}}\n" +
                      "{\"result\":{\"object\":\"document:4\"}}\n" +
                      "{\"result\":{\"object\":\"document:5\"}}\n";
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         var httpClient = new HttpClient(mockHandler.Object);
         var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
@@ -294,8 +294,8 @@ public class StreamingTests {
 
     [Fact]
     public async Task SendStreamingRequestAsync_EmptyResponse_ReturnsNoResults() {
-        var ndjson = "";
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var streamContent = "";
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         var httpClient = new HttpClient(mockHandler.Object);
         var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
@@ -320,10 +320,10 @@ public class StreamingTests {
 
     [Fact]
     public async Task SendStreamingRequestAsync_WhitespaceOnlyLines_SkipsWhitespace() {
-        var ndjson = "{\"result\":{\"object\":\"document:1\"}}\n" +
+        var streamContent = "{\"result\":{\"object\":\"document:1\"}}\n" +
                      "   \n" +  // Whitespace only
                      "{\"result\":{\"object\":\"document:2\"}}\n";
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         var httpClient = new HttpClient(mockHandler.Object);
         var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
@@ -348,10 +348,10 @@ public class StreamingTests {
 
     [Fact]
     public async Task SendStreamingRequestAsync_InvalidJsonLine_SkipsInvalidLine() {
-        var ndjson = "{\"result\":{\"object\":\"document:1\"}}\n" +
+        var streamContent = "{\"result\":{\"object\":\"document:1\"}}\n" +
                      "invalid json here\n" +
                      "{\"result\":{\"object\":\"document:2\"}}\n";
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         var httpClient = new HttpClient(mockHandler.Object);
         var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
         var baseClient = new BaseClient(config, httpClient);
@@ -379,7 +379,7 @@ public class StreamingTests {
     }
 
     // ============================================================
-    // Partial NDJSON Handling Tests
+    // Partial Streaming Handling Tests
     // ============================================================
 
     [Fact]
