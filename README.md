@@ -983,7 +983,7 @@ await fgaClient.WriteAssertions(body, options);
 
 ### Calling Other Endpoints
 
-For advanced use cases where you need to call API endpoints not yet available in the SDK's typed methods, or when you need access to full response details (status code, headers, raw response), you can use `ApiClient.ExecuteAsync()`.
+For advanced use cases where you need to call API endpoints not yet available in the SDK's typed methods, or when you need access to full response details (status code, headers, raw response), you can use `ApiExecutor.ExecuteAsync()`.
 
 #### Basic Usage
 

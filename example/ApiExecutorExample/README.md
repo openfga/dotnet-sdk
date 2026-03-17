@@ -18,7 +18,7 @@ This example demonstrates how to use `ApiExecutor` to make custom HTTP requests 
 
 ## Key Concepts
 
-### ApiClient.ExecuteAsync vs Standard SDK Methods
+### ApiExecutor.ExecuteAsync vs Standard SDK Methods
 
 The SDK provides two ways to interact with the OpenFGA API:
 
@@ -203,10 +203,10 @@ Making DELETE request to /stores/{store_id}
 
 ```
 OpenFgaClient
-    └── GetApiClient() → ApiClient (core building block)
-            └── ExecuteAsync() → Full response details
+    └── ApiExecutor (property)
+            └── ExecuteAsync() / ExecuteStreamingAsync()
                     ├── Authentication (OAuth/ApiToken)
-                    ├── Retry logic with exponential backoff  
+                    ├── Retry logic with exponential backoff
                     ├── Error handling
                     └── Metrics & telemetry
 
@@ -244,7 +244,7 @@ RequestBuilder
 - You don't need access to response headers
 - You want the simplest API
 
-### Use ApiClient.ExecuteAsync When:
+### Use ApiExecutor.ExecuteAsync When:
 - Calling endpoints not yet in the SDK
 - You need response headers or status codes
 - Building custom integrations
