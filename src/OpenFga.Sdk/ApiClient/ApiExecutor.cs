@@ -1,7 +1,6 @@
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Model;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -114,14 +113,12 @@ public class ApiExecutor {
     /// }
     /// </code>
     /// </example>
-    public async IAsyncEnumerable<TResponse> ExecuteStreamingAsync<TRequest, TResponse>(
+    public IAsyncEnumerable<TResponse> ExecuteStreamingAsync<TRequest, TResponse>(
         RequestBuilder<TRequest> requestBuilder,
         string apiName,
         IRequestOptions? options = null,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default) {
-        await foreach (var item in _apiClient.SendStreamingRequestAsync<TRequest, TResponse>(
-            requestBuilder, apiName, options, cancellationToken)) {
-            yield return item;
-        }
+        CancellationToken cancellationToken = default) {
+        return _apiClient.SendStreamingRequestAsync<TRequest, TResponse>(
+            requestBuilder, apiName, options, cancellationToken);
     }
 }

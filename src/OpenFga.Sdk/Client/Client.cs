@@ -60,14 +60,6 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
     /// </example>
     public ApiExecutor ApiExecutor => api.ApiClientInternal.ApiExecutor;
 
-    /// <summary>
-    /// Gets the underlying ApiClient (internal use).
-    /// </summary>
-    /// <returns>The ApiClient instance used by this client</returns>
-    internal ApiClient.ApiClient GetApiClient() {
-        return api.ApiClientInternal;
-    }
-
     public void Dispose() {
         api.Dispose();
     }

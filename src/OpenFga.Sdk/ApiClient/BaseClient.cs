@@ -108,22 +108,6 @@ public class BaseClient : IDisposable {
         return new ResponseWrapper<TRes> { rawResponse = response, responseContent = responseContent };
     }
 
-    // /// <summary>
-    // /// Handles calling the API for requests that are expected to return no content
-    // /// </summary>
-    // /// <param name="requestBuilder"></param>
-    // /// <param name="additionalHeaders"></param>
-    // /// <param name="apiName"></param>
-    // /// <param name="cancellationToken"></param>
-    // /// <returns></returns>
-    // public async Task SendRequestAsync(RequestBuilder requestBuilder,
-    //     IDictionary<string, string>? additionalHeaders = null,
-    //     string? apiName = null, CancellationToken cancellationToken = default) {
-    //     var request = requestBuilder.BuildRequest();
-    //
-    //     await this.SendRequestAsync(request, additionalHeaders, apiName, cancellationToken);
-    // }
-
     /// <summary>
     ///     Handles calling the API
     /// </summary>
@@ -147,26 +131,25 @@ public class BaseClient : IDisposable {
         }
 
         var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        {
-            try {
-                response.EnsureSuccessStatusCode();
-            }
-            catch {
-                throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
-            }
 
-            T responseContent = default;
-            if (response.Content != null && response.StatusCode != HttpStatusCode.NoContent) {
-                using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                // Guard against empty responses; fall back to always attempting deserialization on non-seekable streams
-                if (!contentStream.CanSeek || contentStream.Length > 0) {
-                    responseContent = await JsonSerializer.DeserializeAsync<T>(contentStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
-                                      throw new FgaError();
-                }
-            }
-
-            return new ResponseWrapper<T> { rawResponse = response, responseContent = responseContent };
+        try {
+            response.EnsureSuccessStatusCode();
         }
+        catch (HttpRequestException) {
+            throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
+        }
+
+        T responseContent = default;
+        if (response.Content != null && response.StatusCode != HttpStatusCode.NoContent) {
+            using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            // Guard against empty responses; fall back to always attempting deserialization on non-seekable streams
+            if (!contentStream.CanSeek || contentStream.Length > 0) {
+                responseContent = await JsonSerializer.DeserializeAsync<T>(contentStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
+                                  throw new FgaError();
+            }
+        }
+
+        return new ResponseWrapper<T> { rawResponse = response, responseContent = responseContent };
     }
 
     /// <summary>
