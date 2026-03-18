@@ -70,13 +70,6 @@ namespace OpenFga.Sdk.Model {
             return JsonSerializer.Serialize(this);
         }
 
-        /// <summary>
-        /// Builds a CreateStoreRequest from the JSON string presentation of the object
-        /// </summary>
-        /// <returns>CreateStoreRequest</returns>
-        public static CreateStoreRequest FromJson(string jsonString) {
-            return JsonSerializer.Deserialize<CreateStoreRequest>(jsonString) ?? throw new InvalidOperationException();
-        }
 
         /// <summary>
         /// Returns true if objects are equal
