@@ -112,65 +112,64 @@ make stop-openfga   # Stop OpenFGA when done
 ```text
 === OpenFGA Custom API Requests Example ===
 
-📋 Example 1: List Stores
+Example 1: List Stores
 Making GET request to /stores
-✅ Status: OK
+Status: OK
    Is Successful: True
    Found 0 store(s)
 
-🏪 Example 2: Create Store
+Example 2: Create Store
 Making POST request to /stores
-✅ Status: Created
+Status: Created
    Store ID: 01JQWXYZ123ABC456DEF789GHJ
    Store Name: ApiExecutor-Example-1738713600000
    Raw Response Length: 245 chars
 
-🔍 Example 3: Get Store Details
+Example 3: Get Store Details
 Making GET request to /stores/{store_id}
-✅ Status: OK
+Status: OK
    Store Name: ApiExecutor-Example-1738713600000
    Created At: 2025-02-04T10:00:00Z
    Response Headers: 8
 
-📝 Example 4: Create Authorization Model
+Example 4: Create Authorization Model
 Making POST request to /stores/{store_id}/authorization-models
-✅ Status: Created
+Status: Created
    Model ID: 01JQWXYZ789DEF123ABC456GHJ
 
-✍️  Example 5: Write Relationship Tuples
+Example 5: Write Relationship Tuples
 Making POST request to /stores/{store_id}/write
-✅ Status: OK
+Status: OK
    Tuples written successfully
 
-📖 Example 6: Read Relationship Tuples
+Example 6: Read Relationship Tuples
 Making POST request to /stores/{store_id}/read
-✅ Status: OK
+Status: OK
    Found 2 tuple(s):
      - user:alice is writer of document:roadmap
      - user:bob is reader of document:roadmap
 
-🔐 Example 7: Check Permission
+Example 7: Check Permission
 Making POST request to /stores/{store_id}/check
-✅ Status: OK
+Status: OK
    Allowed: True
 
-📄 Example 8: Raw JSON Response
+Example 8: Raw JSON Response
 Getting response as raw JSON string instead of typed object
-✅ Status: OK
+Status: OK
    Raw JSON (first 100 chars): {"stores":[],"continuation_token":""}...
    RawResponse and Data are the same: True
 
-📨 Example 9: Custom Headers
+Example 9: Custom Headers
 Making request with custom headers
-✅ Status: OK
+Status: OK
    Custom headers sent successfully
    Response has 8 headers
 
-🎯 Example 10: Fluent API for Request Building
-Using the enhanced RequestBuilder with fluent methods
-✅ Status: OK
-   Found 0 store(s) using fluent API
-   Note: Fluent API provides better validation and cleaner syntax!
+Example 10: Fluent API for Request Building
+Using RequestBuilder with fluent methods
+Status: OK
+   Found 0 store(s)
 
 Example 11: Streaming API
 Streaming list-objects for a computed relation via ExecuteStreamingAsync
@@ -186,12 +185,12 @@ Streaming list-objects for a computed relation via ExecuteStreamingAsync
    - document:1000
    - document:1500
    - document:2000
-✓ Streamed 2000 objects
+Streamed 2000 objects
    Streaming demo store deleted
 
-🗑️  Cleanup: Delete Store
+Cleanup: Delete Store
 Making DELETE request to /stores/{store_id}
-✅ Status: NoContent
+Status: NoContent
    Store deleted successfully
 
 === All examples completed successfully! ===

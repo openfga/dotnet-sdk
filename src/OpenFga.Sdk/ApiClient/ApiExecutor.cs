@@ -90,7 +90,8 @@ public class ApiExecutor {
     /// <summary>
     /// Executes a streaming API request using RequestBuilder and returns an IAsyncEnumerable of response items.
     /// Use this for endpoints that stream results (e.g., /stores/{store_id}/streamed-list-objects).
-    /// Note: Streaming responses cannot be retried once the stream has started.
+    /// Note: The connection establishment phase (auth + receiving response headers) is retried on transient
+    /// errors. Once the response body stream has started, it is not retried.
     /// </summary>
     /// <typeparam name="TRequest">The type of the request body</typeparam>
     /// <typeparam name="TResponse">The type of each streamed response item</typeparam>
