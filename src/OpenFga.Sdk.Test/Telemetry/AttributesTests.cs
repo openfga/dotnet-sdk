@@ -71,10 +71,8 @@ namespace OpenFga.Sdk.Test.Telemetry {
                 retryCount: 0
             );
 
-            var batchSizeTag = tagList
-                .FirstOrDefault(t => t.Key == TelemetryAttribute.RequestBatchCheckSize);
-
-            Assert.NotNull(batchSizeTag.Key);
+            var batchSizeTag = Assert.Single(tagList,
+                t => t.Key == TelemetryAttribute.RequestBatchCheckSize);
             Assert.Equal(checkCount, (int)batchSizeTag.Value!);
         }
 
@@ -107,10 +105,8 @@ namespace OpenFga.Sdk.Test.Telemetry {
                 retryCount: 0
             );
 
-            var batchSizeTag = tagList
-                .FirstOrDefault(t => t.Key == TelemetryAttribute.RequestBatchCheckSize);
-
-            Assert.NotNull(batchSizeTag.Key);
+            var batchSizeTag = Assert.Single(tagList,
+                t => t.Key == TelemetryAttribute.RequestBatchCheckSize);
             Assert.Equal(checkCount, (int)batchSizeTag.Value!);
         }
 

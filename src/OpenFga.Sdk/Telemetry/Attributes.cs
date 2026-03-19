@@ -254,27 +254,8 @@ public class Attributes {
     }
 
     private static TagList AddBatchCheckSizeAttribute<T>(RequestBuilder<T> requestBuilder, TagList attributes) {
-        try {
-            // Try to use the strongly-typed Body property if possible
-            if (requestBuilder.Body is Model.BatchCheckRequest batchCheckRequest && batchCheckRequest.Checks != null) {
-                attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestBatchCheckSize, batchCheckRequest.Checks.Count));
-            }
-            else {
-                var jsonBody = requestBuilder.JsonBody;
-                if (jsonBody != null) {
-                    using (var document = JsonDocument.Parse(jsonBody)) {
-                        var root = document.RootElement;
-                        if (root.TryGetProperty("checks", out var checks) &&
-                            checks.ValueKind == JsonValueKind.Array) {
-                            attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestBatchCheckSize,
-                                checks.GetArrayLength()));
-                        }
-                    }
-                }
-            }
-        }
-        catch {
-            // Telemetry attribute extraction is best-effort; silently ignore any parsing errors
+        if (requestBuilder.Body is Model.BatchCheckRequest batchCheckRequest && batchCheckRequest.Checks != null) {
+            attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestBatchCheckSize, batchCheckRequest.Checks.Count));
         }
 
         return attributes;
