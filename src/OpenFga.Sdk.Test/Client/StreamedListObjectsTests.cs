@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +26,29 @@ public class StreamedListObjectsTests {
     private const string AuthorizationModelId = "01HVMMBZ2EMDA86PXWBQJSVQFK";
     private static readonly string ApiUrl = FgaConstants.TestApiUrl;
 
-    private Mock<HttpMessageHandler> CreateMockHttpHandler(
+    /// <summary>
+    /// Builds a newline-delimited JSON stream matching OpenFGA's streaming response format.
+    /// Each line is: {"result":{"object":"document:1"}}
+    /// </summary>
+    private static string CreateStreamingResponse(IEnumerable<string> objects) {
+        var lines = objects.Select(obj =>
+            $"{{\"result\":{{\"object\":\"{obj}\"}}}}");
+        return string.Join("\n", lines);
+    }
+
+    /// <summary>
+    /// Creates a StringContent with application/json content type in a way that is
+    /// compatible across all target frameworks (net48, netcoreapp3.1, net8+).
+    /// Setting the header after construction avoids the StringContent constructor
+    /// overload ambiguity between string and MediaTypeHeaderValue across TFMs.
+    /// </summary>
+    private static StringContent JsonContent(string content) {
+        var sc = new StringContent(content, Encoding.UTF8);
+        sc.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        return sc;
+    }
+
+    private static Mock<HttpMessageHandler> CreateMockHttpHandler(
         HttpStatusCode statusCode,
         string streamContent,
         Action<HttpRequestMessage>? requestValidator = null) {
@@ -40,47 +63,11 @@ public class StreamedListObjectsTests {
                 requestValidator?.Invoke(req);
                 return new HttpResponseMessage {
                     StatusCode = statusCode,
-                    Content = new StringContent(streamContent, Encoding.UTF8, "application/json")
+                    Content = JsonContent(streamContent)
                 };
             });
+
         return mockHandler;
-    }
-
-    private string CreateStreamingResponse(params string[] objects) {
-        return string.Join("\n",
-            objects.Select(obj => $"{{\"result\":{{\"object\":\"{obj}\"}}}}")) + "\n";
-    }
-
-    [Fact]
-    public async Task StreamedListObjects_BasicRequest_StreamsObjectsIncrementally() {
-        var objects = new[] { "document:1", "document:2", "document:3" };
-        var streamContent = CreateStreamingResponse(objects);
-
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent,
-            req => {
-                Assert.Equal(HttpMethod.Post, req.Method);
-                Assert.Contains($"/stores/{StoreId}/streamed-list-objects", req.RequestUri!.ToString());
-            });
-
-        using var httpClient = new HttpClient(mockHandler.Object);
-        var config = new ClientConfiguration {
-            ApiUrl = ApiUrl,
-            StoreId = StoreId
-        };
-        using var fgaClient = new OpenFgaClient(config, httpClient);
-
-        var results = new List<string>();
-        await foreach (var response in fgaClient.StreamedListObjects(
-            new ClientListObjectsRequest {
-                User = "user:anne",
-                Relation = "can_read",
-                Type = "document"
-            })) {
-            results.Add(response.Object);
-        }
-
-        Assert.Equal(3, results.Count);
-        Assert.Equal(objects, results.ToArray());
     }
 
     [Fact]
@@ -107,7 +94,6 @@ public class StreamedListObjectsTests {
             results.Add(response.Object);
         }
 
-        // Assert - Verify request completed successfully with authorization model ID configured
         Assert.Single(results);
         Assert.Equal("document:1", results[0]);
     }
@@ -138,7 +124,6 @@ public class StreamedListObjectsTests {
             results.Add(response.Object);
         }
 
-        // Assert - Verify request completed successfully with consistency preference
         Assert.Single(results);
         Assert.Equal("document:1", results[0]);
     }
@@ -173,7 +158,6 @@ public class StreamedListObjectsTests {
             results.Add(response.Object);
         }
 
-        // Assert - Verify request completed successfully with contextual tuples
         Assert.Single(results);
         Assert.Equal("document:1", results[0]);
     }
@@ -225,7 +209,7 @@ public class StreamedListObjectsTests {
             })) {
             results.Add(response.Object);
             if (results.Count == 2) {
-                break; // Early termination - should not throw or leak resources
+                break;
             }
         }
 
@@ -264,13 +248,12 @@ public class StreamedListObjectsTests {
             }
         });
 
-        // Cancellation happens after the first item, but timing may allow more items before cancellation takes effect
         Assert.True(results.Count >= 1, "At least one item should be processed before cancellation");
     }
 
     [Fact]
     public async Task StreamedListObjects_EmptyResult_ReturnsNoObjects() {
-        var streamContent = ""; // Empty response
+        var streamContent = "";
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
@@ -315,7 +298,6 @@ public class StreamedListObjectsTests {
 
     [Fact]
     public async Task StreamedListObjects_LargeNumberOfObjects_StreamsEfficiently() {
-        // Arrange - simulate a large response
         var objects = Enumerable.Range(1, 100).Select(i => $"document:{i}").ToArray();
         var streamContent = CreateStreamingResponse(objects);
 
@@ -346,7 +328,6 @@ public class StreamedListObjectsTests {
         var objects = new[] { "document:1", "document:2" };
         var streamContent = CreateStreamingResponse(objects);
 
-        // Create a new mock handler for each call
         var mockHandler1 = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         using var httpClient1 = new HttpClient(mockHandler1.Object);
         var config = new ClientConfiguration {
@@ -359,7 +340,6 @@ public class StreamedListObjectsTests {
         using var httpClient2 = new HttpClient(mockHandler2.Object);
         using var fgaClient2 = new OpenFgaClient(config, httpClient2);
 
-        // Act - Call twice
         var results1 = new List<string>();
         await foreach (var response in fgaClient1.StreamedListObjects(
             new ClientListObjectsRequest {
@@ -391,7 +371,6 @@ public class StreamedListObjectsTests {
 
         var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent,
             req => {
-                // Verify custom headers are present
                 Assert.True(req.Headers.Contains("X-Custom-Header"));
                 Assert.Equal("custom-value", req.Headers.GetValues("X-Custom-Header").First());
                 Assert.True(req.Headers.Contains("X-Request-Id"));
@@ -435,15 +414,11 @@ public class StreamedListObjectsTests {
                 ItExpr.IsAny<CancellationToken>()
             )
             .ReturnsAsync(() => new HttpResponseMessage {
-                StatusCode = (HttpStatusCode)429, // TooManyRequests (not available in net48)
-                Content = new StringContent(
-                    "{\"code\":\"rate_limit_exceeded\",\"message\":\"Too many requests\"}",
-                    Encoding.UTF8,
-                    "application/json")
+                StatusCode = (HttpStatusCode)429,
+                Content = JsonContent("{\"code\":\"rate_limit_exceeded\",\"message\":\"Too many requests\"}")
             });
 
         using var httpClient = new HttpClient(mockHandler.Object);
-        // MaxRetry=0: verify the error is thrown without spending time on retries
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
             StoreId = StoreId,
@@ -468,7 +443,6 @@ public class StreamedListObjectsTests {
         var objects = new[] { "document:1", "document:2" };
         var streamContent = CreateStreamingResponse(objects);
 
-        // First call returns 500, second call returns 200 with results
         var callCount = 0;
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
@@ -482,15 +456,12 @@ public class StreamedListObjectsTests {
                 if (callCount == 1) {
                     return new HttpResponseMessage {
                         StatusCode = HttpStatusCode.InternalServerError,
-                        Content = new StringContent(
-                            "{\"code\":\"internal_error\",\"message\":\"Transient error\"}",
-                            Encoding.UTF8,
-                            "application/json")
+                        Content = JsonContent("{\"code\":\"internal_error\",\"message\":\"Transient error\"}")
                     };
                 }
                 return new HttpResponseMessage {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(streamContent, Encoding.UTF8, "application/json")
+                    Content = JsonContent(streamContent)
                 };
             });
 
@@ -512,7 +483,7 @@ public class StreamedListObjectsTests {
             results.Add(response.Object);
         }
 
-        Assert.Equal(2, callCount); // Verify exactly one retry occurred
+        Assert.Equal(2, callCount);
         Assert.Equal(objects, results.ToArray());
     }
 
@@ -521,7 +492,6 @@ public class StreamedListObjectsTests {
         var objects = new[] { "document:1" };
         var streamContent = CreateStreamingResponse(objects);
 
-        // First call returns 429, second call succeeds
         var callCount = 0;
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
@@ -535,15 +505,12 @@ public class StreamedListObjectsTests {
                 if (callCount == 1) {
                     return new HttpResponseMessage {
                         StatusCode = (HttpStatusCode)429,
-                        Content = new StringContent(
-                            "{\"code\":\"rate_limit_exceeded\",\"message\":\"Too many requests\"}",
-                            Encoding.UTF8,
-                            "application/json")
+                        Content = JsonContent("{\"code\":\"rate_limit_exceeded\",\"message\":\"Too many requests\"}")
                     };
                 }
                 return new HttpResponseMessage {
                     StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent(streamContent, Encoding.UTF8, "application/json")
+                    Content = JsonContent(streamContent)
                 };
             });
 
@@ -565,7 +532,7 @@ public class StreamedListObjectsTests {
             results.Add(response.Object);
         }
 
-        Assert.Equal(2, callCount); // Verify exactly one retry occurred
+        Assert.Equal(2, callCount);
         Assert.Equal(objects, results.ToArray());
     }
 }

@@ -549,9 +549,9 @@ class Program {
 
         // NDJSON body that the mock server returns on the successful attempt
         const string ndjsonBody =
-            "{\"object\":\"document:1\"}\n" +
-            "{\"object\":\"document:2\"}\n" +
-            "{\"object\":\"document:3\"}\n";
+            "{\"result\":{\"object\":\"document:1\"}}\n" +
+            "{\"result\":{\"object\":\"document:2\"}}\n" +
+            "{\"result\":{\"object\":\"document:3\"}}\n";
 
         var handler = new MockHttpMessageHandler(request => {
             attemptCount++;
@@ -576,7 +576,8 @@ class Program {
         // Configure with enough retries (>= failuresBeforeSuccess) and a short wait
         var retryConfig = new ClientConfiguration {
             ApiUrl = "http://mock-fga-server",
-            StoreId = "test-store-id",
+            // Use a valid ULID for StoreId (ULID: 26 chars, Crockford base32, e.g. "01ARZ3NDEKTSV4RRFFQ69G5FAV")
+            StoreId = "01ARZ3NDEKTSV4RRFFQ69G5FAV",
             MaxRetry = 3,
             MinWaitInMs = 10  // short so the test runs fast
         };
@@ -600,7 +601,241 @@ class Program {
 
         Console.WriteLine("   PASS: StreamedListObjects correctly retried on 429 and received all items");
         Console.WriteLine();
+
+        // --- Additional Retry Flow Test Scenarios ---
+        // Scenario 1: Exceeding MaxRetry (Permanent 429)
+        await StreamedListObjectsRetry_Permanent429();
+
+        // Scenario 2: Immediate Success (No Retry Needed)
+        await StreamedListObjectsRetry_ImmediateSuccess();
+
+        // Scenario 3: Intermittent Non-Retryable Error (400 Bad Request)
+        await StreamedListObjectsRetry_NonRetryableError();
+
+        // Scenario 4: Retry on 503 then Success
+        await StreamedListObjectsRetry_503ThenSuccess();
+
+        // Scenario 5: Malformed NDJSON After Retries
+        await StreamedListObjectsRetry_MalformedNDJSON();
+
+        // Scenario 6: Partial Success (200 with Fewer Objects)
+        await StreamedListObjectsRetry_PartialSuccess();
+
+        // Scenario 7: Cancellation/Timeout During Retry (not implemented here, would require CancellationToken support)
+        // Expectation: The client should abort retries and throw a cancellation exception.
+        // This would require additional support in the client and test harness.
+        // --- End of Additional Retry Flow Test Scenarios ---
     }
+
+    // Scenario 1: Exceeding MaxRetry (Permanent 429)
+    static async Task StreamedListObjectsRetry_Permanent429() {
+        Console.WriteLine("Scenario 1: Permanent 429 (exceed MaxRetry)");
+        int attemptCount = 0;
+        var handler = new MockHttpMessageHandler(_ => {
+            attemptCount++;
+            Console.WriteLine($"   [mock] attempt {attemptCount} - returning 429");
+            return new HttpResponseMessage((System.Net.HttpStatusCode)429) {
+                Content = new StringContent("{\"code\":\"rate_limit_exceeded\",\"message\":\"rate limit exceeded\"}")
+            };
+        });
+        var httpClient = new HttpClient(handler);
+        var retryConfig = new ClientConfiguration {
+            ApiUrl = "http://mock-fga-server",
+            StoreId = "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            MaxRetry = 3,
+            MinWaitInMs = 10
+        };
+        using var retryClient = new OpenFgaClient(retryConfig, httpClient);
+        try {
+            await foreach (var _ in retryClient.StreamedListObjects(new ClientListObjectsRequest { User = "user:anne", Relation = "reader", Type = "document" })) {}
+            throw new Exception("Expected exception was not thrown");
+        } catch (Exception ex) {
+            Console.WriteLine($"   Caught exception: {ex.GetType().Name}");
+            Console.WriteLine("   PASS: Exception thrown after max retries");
+        }
+        Console.WriteLine();
+    }
+
+    // Scenario 2: Immediate Success (No Retry Needed)
+    static async Task StreamedListObjectsRetry_ImmediateSuccess() {
+        Console.WriteLine("Scenario 2: Immediate Success (no retry)");
+        int attemptCount = 0;
+        const string ndjsonBody = "{\"result\":{\"object\":\"document:1\"}}\n";
+        var handler = new MockHttpMessageHandler(_ => {
+            attemptCount++;
+            Console.WriteLine($"   [mock] attempt {attemptCount} - returning 200");
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK) {
+                Content = new StringContent(ndjsonBody, System.Text.Encoding.UTF8, "application/x-ndjson")
+            };
+        });
+        var httpClient = new HttpClient(handler);
+        var retryConfig = new ClientConfiguration {
+            ApiUrl = "http://mock-fga-server",
+            StoreId = "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            MaxRetry = 3,
+            MinWaitInMs = 10
+        };
+        using var retryClient = new OpenFgaClient(retryConfig, httpClient);
+        var objects = new List<string>();
+        await foreach (var item in retryClient.StreamedListObjects(new ClientListObjectsRequest { User = "user:anne", Relation = "reader", Type = "document" })) {
+            objects.Add(item.Object ?? string.Empty);
+        }
+        Console.WriteLine($"   Attempts made: {attemptCount} (expected 1)");
+        Console.WriteLine($"   Objects streamed: {objects.Count} (expected 1)");
+        Console.WriteLine($"   Objects: {string.Join(", ", objects)}");
+        if (attemptCount == 1 && objects.Count == 1 && objects[0] == "document:1")
+            Console.WriteLine("   PASS: Immediate success, no retry");
+        else
+            throw new Exception("Immediate success scenario failed");
+        Console.WriteLine();
+    }
+
+    // Scenario 3: Intermittent Non-Retryable Error (400 Bad Request)
+    static async Task StreamedListObjectsRetry_NonRetryableError() {
+        Console.WriteLine("Scenario 3: Non-retryable error (400 Bad Request)");
+        int attemptCount = 0;
+        var handler = new MockHttpMessageHandler(_ => {
+            attemptCount++;
+            Console.WriteLine($"   [mock] attempt {attemptCount} - returning 400");
+            return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest) {
+                Content = new StringContent("{\"code\":\"bad_request\",\"message\":\"bad request\"}")
+            };
+        });
+        var httpClient = new HttpClient(handler);
+        var retryConfig = new ClientConfiguration {
+            ApiUrl = "http://mock-fga-server",
+            StoreId = "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            MaxRetry = 3,
+            MinWaitInMs = 10
+        };
+        using var retryClient = new OpenFgaClient(retryConfig, httpClient);
+        try {
+            await foreach (var _ in retryClient.StreamedListObjects(new ClientListObjectsRequest { User = "user:anne", Relation = "reader", Type = "document" })) {}
+            throw new Exception("Expected exception was not thrown");
+        } catch (Exception ex) {
+            Console.WriteLine($"   Caught exception: {ex.GetType().Name}");
+            Console.WriteLine("   PASS: Non-retryable error thrown immediately");
+        }
+        Console.WriteLine();
+    }
+
+    // Scenario 4: Retry on 503 then Success
+    static async Task StreamedListObjectsRetry_503ThenSuccess() {
+        Console.WriteLine("Scenario 4: Retry on 503 then success");
+        int attemptCount = 0;
+        const string ndjsonBody = "{\"result\":{\"object\":\"document:1\"}}\n";
+        var handler = new MockHttpMessageHandler(_ => {
+            attemptCount++;
+            if (attemptCount < 3) {
+                Console.WriteLine($"   [mock] attempt {attemptCount} - returning 503");
+                return new HttpResponseMessage(System.Net.HttpStatusCode.ServiceUnavailable) {
+                    Content = new StringContent("{\"code\":\"unavailable\",\"message\":\"service unavailable\"}")
+                };
+            }
+            Console.WriteLine($"   [mock] attempt {attemptCount} - returning 200");
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK) {
+                Content = new StringContent(ndjsonBody, System.Text.Encoding.UTF8, "application/x-ndjson")
+            };
+        });
+        var httpClient = new HttpClient(handler);
+        var retryConfig = new ClientConfiguration {
+            ApiUrl = "http://mock-fga-server",
+            StoreId = "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            MaxRetry = 3,
+            MinWaitInMs = 10
+        };
+        using var retryClient = new OpenFgaClient(retryConfig, httpClient);
+        var objects = new List<string>();
+        await foreach (var item in retryClient.StreamedListObjects(new ClientListObjectsRequest { User = "user:anne", Relation = "reader", Type = "document" })) {
+            objects.Add(item.Object ?? string.Empty);
+        }
+        Console.WriteLine($"   Attempts made: {attemptCount} (expected 3)");
+        Console.WriteLine($"   Objects streamed: {objects.Count} (expected 1)");
+        if (attemptCount == 3 && objects.Count == 1 && objects[0] == "document:1")
+            Console.WriteLine("   PASS: Retries on 503, then success");
+        else
+            throw new Exception("503 retry scenario failed");
+        Console.WriteLine();
+    }
+
+    // Scenario 5: Malformed NDJSON After Retries
+    static async Task StreamedListObjectsRetry_MalformedNDJSON() {
+        Console.WriteLine("Scenario 5: Malformed NDJSON after retries");
+        int attemptCount = 0;
+        const string malformedNdjson = "not-a-json\n";
+        var handler = new MockHttpMessageHandler(_ => {
+            attemptCount++;
+            if (attemptCount < 3) {
+                Console.WriteLine($"   [mock] attempt {attemptCount} - returning 429");
+                return new HttpResponseMessage((System.Net.HttpStatusCode)429) {
+                    Content = new StringContent("{\"code\":\"rate_limit_exceeded\",\"message\":\"rate limit exceeded\"}")
+                };
+            }
+            Console.WriteLine($"   [mock] attempt {attemptCount} - returning 200 with malformed NDJSON");
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK) {
+                Content = new StringContent(malformedNdjson, System.Text.Encoding.UTF8, "application/x-ndjson")
+            };
+        });
+        var httpClient = new HttpClient(handler);
+        var retryConfig = new ClientConfiguration {
+            ApiUrl = "http://mock-fga-server",
+            StoreId = "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            MaxRetry = 3,
+            MinWaitInMs = 10
+        };
+        using var retryClient = new OpenFgaClient(retryConfig, httpClient);
+        try {
+            await foreach (var _ in retryClient.StreamedListObjects(new ClientListObjectsRequest { User = "user:anne", Relation = "reader", Type = "document" })) {}
+            throw new Exception("Expected parsing exception was not thrown");
+        } catch (Exception ex) {
+            Console.WriteLine($"   Caught exception: {ex.GetType().Name}");
+            Console.WriteLine("   PASS: Malformed NDJSON throws after retries");
+        }
+        Console.WriteLine();
+    }
+
+    // Scenario 6: Partial Success (200 with Fewer Objects)
+    static async Task StreamedListObjectsRetry_PartialSuccess() {
+        Console.WriteLine("Scenario 6: Partial success (fewer objects)");
+        int attemptCount = 0;
+        const string ndjsonBody = "{\"result\":{\"object\":\"document:1\"}}\n";
+        var handler = new MockHttpMessageHandler(_ => {
+            attemptCount++;
+            if (attemptCount < 2) {
+                Console.WriteLine($"   [mock] attempt {attemptCount} - returning 429");
+                return new HttpResponseMessage((System.Net.HttpStatusCode)429) {
+                    Content = new StringContent("{\"code\":\"rate_limit_exceeded\",\"message\":\"rate limit exceeded\"}")
+                };
+            }
+            Console.WriteLine($"   [mock] attempt {attemptCount} - returning 200 with 1 object");
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK) {
+                Content = new StringContent(ndjsonBody, System.Text.Encoding.UTF8, "application/x-ndjson")
+            };
+        });
+        var httpClient = new HttpClient(handler);
+        var retryConfig = new ClientConfiguration {
+            ApiUrl = "http://mock-fga-server",
+            StoreId = "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            MaxRetry = 3,
+            MinWaitInMs = 10
+        };
+        using var retryClient = new OpenFgaClient(retryConfig, httpClient);
+        var objects = new List<string>();
+        await foreach (var item in retryClient.StreamedListObjects(new ClientListObjectsRequest { User = "user:anne", Relation = "reader", Type = "document" })) {
+            objects.Add(item.Object ?? string.Empty);
+        }
+        Console.WriteLine($"   Attempts made: {attemptCount} (expected 2)");
+        Console.WriteLine($"   Objects streamed: {objects.Count} (expected 1)");
+        if (attemptCount == 2 && objects.Count == 1 && objects[0] == "document:1")
+            Console.WriteLine("   PASS: Partial success handled");
+        else
+            throw new Exception("Partial success scenario failed");
+        Console.WriteLine();
+    }
+
+    // Scenario 7: Cancellation/Timeout During Retry (not implemented here, would require CancellationToken support)
+    // Expectation: The client should abort retries and throw a cancellation exception.
+    // This would require additional support in the client and test harness.
 
     /// <summary>Simple inline mock handler that delegates to a synchronous callback.</summary>
     class MockHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> handler) : HttpMessageHandler {

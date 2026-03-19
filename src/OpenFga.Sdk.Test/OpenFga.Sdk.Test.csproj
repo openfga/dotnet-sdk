@@ -36,11 +36,15 @@
   </PropertyGroup>
 
   <!-- Packages needed for .NET versions < .NET 8 -->
-  <ItemGroup Condition="'$(IsNet8OrGreater)' != 'true'">
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.3" />
-    <PackageReference Include="System.Net.Http.Json" Version="10.0.3" />
-    <PackageReference Include="System.Text.Json" Version="10.0.3" />
-  </ItemGroup>
+   <ItemGroup Condition="'$(IsNet8OrGreater)' != 'true'">
+     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.3" />
+     <PackageReference Include="System.Net.Http.Json" Version="10.0.3" />
+     <PackageReference Include="System.Text.Json" Version="10.0.3" />
+   </ItemGroup>
+
+   <ItemGroup>
+     <PackageReference Include="Testcontainers" Version="4.11.0" />
+   </ItemGroup>
 
   <!-- .NET Framework 4.8 specific packages -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
