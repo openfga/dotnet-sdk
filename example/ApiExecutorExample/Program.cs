@@ -60,6 +60,9 @@ class Program {
             // Example 11: Streaming API via ExecuteStreamingAsync
             await StreamingExample(executor, config.ApiUrl);
 
+            // Example 12: Verify StreamedListObjects retries on 429 before streaming
+            await StreamedListObjectsRetryVerification();
+
             // Cleanup: Delete the store we created
             await DeleteStoreExample(executor, config.ApiUrl, storeId);
 
@@ -529,6 +532,80 @@ class Program {
             "DeleteStore");
         Console.WriteLine("   Streaming demo store deleted");
         Console.WriteLine();
+    }
+
+    /// <summary>
+    /// Verifies that StreamedListObjects retries on 429 during connection establishment.
+    ///
+    /// Uses a mock HttpMessageHandler that returns 429 for the first two attempts,
+    /// then succeeds on the third with a small NDJSON payload. If the retry fix is
+    /// working the items are yielded; if broken, an FgaApiRateLimitExceededError is thrown.
+    /// </summary>
+    static async Task StreamedListObjectsRetryVerification() {
+        Console.WriteLine("Example 12: StreamedListObjects retry on 429 (mock)");
+
+        const int failuresBeforeSuccess = 2;
+        var attemptCount = 0;
+
+        // NDJSON body that the mock server returns on the successful attempt
+        const string ndjsonBody =
+            "{\"object\":\"document:1\"}\n" +
+            "{\"object\":\"document:2\"}\n" +
+            "{\"object\":\"document:3\"}\n";
+
+        var handler = new MockHttpMessageHandler(request => {
+            attemptCount++;
+            Console.WriteLine($"   [mock] attempt {attemptCount} - {request.Method} {request.RequestUri?.PathAndQuery}");
+
+            if (attemptCount <= failuresBeforeSuccess) {
+                Console.WriteLine($"   [mock] returning 429 (simulated rate-limit)");
+                var rateLimitResponse = new HttpResponseMessage((System.Net.HttpStatusCode)429) {
+                    Content = new StringContent("{\"code\":\"rate_limit_exceeded\",\"message\":\"rate limit exceeded\"}")
+                };
+                return rateLimitResponse;
+            }
+
+            Console.WriteLine($"   [mock] returning 200 with NDJSON stream");
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK) {
+                Content = new StringContent(ndjsonBody, System.Text.Encoding.UTF8, "application/x-ndjson")
+            };
+        });
+
+        var httpClient = new HttpClient(handler);
+
+        // Configure with enough retries (>= failuresBeforeSuccess) and a short wait
+        var retryConfig = new ClientConfiguration {
+            ApiUrl = "http://mock-fga-server",
+            StoreId = "test-store-id",
+            MaxRetry = 3,
+            MinWaitInMs = 10  // short so the test runs fast
+        };
+
+        using var retryClient = new OpenFgaClient(retryConfig, httpClient);
+
+        var objects = new List<string>();
+        await foreach (var item in retryClient.StreamedListObjects(
+            new ClientListObjectsRequest { User = "user:anne", Relation = "reader", Type = "document" })) {
+            objects.Add(item.Object ?? string.Empty);
+        }
+
+        Console.WriteLine($"   Attempts made  : {attemptCount} (expected {failuresBeforeSuccess + 1})");
+        Console.WriteLine($"   Objects streamed: {objects.Count} (expected 3)");
+        Console.WriteLine($"   Objects: {string.Join(", ", objects)}");
+
+        if (attemptCount != failuresBeforeSuccess + 1)
+            throw new Exception($"Expected {failuresBeforeSuccess + 1} attempts, got {attemptCount}");
+        if (objects.Count != 3)
+            throw new Exception($"Expected 3 objects, got {objects.Count}");
+
+        Console.WriteLine("   PASS: StreamedListObjects correctly retried on 429 and received all items");
+        Console.WriteLine();
+    }
+
+    /// <summary>Simple inline mock handler that delegates to a synchronous callback.</summary>
+    class MockHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> handler) : HttpMessageHandler {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(handler(request));
     }
 
     static async Task DeleteStoreExample(ApiExecutor executor, string basePath, string storeId) {
