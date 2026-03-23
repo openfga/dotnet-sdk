@@ -554,7 +554,7 @@ public class OpenFgaApi : IDisposable {
             QueryParameters = queryParams,
         };
 
-        await foreach (var response in _apiClient.SendStreamingRequestAsync<ListObjectsRequest, StreamedListObjectsResponse>(requestBuilder,
+        await foreach (var response in _apiClient.ApiExecutor.ExecuteStreamingAsync<ListObjectsRequest, StreamedListObjectsResponse>(requestBuilder,
             "StreamedListObjects", options, cancellationToken)) {
             yield return response;
         }

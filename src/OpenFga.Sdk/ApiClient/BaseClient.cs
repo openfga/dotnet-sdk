@@ -98,9 +98,29 @@ public class BaseClient : IDisposable {
         TRes responseContent = default;
         if (response.Content != null && response.StatusCode != HttpStatusCode.NoContent) {
             using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            // Guard against empty responses; fall back to always attempting deserialization on non-seekable streams
-            if (!contentStream.CanSeek || contentStream.Length > 0) {
-                responseContent = await JsonSerializer.DeserializeAsync<TRes>(contentStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
+            // Guard against empty responses, including for non-seekable streams.
+            // For seekable streams, use Length; for non-seekable streams, peek a byte and buffer if present.
+            Stream deserializationStream = contentStream;
+            var hasContent = false;
+            if (deserializationStream.CanSeek) {
+                hasContent = deserializationStream.Length > 0;
+                if (hasContent && deserializationStream.Position != 0) {
+                    deserializationStream.Position = 0;
+                }
+            }
+            else {
+                int firstByte = deserializationStream.ReadByte();
+                if (firstByte != -1) {
+                    hasContent = true;
+                    var bufferedStream = new MemoryStream();
+                    bufferedStream.WriteByte((byte)firstByte);
+                    await deserializationStream.CopyToAsync(bufferedStream).ConfigureAwait(false);
+                    bufferedStream.Position = 0;
+                    deserializationStream = bufferedStream;
+                }
+            }
+            if (hasContent) {
+                responseContent = await JsonSerializer.DeserializeAsync<TRes>(deserializationStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
                                   throw new FgaError();
             }
         }
@@ -141,10 +161,10 @@ public class BaseClient : IDisposable {
 
         T responseContent = default;
         if (response.Content != null && response.StatusCode != HttpStatusCode.NoContent) {
-            using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            // Guard against empty responses; fall back to always attempting deserialization on non-seekable streams
-            if (!contentStream.CanSeek || contentStream.Length > 0) {
-                responseContent = await JsonSerializer.DeserializeAsync<T>(contentStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
+            var contentString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            // Guard against empty or whitespace-only responses before attempting JSON deserialization
+            if (!string.IsNullOrWhiteSpace(contentString)) {
+                responseContent = JsonSerializer.Deserialize<T>(contentString) ??
                                   throw new FgaError();
             }
         }
@@ -260,7 +280,7 @@ public class BaseClient : IDisposable {
                 using var jsonDoc = JsonDocument.Parse(line);
                 var root = jsonDoc.RootElement;
                 if (root.TryGetProperty("result", out var resultElement)) {
-                    parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
+                    parsedResult = resultElement.Deserialize<T>();
                 }
             }
             catch (JsonException) {
