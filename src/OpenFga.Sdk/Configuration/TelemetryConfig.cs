@@ -66,8 +66,11 @@ public class TelemetryConfig {
             // TelemetryAttribute.HttpMethod,
             // TelemetryAttribute.HttpUrl,
 
-            // This not included by default as it has a very high cardinality which could increase costs for users
+            // This is not included by default as it has a very high cardinality which could increase costs for users
             // TelemetryAttribute.FgaRequestUser
+
+            // This is not included by default as it only applies to BatchCheck requests
+            // TelemetryAttribute.RequestBatchCheckSize
         };
 
         return new Dictionary<string, MetricConfig> {
