@@ -36,6 +36,11 @@ public static class TelemetryAttribute {
     /// </summary>
     public static readonly string RequestClientId = "fga-client.request.client_id";
 
+    /// <summary>
+    ///     The number of checks in a batch check request, if applicable.
+    /// </summary>
+    public static readonly string RequestBatchCheckSize = "fga-client.request.batch_check_size";
+
     // Attributes (tags) associated with the response //
 
     /// <summary>
@@ -97,6 +102,7 @@ public static class TelemetryAttribute {
             RequestStoreId,
             RequestModelId,
             RequestClientId,
+            RequestBatchCheckSize,
             ResponseModelId,
             FgaRequestUser,
             HttpMethod,
@@ -188,6 +194,10 @@ public class Attributes {
             attributes = AddRequestModelIdAttributes(requestBuilder, apiName, attributes);
         }
 
+        if (enabledAttributes.Contains(TelemetryAttribute.RequestBatchCheckSize) && apiName is "BatchCheck") {
+            attributes = AddBatchCheckSizeAttribute(requestBuilder, attributes);
+        }
+
         return attributes;
     }
 
@@ -208,7 +218,7 @@ public class Attributes {
         }
 
         if (apiName is "Check" or "ListObjects" or "StreamedListObjects" or "Write" or "Expand" or "ListUsers") {
-            AddRequestBodyAttributes(requestBuilder, apiName, attributes);
+            attributes = AddRequestBodyAttributes(requestBuilder, apiName, attributes); // Assign the return value
         }
 
         return attributes;
@@ -217,8 +227,9 @@ public class Attributes {
     private static TagList AddRequestBodyAttributes<T>(
         RequestBuilder<T> requestBuilder, string apiName, TagList attributes) {
         try {
-            if (requestBuilder.JsonBody != null) {
-                using (var document = JsonDocument.Parse(requestBuilder.JsonBody)) {
+            var jsonBody = requestBuilder.JsonBody;
+            if (jsonBody != null) {
+                using (var document = JsonDocument.Parse(jsonBody)) {
                     var root = document.RootElement;
 
                     if (root.TryGetProperty("authorization_model_id", out var authModelId) &&
@@ -236,7 +247,15 @@ public class Attributes {
             }
         }
         catch {
-            // Handle parsing errors if necessary
+            // Telemetry attribute extraction is best-effort; silently ignore any parsing errors
+        }
+
+        return attributes;
+    }
+
+    private static TagList AddBatchCheckSizeAttribute<T>(RequestBuilder<T> requestBuilder, TagList attributes) {
+        if (requestBuilder.Body is Model.BatchCheckRequest batchCheckRequest && batchCheckRequest.Checks != null) {
+            attributes.Add(new KeyValuePair<string, object?>(TelemetryAttribute.RequestBatchCheckSize, batchCheckRequest.Checks.Count));
         }
 
         return attributes;
