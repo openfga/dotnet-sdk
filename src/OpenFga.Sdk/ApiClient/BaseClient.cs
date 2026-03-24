@@ -100,28 +100,25 @@ public class BaseClient : IDisposable {
             using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             // Guard against empty responses, including for non-seekable streams.
             // For seekable streams, use Length; for non-seekable streams, peek a byte and buffer if present.
-            Stream deserializationStream = contentStream;
-            var hasContent = false;
-            if (deserializationStream.CanSeek) {
-                hasContent = deserializationStream.Length > 0;
-                if (hasContent && deserializationStream.Position != 0) {
-                    deserializationStream.Position = 0;
+            if (contentStream.CanSeek) {
+                if (contentStream.Length > 0) {
+                    if (contentStream.Position != 0) {
+                        contentStream.Position = 0;
+                    }
+                    responseContent = await JsonSerializer.DeserializeAsync<TRes>(contentStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
+                                      throw new FgaError();
                 }
             }
             else {
-                int firstByte = deserializationStream.ReadByte();
+                int firstByte = contentStream.ReadByte();
                 if (firstByte != -1) {
-                    hasContent = true;
-                    var bufferedStream = new MemoryStream();
+                    using var bufferedStream = new MemoryStream();
                     bufferedStream.WriteByte((byte)firstByte);
-                    await deserializationStream.CopyToAsync(bufferedStream).ConfigureAwait(false);
+                    await contentStream.CopyToAsync(bufferedStream).ConfigureAwait(false);
                     bufferedStream.Position = 0;
-                    deserializationStream = bufferedStream;
+                    responseContent = await JsonSerializer.DeserializeAsync<TRes>(bufferedStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
+                                      throw new FgaError();
                 }
-            }
-            if (hasContent) {
-                responseContent = await JsonSerializer.DeserializeAsync<TRes>(deserializationStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
-                                  throw new FgaError();
             }
         }
 
