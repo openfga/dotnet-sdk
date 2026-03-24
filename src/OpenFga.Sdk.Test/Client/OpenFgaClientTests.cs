@@ -342,7 +342,7 @@ public class OpenFgaClientTests : IDisposable {
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
                 ItExpr.Is<HttpRequestMessage>(req =>
-                    req.RequestUri == new Uri($"{_config.BasePath}/stores?name=TestStore&") &&
+                    req.RequestUri == new Uri($"{_config.BasePath}/stores?name=TestStore") &&
                     req.Method == HttpMethod.Get),
                 ItExpr.IsAny<CancellationToken>()
             )
@@ -365,7 +365,7 @@ public class OpenFgaClientTests : IDisposable {
             "SendAsync",
             Times.Exactly(1),
             ItExpr.Is<HttpRequestMessage>(req =>
-                req.RequestUri == new Uri($"{_config.BasePath}/stores?name=TestStore&") &&
+                req.RequestUri == new Uri($"{_config.BasePath}/stores?name=TestStore") &&
                 req.Method == HttpMethod.Get),
             ItExpr.IsAny<CancellationToken>()
         );
@@ -828,7 +828,7 @@ public class OpenFgaClientTests : IDisposable {
                 ItExpr.Is<HttpRequestMessage>(req =>
                     req.RequestUri ==
                     new Uri(
-                        $"{_config.BasePath}/stores/{_config.StoreId}/authorization-models?page_size=1&") &&
+                        $"{_config.BasePath}/stores/{_config.StoreId}/authorization-models?page_size=1") &&
                     req.Method == HttpMethod.Get),
                 ItExpr.IsAny<CancellationToken>()
             )
@@ -850,7 +850,7 @@ public class OpenFgaClientTests : IDisposable {
             Times.Exactly(1),
             ItExpr.Is<HttpRequestMessage>(req =>
                 req.RequestUri ==
-                new Uri($"{_config.BasePath}/stores/{_config.StoreId}/authorization-models?page_size=1&") &&
+                new Uri($"{_config.BasePath}/stores/{_config.StoreId}/authorization-models?page_size=1") &&
                 req.Method == HttpMethod.Get),
             ItExpr.IsAny<CancellationToken>()
         );

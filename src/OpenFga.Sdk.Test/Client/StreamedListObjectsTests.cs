@@ -27,7 +27,7 @@ public class StreamedListObjectsTests {
 
     private Mock<HttpMessageHandler> CreateMockHttpHandler(
         HttpStatusCode statusCode,
-        string ndjsonContent,
+        string streamContent,
         Action<HttpRequestMessage>? requestValidator = null) {
         var mockHandler = new Mock<HttpMessageHandler>();
         mockHandler.Protected()
@@ -40,13 +40,13 @@ public class StreamedListObjectsTests {
                 requestValidator?.Invoke(req);
                 return new HttpResponseMessage {
                     StatusCode = statusCode,
-                    Content = new StringContent(ndjsonContent, Encoding.UTF8, "application/x-ndjson")
+                    Content = new StringContent(streamContent, Encoding.UTF8, "application/json")
                 };
             });
         return mockHandler;
     }
 
-    private string CreateNDJSONResponse(params string[] objects) {
+    private string CreateStreamingResponse(params string[] objects) {
         return string.Join("\n",
             objects.Select(obj => $"{{\"result\":{{\"object\":\"{obj}\"}}}}")) + "\n";
     }
@@ -54,9 +54,9 @@ public class StreamedListObjectsTests {
     [Fact]
     public async Task StreamedListObjects_BasicRequest_StreamsObjectsIncrementally() {
         var objects = new[] { "document:1", "document:2", "document:3" };
-        var ndjson = CreateNDJSONResponse(objects);
+        var streamContent = CreateStreamingResponse(objects);
 
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson,
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent,
             req => {
                 Assert.Equal(HttpMethod.Post, req.Method);
                 Assert.Contains($"/stores/{StoreId}/streamed-list-objects", req.RequestUri!.ToString());
@@ -86,9 +86,9 @@ public class StreamedListObjectsTests {
     [Fact]
     public async Task StreamedListObjects_WithAuthorizationModelId_IncludesModelIdInRequest() {
         var objects = new[] { "document:1" };
-        var ndjson = CreateNDJSONResponse(objects);
+        var streamContent = CreateStreamingResponse(objects);
 
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
@@ -115,9 +115,9 @@ public class StreamedListObjectsTests {
     [Fact]
     public async Task StreamedListObjects_WithConsistency_IncludesConsistencyInRequest() {
         var objects = new[] { "document:1" };
-        var ndjson = CreateNDJSONResponse(objects);
+        var streamContent = CreateStreamingResponse(objects);
 
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
@@ -146,9 +146,9 @@ public class StreamedListObjectsTests {
     [Fact]
     public async Task StreamedListObjects_WithContextualTuples_IncludesContextualTuplesInRequest() {
         var objects = new[] { "document:1" };
-        var ndjson = CreateNDJSONResponse(objects);
+        var streamContent = CreateStreamingResponse(objects);
 
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
@@ -206,9 +206,9 @@ public class StreamedListObjectsTests {
     [Fact]
     public async Task StreamedListObjects_EarlyBreak_DisposesResourcesCleanly() {
         var objects = new[] { "document:1", "document:2", "document:3", "document:4", "document:5" };
-        var ndjson = CreateNDJSONResponse(objects);
+        var streamContent = CreateStreamingResponse(objects);
 
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
@@ -236,9 +236,9 @@ public class StreamedListObjectsTests {
     [Fact]
     public async Task StreamedListObjects_WithCancellationToken_SupportsCancellation() {
         var objects = new[] { "document:1", "document:2", "document:3" };
-        var ndjson = CreateNDJSONResponse(objects);
+        var streamContent = CreateStreamingResponse(objects);
 
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
@@ -270,8 +270,8 @@ public class StreamedListObjectsTests {
 
     [Fact]
     public async Task StreamedListObjects_EmptyResult_ReturnsNoObjects() {
-        var ndjson = ""; // Empty response
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var streamContent = ""; // Empty response
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
@@ -317,9 +317,9 @@ public class StreamedListObjectsTests {
     public async Task StreamedListObjects_LargeNumberOfObjects_StreamsEfficiently() {
         // Arrange - simulate a large response
         var objects = Enumerable.Range(1, 100).Select(i => $"document:{i}").ToArray();
-        var ndjson = CreateNDJSONResponse(objects);
+        var streamContent = CreateStreamingResponse(objects);
 
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         using var httpClient = new HttpClient(mockHandler.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
@@ -344,10 +344,10 @@ public class StreamedListObjectsTests {
     [Fact]
     public async Task StreamedListObjects_MultipleIterations_WorksCorrectly() {
         var objects = new[] { "document:1", "document:2" };
-        var ndjson = CreateNDJSONResponse(objects);
+        var streamContent = CreateStreamingResponse(objects);
 
         // Create a new mock handler for each call
-        var mockHandler1 = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler1 = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         using var httpClient1 = new HttpClient(mockHandler1.Object);
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
@@ -355,7 +355,7 @@ public class StreamedListObjectsTests {
         };
         using var fgaClient1 = new OpenFgaClient(config, httpClient1);
 
-        var mockHandler2 = CreateMockHttpHandler(HttpStatusCode.OK, ndjson);
+        var mockHandler2 = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
         using var httpClient2 = new HttpClient(mockHandler2.Object);
         using var fgaClient2 = new OpenFgaClient(config, httpClient2);
 
@@ -387,9 +387,9 @@ public class StreamedListObjectsTests {
     [Fact]
     public async Task StreamedListObjects_WithCustomHeaders_IncludesHeadersInRequest() {
         var objects = new[] { "document:1", "document:2" };
-        var ndjson = CreateNDJSONResponse(objects);
+        var streamContent = CreateStreamingResponse(objects);
 
-        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, ndjson,
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent,
             req => {
                 // Verify custom headers are present
                 Assert.True(req.Headers.Contains("X-Custom-Header"));
@@ -439,16 +439,15 @@ public class StreamedListObjectsTests {
                 Content = new StringContent(
                     "{\"code\":\"rate_limit_exceeded\",\"message\":\"Too many requests\"}",
                     Encoding.UTF8,
-                    "application/json"),
-                Headers = {
-                    { "Retry-After", "1" }
-                }
+                    "application/json")
             });
 
         using var httpClient = new HttpClient(mockHandler.Object);
+        // MaxRetry=0: verify the error is thrown without spending time on retries
         var config = new ClientConfiguration {
             ApiUrl = ApiUrl,
-            StoreId = StoreId
+            StoreId = StoreId,
+            RetryParams = new RetryParams { MaxRetry = 0, MinWaitInMs = 0 }
         };
         using var fgaClient = new OpenFgaClient(config, httpClient);
 
@@ -462,5 +461,111 @@ public class StreamedListObjectsTests {
                 // Should not reach here
             }
         });
+    }
+
+    [Fact]
+    public async Task StreamedListObjects_TransientConnectionError_RetriesAndSucceeds() {
+        var objects = new[] { "document:1", "document:2" };
+        var streamContent = CreateStreamingResponse(objects);
+
+        // First call returns 500, second call returns 200 with results
+        var callCount = 0;
+        var mockHandler = new Mock<HttpMessageHandler>();
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync((HttpRequestMessage req, CancellationToken ct) => {
+                callCount++;
+                if (callCount == 1) {
+                    return new HttpResponseMessage {
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        Content = new StringContent(
+                            "{\"code\":\"internal_error\",\"message\":\"Transient error\"}",
+                            Encoding.UTF8,
+                            "application/json")
+                    };
+                }
+                return new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(streamContent, Encoding.UTF8, "application/json")
+                };
+            });
+
+        using var httpClient = new HttpClient(mockHandler.Object);
+        var config = new ClientConfiguration {
+            ApiUrl = ApiUrl,
+            StoreId = StoreId,
+            RetryParams = new RetryParams { MaxRetry = 1, MinWaitInMs = 0 }
+        };
+        using var fgaClient = new OpenFgaClient(config, httpClient);
+
+        var results = new List<string>();
+        await foreach (var response in fgaClient.StreamedListObjects(
+            new ClientListObjectsRequest {
+                User = "user:anne",
+                Relation = "can_read",
+                Type = "document"
+            })) {
+            results.Add(response.Object);
+        }
+
+        Assert.Equal(2, callCount); // Verify exactly one retry occurred
+        Assert.Equal(objects, results.ToArray());
+    }
+
+    [Fact]
+    public async Task StreamedListObjects_RateLimitError_RetriesAndSucceeds() {
+        var objects = new[] { "document:1" };
+        var streamContent = CreateStreamingResponse(objects);
+
+        // First call returns 429, second call succeeds
+        var callCount = 0;
+        var mockHandler = new Mock<HttpMessageHandler>();
+        mockHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>()
+            )
+            .ReturnsAsync((HttpRequestMessage req, CancellationToken ct) => {
+                callCount++;
+                if (callCount == 1) {
+                    return new HttpResponseMessage {
+                        StatusCode = (HttpStatusCode)429,
+                        Content = new StringContent(
+                            "{\"code\":\"rate_limit_exceeded\",\"message\":\"Too many requests\"}",
+                            Encoding.UTF8,
+                            "application/json")
+                    };
+                }
+                return new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = new StringContent(streamContent, Encoding.UTF8, "application/json")
+                };
+            });
+
+        using var httpClient = new HttpClient(mockHandler.Object);
+        var config = new ClientConfiguration {
+            ApiUrl = ApiUrl,
+            StoreId = StoreId,
+            RetryParams = new RetryParams { MaxRetry = 1, MinWaitInMs = 0 }
+        };
+        using var fgaClient = new OpenFgaClient(config, httpClient);
+
+        var results = new List<string>();
+        await foreach (var response in fgaClient.StreamedListObjects(
+            new ClientListObjectsRequest {
+                User = "user:anne",
+                Relation = "can_read",
+                Type = "document"
+            })) {
+            results.Add(response.Object);
+        }
+
+        Assert.Equal(2, callCount); // Verify exactly one retry occurred
+        Assert.Equal(objects, results.ToArray());
     }
 }

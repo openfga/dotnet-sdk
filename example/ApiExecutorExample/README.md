@@ -14,10 +14,11 @@ This example demonstrates how to use `ApiExecutor` to make custom HTTP requests 
 8. **Raw JSON Response** - Getting responses as raw JSON strings
 9. **Custom Headers** - Adding custom headers to requests via ClientRequestOptions
 10. **Fluent API** - Using the enhanced RequestBuilder with fluent methods
+11. **Streaming** - Stream results using `ExecuteStreamingAsync` against the streamed-list-objects endpoint
 
 ## Key Concepts
 
-### ApiClient.ExecuteAsync vs Standard SDK Methods
+### ApiExecutor.ExecuteAsync vs Standard SDK Methods
 
 The SDK provides two ways to interact with the OpenFGA API:
 
@@ -111,69 +112,85 @@ make stop-openfga   # Stop OpenFGA when done
 ```text
 === OpenFGA Custom API Requests Example ===
 
-📋 Example 1: List Stores
+Example 1: List Stores
 Making GET request to /stores
-✅ Status: OK
+Status: OK
    Is Successful: True
    Found 0 store(s)
 
-🏪 Example 2: Create Store
+Example 2: Create Store
 Making POST request to /stores
-✅ Status: Created
+Status: Created
    Store ID: 01JQWXYZ123ABC456DEF789GHJ
    Store Name: ApiExecutor-Example-1738713600000
    Raw Response Length: 245 chars
 
-🔍 Example 3: Get Store Details
+Example 3: Get Store Details
 Making GET request to /stores/{store_id}
-✅ Status: OK
+Status: OK
    Store Name: ApiExecutor-Example-1738713600000
    Created At: 2025-02-04T10:00:00Z
    Response Headers: 8
 
-📝 Example 4: Create Authorization Model
+Example 4: Create Authorization Model
 Making POST request to /stores/{store_id}/authorization-models
-✅ Status: Created
+Status: Created
    Model ID: 01JQWXYZ789DEF123ABC456GHJ
 
-✍️  Example 5: Write Relationship Tuples
+Example 5: Write Relationship Tuples
 Making POST request to /stores/{store_id}/write
-✅ Status: OK
+Status: OK
    Tuples written successfully
 
-📖 Example 6: Read Relationship Tuples
+Example 6: Read Relationship Tuples
 Making POST request to /stores/{store_id}/read
-✅ Status: OK
+Status: OK
    Found 2 tuple(s):
      - user:alice is writer of document:roadmap
      - user:bob is reader of document:roadmap
 
-🔐 Example 7: Check Permission
+Example 7: Check Permission
 Making POST request to /stores/{store_id}/check
-✅ Status: OK
+Status: OK
    Allowed: True
 
-📄 Example 8: Raw JSON Response
+Example 8: Raw JSON Response
 Getting response as raw JSON string instead of typed object
-✅ Status: OK
+Status: OK
    Raw JSON (first 100 chars): {"stores":[],"continuation_token":""}...
    RawResponse and Data are the same: True
 
-📨 Example 9: Custom Headers
+Example 9: Custom Headers
 Making request with custom headers
-✅ Status: OK
+Status: OK
    Custom headers sent successfully
    Response has 8 headers
 
-🎯 Example 10: Fluent API for Request Building
-Using the enhanced RequestBuilder with fluent methods
-✅ Status: OK
-   Found 0 store(s) using fluent API
-   Note: Fluent API provides better validation and cleaner syntax!
+Example 10: Fluent API for Request Building
+Using RequestBuilder with fluent methods
+Status: OK
+   Found 0 store(s)
 
-🗑️  Cleanup: Delete Store
+Example 11: Streaming API
+Streaming list-objects for a computed relation via ExecuteStreamingAsync
+   Created store: 01JQWXYZ...
+   Created model: 01JQWXYZ...
+   Writing tuples (1000 as owner, 1000 as viewer)...
+   Wrote 2000 tuples
+   Streaming objects via computed 'can_read' relation...
+   - document:1
+   - document:2
+   - document:3
+   - document:500
+   - document:1000
+   - document:1500
+   - document:2000
+Streamed 2000 objects
+   Streaming demo store deleted
+
+Cleanup: Delete Store
 Making DELETE request to /stores/{store_id}
-✅ Status: NoContent
+Status: NoContent
    Store deleted successfully
 
 === All examples completed successfully! ===
@@ -185,10 +202,10 @@ Making DELETE request to /stores/{store_id}
 
 ```
 OpenFgaClient
-    └── GetApiClient() → ApiClient (core building block)
-            └── ExecuteAsync() → Full response details
+    └── ApiExecutor (property)
+            └── ExecuteAsync() / ExecuteStreamingAsync()
                     ├── Authentication (OAuth/ApiToken)
-                    ├── Retry logic with exponential backoff  
+                    ├── Retry logic with exponential backoff
                     ├── Error handling
                     └── Metrics & telemetry
 
@@ -217,6 +234,7 @@ RequestBuilder
    - Add custom headers via `ClientRequestOptions`
    - Get raw JSON or strongly-typed responses
    - Use path and query parameters easily
+   - Stream results with `ExecuteStreamingAsync` for streaming endpoints
 
 ## When to Use Custom API Requests
 
@@ -225,7 +243,7 @@ RequestBuilder
 - You don't need access to response headers
 - You want the simplest API
 
-### Use ApiClient.ExecuteAsync When:
+### Use ApiExecutor.ExecuteAsync When:
 - Calling endpoints not yet in the SDK
 - You need response headers or status codes
 - Building custom integrations
@@ -295,6 +313,24 @@ var response = await executor.ExecuteAsync<object, CheckResponse>(
 // When you want the raw JSON without deserialization
 var response = await executor.ExecuteAsync(request, "CustomEndpoint");
 string json = response.Data; // Raw JSON string
+```
+
+### Streaming Request
+```csharp
+var request = RequestBuilder<object>
+    .Create(HttpMethod.Post, config.ApiUrl, "/stores/{store_id}/streamed-list-objects")
+    .WithPathParameter("store_id", storeId)
+    .WithBody(new {
+        user = "user:anne",
+        relation = "can_read",
+        type = "document",
+        authorization_model_id = modelId
+    });
+
+await foreach (var item in executor.ExecuteStreamingAsync<object, StreamedListObjectsResponse>(
+    request, "StreamedListObjects")) {
+    Console.WriteLine(item.Object);
+}
 ```
 
 ## Resources

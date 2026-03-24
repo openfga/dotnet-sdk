@@ -98,30 +98,32 @@ public class BaseClient : IDisposable {
         TRes responseContent = default;
         if (response.Content != null && response.StatusCode != HttpStatusCode.NoContent) {
             using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            if (contentStream.Length > 0) {
-                responseContent = await JsonSerializer.DeserializeAsync<TRes>(contentStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
-                                  throw new FgaError();
+            // Guard against empty responses, including for non-seekable streams.
+            // For seekable streams, use Length; for non-seekable streams, peek a byte and buffer if present.
+            if (contentStream.CanSeek) {
+                if (contentStream.Length > 0) {
+                    if (contentStream.Position != 0) {
+                        contentStream.Position = 0;
+                    }
+                    responseContent = await JsonSerializer.DeserializeAsync<TRes>(contentStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
+                                      throw new FgaError();
+                }
+            }
+            else {
+                int firstByte = contentStream.ReadByte();
+                if (firstByte != -1) {
+                    using var bufferedStream = new MemoryStream();
+                    bufferedStream.WriteByte((byte)firstByte);
+                    await contentStream.CopyToAsync(bufferedStream).ConfigureAwait(false);
+                    bufferedStream.Position = 0;
+                    responseContent = await JsonSerializer.DeserializeAsync<TRes>(bufferedStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
+                                      throw new FgaError();
+                }
             }
         }
 
         return new ResponseWrapper<TRes> { rawResponse = response, responseContent = responseContent };
     }
-
-    // /// <summary>
-    // /// Handles calling the API for requests that are expected to return no content
-    // /// </summary>
-    // /// <param name="requestBuilder"></param>
-    // /// <param name="additionalHeaders"></param>
-    // /// <param name="apiName"></param>
-    // /// <param name="cancellationToken"></param>
-    // /// <returns></returns>
-    // public async Task SendRequestAsync(RequestBuilder requestBuilder,
-    //     IDictionary<string, string>? additionalHeaders = null,
-    //     string? apiName = null, CancellationToken cancellationToken = default) {
-    //     var request = requestBuilder.BuildRequest();
-    //
-    //     await this.SendRequestAsync(request, additionalHeaders, apiName, cancellationToken);
-    // }
 
     /// <summary>
     ///     Handles calling the API
@@ -146,29 +148,150 @@ public class BaseClient : IDisposable {
         }
 
         var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        {
-            try {
-                response.EnsureSuccessStatusCode();
+
+        try {
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException) {
+            throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
+        }
+
+        T responseContent = default;
+        if (response.Content != null && response.StatusCode != HttpStatusCode.NoContent) {
+            var contentString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            // Guard against empty or whitespace-only responses before attempting JSON deserialization
+            if (!string.IsNullOrWhiteSpace(contentString)) {
+                responseContent = JsonSerializer.Deserialize<T>(contentString) ??
+                                  throw new FgaError();
             }
-            catch {
+        }
+
+        return new ResponseWrapper<T> { rawResponse = response, responseContent = responseContent };
+    }
+
+    /// <summary>
+    ///     Establishes the HTTP connection for a streaming request by sending the request and validating the
+    ///     response status code. The response body stream is not read yet, making this phase safe to retry.
+    /// </summary>
+    /// <param name="requestBuilder">The request builder (a fresh HttpRequestMessage is created per attempt)</param>
+    /// <param name="additionalHeaders">Additional headers to include</param>
+    /// <param name="apiName">The API name for metrics and error reporting</param>
+    /// <param name="retryCount">The current retry attempt count (0 for the initial request)</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <typeparam name="TReq">The request body type</typeparam>
+    /// <returns>A ResponseWrapper containing the established HttpResponseMessage (caller takes ownership)</returns>
+    internal async Task<ResponseWrapper<HttpResponseMessage>> EstablishStreamingConnectionAsync<TReq>(
+        RequestBuilder<TReq> requestBuilder,
+        IDictionary<string, string>? additionalHeaders,
+        string? apiName,
+        int retryCount,
+        CancellationToken cancellationToken) {
+
+        var request = requestBuilder.BuildRequest();
+
+        if (additionalHeaders != null) {
+            foreach (var header in additionalHeaders.Where(h => h.Value != null)) {
+                request.Headers.Add(header.Key, header.Value);
+            }
+        }
+
+        var httpRequestStopwatch = System.Diagnostics.Stopwatch.StartNew();
+        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+            .ConfigureAwait(false);
+        httpRequestStopwatch.Stop();
+
+        if (_metrics != null && apiName != null) {
+            _metrics.BuildForHttpRequest(apiName, response, requestBuilder, httpRequestStopwatch, retryCount);
+        }
+
+        try {
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException) {
+            using (response) {
                 throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
             }
+        }
 
-            T responseContent = default;
-            if (response.Content != null && response.StatusCode != HttpStatusCode.NoContent) {
-                using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                if (contentStream.Length > 0) {
-                    responseContent = await JsonSerializer.DeserializeAsync<T>(contentStream, cancellationToken: cancellationToken).ConfigureAwait(false) ??
-                                      throw new FgaError();
-                }
+        return new ResponseWrapper<HttpResponseMessage> { rawResponse = response, responseContent = response };
+    }
+
+    /// <summary>
+    ///     Parses a streaming response from an already-established HTTP response, yielding each item as it arrives.
+    ///     This phase should not be retried once started, as partial results may already have been delivered.
+    ///     Uses <see cref="StreamReader.ReadLineAsync()"/> which handles internal buffering, partial chunks,
+    ///     and last-line-without-newline naturally.
+    /// </summary>
+    /// <param name="response">The established HTTP response with an open body stream</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <typeparam name="T">The type of each streamed response object</typeparam>
+    /// <returns>An async enumerable of parsed response objects</returns>
+    internal async IAsyncEnumerable<T> StreamFromResponseAsync<T>(
+        HttpResponseMessage response,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default) {
+
+        if (response.Content == null) {
+            yield break;
+        }
+
+        // Register cancellation token to dispose response and unblock stalled reads on older runtimes
+        using var disposeResponseRegistration = cancellationToken.Register(static state => ((HttpResponseMessage)state!).Dispose(), response);
+
+        // Stream and parse the response
+#if NET6_0_OR_GREATER
+        await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+#else
+        using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+#endif
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+
+        while (true) {
+            string? line;
+            try {
+#if NET7_0_OR_GREATER
+                // ReadLineAsync(CancellationToken) available from .NET 7+
+                line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
+#else
+                line = await reader.ReadLineAsync().ConfigureAwait(false);
+#endif
+            }
+            catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) {
+                throw new OperationCanceledException("Streaming request was cancelled.", cancellationToken);
+            }
+            catch (IOException ex) when (cancellationToken.IsCancellationRequested) {
+                throw new OperationCanceledException("Streaming request was cancelled.", ex, cancellationToken);
             }
 
-            return new ResponseWrapper<T> { rawResponse = response, responseContent = responseContent };
+            if (line == null) {
+                break; // End of stream (ReadLineAsync returns null at EOF)
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (string.IsNullOrWhiteSpace(line)) {
+                continue;
+            }
+
+            T? parsedResult = default;
+            try {
+                using var jsonDoc = JsonDocument.Parse(line);
+                var root = jsonDoc.RootElement;
+                if (root.TryGetProperty("result", out var resultElement)) {
+                    parsedResult = resultElement.Deserialize<T>();
+                }
+            }
+            catch (JsonException) {
+                // Skip malformed lines — the server may send error envelopes or keep-alive pings
+            }
+
+            if (parsedResult != null) {
+                yield return parsedResult;
+            }
         }
     }
 
     /// <summary>
-    ///     Handles calling the API for streaming responses (e.g., NDJSON)
+    ///     Handles calling the API for streaming responses (e.g., streaming)
     /// </summary>
     /// <param name="request">The HTTP request message</param>
     /// <param name="additionalHeaders">Additional headers to include</param>
@@ -200,112 +323,13 @@ public class BaseClient : IDisposable {
             throw await ApiException.CreateSpecificExceptionAsync(response, request, apiName).ConfigureAwait(false);
         }
 
-        if (response.Content == null) {
-            yield break;
-        }
-
-        // Register cancellation token to dispose response and unblock stalled reads
-        using var disposeResponseRegistration = cancellationToken.Register(static state => ((HttpResponseMessage)state!).Dispose(), response);
-
-        // Stream and parse NDJSON response
-#if NET6_0_OR_GREATER
-        await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-#else
-        using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-#endif
-        using var reader = new StreamReader(stream, Encoding.UTF8);
-
-        // Replace the line-by-line reader with a buffered incremental reader to support partial NDJSON lines.
-        var sb = new StringBuilder(8 * 1024); // start with a reasonable buffer
-        var charBuffer = new char[4096];
-
-        while (true) {
-            int read;
-            try {
-                read = await reader.ReadAsync(charBuffer, 0, charBuffer.Length).ConfigureAwait(false);
-            }
-            catch (ObjectDisposedException) when (cancellationToken.IsCancellationRequested) {
-                throw new OperationCanceledException("Streaming request was cancelled.", cancellationToken);
-            }
-            catch (IOException ex) when (cancellationToken.IsCancellationRequested) {
-                throw new OperationCanceledException("Streaming request was cancelled.", ex, cancellationToken);
-            }
-
-            if (read == 0) {
-                // End of stream: flush any remaining partial record without trailing newline
-                if (sb.Length > 0) {
-                    var line = sb.ToString();
-                    sb.Clear();
-
-                    cancellationToken.ThrowIfCancellationRequested();
-                    if (!string.IsNullOrWhiteSpace(line)) {
-                        T? parsedResult = default;
-                        try {
-                            using var jsonDoc = JsonDocument.Parse(line);
-                            var root = jsonDoc.RootElement;
-                            if (root.TryGetProperty("result", out var resultElement)) {
-                                parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
-                            }
-                        }
-                        catch (JsonException) {
-                            // Skip invalid trailing fragment
-                        }
-                        if (parsedResult != null) {
-                            yield return parsedResult;
-                        }
-                    }
-                }
-                break;
-            }
-
-            sb.Append(charBuffer, 0, read);
-
-            // Process all complete lines currently in the buffer
-            int start = 0;
-            while (true) {
-                var span = sb.ToString(); // materialize for IndexOf; small overhead acceptable per chunk
-                int newlineIdx = span.IndexOf('\n', start);
-                if (newlineIdx == -1) {
-                    // No complete line yet. Keep the current tail in StringBuilder.
-                    // Remove processed head (if any) to avoid repeated scanning.
-                    if (start > 0) {
-                        sb.Clear();
-                        sb.Append(span.Substring(start));
-                    }
-                    break;
-                }
-
-                int lineLen = newlineIdx - start;
-                var line = lineLen > 0 ? span.Substring(start, lineLen) : string.Empty;
-                start = newlineIdx + 1;
-
-                cancellationToken.ThrowIfCancellationRequested();
-
-                if (string.IsNullOrWhiteSpace(line)) {
-                    continue;
-                }
-
-                T? parsedResult = default;
-                try {
-                    using var jsonDoc = JsonDocument.Parse(line);
-                    var root = jsonDoc.RootElement;
-                    if (root.TryGetProperty("result", out var resultElement)) {
-                        parsedResult = JsonSerializer.Deserialize<T>(resultElement.GetRawText());
-                    }
-                }
-                catch (JsonException) {
-                    // Skip malformed line
-                }
-
-                if (parsedResult != null) {
-                    yield return parsedResult;
-                }
-            }
+        await foreach (var item in StreamFromResponseAsync<T>(response, cancellationToken)) {
+            yield return item;
         }
     }
 
     /// <summary>
-    ///     Handles calling the API for streaming responses (e.g., NDJSON) from a RequestBuilder
+    ///     Handles calling the API for streaming responses (e.g., streaming) from a RequestBuilder
     /// </summary>
     /// <param name="requestBuilder">The request builder</param>
     /// <param name="additionalHeaders">Additional headers to include</param>

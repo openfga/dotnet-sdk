@@ -2,8 +2,12 @@
 
 ## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.9.1...HEAD)
 
+### Fixed
+- fix: `StreamedListObjects` now correctly retries connection establishment on rate-limit (429) and transient errors; once streaming begins it is intentionally not retried
+
 ### Added
 - feat: add ApiExecutor for raw requests (#176)
+- feat: add streaming support via `ApiExecutor.ExecuteStreamingAsync` for streaming endpoints (e.g. `/streamed-list-objects`)
 - feat: add `FromJson()` methods to `ClientWriteAuthorizationModelRequest` and `ClientCreateStoreRequest` to enable loading from JSON string (#180)
 - feat: report a per call HTTP metric (#173)
 

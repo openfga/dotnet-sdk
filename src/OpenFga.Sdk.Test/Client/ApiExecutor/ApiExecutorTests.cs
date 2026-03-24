@@ -329,7 +329,7 @@ public class ApiExecutorTests : IDisposable {
     }
 
     [Fact]
-    public void GetApiClient_CalledMultipleTimes_ReturnsSameInstance() {
+    public void ApiExecutor_CalledMultipleTimes_ReturnsSameInstance() {
         // Arrange
         var config = new ClientConfiguration {
             ApiUrl = _apiUrl,
@@ -472,7 +472,6 @@ public class ApiExecutorTests : IDisposable {
             req.Method == HttpMethod.Get &&
             req.RequestUri.ToString().Contains("/stores/" + _storeId));
 
-        // Demonstrate the new fluent API inspired by ApiExecutorRequestBuilder
         var requestBuilder = RequestBuilder<Any>
             .Create(HttpMethod.Get, _apiUrl, "/stores/{store_id}")
             .WithPathParameter("store_id", _storeId);
@@ -506,7 +505,6 @@ public class ApiExecutorTests : IDisposable {
             req.RequestUri.ToString().Contains("/stores/" + _storeId + "/check") &&
             req.RequestUri.ToString().Contains("consistency="));
 
-        // Fluent API with method chaining
         var requestBuilder = RequestBuilder<object>
             .Create(HttpMethod.Post, _apiUrl, "/stores/{store_id}/check")
             .WithPathParameter("store_id", _storeId)

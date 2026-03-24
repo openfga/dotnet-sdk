@@ -983,7 +983,7 @@ await fgaClient.WriteAssertions(body, options);
 
 ### Calling Other Endpoints
 
-For advanced use cases where you need to call API endpoints not yet available in the SDK's typed methods, or when you need access to full response details (status code, headers, raw response), you can use `ApiClient.ExecuteAsync()`.
+For advanced use cases where you need to call API endpoints not yet available in the SDK's typed methods, or when you need access to full response details (status code, headers, raw response), you can use `ApiExecutor.ExecuteAsync()`.
 
 #### Basic Usage
 
@@ -1082,6 +1082,27 @@ if (!response.IsSuccessful)
 
 // Safe to use response.Data here
 Console.WriteLine($"Store Name: {response.Data.Name}");
+```
+
+#### Streaming Requests
+
+For endpoints that stream results (such as `/stores/{store_id}/streamed-list-objects`), use `ExecuteStreamingAsync`. It returns an `IAsyncEnumerable<TResponse>` with no 1000-object pagination limit.
+
+```csharp
+var request = RequestBuilder<object>
+    .Create(HttpMethod.Post, configuration.ApiUrl, "/stores/{store_id}/streamed-list-objects")
+    .WithPathParameter("store_id", storeId)
+    .WithBody(new {
+        user = "user:anne",
+        relation = "can_read",
+        type = "document",
+        authorization_model_id = authorizationModelId
+    });
+
+await foreach (var item in executor.ExecuteStreamingAsync<object, StreamedListObjectsResponse>(
+    request, "StreamedListObjects")) {
+    Console.WriteLine(item.Object);
+}
 ```
 
 For a complete example with all features, see the [ApiExecutor Example](./example/ApiExecutorExample/).

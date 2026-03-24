@@ -101,7 +101,9 @@ public class ApiClient : IDisposable {
 
     /// <summary>
     ///     Handles streaming requests that return IAsyncEnumerable.
-    ///     Note: Streaming responses cannot be retried once the stream has started.
+    ///     Retries the connection phase (status code errors, transient network failures) up to the configured
+    ///     maximum. Once the response headers are received and the status code is valid, streaming begins and
+    ///     is not retried.
     /// </summary>
     /// <param name="requestBuilder">The request builder</param>
     /// <param name="apiName">The API name for error reporting and telemetry</param>
@@ -117,12 +119,26 @@ public class ApiClient : IDisposable {
         IRequestOptions? options = null,
         [EnumeratorCancellation] CancellationToken cancellationToken = default) {
 
+        // For streaming, the Stopwatch intentionally covers only authentication + connection establishment
+        // (i.e. time until response headers are received / "time to stream ready"). Total streaming
+        // duration is dominated by data volume and is not a useful latency signal — the HTTP-level
+        // metric (BuildForHttpRequest) is already recorded inside EstablishStreamingConnectionAsync.
+        var sw = Stopwatch.StartNew();
         var authToken = await GetAuthenticationTokenAsync(apiName);
         var additionalHeaders = BuildHeaders(_configuration, authToken, options);
-        var streamIter = _baseClient.SendStreamingRequestAsync<TReq, TRes>(
-            requestBuilder, additionalHeaders, apiName, cancellationToken);
 
-        await foreach (var item in streamIter) {
+        // Retry only the connection establishment phase — before the body stream is opened.
+        // Once streaming starts, retrying would re-deliver already-received items to the caller.
+        var connectionWrapper = await Retry(async (attemptCount) =>
+            await _baseClient.EstablishStreamingConnectionAsync(
+                requestBuilder, additionalHeaders, apiName, attemptCount, cancellationToken));
+
+        sw.Stop();
+        metrics.BuildForResponse(apiName, connectionWrapper.rawResponse, requestBuilder, sw, connectionWrapper.retryCount);
+
+        // Stream from the established connection without retrying
+        using var response = connectionWrapper.rawResponse;
+        await foreach (var item in _baseClient.StreamFromResponseAsync<TRes>(response, cancellationToken)) {
             yield return item;
         }
     }
