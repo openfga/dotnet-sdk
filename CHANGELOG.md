@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.9.1...HEAD)
+## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.10.0...HEAD)
+
+## v0.10.0
+
+### [0.10.0](https://github.com/openfga/dotnet-sdk/compare/v0.9.1...v0.10.0) (2026-03-24)
 
 ### Fixed
 - fix: `StreamedListObjects` now correctly retries connection establishment on rate-limit (429) and transient errors; once streaming begins it is intentionally not retried
