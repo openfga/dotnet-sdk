@@ -59,7 +59,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .NET versions
-        uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5.1.0
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
         with:
           dotnet-version: |
             3.1.x
@@ -68,7 +68,7 @@ jobs:
             9.0.x
 
       - name: Cache NuGet packages
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -95,7 +95,7 @@ jobs:
       - name: Upload coverage to Codecov
         # Only upload coverage from one matrix job to avoid conflicts
         if: matrix.os == 'ubuntu-latest' && matrix.framework == 'net8.0'
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -115,7 +115,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .NET versions
-        uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5.1.0
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
         with:
           dotnet-version: |
             3.1.x
@@ -164,7 +164,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5.1.0
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
         with:
           dotnet-version: |
             3.1.x
@@ -218,7 +218,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5.1.0
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
         with:
           dotnet-version: |
             3.1.x
@@ -230,7 +230,7 @@ jobs:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
 
       - name: Download package artifact
-        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v4.1.8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v4.1.8
         with:
           name: nuget-package
           path: ./dist
