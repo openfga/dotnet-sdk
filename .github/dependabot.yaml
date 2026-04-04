@@ -1,20 +1,24 @@
 # yaml-language-server: $schema=https://json.schemastore.org/dependabot-2.0.json
 version: 2
-
 updates:
   - package-ecosystem: "nuget"
     directory: "/"
     schedule:
       interval: "monthly"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
     groups:
       dependencies:
         patterns:
           - "*"
-
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
     groups:
       dependencies:
         patterns:
