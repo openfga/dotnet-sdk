@@ -25,7 +25,7 @@ public static class FgaConstants {
     /// <summary>
     /// User agent used in HTTP requests.
     /// </summary>
-    public const string UserAgent = "openfga-sdk dotnet/0.10.0";
+    public const string UserAgent = "openfga-sdk dotnet/0.10.0"; // x-release-please-version
 
     /// <summary>
     /// Example API domain for documentation/tests.
