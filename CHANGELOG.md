@@ -1,7 +1,5 @@
 # Changelog
 
-## [Unreleased](https://github.com/openfga/dotnet-sdk/compare/v0.10.0...HEAD)
-
 ## v0.10.0
 
 ### [0.10.0](https://github.com/openfga/dotnet-sdk/compare/v0.9.1...v0.10.0) (2026-03-24)

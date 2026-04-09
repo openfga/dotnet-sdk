@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "simple",
+  "packages": {
+    ".": {
+      "include-component-in-tag": false,
+      "changelog-path": "CHANGELOG.md",
+      "changelog-type": "default",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
+      "changelog-sections": [
+        { "type": "feat",     "section": "Added",         "hidden": false },
+        { "type": "fix",      "section": "Fixed",         "hidden": false },
+        { "type": "perf",     "section": "Changed",       "hidden": false },
+        { "type": "refactor", "section": "Changed",       "hidden": false },
+        { "type": "revert",   "section": "Removed",       "hidden": false },
+        { "type": "docs",     "section": "Documentation", "hidden": false },
+        { "type": "test",     "section": "Tests",         "hidden": true  },
+        { "type": "ci",       "section": "CI",            "hidden": true  },
+        { "type": "chore",    "section": "Miscellaneous", "hidden": true  }
+      ],
+      "extra-files": [
+        { "type": "generic", "path": "src/OpenFga.Sdk/OpenFga.Sdk.csproj" },
+        { "type": "generic", "path": "src/OpenFga.Sdk/Constants/FgaConstants.cs" },
+        { "type": "generic", "path": "example/Example1/Example1.csproj" }
+      ]
+    }
+  }
+}
