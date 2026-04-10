@@ -547,7 +547,7 @@ public class OpenFgaClient : IOpenFgaClient, IDisposable {
         // Create options with headers for this batch
         var batchOptions = new ClientBatchCheckOptions {
             StoreId = options?.StoreId,
-            AuthorizationModelId = options?.AuthorizationModelId,
+            AuthorizationModelId = GetAuthorizationModelId(options),
             Consistency = options?.Consistency,
             Headers = headers
         };
