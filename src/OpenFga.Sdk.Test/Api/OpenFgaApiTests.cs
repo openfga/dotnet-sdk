@@ -269,7 +269,8 @@ namespace OpenFga.Sdk.Test.Api {
             Assert.Equal("Required parameter ApiTokenIssuer was not defined when calling Configuration.",
                 exceptionMissingApiTokenIssuer.Message);
 
-            var missingApiAudienceConfig = new SdkConfiguration {
+            // audience is now optional — config without it should be valid
+            var configWithoutApiAudience = new SdkConfiguration {
                 StoreId = _storeId,
                 ApiHost = _host,
                 Credentials = new Credentials() {
@@ -281,13 +282,7 @@ namespace OpenFga.Sdk.Test.Api {
                     }
                 }
             };
-
-            void ActionMissingApiAudience() =>
-                missingApiAudienceConfig.EnsureValid();
-            var exceptionMissingApiAudience =
-                Assert.Throws<FgaRequiredParamError>(ActionMissingApiAudience);
-            Assert.Equal("Required parameter ApiAudience was not defined when calling Configuration.",
-                exceptionMissingApiAudience.Message);
+            configWithoutApiAudience.EnsureValid(); // should not throw
         }
 
         /// <summary>

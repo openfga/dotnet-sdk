@@ -197,9 +197,10 @@ namespace Example {
                             // - a path, defaults to /oauth/token
                             // - a port
                             ApiTokenIssuer = Environment.GetEnvironmentVariable("FGA_API_TOKEN_ISSUER"),
-                            ApiAudience = Environment.GetEnvironmentVariable("FGA_API_AUDIENCE"),
+                            ApiAudience = Environment.GetEnvironmentVariable("FGA_API_AUDIENCE"), // optional, required for Auth0; omit for standard OAuth2
                             ClientId = Environment.GetEnvironmentVariable("FGA_CLIENT_ID"),
                             ClientSecret = Environment.GetEnvironmentVariable("FGA_CLIENT_SECRET"),
+                            // Scopes = "read write", // optional, space-separated OAuth2 scopes
                         }
                     }
                 };

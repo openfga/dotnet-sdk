@@ -70,10 +70,17 @@ public interface IClientCredentialsConfig {
     string? ApiTokenIssuer { get; set; }
 
     /// <summary>
-    ///     Gets or sets the API Audience.
+    ///     Gets or sets the API Audience. Optional — only required for Auth0-style token servers.
+    ///     Standard OAuth2 servers typically do not use this parameter.
     /// </summary>
     /// <value>API Audience.</value>
     string? ApiAudience { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the space-separated OAuth2 scopes to request. Optional.
+    /// </summary>
+    /// <value>OAuth2 scopes.</value>
+    string? Scopes { get; set; }
 }
 
 public interface ICredentialsConfig : IClientCredentialsConfig, IApiTokenConfig { }
@@ -83,6 +90,7 @@ public struct CredentialsConfig : ICredentialsConfig {
     public string? ClientSecret { get; set; }
     public string? ApiTokenIssuer { get; set; }
     public string? ApiAudience { get; set; }
+    public string? Scopes { get; set; }
     public string? ApiToken { get; set; }
 }
 
@@ -138,10 +146,6 @@ public class Credentials : IAuthCredentialsConfig {
 
                 if (string.IsNullOrWhiteSpace(Config?.ApiTokenIssuer)) {
                     throw new FgaRequiredParamError("Configuration", nameof(Config.ApiTokenIssuer));
-                }
-
-                if (string.IsNullOrWhiteSpace(Config?.ApiAudience)) {
-                    throw new FgaRequiredParamError("Configuration", nameof(Config.ApiAudience));
                 }
 
                 // Validate that the normalized URL is well-formed

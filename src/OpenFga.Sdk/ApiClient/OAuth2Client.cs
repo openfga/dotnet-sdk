@@ -121,6 +121,10 @@ public class OAuth2Client {
             _authRequest["audience"] = credentialsConfig.Config.ApiAudience;
         }
 
+        if (!string.IsNullOrWhiteSpace(credentialsConfig.Config.Scopes)) {
+            _authRequest["scope"] = credentialsConfig.Config.Scopes;
+        }
+
         _retryHandler = new RetryHandler(retryParams);
         this.metrics = metrics;
     }
