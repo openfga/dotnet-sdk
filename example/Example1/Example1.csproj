@@ -11,7 +11,7 @@
   <!--  To target the released version, uncomment this section -->
 
   <ItemGroup>
-    <PackageReference Include="OpenFga.Sdk" Version="0.10.0"><PrivateAssets>all</PrivateAssets></PackageReference>
+    <PackageReference Include="OpenFga.Sdk" Version="0.10.0"><PrivateAssets>all</PrivateAssets></PackageReference><!-- x-release-please-version -->
   </ItemGroup>
 
   <!--  To target the local build, use project reference -->

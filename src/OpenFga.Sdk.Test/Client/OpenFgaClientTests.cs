@@ -2899,6 +2899,101 @@ public class OpenFgaClientTests : IDisposable {
     }
 
     /// <summary>
+    /// Test BatchCheck falls back to client-level AuthorizationModelId when not specified per-call
+    /// </summary>
+    [Fact]
+    public async Task BatchCheck_FallsBackToClientLevelAuthorizationModelId() {
+        const string clientAuthModelId = "01GXSA8YR785C4FYS3C0RTG7B1";
+        var config = new ClientConfiguration() {
+            StoreId = _storeId,
+            ApiUrl = _apiUrl,
+            AuthorizationModelId = clientAuthModelId
+        };
+
+        var expectedResponse = new BatchCheckResponse {
+            Result = new Dictionary<string, BatchCheckSingleResult> {
+                { "corr-1", new BatchCheckSingleResult { Allowed = true } }
+            }
+        };
+
+        string? capturedRequestBody = null;
+        var (client, _) = CreateTestClientForHeaders(expectedResponse, req => {
+            if (req.RequestUri?.AbsoluteUri.EndsWith("/batch-check") == true &&
+                req.Method == HttpMethod.Post) {
+                capturedRequestBody = req.Content?.ReadAsStringAsync().GetAwaiter().GetResult();
+                return true;
+            }
+            return false;
+        }, config);
+
+        var body = new ClientBatchCheckRequest {
+            Checks = new List<ClientBatchCheckItem> {
+                new() {
+                    User = "user:anne",
+                    Relation = "reader",
+                    Object = "document:budget",
+                    CorrelationId = "corr-1"
+                }
+            }
+        };
+
+        // No AuthorizationModelId in per-call options — should fall back to client-level config
+        var response = await client.BatchCheck(body);
+
+        Assert.NotNull(response);
+        Assert.NotNull(capturedRequestBody);
+        var batchCheckRequest = JsonSerializer.Deserialize<BatchCheckRequest>(capturedRequestBody!);
+        Assert.NotNull(batchCheckRequest);
+        Assert.Equal(clientAuthModelId, batchCheckRequest.AuthorizationModelId);
+    }
+
+    /// <summary>
+    /// Test BatchCheck falls back to client-level StoreId when not specified per-call
+    /// </summary>
+    [Fact]
+    public async Task BatchCheck_FallsBackToClientLevelStoreId() {
+        const string clientStoreId = "01H0H015178Y2V4CX10C2KGHF4";
+        var config = new ClientConfiguration() {
+            StoreId = clientStoreId,
+            ApiUrl = _apiUrl,
+        };
+
+        var expectedResponse = new BatchCheckResponse {
+            Result = new Dictionary<string, BatchCheckSingleResult> {
+                { "corr-1", new BatchCheckSingleResult { Allowed = true } }
+            }
+        };
+
+        Uri? capturedRequestUri = null;
+        var (client, _) = CreateTestClientForHeaders(expectedResponse, req => {
+            if (req.RequestUri?.AbsoluteUri.EndsWith("/batch-check") == true &&
+                req.Method == HttpMethod.Post) {
+                capturedRequestUri = req.RequestUri;
+                return true;
+            }
+            return false;
+        }, config);
+
+        var body = new ClientBatchCheckRequest {
+            Checks = new List<ClientBatchCheckItem> {
+                new() {
+                    User = "user:anne",
+                    Relation = "reader",
+                    Object = "document:budget",
+                    CorrelationId = "corr-1"
+                }
+            }
+        };
+
+        // No StoreId in per-call options — should fall back to client-level config
+        var response = await client.BatchCheck(body);
+
+        Assert.NotNull(response);
+        Assert.NotNull(capturedRequestUri);
+        Assert.Contains($"/stores/{clientStoreId}/", capturedRequestUri.AbsoluteUri);
+    }
+
+    /// <summary>
     /// Test CreateStore with custom headers
     /// </summary>
     [Fact]
