@@ -2,51 +2,12 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-    commit-message:
-      prefix: "chore(deps)"
-      prefix-development: "chore(deps-dev)"
-    groups:
-      dependencies:
-        patterns:
-          - "*"
-  - package-ecosystem: "nuget"
-    directory: "/example/OpenTelemetryExample"
-    schedule:
-      interval: "monthly"
-    commit-message:
-      prefix: "chore(deps)"
-      prefix-development: "chore(deps-dev)"
-    groups:
-      dependencies:
-        patterns:
-          - "*"
-  - package-ecosystem: "nuget"
-    directory: "/example/ApiExecutorExample"
-    schedule:
-      interval: "monthly"
-    commit-message:
-      prefix: "chore(deps)"
-      prefix-development: "chore(deps-dev)"
-    groups:
-      dependencies:
-        patterns:
-          - "*"
-  - package-ecosystem: "nuget"
-    directory: "/example/Example1"
-    schedule:
-      interval: "monthly"
-    commit-message:
-      prefix: "chore(deps)"
-      prefix-development: "chore(deps-dev)"
-    groups:
-      dependencies:
-        patterns:
-          - "*"
-  - package-ecosystem: "nuget"
-    directory: "/example/StreamedListObjectsExample"
+    directories:
+      - "/"
+      - "/example/OpenTelemetryExample"
+      - "/example/Example1"
+      - "/example/ApiExecutorExample"
+      - "/example/StreamedListObjectsExample"
     schedule:
       interval: "monthly"
     commit-message:
