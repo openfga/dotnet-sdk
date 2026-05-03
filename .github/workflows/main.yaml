@@ -68,7 +68,7 @@ jobs:
             9.0.x
 
       - name: Cache NuGet packages
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -85,7 +85,7 @@ jobs:
         run: dotnet test src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj --no-build --configuration Release --framework ${{ matrix.framework }} --verbosity normal --logger trx --results-directory TestResults/ --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: Upload test results
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.framework }}
@@ -147,7 +147,7 @@ jobs:
           done
 
       - name: Upload SDK artifacts
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sdk-build-outputs
           path: src/OpenFga.Sdk/bin/Release/
@@ -194,7 +194,7 @@ jobs:
         run: ls -la artifact-pack
 
       - name: Upload NuGet package artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: nuget-package
           path: |
