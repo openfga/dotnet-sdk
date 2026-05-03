@@ -12,6 +12,17 @@ updates:
       dependencies:
         patterns:
           - "*"
+  - package-ecosystem: "nuget"
+    directory: "/example/OpenTelemetryExample"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
