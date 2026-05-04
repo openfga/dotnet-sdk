@@ -2,7 +2,12 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/"
+    directories:
+      - "/"
+      - "/example/OpenTelemetryExample"
+      - "/example/Example1"
+      - "/example/ApiExecutorExample"
+      - "/example/StreamedListObjectsExample"
     schedule:
       interval: "monthly"
     commit-message:
