@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.1](https://github.com/openfga/dotnet-sdk/compare/v0.10.0...v0.10.1) (2026-05-13)
+
+
+### Added
+
+* batch check fallback to client level authmodel ID ([#199](https://github.com/openfga/dotnet-sdk/issues/199)) ([733c4c3](https://github.com/openfga/dotnet-sdk/commit/733c4c3438bc899643c8755fb4ed3e5085b86a5a))
+* draft releases, version verification, and reusable workflows ([#210](https://github.com/openfga/dotnet-sdk/issues/210)) ([04b5ad1](https://github.com/openfga/dotnet-sdk/commit/04b5ad1ef3ba72930722e57771f818cc7679fcdb))
+* release automation configs ([#193](https://github.com/openfga/dotnet-sdk/issues/193)) ([ec3acde](https://github.com/openfga/dotnet-sdk/commit/ec3acdecf78da7a5f5049b88f0e2f59e422c1e12))
+
+
+### Miscellaneous
+
+* release 0.10.1 ([3a72655](https://github.com/openfga/dotnet-sdk/commit/3a72655aa9fbf4a8de0dc3504e9ab8724c180e00))
+
 ## v0.10.0
 
 ### [0.10.0](https://github.com/openfga/dotnet-sdk/compare/v0.9.1...v0.10.0) (2026-03-24)
