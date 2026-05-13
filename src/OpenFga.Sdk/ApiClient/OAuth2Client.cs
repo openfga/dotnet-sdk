@@ -80,7 +80,8 @@ public class OAuth2Client {
 
     private readonly BaseClient _httpClient;
     private AuthToken _authToken = new();
-    private readonly SemaphoreSlim _tokenSemaphore = new(1, 1);
+    private readonly object _exchangeLock = new();
+    private Task<string>? _inflightExchange;
     private IDictionary<string, string> _authRequest { get; }
     private string _apiTokenIssuer { get; }
     private readonly RetryHandler _retryHandler;
@@ -215,24 +216,32 @@ public class OAuth2Client {
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task<string> GetAccessTokenAsync(CancellationToken cancellationToken = default) {
+    public Task<string> GetAccessTokenAsync(CancellationToken cancellationToken = default) {
         if (_authToken.IsValid()) {
-            return _authToken.AccessToken!;
+            return Task.FromResult(_authToken.AccessToken!);
         }
 
-        await _tokenSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try {
-            // Re-check after acquiring as another caller may have refreshed while we waited
+        lock (_exchangeLock) {
             if (_authToken.IsValid()) {
-                return _authToken.AccessToken!;
+                return Task.FromResult(_authToken.AccessToken!);
             }
 
-            await ExchangeTokenAsync(cancellationToken).ConfigureAwait(false);
+            _inflightExchange ??= ExchangeAndResetAsync(cancellationToken);
 
+            return _inflightExchange;
+        }
+    }
+
+    private async Task<string> ExchangeAndResetAsync(CancellationToken cancellationToken) {
+        try {
+            await Task.Yield();
+            await ExchangeTokenAsync(cancellationToken).ConfigureAwait(false);
             return _authToken.AccessToken ?? throw new InvalidOperationException();
         }
         finally {
-            _tokenSemaphore.Release();
+            lock (_exchangeLock) {
+                _inflightExchange = null;
+            }
         }
     }
 

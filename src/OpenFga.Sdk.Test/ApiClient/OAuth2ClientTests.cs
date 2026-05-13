@@ -368,7 +368,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
             var retryParams = CreateTestRetryParams(maxRetry: 0, minWaitInMs: 10);
 
             var callCount = 0;
-            var gate = new TaskCompletionSource<bool>();
+            var gate = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             var mockHandler = new Mock<HttpMessageHandler>();
             mockHandler
                 .Protected()
@@ -378,8 +378,6 @@ namespace OpenFga.Sdk.Test.ApiClient {
                     ItExpr.IsAny<CancellationToken>())
                 .Returns<HttpRequestMessage, CancellationToken>(async (req, ct) => {
                     Interlocked.Increment(ref callCount);
-                    // Hold the first exchange open until the gate is released,
-                    // giving all concurrent callers time to queue up.
                     await gate.Task;
                     return CreateTokenResponse("shared-token", 3600);
                 });
@@ -396,7 +394,6 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 .Select(_ => oauth2Client.GetAccessTokenAsync())
                 .ToList();
 
-            // Let the exchange complete
             gate.SetResult(true);
 
             var tokens = await Task.WhenAll(tasks);
@@ -410,7 +407,8 @@ namespace OpenFga.Sdk.Test.ApiClient {
             var credentials = CreateTestCredentials();
             var retryParams = CreateTestRetryParams(maxRetry: 0, minWaitInMs: 10);
 
-            var gate = new TaskCompletionSource<bool>();
+            var callCount = 0;
+            var gate = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
             var mockHandler = new Mock<HttpMessageHandler>();
             mockHandler
                 .Protected()
@@ -419,6 +417,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
                 .Returns<HttpRequestMessage, CancellationToken>(async (req, ct) => {
+                    Interlocked.Increment(ref callCount);
                     await gate.Task;
                     return new HttpResponseMessage {
                         StatusCode = HttpStatusCode.Unauthorized,
@@ -440,16 +439,18 @@ namespace OpenFga.Sdk.Test.ApiClient {
 
             gate.SetResult(true);
 
-            var exceptions = new List<Exception>();
+            var exceptions = new List<FgaApiError>();
             foreach (var task in tasks) {
                 try {
                     await task;
+                    Assert.Fail("Expected FgaApiError but call succeeded");
                 }
-                catch (Exception ex) {
+                catch (FgaApiError ex) {
                     exceptions.Add(ex);
                 }
             }
 
+            Assert.Equal(1, callCount);
             Assert.Equal(concurrency, exceptions.Count);
             Assert.All(exceptions, ex => Assert.IsAssignableFrom<FgaApiError>(ex));
         }
