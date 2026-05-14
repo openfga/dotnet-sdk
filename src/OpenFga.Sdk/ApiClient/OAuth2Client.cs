@@ -25,6 +25,7 @@ public class OAuth2Client {
     private const string DEFAULT_API_TOKEN_ISSUER_PATH = "/oauth/token";
 
     private static readonly Random _random = new();
+    private static readonly object _randomLock = new();
     private readonly Metrics metrics;
 
     /// <summary>
@@ -56,18 +57,31 @@ public class OAuth2Client {
 
         public string? AccessToken { get; set; }
 
-        public bool IsValid() =>
-            !string.IsNullOrWhiteSpace(AccessToken) && (ExpiresAt == null ||
-                                                        ExpiresAt - DateTime.Now >
-                                                        TimeSpan.FromSeconds(
-                                                            TOKEN_EXPIRY_BUFFER_THRESHOLD_IN_SEC +
-                                                            _random.Next(0, TOKEN_EXPIRY_JITTER_IN_SEC)));
+        public bool IsValid() {
+            if (string.IsNullOrWhiteSpace(AccessToken)) {
+                return false;
+            }
+
+            if (ExpiresAt == null) {
+                return true;
+            }
+
+            int jitter;
+            lock (_randomLock) {
+                jitter = _random.Next(0, TOKEN_EXPIRY_JITTER_IN_SEC);
+            }
+
+            return ExpiresAt - DateTime.Now >
+                   TimeSpan.FromSeconds(TOKEN_EXPIRY_BUFFER_THRESHOLD_IN_SEC + jitter);
+        }
     }
 
     #region Fields
 
     private readonly BaseClient _httpClient;
     private AuthToken _authToken = new();
+    private readonly object _exchangeLock = new();
+    private Task<string>? _inflightExchange;
     private IDictionary<string, string> _authRequest { get; }
     private string _apiTokenIssuer { get; }
     private readonly RetryHandler _retryHandler;
@@ -202,15 +216,33 @@ public class OAuth2Client {
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task<string> GetAccessTokenAsync() {
-        // If we already have an access token in memory
+    public Task<string> GetAccessTokenAsync(CancellationToken cancellationToken = default) {
         if (_authToken.IsValid()) {
-            return _authToken.AccessToken!;
+            return Task.FromResult(_authToken.AccessToken!);
         }
 
-        await ExchangeTokenAsync();
+        lock (_exchangeLock) {
+            if (_authToken.IsValid()) {
+                return Task.FromResult(_authToken.AccessToken!);
+            }
 
-        return _authToken.AccessToken ?? throw new InvalidOperationException();
+            _inflightExchange ??= ExchangeAndResetAsync(cancellationToken);
+
+            return _inflightExchange;
+        }
+    }
+
+    private async Task<string> ExchangeAndResetAsync(CancellationToken cancellationToken) {
+        try {
+            await Task.Yield();
+            await ExchangeTokenAsync(cancellationToken).ConfigureAwait(false);
+            return _authToken.AccessToken ?? throw new InvalidOperationException();
+        }
+        finally {
+            lock (_exchangeLock) {
+                _inflightExchange = null;
+            }
+        }
     }
 
     #endregion

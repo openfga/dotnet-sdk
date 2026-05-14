@@ -6,6 +6,8 @@ using OpenFga.Sdk.Configuration;
 using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Telemetry;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -19,7 +21,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
     /// Unit tests for OAuth2Client retry logic
     /// </summary>
     public class OAuth2ClientTests {
-        private const string TestTokenIssuer = "oauth.example.com";
+        private const string TestTokenIssuer = "issuer.fga.example";
         private const string TestClientId = "test-client-id";
         private const string TestClientSecret = "test-client-secret";
         private const string TestAudience = "test-audience";
@@ -105,7 +107,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -142,7 +144,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -181,7 +183,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -221,7 +223,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -256,7 +258,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -291,7 +293,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
 
@@ -343,7 +345,7 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 });
 
             var httpClient = new HttpClient(mockHandler.Object);
-            var configuration = new SdkConfiguration { ApiUrl = "https://api.example.com" };
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
             var baseClient = new BaseClient(configuration, httpClient);
             var metrics = new Metrics(configuration);
             var retryParams = CreateTestRetryParams();
@@ -354,6 +356,144 @@ namespace OpenFga.Sdk.Test.ApiClient {
 
             // Assert
             Assert.Equal(expectedPath, actualRequestUri);
+        }
+
+        #endregion
+
+        #region Concurrency
+
+        [Fact]
+        public async Task OAuth2_ConcurrentGetAccessToken_OnlyExchangesOnce() {
+            var credentials = CreateTestCredentials();
+            var retryParams = CreateTestRetryParams(maxRetry: 0, minWaitInMs: 10);
+
+            var callCount = 0;
+            var gate = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var mockHandler = new Mock<HttpMessageHandler>();
+            mockHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Returns<HttpRequestMessage, CancellationToken>(async (req, ct) => {
+                    Interlocked.Increment(ref callCount);
+                    await gate.Task;
+                    return CreateTokenResponse("shared-token", 3600);
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
+            var baseClient = new BaseClient(configuration, httpClient);
+            var metrics = new Metrics(configuration);
+
+            var oauth2Client = new OAuth2Client(credentials, baseClient, retryParams, metrics);
+
+            const int concurrency = 20;
+            var tasks = Enumerable.Range(0, concurrency)
+                .Select(_ => oauth2Client.GetAccessTokenAsync())
+                .ToList();
+
+            gate.SetResult(true);
+
+            var tokens = await Task.WhenAll(tasks);
+
+            Assert.Equal(1, callCount);
+            Assert.All(tokens, t => Assert.Equal("shared-token", t));
+        }
+
+        [Fact]
+        public async Task OAuth2_ConcurrentGetAccessToken_AllSeeExchangeError() {
+            var credentials = CreateTestCredentials();
+            var retryParams = CreateTestRetryParams(maxRetry: 0, minWaitInMs: 10);
+
+            var callCount = 0;
+            var gate = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var mockHandler = new Mock<HttpMessageHandler>();
+            mockHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Returns<HttpRequestMessage, CancellationToken>(async (req, ct) => {
+                    Interlocked.Increment(ref callCount);
+                    await gate.Task;
+                    return new HttpResponseMessage {
+                        StatusCode = HttpStatusCode.Unauthorized,
+                        Content = new StringContent("{\"error\":\"invalid_client\"}")
+                    };
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
+            var baseClient = new BaseClient(configuration, httpClient);
+            var metrics = new Metrics(configuration);
+
+            var oauth2Client = new OAuth2Client(credentials, baseClient, retryParams, metrics);
+
+            const int concurrency = 10;
+            var tasks = Enumerable.Range(0, concurrency)
+                .Select(_ => oauth2Client.GetAccessTokenAsync())
+                .ToList();
+
+            gate.SetResult(true);
+
+            var exceptions = new List<FgaApiError>();
+            foreach (var task in tasks) {
+                try {
+                    await task;
+                    Assert.Fail("Expected FgaApiError but call succeeded");
+                }
+                catch (FgaApiError ex) {
+                    exceptions.Add(ex);
+                }
+            }
+
+            Assert.Equal(1, callCount);
+            Assert.Equal(concurrency, exceptions.Count);
+            Assert.All(exceptions, ex => Assert.IsAssignableFrom<FgaApiError>(ex));
+        }
+
+        [Fact]
+        public async Task OAuth2_ConcurrentGetAccessToken_SkipsExchangeWhenTokenValid() {
+            var credentials = CreateTestCredentials();
+            var retryParams = CreateTestRetryParams(maxRetry: 0, minWaitInMs: 10);
+
+            var callCount = 0;
+            var mockHandler = new Mock<HttpMessageHandler>();
+            mockHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(() => {
+                    Interlocked.Increment(ref callCount);
+                    return CreateTokenResponse("cached-token", 3600);
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
+            var baseClient = new BaseClient(configuration, httpClient);
+            var metrics = new Metrics(configuration);
+
+            var oauth2Client = new OAuth2Client(credentials, baseClient, retryParams, metrics);
+
+            // First call populates the token
+            var firstToken = await oauth2Client.GetAccessTokenAsync();
+            Assert.Equal("cached-token", firstToken);
+            Assert.Equal(1, callCount);
+
+            // Subsequent concurrent calls should all hit the fast path
+            var tasks = Enumerable.Range(0, 20)
+                .Select(_ => oauth2Client.GetAccessTokenAsync())
+                .ToList();
+
+            var tokens = await Task.WhenAll(tasks);
+
+            Assert.Equal(1, callCount);
+            Assert.All(tokens, t => Assert.Equal("cached-token", t));
         }
 
         #endregion
