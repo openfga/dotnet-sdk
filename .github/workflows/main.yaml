@@ -214,7 +214,7 @@ jobs:
         run: |
           TAG_VERSION="${GITHUB_REF#refs/tags/v}"
           MANIFEST_VERSION=$(jq -r '.["."]' .release-please-manifest.json)
-          CSPROJ_VERSION=$(grep 'x-release-please-version' src/OpenFga.Sdk/OpenFga.Sdk.csproj | grep -oP '>\K[^<]+')Expand commentComment on line R217Resolved
+          CSPROJ_VERSION=$(grep 'x-release-please-version' src/OpenFga.Sdk/OpenFga.Sdk.csproj | grep -oP '>\K[^<]+')
 
           echo "Tag: $TAG_VERSION | Manifest: $MANIFEST_VERSION | .csproj: $CSPROJ_VERSION"
 
