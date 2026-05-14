@@ -6,18 +6,11 @@
 ### Added
 
 * batch check fallback to client level authmodel ID ([#199](https://github.com/openfga/dotnet-sdk/issues/199)) ([733c4c3](https://github.com/openfga/dotnet-sdk/commit/733c4c3438bc899643c8755fb4ed3e5085b86a5a))
-* draft releases, version verification, and reusable workflows ([#210](https://github.com/openfga/dotnet-sdk/issues/210)) ([04b5ad1](https://github.com/openfga/dotnet-sdk/commit/04b5ad1ef3ba72930722e57771f818cc7679fcdb))
-* release automation configs ([#193](https://github.com/openfga/dotnet-sdk/issues/193)) ([ec3acde](https://github.com/openfga/dotnet-sdk/commit/ec3acdecf78da7a5f5049b88f0e2f59e422c1e12))
-
 
 ### Fixed
 
 * lock token exchange flow so at most one can be active at the sam… ([#213](https://github.com/openfga/dotnet-sdk/issues/213)) ([35d10f4](https://github.com/openfga/dotnet-sdk/commit/35d10f40c5774bd641c0f049d49daf7c30aa642f))
 
-
-### Miscellaneous
-
-* release 0.10.1 ([a3e599a](https://github.com/openfga/dotnet-sdk/commit/a3e599a7be45148f780d77abf88805ffaff8c3e7))
 
 ## v0.10.0
 
