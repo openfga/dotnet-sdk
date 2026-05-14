@@ -9,7 +9,7 @@
 
 ### Fixed
 
-* lock token exchange flow so at most one can be active at the sam… ([#213](https://github.com/openfga/dotnet-sdk/issues/213)) ([35d10f4](https://github.com/openfga/dotnet-sdk/commit/35d10f40c5774bd641c0f049d49daf7c30aa642f))
+* lock token exchange flow so at most one can be active at the same time ([#213](https://github.com/openfga/dotnet-sdk/issues/213)) ([35d10f4](https://github.com/openfga/dotnet-sdk/commit/35d10f40c5774bd641c0f049d49daf7c30aa642f))
 
 
 ## v0.10.0
