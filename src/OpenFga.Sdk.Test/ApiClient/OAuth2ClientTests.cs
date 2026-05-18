@@ -307,6 +307,159 @@ namespace OpenFga.Sdk.Test.ApiClient {
 
         #endregion
 
+        #region OAuth2 Scopes
+
+        [Fact]
+        public async Task OAuth2_ExchangeToken_IncludesScopesInRequest() {
+            var credentials = new Credentials {
+                Method = CredentialsMethod.ClientCredentials,
+                Config = new CredentialsConfig {
+                    ClientId = TestClientId,
+                    ClientSecret = TestClientSecret,
+                    ApiTokenIssuer = TestTokenIssuer,
+                    ApiAudience = TestAudience,
+                    Scopes = "scope1 scope2"
+                }
+            };
+            var retryParams = CreateTestRetryParams(maxRetry: 0, minWaitInMs: 10);
+
+            string? requestBody = null;
+            var mockHandler = new Mock<HttpMessageHandler>();
+            mockHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync((HttpRequestMessage request, CancellationToken ct) => {
+                    requestBody = request.Content?.ReadAsStringAsync().Result;
+                    return CreateTokenResponse();
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
+            var baseClient = new BaseClient(configuration, httpClient);
+            var metrics = new Metrics(configuration);
+
+            var oauth2Client = new OAuth2Client(credentials, baseClient, retryParams, metrics);
+            await oauth2Client.GetAccessTokenAsync();
+
+            Assert.NotNull(requestBody);
+            Assert.Contains("scope=scope1+scope2", requestBody);
+        }
+
+        [Fact]
+        public async Task OAuth2_ExchangeToken_OmitsScopeWhenNotConfigured() {
+            var credentials = CreateTestCredentials();
+            var retryParams = CreateTestRetryParams(maxRetry: 0, minWaitInMs: 10);
+
+            string? requestBody = null;
+            var mockHandler = new Mock<HttpMessageHandler>();
+            mockHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync((HttpRequestMessage request, CancellationToken ct) => {
+                    requestBody = request.Content?.ReadAsStringAsync().Result;
+                    return CreateTokenResponse();
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
+            var baseClient = new BaseClient(configuration, httpClient);
+            var metrics = new Metrics(configuration);
+
+            var oauth2Client = new OAuth2Client(credentials, baseClient, retryParams, metrics);
+            await oauth2Client.GetAccessTokenAsync();
+
+            Assert.NotNull(requestBody);
+            Assert.DoesNotContain("scope=", requestBody);
+        }
+
+        [Fact]
+        public async Task OAuth2_ExchangeToken_WorksWithoutAudience() {
+            var credentials = new Credentials {
+                Method = CredentialsMethod.ClientCredentials,
+                Config = new CredentialsConfig {
+                    ClientId = TestClientId,
+                    ClientSecret = TestClientSecret,
+                    ApiTokenIssuer = TestTokenIssuer,
+                    Scopes = "read write"
+                }
+            };
+            var retryParams = CreateTestRetryParams(maxRetry: 0, minWaitInMs: 10);
+
+            string? requestBody = null;
+            var mockHandler = new Mock<HttpMessageHandler>();
+            mockHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync((HttpRequestMessage request, CancellationToken ct) => {
+                    requestBody = request.Content?.ReadAsStringAsync().Result;
+                    return CreateTokenResponse();
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
+            var baseClient = new BaseClient(configuration, httpClient);
+            var metrics = new Metrics(configuration);
+
+            var oauth2Client = new OAuth2Client(credentials, baseClient, retryParams, metrics);
+            var token = await oauth2Client.GetAccessTokenAsync();
+
+            Assert.Equal("test-access-token", token);
+            Assert.NotNull(requestBody);
+            Assert.DoesNotContain("audience=", requestBody);
+            Assert.Contains("scope=read+write", requestBody);
+        }
+
+        [Fact]
+        public async Task OAuth2_ExchangeToken_IncludesBothAudienceAndScopes() {
+            var credentials = new Credentials {
+                Method = CredentialsMethod.ClientCredentials,
+                Config = new CredentialsConfig {
+                    ClientId = TestClientId,
+                    ClientSecret = TestClientSecret,
+                    ApiTokenIssuer = TestTokenIssuer,
+                    ApiAudience = TestAudience,
+                    Scopes = "openid profile"
+                }
+            };
+            var retryParams = CreateTestRetryParams(maxRetry: 0, minWaitInMs: 10);
+
+            string? requestBody = null;
+            var mockHandler = new Mock<HttpMessageHandler>();
+            mockHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync((HttpRequestMessage request, CancellationToken ct) => {
+                    requestBody = request.Content?.ReadAsStringAsync().Result;
+                    return CreateTokenResponse();
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
+            var baseClient = new BaseClient(configuration, httpClient);
+            var metrics = new Metrics(configuration);
+
+            var oauth2Client = new OAuth2Client(credentials, baseClient, retryParams, metrics);
+            await oauth2Client.GetAccessTokenAsync();
+
+            Assert.NotNull(requestBody);
+            Assert.Contains("audience=test-audience", requestBody);
+            Assert.Contains("scope=openid+profile", requestBody);
+        }
+
+        #endregion
+
         #region ApiTokenIssuer Path Handling
 
         [Theory]
