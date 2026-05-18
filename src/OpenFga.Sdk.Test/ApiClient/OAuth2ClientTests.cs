@@ -331,8 +331,10 @@ namespace OpenFga.Sdk.Test.ApiClient {
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync((HttpRequestMessage request, CancellationToken ct) => {
-                    requestBody = request.Content?.ReadAsStringAsync().Result;
+                .Returns(async (HttpRequestMessage request, CancellationToken ct) => {
+                    requestBody = request.Content is null
+                        ? null
+                        : await request.Content.ReadAsStringAsync();
                     return CreateTokenResponse();
                 });
 
@@ -361,8 +363,10 @@ namespace OpenFga.Sdk.Test.ApiClient {
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync((HttpRequestMessage request, CancellationToken ct) => {
-                    requestBody = request.Content?.ReadAsStringAsync().Result;
+                .Returns(async (HttpRequestMessage request, CancellationToken ct) => {
+                    requestBody = request.Content is null
+                        ? null
+                        : await request.Content.ReadAsStringAsync();
                     return CreateTokenResponse();
                 });
 
@@ -399,8 +403,10 @@ namespace OpenFga.Sdk.Test.ApiClient {
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync((HttpRequestMessage request, CancellationToken ct) => {
-                    requestBody = request.Content?.ReadAsStringAsync().Result;
+                .Returns(async (HttpRequestMessage request, CancellationToken ct) => {
+                    requestBody = request.Content is null
+                        ? null
+                        : await request.Content.ReadAsStringAsync();
                     return CreateTokenResponse();
                 });
 
@@ -440,8 +446,10 @@ namespace OpenFga.Sdk.Test.ApiClient {
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
                     ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync((HttpRequestMessage request, CancellationToken ct) => {
-                    requestBody = request.Content?.ReadAsStringAsync().Result;
+                .Returns(async (HttpRequestMessage request, CancellationToken ct) => {
+                    requestBody = request.Content is null
+                        ? null
+                        : await request.Content.ReadAsStringAsync();
                     return CreateTokenResponse();
                 });
 
