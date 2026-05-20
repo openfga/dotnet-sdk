@@ -131,8 +131,12 @@ public class OAuth2Client {
             { "grant_type", "client_credentials" }
         };
 
-        if (credentialsConfig.Config.ApiAudience != null) {
+        if (!string.IsNullOrWhiteSpace(credentialsConfig.Config.ApiAudience)) {
             _authRequest["audience"] = credentialsConfig.Config.ApiAudience;
+        }
+
+        if (!string.IsNullOrWhiteSpace(credentialsConfig.Config.Scopes)) {
+            _authRequest["scope"] = credentialsConfig.Config.Scopes;
         }
 
         _retryHandler = new RetryHandler(retryParams);
