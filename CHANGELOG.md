@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.10.3](https://github.com/openfga/dotnet-sdk/compare/v0.10.3-beta.1...v0.10.3) (2026-05-20)
+
+
+### Added
+
+* support OAuth2 scopes for client credentials authentication ([#218](https://github.com/openfga/dotnet-sdk/issues/218)) ([ff9fcff](https://github.com/openfga/dotnet-sdk/commit/ff9fcfff1b563e09a75631a5f7e6fa57c762abd9))
+
+
+### Miscellaneous
+
+* release 0.10.3 ([9c79f8e](https://github.com/openfga/dotnet-sdk/commit/9c79f8e84811a1d4ba3189ab44d1305159b54da8))
+
 ## [0.10.3-beta.1](https://github.com/openfga/dotnet-sdk/compare/v0.10.2...v0.10.3-beta.1) (2026-05-20)
 
 
