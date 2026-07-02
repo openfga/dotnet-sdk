@@ -54,7 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.9" />
     <Folder Include="Models"/>
     <None Include="../../assets/FGAIcon.png" Pack="true" Visible="false" PackagePath=""/>
     <None Include="../../README.md" Pack="true" PackagePath=""/>
