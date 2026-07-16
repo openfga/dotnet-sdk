@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -75,7 +76,8 @@ public class ClientCheckRequest : IClientCheckRequest, IEquatable<ClientCheckReq
             (
                 ContextualTuples == input.ContextualTuples ||
                 (ContextualTuples != null &&
-                 ContextualTuples.Equals(input.ContextualTuples))
+                 input.ContextualTuples != null &&
+                 ContextualTuples.SequenceEqual(input.ContextualTuples))
             ) &&
             (
                 this.Context == input.Context ||
@@ -112,7 +114,10 @@ public class ClientCheckRequest : IClientCheckRequest, IEquatable<ClientCheckReq
             }
 
             if (ContextualTuples != null) {
-                hashCode = (hashCode * 9923) + ContextualTuples.GetHashCode();
+                hashCode = (hashCode * 9923) + ContextualTuples.Count;
+                foreach (var contextualTuple in ContextualTuples) {
+                    hashCode = (hashCode * 9923) + (contextualTuple?.GetHashCode() ?? 0);
+                }
             }
 
             if (Context != null) {
