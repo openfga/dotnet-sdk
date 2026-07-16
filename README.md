@@ -981,6 +981,7 @@ var body = new List<ClientAssertion>() {new ClientAssertion() {
 await fgaClient.WriteAssertions(body, options);
 ```
 
+
 ### Calling Other Endpoints
 
 For advanced use cases where you need to call API endpoints not yet available in the SDK's typed methods, or when you need access to full response details (status code, headers, raw response), you can use `ApiExecutor.ExecuteAsync()`.
@@ -1044,8 +1045,8 @@ var options = new ClientRequestOptions {
 };
 
 var response = await executor.ExecuteAsync<object, TResponse>(
-    request, 
-    "CustomEndpoint", 
+    request,
+    "CustomEndpoint",
     options
 );
 ```
@@ -1106,6 +1107,7 @@ await foreach (var item in executor.ExecuteStreamingAsync<object, StreamedListOb
 ```
 
 For a complete example with all features, see the [ApiExecutor Example](./example/ApiExecutorExample/).
+
 
 ### Retries
 
