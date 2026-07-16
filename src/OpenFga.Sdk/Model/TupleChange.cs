@@ -127,6 +127,7 @@ namespace OpenFga.Sdk.Model {
                     this.Operation.Equals(input.Operation)
                 ) &&
                 (
+                    this.Timestamp == input.Timestamp ||
                     this.Timestamp.Equals(input.Timestamp)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.TryGetValue(kv.Key, out var inputValue) && Equals(kv.Value, inputValue)));

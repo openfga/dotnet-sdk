@@ -154,13 +154,11 @@ namespace OpenFga.Sdk.Model {
                 ) &&
                 (
                     this.CreatedAt == input.CreatedAt ||
-                    (this.CreatedAt != null &&
-                    this.CreatedAt.Equals(input.CreatedAt))
+                    this.CreatedAt.Equals(input.CreatedAt)
                 ) &&
                 (
                     this.UpdatedAt == input.UpdatedAt ||
-                    (this.UpdatedAt != null &&
-                    this.UpdatedAt.Equals(input.UpdatedAt))
+                    this.UpdatedAt.Equals(input.UpdatedAt)
                 ) &&
                 (
                     this.DeletedAt == input.DeletedAt ||
@@ -184,12 +182,8 @@ namespace OpenFga.Sdk.Model {
                 if (this.Name != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Name.GetHashCode();
                 }
-                if (this.CreatedAt != null) {
-                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.CreatedAt.GetHashCode();
-                }
-                if (this.UpdatedAt != null) {
-                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.UpdatedAt.GetHashCode();
-                }
+                hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.CreatedAt.GetHashCode();
+                hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.UpdatedAt.GetHashCode();
                 if (this.DeletedAt != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.DeletedAt.GetHashCode();
                 }
