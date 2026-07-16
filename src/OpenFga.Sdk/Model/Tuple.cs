@@ -115,8 +115,7 @@ namespace OpenFga.Sdk.Model {
                 ) &&
                 (
                     this.Timestamp == input.Timestamp ||
-                    (this.Timestamp != null &&
-                    this.Timestamp.Equals(input.Timestamp))
+                    this.Timestamp.Equals(input.Timestamp)
                 )
                 && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.TryGetValue(kv.Key, out var inputValue) && Equals(kv.Value, inputValue)));
         }
@@ -132,9 +131,7 @@ namespace OpenFga.Sdk.Model {
                 if (this.Key != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Key.GetHashCode();
                 }
-                if (this.Timestamp != null) {
-                    hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Timestamp.GetHashCode();
-                }
+                hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.Timestamp.GetHashCode();
                 if (this.AdditionalProperties != null) {
                     hashCode = (hashCode * FgaConstants.HashCodeMultiplierPrimeNumber) + this.AdditionalProperties.GetHashCode();
                 }
