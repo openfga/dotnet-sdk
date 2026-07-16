@@ -141,6 +141,38 @@ public class StreamingTests {
     }
 
     [Fact]
+    public async Task SendStreamingRequestAsync_ErrorChunkMidStream_ThrowsFgaApiError() {
+        var streamContent = "{\"result\":{\"object\":\"document:1\"}}\n" +
+                     "{\"error\":{\"code\":13,\"message\":\"internal stream error\"}}\n";
+        var mockHandler = CreateMockHttpHandler(HttpStatusCode.OK, streamContent);
+        var httpClient = new HttpClient(mockHandler.Object);
+        var config = new Sdk.Configuration.Configuration { ApiUrl = FgaConstants.TestApiUrl };
+        var baseClient = new BaseClient(config, httpClient);
+
+        var requestBuilder = new RequestBuilder<object> {
+            Method = HttpMethod.Post,
+            BasePath = FgaConstants.TestApiUrl,
+            PathTemplate = "/test",
+            PathParameters = new Dictionary<string, string>(),
+            QueryParameters = new Dictionary<string, string>(),
+            Body = new { }
+        };
+
+        var results = new List<StreamedListObjectsResponse>();
+        var exception = await Assert.ThrowsAsync<FgaApiError>(async () => {
+            await foreach (var item in baseClient.SendStreamingRequestAsync<object, StreamedListObjectsResponse>(
+                requestBuilder, null, "Test")) {
+                results.Add(item);
+            }
+        });
+
+        Assert.Contains("code: 13", exception.Message);
+        Assert.Contains("internal stream error", exception.Message);
+        Assert.Single(results);
+        Assert.Equal("document:1", results[0].Object);
+    }
+
+    [Fact]
     public async Task SendStreamingRequestAsync_EmptyLines_SkipsEmptyLines() {
         var streamContent = "{\"result\":{\"object\":\"document:1\"}}\n\n" +
                      "{\"result\":{\"object\":\"document:2\"}}\n";

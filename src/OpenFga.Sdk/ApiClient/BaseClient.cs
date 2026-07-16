@@ -1,4 +1,5 @@
 using OpenFga.Sdk.Exceptions;
+using OpenFga.Sdk.Model;
 using OpenFga.Sdk.Telemetry;
 using System;
 using System.Collections.Generic;
@@ -273,15 +274,23 @@ public class BaseClient : IDisposable {
             }
 
             T? parsedResult = default;
+            Status? streamError = null;
             try {
                 using var jsonDoc = JsonDocument.Parse(line);
                 var root = jsonDoc.RootElement;
-                if (root.TryGetProperty("result", out var resultElement)) {
+                if (root.TryGetProperty("error", out var errorElement) && errorElement.ValueKind == JsonValueKind.Object) {
+                    streamError = errorElement.Deserialize<Status>();
+                }
+                else if (root.TryGetProperty("result", out var resultElement)) {
                     parsedResult = resultElement.Deserialize<T>();
                 }
             }
             catch (JsonException) {
-                // Skip malformed lines — the server may send error envelopes or keep-alive pings
+                // Skip malformed lines — the server may send keep-alive pings
+            }
+
+            if (streamError != null) {
+                throw new FgaApiError($"Stream returned an error (code: {streamError.Code}): {streamError.Message}");
             }
 
             if (parsedResult != null) {
