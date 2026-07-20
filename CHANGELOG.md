@@ -5,12 +5,7 @@
 
 ### Fixed
 
-* compare contextual tuples by value ([#228](https://github.com/openfga/dotnet-sdk/issues/228)) ([0734480](https://github.com/openfga/dotnet-sdk/commit/0734480f1a3597b24dc8881eadb19be4e8642ec5))
-
-
-### Miscellaneous
-
-* release 0.10.4 ([53bc5bb](https://github.com/openfga/dotnet-sdk/commit/53bc5bb0131168b0c807e59d95d3e221845fc327))
+* compare contextual tuples by value ([#228](https://github.com/openfga/dotnet-sdk/issues/228)) ([0734480](https://github.com/openfga/dotnet-sdk/commit/0734480f1a3597b24dc8881eadb19be4e8642ec5)) , Thanks @ihopenre-eng
 
 ## [0.10.3](https://github.com/openfga/dotnet-sdk/compare/v0.10.2...v0.10.3) (2026-05-20)
 
