@@ -2513,7 +2513,11 @@ public class OpenFgaClientTests : IDisposable {
                 var content = req.Content!.ReadAsStringAsync().Result;
                 var writeRequest = JsonSerializer.Deserialize<WriteRequest>(content);
                 if (writeRequest != null) {
-                    capturedRequests.Add(writeRequest);
+                    // Chunked non-transaction writes are sent in parallel; guard the
+                    // shared list to avoid losing entries to a data race.
+                    lock (capturedRequests) {
+                        capturedRequests.Add(writeRequest);
+                    }
                 }
             });
 
