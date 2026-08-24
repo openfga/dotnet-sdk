@@ -8,6 +8,7 @@ using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Exceptions.Parsers;
 using OpenFga.Sdk.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -2495,7 +2496,8 @@ public class OpenFgaClientTests : IDisposable {
     /// </summary>
     [Fact]
     public async Task Write_NonTransactionWithConflictOptions_ShouldPassOptionsToAllRequests() {
-        var capturedRequests = new List<WriteRequest>();
+        // Chunked non-transaction writes are sent in parallel, so captures must be thread-safe.
+        var capturedRequests = new ConcurrentBag<WriteRequest>();
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -2513,11 +2515,7 @@ public class OpenFgaClientTests : IDisposable {
                 var content = req.Content!.ReadAsStringAsync().Result;
                 var writeRequest = JsonSerializer.Deserialize<WriteRequest>(content);
                 if (writeRequest != null) {
-                    // Chunked non-transaction writes are sent in parallel; guard the
-                    // shared list to avoid losing entries to a data race.
-                    lock (capturedRequests) {
-                        capturedRequests.Add(writeRequest);
-                    }
+                    capturedRequests.Add(writeRequest);
                 }
             });
 
