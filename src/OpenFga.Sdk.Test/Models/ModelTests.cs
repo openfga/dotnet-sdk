@@ -111,5 +111,47 @@ namespace OpenFga.Sdk.Test.Models {
 
             JsonSerializer.Deserialize<ListObjectsResponse>(jsonResponse);
         }
+        [Fact]
+        public void WriteRequestWritesEqualsNullSafety() {
+            var writesWithNull = new WriteRequestWrites(new List<TupleKey>(), onDuplicate: null);
+            var writesWithError = new WriteRequestWrites(new List<TupleKey>(), onDuplicate: WriteRequestWrites.OnDuplicateEnum.Error);
+            var writesWithNull2 = new WriteRequestWrites(new List<TupleKey>(), onDuplicate: null);
+
+            Assert.False(writesWithNull.Equals(writesWithError));
+            Assert.False(writesWithError.Equals(writesWithNull));
+            Assert.True(writesWithNull.Equals(writesWithNull2));
+
+            var writesNullProps1 = new WriteRequestWrites(new List<TupleKey>(), onDuplicate: null) { AdditionalProperties = null };
+            var writesNullProps2 = new WriteRequestWrites(new List<TupleKey>(), onDuplicate: null) { AdditionalProperties = null };
+            Assert.True(writesNullProps1.Equals(writesNullProps2));
+            Assert.False(writesNullProps1.Equals(writesWithNull));
+            Assert.False(writesWithNull.Equals(writesNullProps1));
+        }
+        [Fact]
+        public void WriteRequestDeletesEqualsNullSafety() {
+            var deletesWithNull = new WriteRequestDeletes(new List<TupleKeyWithoutCondition>(), onMissing: null);
+            var deletesWithError = new WriteRequestDeletes(new List<TupleKeyWithoutCondition>(), onMissing: WriteRequestDeletes.OnMissingEnum.Error);
+            var deletesWithNull2 = new WriteRequestDeletes(new List<TupleKeyWithoutCondition>(), onMissing: null);
+
+            Assert.False(deletesWithNull.Equals(deletesWithError));
+            Assert.False(deletesWithError.Equals(deletesWithNull));
+            Assert.True(deletesWithNull.Equals(deletesWithNull2));
+
+            var deletesNullProps1 = new WriteRequestDeletes(new List<TupleKeyWithoutCondition>(), onMissing: null) { AdditionalProperties = null };
+            var deletesNullProps2 = new WriteRequestDeletes(new List<TupleKeyWithoutCondition>(), onMissing: null) { AdditionalProperties = null };
+            Assert.True(deletesNullProps1.Equals(deletesNullProps2));
+            Assert.False(deletesNullProps1.Equals(deletesWithNull));
+            Assert.False(deletesWithNull.Equals(deletesNullProps1));
+        }
+        [Fact]
+        public void CheckRequestEqualsNullSafety() {
+            var checkWithDefault = new CheckRequest(new CheckRequestTupleKey("doc:1", "viewer", "user:anne"));
+            var checkWithNullProps1 = new CheckRequest(new CheckRequestTupleKey("doc:1", "viewer", "user:anne")) { AdditionalProperties = null };
+            var checkWithNullProps2 = new CheckRequest(new CheckRequestTupleKey("doc:1", "viewer", "user:anne")) { AdditionalProperties = null };
+
+            Assert.True(checkWithNullProps1.Equals(checkWithNullProps2));
+            Assert.False(checkWithNullProps1.Equals(checkWithDefault));
+            Assert.False(checkWithDefault.Equals(checkWithNullProps1));
+        }
     }
 }

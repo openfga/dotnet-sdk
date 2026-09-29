@@ -123,7 +123,7 @@ namespace OpenFga.Sdk.Model {
                     input.Computed != null &&
                     this.Computed.SequenceEqual(input.Computed)
                 )
-                && (this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.TryGetValue(kv.Key, out var inputValue) && Equals(kv.Value, inputValue)));
+                && (object.ReferenceEquals(this.AdditionalProperties, input.AdditionalProperties) || (this.AdditionalProperties != null && input.AdditionalProperties != null && this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.TryGetValue(kv.Key, out var inputValue) && Equals(kv.Value, inputValue))));
         }
 
         /// <summary>
