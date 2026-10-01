@@ -96,7 +96,7 @@ namespace OpenFga.Sdk.Model {
                     (this.Name != null &&
                     this.Name.Equals(input.Name))
                 )
-                && (object.ReferenceEquals(this.AdditionalProperties, input.AdditionalProperties) || (this.AdditionalProperties != null && input.AdditionalProperties != null && this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.TryGetValue(kv.Key, out var inputValue) && Equals(kv.Value, inputValue))));
+                 && (ReferenceEquals(this.AdditionalProperties, input.AdditionalProperties) || (this.AdditionalProperties != null && input.AdditionalProperties != null && this.AdditionalProperties.Count == input.AdditionalProperties.Count && this.AdditionalProperties.All(kv => input.AdditionalProperties.TryGetValue(kv.Key, out var inputValue) && Equals(kv.Value, inputValue))));
         }
 
         /// <summary>
