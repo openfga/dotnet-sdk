@@ -121,7 +121,12 @@ We strongly recommend you initialize the `OpenFgaClient` only once and then re-u
 ```csharp
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Configuration;
+using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Example {
     public class Example {
@@ -147,7 +152,12 @@ namespace Example {
 ```csharp
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Configuration;
+using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Example {
     public class Example {
@@ -179,7 +189,12 @@ namespace Example {
 ```csharp
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Configuration;
+using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Example {
     public class Example {
@@ -1131,7 +1146,12 @@ Apply your custom retry values by passing the object to the `ClientConfiguration
 ```csharp
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Configuration;
+using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Example {
     public class Example {
