@@ -228,6 +228,8 @@ namespace Example {
 }
 ```
 
+For a complete, runnable example, see [Example1](https://github.com/openfga/dotnet-sdk/tree/main/example/Example1).
+
 ### Custom Headers
 
 #### Default Headers
