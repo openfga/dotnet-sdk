@@ -50,6 +50,7 @@ See the OpenTelemetry docs on [Customizing the SDK](https://github.com/open-tele
 ```csharp
 using OpenFga.Sdk.Client;
 using OpenFga.Sdk.Client.Model;
+using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
 using OpenFga.Sdk.Telemetry;
 using OpenTelemetry;
