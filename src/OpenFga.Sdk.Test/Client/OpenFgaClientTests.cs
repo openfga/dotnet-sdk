@@ -1391,7 +1391,6 @@ public class OpenFgaClientTests : IDisposable {
     public async Task BatchCheckTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         string capturedContent = null;
-        int callCounter = 0;
 
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -1408,17 +1407,17 @@ public class OpenFgaClientTests : IDisposable {
                 }
             })
             .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
-                // Checks are sent in parallel, so the counter must be incremented atomically.
-                var call = Interlocked.Increment(ref callCounter);
-                return call switch {
-                    1 or 3 => Task.Run(async () => {
+                // Checks are sent in parallel, so respond by relation rather than call order.
+                var checkRequest = JsonSerializer.Deserialize<CheckRequest>(request.Content!.ReadAsStringAsync().Result);
+                return checkRequest!.TupleKey.Relation switch {
+                    "viewer" or "creator" => Task.Run(async () => {
                         await Task.Delay(500);
                         return new HttpResponseMessage() {
                             StatusCode = HttpStatusCode.OK,
                             Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
                         };
                     }),
-                    2 => Task.Run(async () => {
+                    "admin" => Task.Run(async () => {
                         await Task.Delay(500);
                         return new HttpResponseMessage() {
                             StatusCode = HttpStatusCode.OK,
@@ -1499,6 +1498,15 @@ public class OpenFgaClientTests : IDisposable {
         Assert.Equal(2, notAllowedResponses.Count);
         var failedResponses = response.Responses.FindAll(res => res.Error != null);
         Assert.Single(failedResponses);
+
+        // Responses arrive in completion order, so look each one up by its request's relation.
+        var responsesByRelation = response.Responses.ToDictionary(res => res.Request.Relation);
+        Assert.True(responsesByRelation["viewer"].Allowed);
+        Assert.True(responsesByRelation["creator"].Allowed);
+        Assert.False(responsesByRelation["admin"].Allowed);
+        Assert.Null(responsesByRelation["admin"].Error);
+        Assert.False(responsesByRelation["deleter"].Allowed);
+        Assert.IsType<FgaApiNotFoundError>(responsesByRelation["deleter"].Error);
     }
 
     /// <summary>
@@ -1712,7 +1720,6 @@ public class OpenFgaClientTests : IDisposable {
     public async Task ListRelationsTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         string capturedContent = null;
-        int callCounter = 0;
 
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -1729,14 +1736,14 @@ public class OpenFgaClientTests : IDisposable {
                 }
             })
             .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
-                // Checks are sent in parallel, so the counter must be incremented atomically.
-                var call = Interlocked.Increment(ref callCounter);
-                return call switch {
-                    1 or 3 => Task.FromResult(new HttpResponseMessage() {
+                // Checks are sent in parallel, so respond by relation rather than call order.
+                var checkRequest = JsonSerializer.Deserialize<CheckRequest>(request.Content!.ReadAsStringAsync().Result);
+                return checkRequest!.TupleKey.Relation switch {
+                    "can_view" or "can_delete" => Task.FromResult(new HttpResponseMessage() {
                         StatusCode = HttpStatusCode.OK,
                         Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
                     }),
-                    2 or 4 => Task.FromResult(new HttpResponseMessage() {
+                    "can_edit" or "can_rename" => Task.FromResult(new HttpResponseMessage() {
                         StatusCode = HttpStatusCode.OK,
                         Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
                     }),
@@ -1779,9 +1786,8 @@ public class OpenFgaClientTests : IDisposable {
         Assert.Contains("MINIMIZE_LATENCY", capturedContent);
 
         Assert.IsType<ListRelationsResponse>(response);
-        Assert.Equal(2, response.Relations.Count);
-        // TODO: Ensure the relations are correct, currently because the mocks are generic and we process in parallel,
-        // we do not know what order they will be processed in
+        // Relations are returned in completion order, so compare them sorted.
+        Assert.Equal(new[] { "can_delete", "can_view" }, response.Relations.OrderBy(r => r));
     }
 
     /// <summary>
@@ -1791,7 +1797,6 @@ public class OpenFgaClientTests : IDisposable {
     public async Task ListRelationsRelationNotFoundTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         string capturedContent = null;
-        int callCounter = 0;
 
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -1808,14 +1813,14 @@ public class OpenFgaClientTests : IDisposable {
                 }
             })
             .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
-                // Checks are sent in parallel, so the counter must be incremented atomically.
-                var call = Interlocked.Increment(ref callCounter);
-                return call switch {
-                    1 or 3 => Task.FromResult(new HttpResponseMessage() {
+                // Checks are sent in parallel, so respond by relation rather than call order.
+                var checkRequest = JsonSerializer.Deserialize<CheckRequest>(request.Content!.ReadAsStringAsync().Result);
+                return checkRequest!.TupleKey.Relation switch {
+                    "can_view" or "can_delete" => Task.FromResult(new HttpResponseMessage() {
                         StatusCode = HttpStatusCode.OK,
                         Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
                     }),
-                    2 => Task.FromResult(new HttpResponseMessage() {
+                    "can_edit" => Task.FromResult(new HttpResponseMessage() {
                         StatusCode = HttpStatusCode.OK,
                         Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
                     }),
