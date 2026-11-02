@@ -1408,8 +1408,9 @@ public class OpenFgaClientTests : IDisposable {
                 }
             })
             .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
-                callCounter++;
-                return callCounter switch {
+                // Checks are sent in parallel, so the counter must be incremented atomically.
+                var call = Interlocked.Increment(ref callCounter);
+                return call switch {
                     1 or 3 => Task.Run(async () => {
                         await Task.Delay(500);
                         return new HttpResponseMessage() {
@@ -1728,8 +1729,9 @@ public class OpenFgaClientTests : IDisposable {
                 }
             })
             .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
-                callCounter++;
-                return callCounter switch {
+                // Checks are sent in parallel, so the counter must be incremented atomically.
+                var call = Interlocked.Increment(ref callCounter);
+                return call switch {
                     1 or 3 => Task.FromResult(new HttpResponseMessage() {
                         StatusCode = HttpStatusCode.OK,
                         Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
@@ -1806,8 +1808,9 @@ public class OpenFgaClientTests : IDisposable {
                 }
             })
             .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
-                callCounter++;
-                return callCounter switch {
+                // Checks are sent in parallel, so the counter must be incremented atomically.
+                var call = Interlocked.Increment(ref callCounter);
+                return call switch {
                     1 or 3 => Task.FromResult(new HttpResponseMessage() {
                         StatusCode = HttpStatusCode.OK,
                         Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
