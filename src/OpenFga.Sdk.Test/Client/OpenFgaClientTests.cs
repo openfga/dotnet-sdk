@@ -1408,8 +1408,8 @@ public class OpenFgaClientTests : IDisposable {
             })
             .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
                 // Checks are sent in parallel, so respond by relation rather than call order.
-                var checkRequest = JsonSerializer.Deserialize<CheckRequest>(request.Content!.ReadAsStringAsync().Result);
-                return checkRequest!.TupleKey.Relation switch {
+                var relation = JsonSerializer.Deserialize<CheckRequest>(request.Content!.ReadAsStringAsync().Result)!.TupleKey.Relation;
+                return relation switch {
                     "viewer" or "creator" => Task.Run(async () => {
                         await Task.Delay(500);
                         return new HttpResponseMessage() {
@@ -1424,13 +1424,14 @@ public class OpenFgaClientTests : IDisposable {
                             Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
                         };
                     }),
-                    _ => Task.Run(async () => {
+                    "deleter" => Task.Run(async () => {
                         await Task.Delay(500);
                         return new HttpResponseMessage() {
                             StatusCode = HttpStatusCode.NotFound,
                             Content = Utils.CreateJsonStringContent(new Object { }),
                         };
-                    })
+                    }),
+                    _ => throw new InvalidOperationException($"Unexpected relation: {relation}")
                 };
             });
 
@@ -1737,8 +1738,8 @@ public class OpenFgaClientTests : IDisposable {
             })
             .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
                 // Checks are sent in parallel, so respond by relation rather than call order.
-                var checkRequest = JsonSerializer.Deserialize<CheckRequest>(request.Content!.ReadAsStringAsync().Result);
-                return checkRequest!.TupleKey.Relation switch {
+                var relation = JsonSerializer.Deserialize<CheckRequest>(request.Content!.ReadAsStringAsync().Result)!.TupleKey.Relation;
+                return relation switch {
                     "can_view" or "can_delete" => Task.FromResult(new HttpResponseMessage() {
                         StatusCode = HttpStatusCode.OK,
                         Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
@@ -1747,10 +1748,7 @@ public class OpenFgaClientTests : IDisposable {
                         StatusCode = HttpStatusCode.OK,
                         Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
                     }),
-                    _ => Task.FromResult(new HttpResponseMessage() {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Content = Utils.CreateJsonStringContent(new Object { }),
-                    })
+                    _ => throw new InvalidOperationException($"Unexpected relation: {relation}")
                 };
             });
 
@@ -1797,6 +1795,8 @@ public class OpenFgaClientTests : IDisposable {
     public async Task ListRelationsRelationNotFoundTest() {
         var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         string capturedContent = null;
+        // Checks are sent in parallel, so captures must be thread-safe.
+        var sentRelations = new ConcurrentBag<string>();
 
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -1814,8 +1814,9 @@ public class OpenFgaClientTests : IDisposable {
             })
             .Returns<HttpRequestMessage, CancellationToken>((request, token) => {
                 // Checks are sent in parallel, so respond by relation rather than call order.
-                var checkRequest = JsonSerializer.Deserialize<CheckRequest>(request.Content!.ReadAsStringAsync().Result);
-                return checkRequest!.TupleKey.Relation switch {
+                var relation = JsonSerializer.Deserialize<CheckRequest>(request.Content!.ReadAsStringAsync().Result)!.TupleKey.Relation;
+                sentRelations.Add(relation);
+                return relation switch {
                     "can_view" or "can_delete" => Task.FromResult(new HttpResponseMessage() {
                         StatusCode = HttpStatusCode.OK,
                         Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = true }),
@@ -1824,10 +1825,11 @@ public class OpenFgaClientTests : IDisposable {
                         StatusCode = HttpStatusCode.OK,
                         Content = Utils.CreateJsonStringContent(new CheckResponse { Allowed = false }),
                     }),
-                    _ => Task.FromResult(new HttpResponseMessage() {
+                    "can_rename" => Task.FromResult(new HttpResponseMessage() {
                         StatusCode = HttpStatusCode.NotFound,
                         Content = Utils.CreateJsonStringContent(new Object { }),
-                    })
+                    }),
+                    _ => throw new InvalidOperationException($"Unexpected relation: {relation}")
                 };
             });
 
@@ -1859,6 +1861,9 @@ public class OpenFgaClientTests : IDisposable {
                 req.Method == HttpMethod.Post),
             ItExpr.IsAny<CancellationToken>()
         );
+
+        // ListRelations throws the first error it finds, so also verify every requested relation was sent.
+        Assert.Equal(new[] { "can_delete", "can_edit", "can_rename", "can_view" }, sentRelations.OrderBy(r => r));
 
         // Verify the captured content contains the expected consistency setting
         Assert.Contains("MINIMIZE_LATENCY", capturedContent);
