@@ -85,7 +85,7 @@ jobs:
         run: dotnet test src/OpenFga.Sdk.Test/OpenFga.Sdk.Test.csproj --no-build --configuration Release --framework ${{ matrix.framework }} --verbosity normal --logger trx --results-directory TestResults/ --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: Upload test results
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.framework }}
@@ -147,7 +147,7 @@ jobs:
           done
 
       - name: Upload SDK artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: sdk-build-outputs
           path: src/OpenFga.Sdk/bin/Release/
@@ -194,7 +194,7 @@ jobs:
         run: ls -la artifact-pack
 
       - name: Upload NuGet package artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: nuget-package
           path: |
@@ -256,7 +256,7 @@ jobs:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
 
       - name: Download package artifact
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v4.1.8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v4.1.8
         with:
           name: nuget-package
           path: ./dist
