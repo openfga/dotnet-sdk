@@ -1499,7 +1499,7 @@ public class OpenFgaClientTests : IDisposable {
         var failedResponses = response.Responses.FindAll(res => res.Error != null);
         Assert.Single(failedResponses);
 
-        // Responses arrive in completion order, so look each one up by its request's relation.
+        // ClientBatchCheck returns responses in no particular order, so look each one up by its request's relation.
         var responsesByRelation = response.Responses.ToDictionary(res => res.Request.Relation);
         Assert.True(responsesByRelation["viewer"].Allowed);
         Assert.True(responsesByRelation["creator"].Allowed);
@@ -1786,7 +1786,7 @@ public class OpenFgaClientTests : IDisposable {
         Assert.Contains("MINIMIZE_LATENCY", capturedContent);
 
         Assert.IsType<ListRelationsResponse>(response);
-        // Relations are returned in completion order, so compare them sorted.
+        // ListRelations returns relations in no particular order, so compare them sorted.
         Assert.Equal(new[] { "can_delete", "can_view" }, response.Relations.OrderBy(r => r));
     }
 
