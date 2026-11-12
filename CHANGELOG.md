@@ -17,6 +17,11 @@
 
 * release 0.10.5 ([c53b27f](https://github.com/openfga/dotnet-sdk/commit/c53b27f94b67d2a3738be8b9eb342f1c83e46b16))
 
+
+### Security
+
+* Fixed [GHSA-q6gq-jv82-w5xf](https://github.com/openfga/dotnet-sdk/security/advisories/GHSA-q6gq-jv82-w5xf), where the API token or client secret could be exposed through the `RequestHeaders` and `RequestData` properties of exceptions raised for failed API and token requests. ([5cb4905](https://github.com/openfga/dotnet-sdk/commit/5cb490565df66b353e2969b976c4b1e637d29c1d))
+
 ## [0.10.4](https://github.com/openfga/dotnet-sdk/compare/v0.10.3...v0.10.4) (2026-07-19)
 
 
