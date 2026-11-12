@@ -14,6 +14,7 @@ using Moq.Protected;
 using OpenFga.Sdk.ApiClient;
 using OpenFga.Sdk.Client.Model;
 using OpenFga.Sdk.Configuration;
+using OpenFga.Sdk.Exceptions;
 using OpenFga.Sdk.Model;
 using System.Collections.Generic;
 using System.Linq;
@@ -377,6 +378,151 @@ namespace OpenFga.Sdk.Test.ApiClient {
                 ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>()
             );
+        }
+
+        #endregion
+
+        #region Sensitive Data Handling
+
+        private static RequestBuilder<object> CreateReadAuthorizationModelsRequest(SdkConfiguration config) =>
+            new RequestBuilder<object> {
+                Method = HttpMethod.Get,
+                BasePath = config.BasePath,
+                PathTemplate = $"/stores/{TestStoreId}/authorization-models",
+                Body = null
+            };
+
+        /// <summary>
+        /// When the token exchange fails, ApiClient wraps the error in an FgaApiAuthenticationError.
+        /// Neither the wrapper nor the wrapped (inner) exception may expose the client secret.
+        /// </summary>
+        [Fact]
+        public async Task ApiClient_WithOAuth_TokenExchangeFailure_DoesNotExposeClientSecret() {
+            var config = CreateOAuthConfiguration();
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req => req.RequestUri.ToString().Contains("/oauth/token")),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(() => new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.Unauthorized,
+                    Content = new StringContent("{\"error\":\"invalid_client\"}", System.Text.Encoding.UTF8, "application/json")
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var apiClient = new Sdk.ApiClient.ApiClient(config, httpClient);
+
+            var exception = await Assert.ThrowsAsync<FgaApiAuthenticationError>(() =>
+                apiClient.ApiExecutor.ExecuteAsync<object, ReadAuthorizationModelsResponse>(
+                    CreateReadAuthorizationModelsRequest(config), "ReadAuthorizationModels"));
+
+            Assert.Equal("Invalid Client Credentials", exception.Message);
+            Assert.Equal("ReadAuthorizationModels", exception.ApiName);
+
+            var inner = Assert.IsType<FgaApiAuthenticationError>(exception.InnerException);
+            Assert.Equal(HttpStatusCode.Unauthorized, inner.StatusCode);
+            Assert.Equal("ExchangeTokenAsync", inner.ApiName);
+
+#if !NETFRAMEWORK
+            // Since .NET Core 3.0, HttpClient leaves the in-memory request content intact after sending, so a redacted
+            // copy is retained. (.NET Framework disposes the request content, in which case the SDK drops it - fail closed.)
+            Assert.NotNull(inner.RequestData);
+#endif
+            if (inner.RequestData != null) {
+                var innerRequestBody = await inner.RequestData.ReadAsStringAsync();
+                Assert.Contains($"client_id={TestClientId}", innerRequestBody);
+                Assert.Contains("client_secret=[REDACTED]", innerRequestBody);
+                Assert.DoesNotContain(TestClientSecret, innerRequestBody);
+            }
+
+            Assert.DoesNotContain(TestClientSecret, exception.ToString());
+            Assert.DoesNotContain(TestClientSecret, inner.ToString());
+            Assert.DoesNotContain(TestClientSecret, inner.RequestHeaders?.ToString() ?? string.Empty);
+        }
+
+        /// <summary>
+        /// A failed API call must not retain the raw bearer token (API token) in the error's request headers.
+        /// </summary>
+        [Fact]
+        public async Task ApiClient_WithApiToken_ApiFailure_DoesNotExposeBearerToken() {
+            var config = CreateApiTokenConfiguration();
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(() => new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Content = new StringContent("{\"code\":\"validation_error\",\"message\":\"bad request\"}",
+                        System.Text.Encoding.UTF8, "application/json")
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var apiClient = new Sdk.ApiClient.ApiClient(config, httpClient);
+
+            var exception = await Assert.ThrowsAsync<FgaApiValidationError>(() =>
+                apiClient.ApiExecutor.ExecuteAsync<object, ReadAuthorizationModelsResponse>(
+                    CreateReadAuthorizationModelsRequest(config), "ReadAuthorizationModels"));
+
+            Assert.NotNull(exception.RequestHeaders);
+            Assert.True(exception.RequestHeaders.Contains("Authorization"));
+            Assert.Equal("Bearer [REDACTED]", Assert.Single(exception.RequestHeaders.GetValues("Authorization")));
+            Assert.DoesNotContain(TestApiToken, exception.RequestHeaders.ToString());
+            Assert.DoesNotContain(TestApiToken, exception.ToString());
+        }
+
+        /// <summary>
+        /// A failed API call must not retain the raw bearer token (OAuth access token) in the error's request
+        /// headers, while non-sensitive headers remain available for debugging.
+        /// </summary>
+        [Fact]
+        public async Task ApiClient_WithOAuth_ApiFailure_DoesNotExposeAccessToken() {
+            var config = CreateOAuthConfiguration();
+            var mockHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req => req.RequestUri.ToString().Contains("/oauth/token")),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(CreateOAuthTokenResponse());
+
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req => !req.RequestUri.ToString().Contains("/oauth/token")),
+                    ItExpr.IsAny<CancellationToken>()
+                )
+                .ReturnsAsync(() => new HttpResponseMessage {
+                    StatusCode = HttpStatusCode.NotFound,
+                    Content = new StringContent("{\"code\":\"store_id_not_found\",\"message\":\"not found\"}",
+                        System.Text.Encoding.UTF8, "application/json")
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var apiClient = new Sdk.ApiClient.ApiClient(config, httpClient);
+
+            var options = new ClientRequestOptions {
+                Headers = new Dictionary<string, string> { { "X-Custom-Header", "custom-value" } }
+            };
+
+            var exception = await Assert.ThrowsAsync<FgaApiNotFoundError>(() =>
+                apiClient.ApiExecutor.ExecuteAsync<object, ReadAuthorizationModelsResponse>(
+                    CreateReadAuthorizationModelsRequest(config), "ReadAuthorizationModels", options));
+
+            Assert.NotNull(exception.RequestHeaders);
+            Assert.Equal("Bearer [REDACTED]", Assert.Single(exception.RequestHeaders.GetValues("Authorization")));
+            Assert.Equal("custom-value", Assert.Single(exception.RequestHeaders.GetValues("X-Custom-Header")));
+            Assert.DoesNotContain(TestOAuthToken, exception.RequestHeaders.ToString());
+            Assert.DoesNotContain(TestClientSecret, exception.RequestHeaders.ToString());
+            Assert.DoesNotContain(TestOAuthToken, exception.ToString());
         }
 
         #endregion

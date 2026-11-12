@@ -39,7 +39,11 @@ public class FgaApiError : ApiException {
     public string? StoreId { get; internal set; }
 
     /// <summary>
-    /// The request data sent to the API
+    /// The request data sent to the API.
+    /// Credentials are redacted: for form-encoded bodies (the OAuth2 client credentials exchange) only
+    /// non-sensitive fields such as <c>client_id</c> and <c>grant_type</c> are preserved, while fields such as
+    /// <c>client_secret</c> are replaced with <c>[REDACTED]</c>. May be <see langword="null"/> when the body could
+    /// not be safely retained.
     /// </summary>
     [JsonPropertyName("request_data")]
     public HttpContent? RequestData { get; internal set; }
@@ -51,7 +55,8 @@ public class FgaApiError : ApiException {
     public HttpContent? ResponseData { get; internal set; }
 
     /// <summary>
-    /// The request headers sent to the API
+    /// A copy of the request headers sent to the API, with the value of credential-bearing headers
+    /// (e.g. <c>Authorization</c>) redacted.
     /// </summary>
     [JsonPropertyName("request_headers")]
     public HttpRequestHeaders RequestHeaders { get; internal set; }
@@ -170,8 +175,10 @@ public class FgaApiError : ApiException {
         ApiName = apiName;
         Method = request.Method;
         RequestUrl = request.RequestUri?.ToString();
-        RequestData = request.Content;
-        RequestHeaders = request.Headers;
+        // Never retain raw credentials on the exception: callers routinely log or serialize it, which would leak the
+        // client secret sent in the token exchange body or the bearer token sent in the Authorization header.
+        RequestData = SensitiveDataRedactor.RedactRequestContent(request.Content);
+        RequestHeaders = SensitiveDataRedactor.RedactRequestHeaders(request.Headers);
         ResponseData = response?.Content;
         ResponseHeaders = response?.Headers;
         ShouldRetry = shouldRetry;

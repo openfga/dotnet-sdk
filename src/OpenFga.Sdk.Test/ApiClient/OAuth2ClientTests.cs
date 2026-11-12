@@ -658,5 +658,137 @@ namespace OpenFga.Sdk.Test.ApiClient {
         }
 
         #endregion
+
+        #region Sensitive Data Handling
+
+        /// <summary>
+        /// Walks the full exception chain and asserts that the client secret is not reachable from any
+        /// surface that is commonly logged or serialized (Message, ToString, request data/headers/url).
+        /// </summary>
+        private static async Task AssertClientSecretIsNotExposed(Exception? exception, string clientSecret) {
+            Assert.NotNull(exception);
+
+            var depth = 0;
+            for (var current = exception; current != null; current = current.InnerException, depth++) {
+                Assert.True(depth < 10, "Exception chain is unexpectedly deep");
+
+                Assert.DoesNotContain(clientSecret, current.Message);
+                Assert.DoesNotContain(clientSecret, current.ToString());
+
+                if (current is not FgaApiError apiError) {
+                    continue;
+                }
+
+                Assert.DoesNotContain(clientSecret, apiError.RequestUrl ?? string.Empty);
+
+                if (apiError.RequestData != null) {
+                    var requestBody = await apiError.RequestData.ReadAsStringAsync();
+                    Assert.DoesNotContain(clientSecret, requestBody);
+                }
+
+                if (apiError.RequestHeaders != null) {
+                    Assert.DoesNotContain(clientSecret, apiError.RequestHeaders.ToString());
+                }
+            }
+        }
+
+        private static OAuth2Client CreateOAuth2ClientReturning(HttpStatusCode statusCode, string responseBody,
+            Credentials? credentials = null) {
+            var mockHandler = new Mock<HttpMessageHandler>();
+            mockHandler
+                .Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(() => new HttpResponseMessage {
+                    StatusCode = statusCode,
+                    Content = new StringContent(responseBody, System.Text.Encoding.UTF8, "application/json")
+                });
+
+            var httpClient = new HttpClient(mockHandler.Object);
+            var configuration = new SdkConfiguration { ApiUrl = Constants.FgaConstants.TestApiUrl };
+            var baseClient = new BaseClient(configuration, httpClient);
+            var metrics = new Metrics(configuration);
+
+            return new OAuth2Client(credentials ?? CreateTestCredentials(), baseClient,
+                CreateTestRetryParams(maxRetry: 0, minWaitInMs: 10), metrics);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.Unauthorized, typeof(FgaApiAuthenticationError))]
+        [InlineData(HttpStatusCode.Forbidden, typeof(FgaApiAuthenticationError))]
+        [InlineData(HttpStatusCode.BadRequest, typeof(FgaApiValidationError))]
+        [InlineData(HttpStatusCode.NotFound, typeof(FgaApiNotFoundError))]
+        [InlineData((HttpStatusCode)429, typeof(FgaApiRateLimitExceededError))]
+        [InlineData(HttpStatusCode.InternalServerError, typeof(FgaApiInternalError))]
+        [InlineData(HttpStatusCode.NotImplemented, typeof(FgaApiError))]
+        public async Task OAuth2_ExchangeTokenFailure_DoesNotExposeClientSecret(HttpStatusCode statusCode, Type expectedExceptionType) {
+            const string clientSecret = "super-secret-value-that-must-never-be-logged";
+            var credentials = CreateTestCredentials(clientSecret: clientSecret);
+            var oauth2Client = CreateOAuth2ClientReturning(statusCode,
+                "{\"error\":\"invalid_client\",\"error_description\":\"Client authentication failed\"}", credentials);
+
+            var exception = await Assert.ThrowsAnyAsync<FgaApiError>(() => oauth2Client.GetAccessTokenAsync());
+
+            Assert.IsType(expectedExceptionType, exception);
+            Assert.Equal(statusCode, exception.StatusCode);
+            await AssertClientSecretIsNotExposed(exception, clientSecret);
+        }
+
+        [Fact]
+        public async Task OAuth2_ExchangeTokenFailure_RedactsSecretButKeepsNonSensitiveRequestData() {
+            const string clientSecret = "super-secret-value-that-must-never-be-logged";
+            var credentials = CreateTestCredentials(clientSecret: clientSecret);
+            credentials.Config!.Scopes = "read write";
+            var oauth2Client = CreateOAuth2ClientReturning(HttpStatusCode.Unauthorized,
+                "{\"error\":\"invalid_client\"}", credentials);
+
+            var exception = await Assert.ThrowsAsync<FgaApiAuthenticationError>(() => oauth2Client.GetAccessTokenAsync());
+
+            // Request metadata that is useful for debugging must still be present
+            Assert.Equal(HttpMethod.Post, exception.Method);
+            Assert.Equal($"https://{TestTokenIssuer}/oauth/token", exception.RequestUrl);
+            Assert.Equal("ExchangeTokenAsync", exception.ApiName);
+
+#if !NETFRAMEWORK
+            // Since .NET Core 3.0, HttpClient leaves the in-memory request content intact after sending, so a redacted
+            // copy is retained. (.NET Framework disposes the request content, in which case the SDK drops it - fail closed.)
+            Assert.NotNull(exception.RequestData);
+#endif
+            if (exception.RequestData != null) {
+                Assert.Equal("application/x-www-form-urlencoded", exception.RequestData.Headers.ContentType?.MediaType);
+
+                var requestBody = await exception.RequestData.ReadAsStringAsync();
+                Assert.Contains($"client_id={TestClientId}", requestBody);
+                Assert.Contains("grant_type=client_credentials", requestBody);
+                Assert.Contains($"audience={TestAudience}", requestBody);
+                Assert.Contains("scope=read+write", requestBody);
+
+                // ... but the secret itself must be redacted
+                Assert.Contains("client_secret=[REDACTED]", requestBody);
+                Assert.DoesNotContain(clientSecret, requestBody);
+            }
+
+            await AssertClientSecretIsNotExposed(exception, clientSecret);
+        }
+
+        [Fact]
+        public async Task OAuth2_ExchangeTokenFailure_DoesNotExposeUrlEncodedClientSecret() {
+            // Secrets containing reserved characters are percent-encoded on the wire; make sure neither the raw
+            // nor the encoded representation is retained.
+            const string clientSecret = "s3cr3t&with=reserved chars+/?#";
+            var credentials = CreateTestCredentials(clientSecret: clientSecret);
+            var oauth2Client = CreateOAuth2ClientReturning(HttpStatusCode.Unauthorized,
+                "{\"error\":\"invalid_client\"}", credentials);
+
+            var exception = await Assert.ThrowsAsync<FgaApiAuthenticationError>(() => oauth2Client.GetAccessTokenAsync());
+
+            await AssertClientSecretIsNotExposed(exception, clientSecret);
+            await AssertClientSecretIsNotExposed(exception, Uri.EscapeDataString(clientSecret));
+            await AssertClientSecretIsNotExposed(exception, "s3cr3t");
+        }
+
+        #endregion
     }
 }
