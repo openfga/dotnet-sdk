@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.10.5](https://github.com/openfga/dotnet-sdk/compare/v0.10.4...v0.10.5) (2026-11-12)
+
+
+### Fixed
+
+* make AdditionalProperties null-safe in model Equals methods ([#124](https://github.com/openfga/dotnet-sdk/issues/124)) ([#239](https://github.com/openfga/dotnet-sdk/issues/239)) ([b7626ed](https://github.com/openfga/dotnet-sdk/commit/b7626ed1fb747c112670314582a97dfebefc1353))
+
+
+### Documentation
+
+* add missing using directives to code examples ([#245](https://github.com/openfga/dotnet-sdk/issues/245)) ([eb4de96](https://github.com/openfga/dotnet-sdk/commit/eb4de962d560adee2036a09a5d041597cf6f887a))
+
+
+### Miscellaneous
+
+* release 0.10.5 ([c53b27f](https://github.com/openfga/dotnet-sdk/commit/c53b27f94b67d2a3738be8b9eb342f1c83e46b16))
+
 ## [0.10.4](https://github.com/openfga/dotnet-sdk/compare/v0.10.3...v0.10.4) (2026-07-19)
 
 
