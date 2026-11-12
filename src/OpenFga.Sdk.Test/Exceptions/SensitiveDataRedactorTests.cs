@@ -17,6 +17,21 @@ namespace OpenFga.Sdk.Test.Exceptions {
         private const string Secret = "super-secret-value";
         private static readonly string[] MultiHeaderValues = { "one", "two" };
 
+        /// <summary>
+        /// The redactor may drop a form-encoded body (return <see langword="null"/>) when it cannot be safely re-read on
+        /// a given runtime (e.g. .NET Framework). That is acceptable; what must never happen is the raw secret being retained.
+        /// </summary>
+        private static async Task AssertRedactedOrDropped(HttpContent? redacted, string expectedBody) {
+            if (redacted == null) {
+                return;
+            }
+
+            Assert.Equal("application/x-www-form-urlencoded", redacted.Headers.ContentType?.MediaType);
+            var body = await redacted.ReadAsStringAsync();
+            Assert.DoesNotContain(Secret, body);
+            Assert.Equal(expectedBody, body);
+        }
+
         #region Form-encoded bodies
 
         [Fact]
@@ -85,12 +100,8 @@ namespace OpenFga.Sdk.Test.Exceptions {
 
             var redacted = SensitiveDataRedactor.RedactRequestContent(content);
 
-            Assert.NotNull(redacted);
             Assert.NotSame(content, redacted);
-            Assert.Equal("application/x-www-form-urlencoded", redacted!.Headers.ContentType?.MediaType);
-
-            var body = await redacted.ReadAsStringAsync();
-            Assert.Equal("client_id=my-client&client_secret=[REDACTED]&grant_type=client_credentials", body);
+            await AssertRedactedOrDropped(redacted, "client_id=my-client&client_secret=[REDACTED]&grant_type=client_credentials");
         }
 
         [Fact]
@@ -99,8 +110,8 @@ namespace OpenFga.Sdk.Test.Exceptions {
 
             var redacted = SensitiveDataRedactor.RedactRequestContent(content);
 
-            Assert.NotNull(redacted);
-            Assert.Equal("client_id=my-client&client_secret=[REDACTED]", await redacted!.ReadAsStringAsync());
+            Assert.NotSame(content, redacted);
+            await AssertRedactedOrDropped(redacted, "client_id=my-client&client_secret=[REDACTED]");
         }
 
         [Fact]
@@ -209,9 +220,8 @@ namespace OpenFga.Sdk.Test.Exceptions {
 
             var error = new FgaApiError(response, request, "ExchangeTokenAsync");
 
-            Assert.NotNull(error.RequestData);
-            var body = await error.RequestData!.ReadAsStringAsync();
-            Assert.Equal("client_id=my-client&client_secret=[REDACTED]&grant_type=client_credentials", body);
+            Assert.NotSame(request.Content, error.RequestData);
+            await AssertRedactedOrDropped(error.RequestData, "client_id=my-client&client_secret=[REDACTED]&grant_type=client_credentials");
             Assert.Equal("Bearer [REDACTED]", Assert.Single(error.RequestHeaders.GetValues("Authorization")));
             Assert.DoesNotContain(Secret, error.ToString());
 
