@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -74,13 +75,17 @@ internal static class SensitiveDataRedactor {
         }
 
         try {
-            var readTask = content.ReadAsStringAsync();
-            if (!readTask.IsCompleted) {
+            // CopyToAsync is used rather than ReadAsStringAsync: on .NET Framework the latter buffers through a
+            // continuation that is not inlined, so it never reports completion synchronously even for in-memory content.
+            using var buffer = new MemoryStream();
+            var copyTask = content.CopyToAsync(buffer);
+            if (!copyTask.IsCompleted) {
                 // Never block inside exception construction; drop the body instead.
                 return null;
             }
 
-            var body = readTask.GetAwaiter().GetResult();
+            copyTask.GetAwaiter().GetResult();
+            var body = GetEncoding(content).GetString(buffer.ToArray());
             return new StringContent(RedactFormUrlEncodedBody(body), Encoding.UTF8, FormUrlEncodedMediaType);
         }
         catch {
@@ -145,6 +150,20 @@ internal static class SensitiveDataRedactor {
 
     private static bool IsFormUrlEncoded(HttpContent content) =>
         string.Equals(content.Headers.ContentType?.MediaType, FormUrlEncodedMediaType, StringComparison.OrdinalIgnoreCase);
+
+    private static Encoding GetEncoding(HttpContent content) {
+        var charSet = content.Headers.ContentType?.CharSet;
+        if (string.IsNullOrEmpty(charSet)) {
+            return Encoding.UTF8;
+        }
+
+        try {
+            return Encoding.GetEncoding(charSet!.Trim('"'));
+        }
+        catch (ArgumentException) {
+            return Encoding.UTF8;
+        }
+    }
 
     private static string DecodeFormComponent(string value) => Uri.UnescapeDataString(value.Replace('+', ' '));
 

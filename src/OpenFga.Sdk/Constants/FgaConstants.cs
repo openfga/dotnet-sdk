@@ -20,7 +20,7 @@ public static class FgaConstants {
     /// <summary>
     /// Version of the OpenFGA .NET SDK.
     /// </summary>
-    public const string SdkVersion = "0.10.4"; // x-release-please-version
+    public const string SdkVersion = "0.10.5"; // x-release-please-version
 
     /// <summary>
     /// User agent used in HTTP requests.
